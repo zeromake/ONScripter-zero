@@ -91,7 +91,7 @@ GlesRenderer::GlesRenderer(SDL_Window *window, SDL_Texture *texture, const float
 #else
 #define SDL_PROC(ret,func,params) \
     do { \
-        func = utils::auto_cast(SDL_GL_GetProcAddress(#func)); \
+        func = static_cast<func##_T>(SDL_GL_GetProcAddress(#func)); \
         if ( ! func ) { \
             SDL_SetError("Couldn't load GLES2 function %s: %s", #func, SDL_GetError()); \
             utils::printError("Couldn't load GLES2 function %s: %s", #func, SDL_GetError()); \

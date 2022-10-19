@@ -29,12 +29,15 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "SarReader.h"
+#include "coding2utf16.h"
 #ifdef _WIN32
 #include <direct.h>
 inline int mkdir(const char *pathname, int unused){
   return _mkdir(pathname);
 }
 #endif
+
+Coding2UTF16 *coding2utf16;
 
 extern int errno;
 

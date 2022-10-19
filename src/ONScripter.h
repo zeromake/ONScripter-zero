@@ -36,7 +36,7 @@
 
 #if defined(USE_SMPEG)
 #include <smpeg.h>
-#endif    
+#endif
 
 #define DEFAULT_VIDEO_SURFACE_FLAG (SDL_SWSURFACE)
 

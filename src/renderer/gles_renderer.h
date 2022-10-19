@@ -36,7 +36,9 @@ class GlesRenderer {
 	int output_size[2];
 	bool _pause = false;
 #if !(defined(IOS) || defined(ANDROID))
-#define SDL_PROC(ret,func,params) ret (APIENTRY *func) params;
+#define SDL_PROC(ret,func,params) ret (APIENTRY *func) params;\
+	typedef ret (APIENTRY *func##_T) params;
+
 #include "gles2funcs.h"
 #undef SDL_PROC
 #endif

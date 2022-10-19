@@ -85,22 +85,6 @@ namespace utils{
 	template<class T> T clamp(T x, T min, T max){
         return x < min ? min : (x > max ? max : x);
     }
-
-	template <typename From>
-	class auto_cast {
-	public:
-		explicit constexpr auto_cast(From const& t) noexcept
-				: val { t }
-		{}
-
-		template <typename To>
-		constexpr operator To() const noexcept(noexcept(static_cast<To>(std::declval<From>()))) {
-			return static_cast<To>(val);
-		}
-
-	private:
-		From const& val;
-	};
 }
 
 #endif
