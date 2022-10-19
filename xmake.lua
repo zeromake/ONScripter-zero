@@ -2,7 +2,7 @@ add_rules("mode.debug", "mode.release")
 
 add_requires("libsdl", "libsdl_image", "libsdl_ttf", "libsdl_mixer", "bzip2", "libjpeg")
 add_includedirs("src")
-add_defines("XMD_H=1")
+add_defines("XMD_H=1", "USE_SIMD_X86_AVX2=1")
 add_cxxflags("/UNICODE")
 add_defines("UNICODE", "_UNICODE")
 
