@@ -2,9 +2,14 @@ add_rules("mode.debug", "mode.release")
 
 add_requires("libsdl", "libsdl_image", "libsdl_ttf", "libsdl_mixer", "bzip2", "libjpeg", "luajit")
 add_includedirs("src")
-add_defines("XMD_H=1", "USE_SIMD_X86_AVX2=1")
-add_cxxflags("/UNICODE")
-add_defines("UNICODE", "_UNICODE")
+add_defines("USE_SIMD_X86_AVX2=1")
+set_languages("c++11")
+
+if is_host("windows") then
+    add_defines("XMD_H=1")
+    add_cxxflags("/utf-8", "/UNICODE")
+    add_defines("UNICODE", "_UNICODE")
+end
 
 target("nsaconv")
     set_kind("binary")
@@ -62,6 +67,9 @@ target("sardec")
 target("onscripter")
     set_kind("binary")
     add_packages("bzip2", "libjpeg")
+    if is_host("macosx") then
+        add_frameworks("OpenGL")
+    end
     add_packages("libsdl", "libsdl_image", "libsdl_ttf", "libsdl_mixer", "luajit")
     add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_LUA=1", "USE_PARALLEL=1")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/builtin_dll/*.cpp")

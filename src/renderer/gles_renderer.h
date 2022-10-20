@@ -20,7 +20,11 @@
 */
 #pragma once
 #include <SDL.h>
+#ifndef __APPLE__
 #include <SDL_opengles2.h>
+#else
+#include <SDL_opengl.h>
+#endif
 
 class GlesRenderer {
     SDL_Window *window;
@@ -36,8 +40,13 @@ class GlesRenderer {
 	int output_size[2];
 	bool _pause = false;
 #if !(defined(IOS) || defined(ANDROID))
-#define SDL_PROC(ret,func,params) ret (APIENTRY *func) params;\
-	typedef ret (APIENTRY *func##_T) params;
+#ifdef __APPLE__
+#define SDL_PROC(ret,func,params) ret(*func) params;\
+	typedef ret (*func##_T) params;
+#else
+#define SDL_PROC(ret,func,params) ret (__stdcall *func) params;\
+	typedef ret (__stdcall *func##_T) params;
+#endif
 
 #include "gles2funcs.h"
 #undef SDL_PROC
