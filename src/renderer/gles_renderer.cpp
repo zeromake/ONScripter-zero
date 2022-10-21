@@ -86,7 +86,7 @@ void GlesRenderer::initVertexData() {
 }
 
 GlesRenderer::GlesRenderer(SDL_Window *window, SDL_Texture *texture, const float input_size[2], const float output_size[2], const float sharpness) {
-#if defined(IOS) || defined(ANDROID) || defined(__APPLE__)
+#if defined(IOS) || defined(ANDROID)
 //#define SDL_PROC(ret,func,params) func=func;
 #else
 #define SDL_PROC(ret,func,params) \

@@ -3,3 +3,10 @@ build
 .vscode
 *.a
 *.o
+
+3rd/*
+!3rd/fetch.lua
+!3rd/copy.lua
+!3rd/xmake.lua
+!3rd/pre
+!3rd/.include

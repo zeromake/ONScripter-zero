@@ -277,7 +277,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             skip_whitespace_flag = false;
             continue;
         }
-#endif            
+#endif
 
 #ifndef FORCE_1BYTE_CHAR            
         if (cache_info && !cache_info->is_tight_region){

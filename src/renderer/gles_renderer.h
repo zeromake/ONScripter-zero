@@ -23,6 +23,8 @@
 #ifndef __APPLE__
 #include <SDL_opengles2.h>
 #else
+// #include <OpenGLES/ES2/gl.h>
+// #include <OpenGLES/ES2/glext.h>
 #include <SDL_opengl.h>
 #endif
 
