@@ -1128,23 +1128,32 @@ void ScriptHandler::readConfiguration()
         SKIP_SPACE(buf);
         if (!strncmp( buf, "mode", 4 )){
             buf += 4;
-            if      (!strncmp( buf, "800", 3 )){
-                screen_width  = 800;
-                screen_height = 600;
-                buf += 3;
+            screen_width = 0;
+            screen_height = 0;
+            while (*buf >= '0' && *buf <= '9') {
+                screen_width *= 10;
+                screen_width += (*buf - '0');
+                buf += 1;
             }
-            else if (!strncmp( buf, "400", 3 )){
-                screen_width  = 400;
-                screen_height = 300;
-                buf += 3;
+            if (*buf == 'x' || *buf == '*') {
+                buf += 1;
+                while (*buf >= '0' && *buf <= '9') {
+                    screen_height *= 10;
+                    screen_height += (*buf - '0');
+                    buf += 1;
+                }
             }
-            else if (!strncmp( buf, "320", 3 )){
-                screen_width  = 320;
-                screen_height = 240;
-                buf += 3;
+            if (screen_height == 0) {
+                if (screen_width == 800 ){
+                    screen_height = 600;
+                } else if (screen_width = 400){
+                    screen_height = 300;
+                } else if (screen_width == 320){
+                    screen_height = 240;
+                } else {
+                    break;
+                }
             }
-            else
-                break;
         }
         else if (!strncmp( buf, "value", 5 ) ||
                  *buf == 'g' || *buf == 'G'){
@@ -1172,18 +1181,46 @@ void ScriptHandler::readConfiguration()
             screen_height = 0;
             while (*buf >= '0' && *buf <= '9')
                 screen_height = screen_height*10 + *buf++ - '0';
-        }
-        else if (*buf == 'l' || *buf == 'L'){
+        } else if (*buf == 'l' || *buf == 'L'){
             buf++;
             SKIP_SPACE(buf);
             while (*buf >= '0' && *buf <= '9') buf++;
-        }
-        else if (*buf != ',')
+        } else if (!strncmp(buf, "rescale", 7)) {
+            buf += 7;
+            int _screen_ratio1 = 0;
+            int _screen_ratio2 = 0;
+            while (*buf >= '0' && *buf <= '9') {
+                _screen_ratio1 *= 10;
+                _screen_ratio1 += (*buf - '0');
+                buf += 1;
+            }
+            if (*buf == '/') {
+                buf += 1;
+                while (*buf >= '0' && *buf <= '9') {
+                    _screen_ratio2 *= 10;
+                    _screen_ratio2 += (*buf - '0');
+                    buf += 1;
+                }
+            }
+            if (_screen_ratio1 == 0 || _screen_ratio2 == 0) {
+                _screen_ratio1 = 1;
+                _screen_ratio2 = 1;
+            }
+            if (screen_ratio1 == 0 && screen_ratio2 == 0) {
+                screen_ratio1 = _screen_ratio1;
+                screen_ratio2 = _screen_ratio2;
+            }
+        } else if (*buf != ',') {
             break;
+        }
 
         SKIP_SPACE(buf);
         if (!config_flag && *buf != ',') break;
         if (*buf == ',') buf++;
+    }
+    if (screen_ratio1 > 0 && screen_ratio2 > 0) {
+        screen_width *= screen_ratio1 / screen_ratio2;
+        screen_height *= screen_ratio1 / screen_ratio2;
     }
 }
 

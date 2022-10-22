@@ -172,6 +172,7 @@ public:
     int arcCommand();
     int addkinsokuCommand();
     int addCommand();
+    void setRescale(int scale1, int scale2);
     
 protected:
     struct UserFuncLUT{
@@ -272,6 +273,7 @@ protected:
 
     /* ---------------------------------------- */
     /* Global definitions */
+    bool init_screen_ratio;
     int screen_ratio1, screen_ratio2;
     int screen_width, screen_height;
     int screen_device_width, screen_device_height;

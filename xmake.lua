@@ -1,13 +1,14 @@
 add_rules("mode.debug", "mode.release")
 
-add_requires("libsdl_ttf", "libsdl_mixer", "luajit")
+add_requires("libsdl_mixer")
 add_includedirs("src")
 add_defines("USE_SIMD_X86_AVX2=1")
-set_languages("c++11")
+-- set_languages("cxx11")
 
 if is_host("windows") then
     add_defines("XMD_H=1")
-    add_cxxflags("/utf-8", "/UNICODE")
+    add_cxflags("/utf-8")
+    add_cxflags("/UNICODE")
     add_defines("UNICODE", "_UNICODE")
 end
 
@@ -22,10 +23,12 @@ target("nsaconv")
         "src/coding2utf16.cpp",
         "src/conv_shared.cpp",
         "src/gbk2utf16.cpp",
+        "src/sjis2utf16.cpp",
         "src/NsaReader.cpp",
         "src/SarReader.cpp",
         "src/DirectReader.cpp",
-        "src/resize_image.cpp"
+        "src/resize_image.cpp",
+        "src/language/*.cpp"
     )
 
 target("nsadec")
@@ -34,9 +37,12 @@ target("nsadec")
     add_files(
         "tools/nsadec.cpp",
         "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/sjis2utf16.cpp",
         "src/NsaReader.cpp",
         "src/DirectReader.cpp",
-        "src/SarReader.cpp"
+        "src/SarReader.cpp",
+        "src/language/*.cpp"
     )
 
 target("nscriptdecode")
@@ -69,7 +75,7 @@ target("sardec")
 
 target("onscripter")
     set_kind("binary")
-    add_links("bzip2", "jpeg", "sdl2", "sdl2_image")
+    add_links("bzip2", "jpeg", "sdl2", "sdl2_image", "sdl2_ttf", "z", "freetype", "brotli", "harfbuzz")
     if is_host("macosx") then
         add_frameworks(
             "OpenGL",
@@ -88,8 +94,11 @@ target("onscripter")
             "CoreHaptics"
         )
         add_syslinks("iconv")
+    elseif is_host("windows") then
+        add_syslinks("gdi32", "user32", "winmm", "shell32", "setupapi", "advapi32", "ole32", "version", "imm32", "oleaut32")
     end
-    add_packages("libsdl_ttf", "libsdl_mixer", "luajit")
-    add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_LUA=1", "USE_PARALLEL=1")
-    add_files("src/*.cpp", "src/renderer/*.cpp", "src/builtin_dll/*.cpp")
-    remove_files("src/AVIWrapper.cpp")
+    add_packages("libsdl_ttf", "libsdl_mixer")
+    add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
+    add_files("src/*.cpp", "src/renderer/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
+    add_files("src/resource.rc")
+    remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")

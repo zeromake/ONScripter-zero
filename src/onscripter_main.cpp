@@ -62,11 +62,12 @@ void optionHelp()
     printf( "      --window\t\tstart in windowed mode\n");
     printf( "      --force-button-shortcut\tignore useescspc and getenter command\n");
     printf( "      --enable-wheeldown-advance\tadvance the text on mouse wheel down\n");
+    printf( "      --rescale \tdo rescale the images in the archives\n");
     printf( "      --disable-rescale\tdo not rescale the images in the archives\n");
     printf( "      --render-font-outline\trender the outline of a text instead of casting a shadow\n");
     printf( "      --edit\t\tenable online modification of the volume and variables when 'z' is pressed\n");
     printf( "      --key-exe file\tset a file (*.EXE) that includes a key table\n");
-    printf( "      --enc:sjis\tuse sjis coding script\n");
+    printf( "      --enc:sjis|gbk\tuse sjis|gbk coding script\n");
     printf( "      --debug:1\t\tprint debug info\n");
     printf( "      --fontcache\tcache default font\n");
     printf( "  -h, --help\t\tshow this help and exit\n");
@@ -302,6 +303,25 @@ void parseOption(int argc, char *argv[]) {
             }
             else if (!strcmp(argv[0]+1, "-enc:sjis")){
                 if (coding2utf16 == NULL) coding2utf16 = new SJIS2UTF16();
+            }
+            else if (!strcmp(argv[0]+1, "-enc:gbk")){
+                if (coding2utf16 == NULL) coding2utf16 = new GBK2UTF16();
+            }
+            else if (!strcmp(argv[0]+1, "-rescale")) {
+                argc--;
+                argv++;
+                int screen_ratio1 = 0;
+                int screen_ratio2 = 1;
+                char* buf = argv[0];
+                while (*buf >= '0' && *buf <= '9') {
+                    screen_ratio1 *= 10;
+                    screen_ratio1 += (*buf - '0');
+                    buf += 1;
+                }
+                if (screen_ratio1 == 0) {
+                    screen_ratio1 = 1;
+                }
+                ons.setRescale(screen_ratio1, screen_ratio2);
             }
             else if (!strcmp(argv[0]+1, "-debug:1")){
                 ons.setDebugLevel(1);
