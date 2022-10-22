@@ -33,13 +33,15 @@
 #include "gbk2utf16.h"
 #ifdef _WIN32
 #include <direct.h>
+#include <string>
+#include <algorithm>
 inline int mkdir(const char *pathname, int unused){
 	return _mkdir(pathname);
 }
 #endif
 
 extern int errno;
-Coding2UTF16 *coding2utf16;
+Coding2UTF16 *coding2utf16 = new GBK2UTF16();
 
 int main( int argc, char **argv )
 {
@@ -52,7 +54,9 @@ int main( int argc, char **argv )
     int archive_type = BaseReader::ARCHIVE_TYPE_NSA;
     FILE *fp;
     struct stat file_stat;
-
+    char *out = "";
+    bool useLower = false;
+    bool vLog = false;
     if ( argc >= 2 ){
         while ( argc > 2 ){
 			if (!strcmp(argv[1], "-ns2")) {
@@ -61,14 +65,21 @@ int main( int argc, char **argv )
                 nsa_offset = atoi(argv[2]);
                 argc--;
                 argv++;
+            } else if (!strcmp(argv[1], "-out")) {
+                out = argv[2];
+                argc--;
+                argv++;
+            } else if (!strcmp(argv[1], "-lower")) {
+                useLower = true;
+            } else if (!strcmp(argv[1], "-v")) {
+                vLog = true;
             }
-
             argc--;
             argv++;
         }
     }
     if ( argc != 2 ){
-        fprintf( stderr, "Usage: nsadec [-offset ##] [-ns2] arc_file\n");
+        fprintf( stderr, "Usage: nsadec [-offset ##] [-ns2] [-out dir] [-lower] arc_file\n");
         exit(-1);
     }
     cNR.openForConvert( argv[1], archive_type, nsa_offset );
@@ -87,8 +98,16 @@ int main( int argc, char **argv )
             length = sFI.length;
             //continue;
         }
-
-        strcpy( file_name, sFI.name );
+        if (out[0] != '\0') {
+            sprintf(file_name, "%s/%s", out, sFI.name);
+        } else {
+            strcpy(file_name, sFI.name);
+        }
+        if (useLower) {
+            std::string s = file_name;
+            std::transform(s.begin(), s.end(), s.begin(), std::tolower);
+            strcpy(file_name, s.c_str());
+        }
         for ( j=0 ; j<strlen(file_name) ; j++ ){
             if ( file_name[j] == '\\' ){
                 file_name[j] = '/';
@@ -101,6 +120,11 @@ int main( int argc, char **argv )
             }
         }
     
+        if (vLog) {
+            printf("\033[Kouting %s\t\t%.2fkb\t\t%d/%d\r", file_name, float(length) / 1024.0f, i, count);
+        } else {
+            printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
+        }
         if ( (fp = fopen( file_name, "wb" ) )){
             fwrite( buffer, 1, length, fp );
             fclose(fp);

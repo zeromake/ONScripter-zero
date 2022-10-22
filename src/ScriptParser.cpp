@@ -273,6 +273,10 @@ void ScriptParser::reset()
 
 int ScriptParser::openScript()
 {
+    if (init_screen_ratio) {
+        script_h.screen_ratio1 = screen_ratio1;
+        script_h.screen_ratio2 = screen_ratio2;
+    }
     script_h.cBR = new NsaReader( 0, archive_path, BaseReader::ARCHIVE_TYPE_NS2, key_table );
     if (script_h.cBR->open( nsa_path )){
         delete script_h.cBR;
@@ -284,8 +288,18 @@ int ScriptParser::openScript()
 
     screen_width  = script_h.screen_width;
     screen_height = script_h.screen_height;
-
+    if (!init_screen_ratio) {
+        setRescale(script_h.screen_ratio1, script_h.screen_ratio2);
+    }
     return 0;
+}
+
+void ScriptParser::setRescale(int scale1, int scale2) {
+    if (scale1 > 0 && scale2 > 0) {
+        init_screen_ratio = true;
+        screen_ratio1 = scale1;
+        screen_ratio2 = scale2;
+    }
 }
 
 unsigned char ScriptParser::convHexToDec( char ch )

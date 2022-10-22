@@ -56,6 +56,23 @@ local headerFiles = {
             "SDL_image.h",
         },
     },
+    {
+        "zlib/zlib-1.2.13/",
+        {
+            "zlib.h",
+            "zconf.h",
+        },
+    },
+    {
+        "libsdl_ttf/SDL2_ttf-2.20.1/",
+        {
+            "SDL_ttf.h",
+        }
+    },
+    {
+        "fmt/fmt-9.1.0/",
+        "/include/fmt/"
+    },
 }
 
 for _, item in ipairs(headerFiles) do

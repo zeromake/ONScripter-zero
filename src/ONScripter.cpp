@@ -152,8 +152,14 @@ void ONScripter::initSDL()
     }
     
     // use hardware scaling
-    screen_ratio1 = 1;
-    screen_ratio2 = 1;
+    
+    if (script_h.screen_ratio1 > 0 && script_h.screen_ratio2 > 0) {
+        screen_ratio1 = script_h.screen_ratio1;
+        screen_ratio2 = script_h.screen_ratio2;
+    } else {
+        screen_ratio1 = 1;
+        screen_ratio2 = 1;
+    }
     screen_width  = script_h.screen_width;
     screen_height = script_h.screen_height;
     screen_scale_ratio1 = (float)screen_width / screen_device_width;
