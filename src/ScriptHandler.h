@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include "BaseReader.h"
 
 #define IS_TWO_BYTE(x) \
@@ -235,6 +236,8 @@ public:
     
     int screen_width;
     int screen_height;
+    int screen_ratio1;
+    int screen_ratio2;
     int variable_range;
     int global_variable_border;
 

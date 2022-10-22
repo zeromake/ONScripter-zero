@@ -71,7 +71,6 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface)
     }
     SDL_UnlockSurface( surface );
 }
-
 void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char* text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
 {
     unsigned short unicode;
