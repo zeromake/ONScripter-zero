@@ -41,7 +41,7 @@ extern "C" void waveCallback(int channel);
 #define FONT_FILE "default.ttf"
 #define REGISTRY_FILE "registry.txt"
 #define DLL_FILE "dll.txt"
-#define DEFAULT_ENV_FONT "����"
+#define DEFAULT_ENV_FONT "Microsoft Yahei"
 #define DEFAULT_AUTOMODE_TIME 1000
 
 #ifdef __OS2__
@@ -97,12 +97,36 @@ void ONScripter::initSDL()
 {
     /* ---------------------------------------- */
     /* Initialize SDL */
-
-    if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) < 0 ){
+    // 
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0){
         utils::printError("Couldn't initialize SDL: %s\n", SDL_GetError());
         exit(-1);
     }
-
+    int count = SDL_GetNumAudioDrivers();
+    #if defined(_WIN32)
+    const char* firstAudioDriver = "directsound";
+    #else
+    const char* firstAudioDriver = "";
+    #endif
+    const char* defaultAudioDriver = NULL;
+    const char* useAudioDriver = NULL;
+    for (int i = 0; i < count; i++) {
+        auto audioDriverName = SDL_GetAudioDriver(i);
+        if (defaultAudioDriver == NULL) {
+            defaultAudioDriver = audioDriverName;
+        }
+        if (!strcmp(audioDriverName, firstAudioDriver)) {
+            useAudioDriver = firstAudioDriver;
+            break;
+        }
+    }
+    if (useAudioDriver == NULL) {
+        useAudioDriver = defaultAudioDriver;
+    }
+    if (SDL_AudioInit(useAudioDriver) < 0) {
+        utils::printError("Couldn't initialize SDL Audio: %s\n", SDL_GetError());
+        exit(-1);
+    }
 #ifdef USE_CDROM
     if( cdaudio_flag && SDL_InitSubSystem( SDL_INIT_CDROM ) < 0 ){
         utils::printError("Couldn't initialize CD-ROM: %s\n", SDL_GetError());
@@ -117,7 +141,9 @@ void ONScripter::initSDL()
     if(SDL_InitSubSystem( SDL_INIT_JOYSTICK ) == 0 && SDL_JoystickOpen(0) != NULL)
         utils::printInfo("Initialize JOYSTICK\n");
 #endif
-
+    if(SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0) {
+        utils::printInfo("Initialize GAMECONTROLLER\n");
+    }
     /* ---------------------------------------- */
     /* Initialize SDL */
     if ( TTF_Init() < 0 ){
@@ -172,9 +198,17 @@ void ONScripter::initSDL()
     SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    if (!isnan(sharpness)) {
+    // if (!isnan(sharpness)) {
+#if defined(_WIN32)
+        SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d");
+#elif defined(__APPLE__)
+        SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
+#elif defined(ANDROID) || defined(IOS)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
-    }
+#else
+        SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+#endif
+    // }
     int window_flag = SDL_WINDOW_SHOWN;
 #if defined(ANDROID) || defined(IOS) || defined(WINRT)
     window_flag |= SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN;
@@ -209,7 +243,7 @@ void ONScripter::initSDL()
 
     underline_value = script_h.screen_height;
 
-    utils::printInfo("Display: %d x %d (%d bpp)\n", screen_width, screen_height, screen_bpp);
+    utils::printInfo("Display(%s): %d x %d (%d bpp)\n", info.name, screen_width, screen_height, screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
     
     screen_rect.x = screen_rect.y = 0;
@@ -230,22 +264,31 @@ void ONScripter::initSDL()
     setCaption(wm_title_string, wm_icon_string);
 }
 
+typedef void (__cdecl *waveCallback_T)(int channel);
+
 void ONScripter::openAudio(int freq)
 {
     Mix_CloseAudio();
+    // const int count = SDL_GetNumAudioDevices(0);
+    // for (int i = 0; i < count; ++i) {
+    //     auto deviceName = SDL_GetAudioDeviceName(i, 0);
+    //     utils::printInfo("Audio device: %d %s\n", i, deviceName);
+    // }
 
-    if ( Mix_OpenAudio( (freq<0)?44100:freq, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){      
+    auto audioDeviceId = Mix_OpenAudio((freq<0)?44100:freq, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF);
+    if (audioDeviceId < 0){
         utils::printError("Couldn't open audio device!\n"
             "  reason: [%s].\n", SDL_GetError());
         audio_open_flag = false;
-    }
-    else{
+    } else {
         int freq;
         Uint16 format;
         int channels;
 
         Mix_QuerySpec( &freq, &format, &channels);
-        utils::printInfo("Audio: %d Hz %d bit %s\n", freq,
+        auto deviceName = SDL_GetAudioDeviceName(audioDeviceId, 0);
+        auto audioDriver = SDL_GetCurrentAudioDriver();
+        utils::printInfo("Audio(%s): %s %d Hz %d bit %s\n", deviceName, audioDriver, freq,
             (format & 0xFF),
             (channels > 1) ? "stereo" : "mono");
         audio_format.format = format;
@@ -254,8 +297,8 @@ void ONScripter::openAudio(int freq)
 
         audio_open_flag = true;
 
-        Mix_AllocateChannels( ONS_MIX_CHANNELS+ONS_MIX_EXTRA_CHANNELS );
-        Mix_ChannelFinished( waveCallback );
+        Mix_AllocateChannels(ONS_MIX_CHANNELS+ONS_MIX_EXTRA_CHANNELS);
+        Mix_ChannelFinished(waveCallback);
     }
 }
 
@@ -534,7 +577,12 @@ int ONScripter::init()
     loop_bgm_name[1] = NULL;
 
     int i;
-    for (i=0 ; i<ONS_MIX_CHANNELS+ONS_MIX_EXTRA_CHANNELS ; i++) wave_sample[i] = NULL;
+    for (i=0 ; i<ONS_MIX_CHANNELS+ONS_MIX_EXTRA_CHANNELS ; i++) {
+        if (wave_sample[i] != NULL) {
+            Mix_FreeChunk(wave_sample[i]);
+            wave_sample[i] = NULL;
+        }
+    }
 
     // ----------------------------------------
     // Initialize misc variables
@@ -551,6 +599,11 @@ int ONScripter::init()
     for (i=0 ; i<MAX_PARAM_NUM ; i++) bar_info[i] = prnum_info[i] = NULL;
 
     loadEnvData();
+    // 初始化时没有全屏窗口
+    if (fullscreen_mode) {
+        fullscreen_mode = false;
+        menu_fullCommand();
+    }
     defineresetCommand();
 
     readToken();
@@ -1321,7 +1374,9 @@ void ONScripter::loadEnvData()
     automode_time = DEFAULT_AUTOMODE_TIME;
     
     if (loadFileIOBuf( "envdata" ) > 0){
-        if (readInt() == 1 && window_mode == false) menu_fullCommand();
+        if (readInt() == 1 && window_mode == false) {
+            menu_fullCommand();
+        }
         if (readInt() == 0) volume_on_flag = false;
         text_speed_no = readInt();
         if (readInt() == 1) skip_mode |= SKIP_TO_EOP;

@@ -49,6 +49,14 @@ local downloads = {
         "fmt",
         "https://github.com/fmtlib/fmt/releases/download/9.1.0/fmt-9.1.0.zip",
     },
+    {
+        "smpeg",
+        "https://github.com/icculus/smpeg/archive/refs/heads/main.zip",
+    },
+    {
+        "libsdl_mixer",
+        "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.6.2/SDL2_mixer-2.6.2.tar.gz",
+    },
 }
 
 local downloadDir = path.join(os.scriptdir(), "download")

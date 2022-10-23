@@ -1,6 +1,7 @@
 add_rules("mode.debug", "mode.release")
 
-set_languages("c++11")
+-- set_languages("c++17")
+
 local arch = os.getenv("ARCH") or "x64"
 if arch == "x86_64" then
     arch = "x64"
@@ -317,6 +318,8 @@ end
 
 
 
+local pngPath = path.join(os.scriptdir(), "png/lpng1637")
+
 if targets["png"] == true then
 
 target("png")
@@ -324,7 +327,7 @@ target("png")
     add_deps("z")
     add_includedirs(path.join(os.scriptdir(), zlibPath))
     on_config(function()
-        local libconfig = path.join(os.scriptdir(), "png/lpng1637/pnglibconf.h")
+        local libconfig = path.join(pngPath, "pnglibconf.h")
         if not os.exists(libconfig) then
             os.cp(path.join(os.scriptdir(), "pre/png/pnglibconf.h"), libconfig)
         end
@@ -346,7 +349,7 @@ target("png")
         "pngwtran.c",
         "pngwutil.c",
     }) do
-        add_files(path.join(os.scriptdir(), "png/lpng1637", f))
+        add_files(path.join(pngPath, f))
     end
 
     if is_arch("arm*") then
@@ -356,7 +359,7 @@ target("png")
             "arm/filter_neon_intrinsics.c",
             "arm/palette_neon_intrinsics.c",
         }) do
-            add_files(path.join(os.scriptdir(), "png/lpng1637", f))
+            add_files(path.join(pngPath, f))
         end
     end
 
@@ -365,7 +368,7 @@ target("png")
             "mips/mips_init.c",
             "mips/filter_msa_intrinsics.c",
         }) do
-            add_files(path.join(os.scriptdir(), "png/lpng1637", f))
+            add_files(path.join(pngPath, f))
         end
     end
 
@@ -374,7 +377,7 @@ target("png")
             "intel/intel_init.c",
             "intel/filter_sse2_intrinsics.c",
         }) do
-            add_files(path.join(os.scriptdir(), "png/lpng1637", f))
+            add_files(path.join(pngPath, f))
         end
     end
 
@@ -383,7 +386,7 @@ target("png")
             "powerpc/powerpc_init.c",
             "powerpc/filter_vsx_intrinsics.c",
         }) do
-            add_files(path.join(os.scriptdir(), "png/lpng1637", f))
+            add_files(path.join(pngPath, f))
         end
     end
 end
@@ -456,7 +459,8 @@ target("freetype")
         path.join(harfbuzzPath, "src"),
         path.join(brotliPath, "c/include"),
         bzip2Path,
-        zlibPath
+        zlibPath,
+        pngPath
     )
     -- add_linkdirs(path.join(os.scriptdir(), "build/windows/x64/release"))
     -- add_links("harfbuzz", "brotli", "z", "bzip2")
@@ -464,9 +468,9 @@ target("freetype")
         "FT2_BUILD_LIBRARY",
         "_LIB",
         "FT_CONFIG_OPTION_USE_HARFBUZZ",
-        "FT_CONFIG_OPTION_USE_ZLIB",
         "FT_CONFIG_OPTION_USE_BZIP2",
-        "FT_CONFIG_OPTION_USE_BROTLI"
+        "FT_CONFIG_OPTION_USE_BROTLI",
+        "FT_CONFIG_OPTION_USE_PNG"
     )
     for _, f in ipairs(freetypeFiles) do
         add_files(path.join(freetypePath, f))
@@ -489,4 +493,85 @@ target("sdl2_ttf")
         "SDL_ttf.c"
     }) do
         add_files(path.join(sdlTTFPath, f))
+    end
+
+local smpegFiles = {
+    "*.cpp",
+    "video/*.cpp",
+    "audio/*.cpp",
+}
+
+local smpegPath = path.join(os.scriptdir(), "smpeg/smpeg-main")
+
+target("smpeg")
+    set_kind("static")
+    add_includedirs(
+        smpegPath,
+        path.join(sdlPath, "include")
+    )
+    add_defines(
+        "memset=SDL_memset",
+        "malloc=SDL_malloc",
+        "memmove=SDL_memmove",
+        "memcpy=SDL_memcpy",
+        "realloc=SDL_realloc",
+        "free=SDL_free"
+    )
+    add_defines(
+        -- "USE_MMX=1",
+        "USE_TIMESTAMP_SYNC=1",
+        "USE_SYSTEM_THREAD=1",
+        "THREADED_AUDIO=1"
+    )
+    for _, f in ipairs(smpegFiles) do
+        add_files(path.join(smpegPath, f))
+    end
+
+local sdlMixerFiles = {
+    "src/mixer.c",
+    "src/music.c",
+    "src/utils.c",
+    "src/effects_internal.c",
+    "src/effect_position.c",
+    "src/effect_stereoreverse.c",
+    "src/codecs/music_drflac.c",
+    "src/codecs/music_drmp3.c",
+    "src/codecs/music_ogg_stb.c",
+    "src/codecs/music_xmp.c",
+    "src/codecs/load_aiff.c",
+    "src/codecs/load_voc.c",
+    "src/codecs/mp3utils.c",
+    "src/codecs/music_cmd.c",
+    "src/codecs/music_flac.c",
+    "src/codecs/music_fluidsynth.c",
+    "src/codecs/music_modplug.c",
+    "src/codecs/music_mpg123.c",
+    "src/codecs/music_nativemidi.c",
+    "src/codecs/music_ogg.c",
+    "src/codecs/music_opus.c",
+    "src/codecs/music_timidity.c",
+    "src/codecs/music_wav.c",
+    "src/codecs/native_midi/*.c",
+}
+
+local sdlMixerPath = path.join(os.scriptdir(), "libsdl_mixer/SDL2_mixer-2.6.2")
+
+target("sdl2_mixer")
+    set_kind("static")
+    add_includedirs(
+        path.join(sdlMixerPath, "include"),
+        path.join(sdlMixerPath, "src"),
+        path.join(sdlMixerPath, "src/codecs"),
+        path.join(sdlPath, "include")
+    )
+    add_defines(
+        "MUSIC_WAV=1",
+        "MUSIC_OGG=1",
+        -- "MUSIC_OPUS=1",
+        "OGG_USE_STB=1",
+        "MUSIC_MP3_DRMP3=1",
+        "MUSIC_MID_NATIVE=1"
+    )
+    for _, f in ipairs(sdlMixerFiles) do
+        add_files(path.join(sdlMixerPath, f))
     end

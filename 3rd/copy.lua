@@ -71,7 +71,31 @@ local headerFiles = {
     },
     {
         "fmt/fmt-9.1.0/",
-        "/include/fmt/"
+        {
+            "/include/fmt/",
+        },
+    },
+    {
+        "smpeg/smpeg-main/",
+        {
+            "MPEG.h",
+            "MPEGaction.h",
+            "MPEGaudio.h",
+            "MPEGerror.h",
+            "MPEGframe.h",
+            "MPEGring.h",
+            "MPEGlist.h",
+            "MPEGstream.h",
+            "MPEGsystem.h",
+            "MPEGvideo.h",
+            "smpeg.h",
+        }
+    },
+    {
+        "libsdl_mixer/SDL2_mixer-2.6.2/",
+        {
+            "include/SDL_mixer.h",
+        },
     },
 }
 

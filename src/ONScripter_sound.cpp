@@ -180,8 +180,15 @@ int ONScripter::playWave(Mix_Chunk *chunk, int format, bool loop_flag, int chann
 {
     if (!chunk) return -1;
 
-    Mix_Pause( channel );
-    if ( wave_sample[channel] ) Mix_FreeChunk( wave_sample[channel] );
+
+    auto prevChunk = wave_sample[channel];
+    if (prevChunk) {
+        prev_chunk_skip[channel] = true;
+    }
+    Mix_Pause(channel);
+    if (prevChunk) {
+        Mix_FreeChunk(prevChunk);
+    }
     wave_sample[channel] = chunk;
 
     if      (channel == 0)               Mix_Volume( channel, voice_volume * MIX_MAX_VOLUME / 100 );
@@ -462,13 +469,12 @@ void ONScripter::stopAllDWAVE()
 
 void ONScripter::playClickVoice()
 {
-    if      ( clickstr_state == CLICK_NEWPAGE ){
-        if ( clickvoice_file_name[CLICKVOICE_NEWPAGE] )
+    if (clickstr_state == CLICK_NEWPAGE){
+        if (clickvoice_file_name[CLICKVOICE_NEWPAGE])
             playSound(clickvoice_file_name[CLICKVOICE_NEWPAGE], 
                       SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
-    }
-    else if ( clickstr_state == CLICK_WAIT ){
-        if ( clickvoice_file_name[CLICKVOICE_NORMAL] )
+    } else if (clickstr_state == CLICK_WAIT){
+        if (clickvoice_file_name[CLICKVOICE_NORMAL])
             playSound(clickvoice_file_name[CLICKVOICE_NORMAL], 
                       SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
     }

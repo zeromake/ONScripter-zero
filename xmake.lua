@@ -1,6 +1,5 @@
 add_rules("mode.debug", "mode.release")
 
-add_requires("libsdl_mixer")
 add_includedirs("src")
 add_defines("USE_SIMD_X86_AVX2=1")
 -- set_languages("cxx11")
@@ -75,7 +74,19 @@ target("sardec")
 
 target("onscripter")
     set_kind("binary")
-    add_links("bzip2", "jpeg", "sdl2", "sdl2_image", "sdl2_ttf", "z", "freetype", "brotli", "harfbuzz")
+    add_links(
+        "z",
+        "bzip2",
+        "jpeg",
+        "png",
+        "sdl2",
+        "sdl2_image",
+        "sdl2_ttf",
+        "sdl2_mixer",
+        "freetype",
+        "brotli",
+        "harfbuzz"
+    )
     if is_host("macosx") then
         add_frameworks(
             "OpenGL",

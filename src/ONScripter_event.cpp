@@ -325,14 +325,20 @@ void ONScripter::flushEventSub( SDL_Event &event )
         playMIDI(midi_play_loop_flag);
     }
     else if ( event.type == ONS_CHUNK_EVENT ){ // for processing btntim2 and automode correctly
-        if ( wave_sample[event.user.code] ){
-            Mix_FreeChunk( wave_sample[event.user.code] );
-            wave_sample[event.user.code] = NULL;
-            if (event.user.code == MIX_LOOPBGM_CHANNEL0 && 
-                loop_bgm_name[1] &&
-                wave_sample[MIX_LOOPBGM_CHANNEL1])
-                Mix_PlayChannel(MIX_LOOPBGM_CHANNEL1, 
-                                wave_sample[MIX_LOOPBGM_CHANNEL1], -1);
+        if (wave_sample[event.user.code]) {
+            // 由于用户的手动点击播放音频现在是下一个，但是事件是却是上一个音频发起的
+            auto chunk = wave_sample[event.user.code];
+            auto prevChunkSkip = prev_chunk_skip[event.user.code];
+            if (!prevChunkSkip) {
+                Mix_FreeChunk(chunk);
+                wave_sample[event.user.code] = NULL;
+                if (event.user.code == MIX_LOOPBGM_CHANNEL0 && 
+                    loop_bgm_name[1] &&
+                    wave_sample[MIX_LOOPBGM_CHANNEL1])
+                    Mix_PlayChannel(MIX_LOOPBGM_CHANNEL1, wave_sample[MIX_LOOPBGM_CHANNEL1], -1);
+            } else {
+                prev_chunk_skip[event.user.code] = false;
+            }
         }
     }
 }
@@ -478,8 +484,7 @@ bool ONScripter::mousePressEvent( SDL_MouseButtonEvent *event )
         if (current_over_button == -1){
             if (!bexec_flag) current_button_state.button = 0;
             sprintf(current_button_state.str, "LCLICK");
-        }
-        else{
+        } else {
             sprintf(current_button_state.str, "S%d", current_over_button);
             if (bexec_flag && current_button_link){
                 ButtonLink *cbl = current_button_link;
@@ -1173,7 +1178,7 @@ void ONScripter::timerEvent(bool init_flag)
 }
 
 #if (defined(IOS) || defined(ANDROID) || defined(WINRT))
-//TODO: �������Ҽ�ģ��
+//TODO: �������Ҽ�ģ��
 SDL_MouseWheelEvent transTouchKey(SDL_TouchFingerEvent &finger) {
     static struct FingerPoint {
         float x, y;
