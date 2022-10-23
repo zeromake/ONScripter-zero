@@ -1055,7 +1055,7 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
         if (len == count){
             len = fread(tmp_script_buf, 1, TMP_SCRIPT_BUF_LEN, fp);
             if (len == 0){
-                if (cr_flag) *(*buf)++ = 0x0a;
+                if (cr_flag) *(*buf)++ = '\n';
                 break;
             }
             count = 0;
@@ -1070,36 +1070,39 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
             ch = key_table[(unsigned char)ch] ^ 0x84;
         }
 
-        if ( cr_flag && ch != 0x0a ){
-            *(*buf)++ = 0x0a;
+        // 有 \r 但是下一个字符不是 \n 强制补充一个 \n
+        if (cr_flag && ch != '\n' ){
+            *(*buf)++ = '\n';
             newline_flag = true;
             cr_flag = false;
         }
-    
-        if ( ch == '*' && newline_flag && !newlabel_flag){
+
+        // 读取 * 开头的 label
+        if (ch == '*' && newline_flag && !newlabel_flag){
             num_of_labels++;
             newlabel_flag = true;
-        }
-        else
+        } else {
             newlabel_flag = false;
+        }
 
-        if ( ch == 0x0d ){
+        if ( ch == '\r' ){
             cr_flag = true;
             continue;
         }
-        if ( ch == 0x0a ){
-            *(*buf)++ = 0x0a;
+        if ( ch == '\n' ){
+            *(*buf)++ = '\n';
             newline_flag = true;
             cr_flag = false;
         }
         else{
             *(*buf)++ = ch;
+            // 空白字符不算作一行开头
             if ( ch != ' ' && ch != '\t' )
                 newline_flag = false;
         }
     }
 
-    *(*buf)++ = 0x0a;
+    *(*buf)++ = '\n';
     return 0;
 }
 

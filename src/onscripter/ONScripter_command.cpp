@@ -635,7 +635,7 @@ int ONScripter::skipoffCommand()
     skip_mode &= ~SKIP_NORMAL;
  
     return RET_CONTINUE; 
-} 
+}
 
 int ONScripter::sevolCommand()
 {
@@ -963,7 +963,7 @@ int ONScripter::savescreenshotCommand()
     bool delete_flag = true;
     if      ( script_h.isName( "savescreenshot2" ) ){
         delete_flag = false;
-    }       
+    }
 
     if (screenshot_surface == NULL)
         screenshot_surface = AnimationInfo::alloc32bitSurface(screen_device_width, screen_device_height, texture_format);
@@ -1024,7 +1024,7 @@ int ONScripter::savegameCommand()
         savestr = script_h.readStr();
 
     if (saveon_flag && internal_saveon_flag) storeSaveFile();
-    writeSaveFile( no, savestr ); 
+    writeSaveFile( no, savestr );
 
     return RET_CONTINUE;
 }
@@ -1501,7 +1501,7 @@ int ONScripter::mp3Command()
             }
         }
     }
-        
+
     return RET_CONTINUE;
 }
 
@@ -3083,7 +3083,7 @@ int ONScripter::defineresetCommand()
 
 #ifdef USE_LUA
     lua_handler.init(this, &script_h, screen_ratio1, screen_ratio2);
-#endif    
+#endif
 
     current_mode = DEFINE_MODE;
 

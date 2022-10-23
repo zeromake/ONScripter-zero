@@ -487,7 +487,7 @@ int ONScripter::init()
     screenshot_w = screen_width;
     screenshot_h = screen_height;
 
-    texture = SDL_CreateTexture(renderer, texture_format, SDL_TEXTUREACCESS_STATIC, accumulation_surface->w, accumulation_surface->h); 
+    texture = SDL_CreateTexture(renderer, texture_format, SDL_TEXTUREACCESS_STATIC, accumulation_surface->w, accumulation_surface->h);
 
     effect_tmp = 0;
     tmp_image_buf = NULL;
@@ -811,7 +811,7 @@ void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
     SDL_UnlockSurface(accumulation_surface);
 
     screen_dirty_flag = false;
-#ifdef ANDROID // See sdl2 DOCS/README-android.md for more information on this
+#if defined(ANDROID) || defined(RENDER_COPY_RECT_FULL) // See sdl2 DOCS/README-android.md for more information on this
     SDL_RenderClear(renderer);
     SDL_Rect *rect_ptr = nullptr;
 #else
@@ -969,7 +969,7 @@ void ONScripter::setFullScreen(bool fullscreen) {
 
 void ONScripter::executeLabel()
 {
-  executeLabelTop:    
+  executeLabelTop:
 
     while ( current_line<current_label_info.num_of_lines ){
         if ( debug_level > 0 )

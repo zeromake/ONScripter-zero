@@ -312,7 +312,7 @@ FILE *DirectReader::getFileHandle( const char *file_name, int &compression_type,
     len = strlen(capital_name);
 #elif defined(LINUX)
     convertCodingToEUC(capital_name);
-#endif    
+#endif
 
     *length = 0;
     if ( (fp = fopen( capital_name, "rb" )) != NULL && len >= 3 ){
