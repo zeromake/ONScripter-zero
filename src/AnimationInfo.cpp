@@ -818,7 +818,7 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
 //            (((mask_rb & 0xffff) / alpha) & 0xff);                      
 //        Uint32 mask_g  = (((*dst_buffer & 0x00ff00) * mask1 +           
 //                           src_color2 * mask2) / alpha) & 0x00ff00;     
-//        *dst_buffer = mask_rb | mask_g | (alpha << 24);                 
+//        *dst_buffer = mask_rb | mask_g | (alpha << 24);
 
 // used to draw characters on text_surface
 // Alpha = 1 - (1-Da)(1-Sa)
