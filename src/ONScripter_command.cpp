@@ -2856,12 +2856,11 @@ int ONScripter::dwavestopCommand()
     if      (ch < 0) ch = 0;
     else if (ch >= ONS_MIX_CHANNELS) ch = ONS_MIX_CHANNELS-1;
 
-    if ( wave_sample[ch] ){
+    if (wave_sample[ch]){
         Mix_Pause( ch );
         Mix_FreeChunk( wave_sample[ch] );
         wave_sample[ch] = NULL;
     }
-
     return RET_CONTINUE;
 }
 
@@ -2891,14 +2890,12 @@ int ONScripter::dwaveCommand()
 
     if (play_mode == WAVE_PLAY_LOADED){
         Mix_PlayChannel(ch, wave_sample[ch], loop_flag?-1:0);
-    }
-    else{
+    } else{
         const char *buf = script_h.readStr();
         int fmt = SOUND_CHUNK;
         if (play_mode == WAVE_PRELOAD) fmt |= SOUND_PRELOAD;
         playSound(buf, fmt, loop_flag, ch);
     }
-        
     return RET_CONTINUE;
 }
 

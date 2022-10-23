@@ -351,6 +351,8 @@ void parseOption(int argc, char *argv[]) {
     }
 }
 
+#undef main
+
 int main(int argc, char *argv[])
 {
     utils::printInfo("ONScripter-Jh version %s (%s, %d.%02d)\n", ONS_JH_VERSION, ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);

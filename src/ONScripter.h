@@ -430,6 +430,7 @@ public:
     AnimationInfo *getSpriteInfo(int no){ return &sprite_info[no]; };
     AnimationInfo *getSprite2Info(int no){ return &sprite2_info[no]; };
     Uint32 getTextureFormat() { return texture_format; };
+    bool prev_chunk_skip[ONS_MIX_CHANNELS+ONS_MIX_EXTRA_CHANNELS];
 private:
     int  parseLine();
     void deleteButtonLink();
