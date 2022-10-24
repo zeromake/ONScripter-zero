@@ -385,8 +385,7 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
                     anim->duration_list[i] = getNumberFromBuffer( (const char**)&buffer );
                     buffer++;
                 }
-            }
-            else{
+            } else{
                 anim->duration_list[0] = getNumberFromBuffer( (const char**)&buffer );
                 for ( i=1 ; i<anim->num_of_cells ; i++ )
                     anim->duration_list[i] = anim->duration_list[0];

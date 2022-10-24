@@ -78,8 +78,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
         unsigned index = ((unsigned char*)text)[0];
         index = index << 8 | ((unsigned char*)text)[1];
         unicode = coding2utf16->conv2UTF16( index );
-    }
-    else{
+    } else {
         if ((text[0] & 0xe0) == 0xa0 || (text[0] & 0xe0) == 0xc0) unicode = ((unsigned char*)text)[0] - 0xa0 + 0xff60;
         else unicode = text[0];
     }
@@ -216,7 +215,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         int xy[2];
         xy[0] = info->x() * screen_ratio1 / screen_ratio2;
         xy[1] = info->y() * screen_ratio1 / screen_ratio2;
-    
+
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
         drawGlyph( surface, info, color, text2, xy, cache_info, clip, dst_rect );

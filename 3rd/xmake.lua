@@ -1,6 +1,6 @@
 add_rules("mode.debug", "mode.release")
 
--- set_languages("c++17")
+set_languages("c++17")
 
 local arch = os.getenv("ARCH") or "x64"
 if arch == "x86_64" then
@@ -23,6 +23,8 @@ if is_host("macosx") then
         bzip2 = true,
         sdl2 = true,
         jpeg = true,
+        z = true,
+        png = true,
     }
 end
 
@@ -273,7 +275,10 @@ target("harfbuzz")
     set_kind("static")
     -- set_kind("shared")
     add_includedirs(path.join(freetypePath, "include"))
-    add_defines("HAVE_ATEXIT=1", "HAVE_ISATTY=1", "HAVE_STDBOOL_H=1", "HAVE_DIRECTWRITE=1", "HAVE_FREETYPE")
+    add_defines("HAVE_ATEXIT=1", "HAVE_ISATTY=1", "HAVE_STDBOOL_H=1", "HAVE_FREETYPE")
+    if is_host("windows") then
+        add_defines("HAVE_DIRECTWRITE=1")
+    end
     for _, f in ipairs({
         "src/harfbuzz.cc"
     }) do
@@ -448,14 +453,26 @@ local freetypeFiles = {
     "src/type1/type1.c",
     "src/type42/type42.c",
     "src/winfonts/winfnt.c",
-    "builds/windows/ftdebug.c",
-    "builds/windows/ftsystem.c",
 }
+
+if is_host("windows") then
+    table.join2(freetypeFiles, {
+        "builds/windows/ftdebug.c",
+        "builds/windows/ftsystem.c",
+    })
+elseif is_host("macosx") then
+    table.join2(freetypeFiles, {
+        "builds/mac/ftmac.c",
+        "src/base/ftdebug.c",
+        "builds/unix/ftsystem.c",
+    })
+end
 
 target("freetype")
     set_kind("static")
     add_includedirs(
         path.join(freetypePath, "include"),
+        path.join(freetypePath, "src/base"),
         path.join(harfbuzzPath, "src"),
         path.join(brotliPath, "c/include"),
         bzip2Path,
@@ -467,11 +484,16 @@ target("freetype")
     add_defines(
         "FT2_BUILD_LIBRARY",
         "_LIB",
+        "FT_CONFIG_OPTION_USE_ZLIB",
+        "FT_CONFIG_OPTION_SYSTEM_ZLIB",
         "FT_CONFIG_OPTION_USE_HARFBUZZ",
         "FT_CONFIG_OPTION_USE_BZIP2",
         "FT_CONFIG_OPTION_USE_BROTLI",
         "FT_CONFIG_OPTION_USE_PNG"
     )
+    if is_host("macosx") then
+        add_defines("HAVE_UNISTD_H=1", "HAVE_FCNTL_H=1")
+    end
     for _, f in ipairs(freetypeFiles) do
         add_files(path.join(freetypePath, f))
     end
