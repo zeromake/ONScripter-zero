@@ -107,14 +107,13 @@ target("onscripter")
         add_syslinks("iconv")
         add_defines("RENDER_COPY_RECT_FULL=1")
     elseif is_host("windows") then
+        add_files("src/resource.rc")
         add_syslinks("gdi32", "user32", "winmm", "shell32", "setupapi", "advapi32", "ole32", "version", "imm32", "oleaut32")
     end
     add_packages("libsdl_ttf", "libsdl_mixer")
     add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
-    -- add_files("src/resource.rc")
     remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")
-
 
 
 target("demo")
@@ -151,6 +150,7 @@ target("demo")
         )
         add_syslinks("iconv")
     elseif is_host("windows") then
+        add_files("src/resource.rc")
         add_syslinks("gdi32", "user32", "winmm", "shell32", "setupapi", "advapi32", "ole32", "version", "imm32", "oleaut32")
     end
     add_files("demo.cpp")
