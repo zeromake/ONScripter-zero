@@ -2,6 +2,7 @@
 #include <SDL_ttf.h>
 
 // macosx https://discourse.libsdl.org/t/high-dpi-mode/34411
+// https://github.com/libsdl-org/SDL/blob/main/docs/README-ios.md#notes----retina--high-dpi-and-window-sizes
 
 SDL_Surface* DrawText(TTF_Font* font, const char* text) {
   static SDL_Color fcol={0xff, 0x00, 0x00}, bcol={0xff, 0xff, 0xff};
@@ -12,10 +13,12 @@ SDL_Surface* DrawText(TTF_Font* font, const char* text) {
 
 int main()
 {
+    int windowWidth = 800;
+    int windowHeight = 600;
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window;
     SDL_Renderer* renderer;
-    SDL_Rect viewport_rect = {0, 250, 800, 600};
+    SDL_Rect viewport_rect = {0, 0, 400, 300};
     SDL_Event event;
     SDL_bool exit = SDL_FALSE;
     bool run = true;
@@ -25,6 +28,16 @@ int main()
 
     // SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_ALLOW_HIGHDPI, &window, &renderer);
+    int rw = 0, rh = 0;
+    SDL_GetRendererOutputSize(renderer, &rw, &rh);
+    if(rw != windowWidth) {
+        float widthScale = (float)rw / (float) windowWidth;
+        float heightScale = (float)rh / (float) windowHeight;
+        if(widthScale != heightScale) {
+            fprintf(stderr, "WARNING: width scale != height scale\n");
+        }
+        SDL_RenderSetScale(renderer, widthScale, heightScale);
+    }
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer);
     SDL_Surface* screen = DrawText(font, "测试文章");
@@ -35,7 +48,7 @@ int main()
     // 获取贴图的宽和高
     SDL_QueryTexture(texture, nullptr, nullptr, &textureW, &textureH);
     SDL_Rect imageRect{ 0, 0, textureW, textureH };
-    SDL_Rect dstRect{ 130, 50, textureW, textureH };
+    SDL_Rect dstRect{ 130, 50, textureW/2, textureH/2 };
     // SDL_RenderSetViewport(renderer, &viewport_rect);
     while (!exit)
     {
@@ -51,15 +64,15 @@ int main()
             }
         if (run) {
             viewport_rect.x += 1;
-            if (viewport_rect.x >= 800) {
+            if (viewport_rect.x >= 400) {
                 viewport_rect.x = 0;
             }
         }
 
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
-        // SDL_SetRenderDrawColor(renderer, 0x00, 0x7f, 0x00, 0xff);
-        // SDL_RenderFillRect(renderer, &viewport_rect);
+        SDL_SetRenderDrawColor(renderer, 0x00, 0x7f, 0x00, 0xff);
+        SDL_RenderFillRect(renderer, &viewport_rect);
         SDL_RenderCopy(renderer, texture, &imageRect, &dstRect);
         SDL_RenderPresent(renderer);
     }
