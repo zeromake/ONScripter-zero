@@ -88,7 +88,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
     if (TTF_GetFontStyle( (TTF_Font*)info->ttf_font[0] ) !=
         (info->is_bold?TTF_STYLE_BOLD:TTF_STYLE_NORMAL) )
         TTF_SetFontStyle( (TTF_Font*)info->ttf_font[0], (info->is_bold?TTF_STYLE_BOLD:TTF_STYLE_NORMAL));
-#endif    
+#endif
     TTF_GlyphMetrics( (TTF_Font*)info->ttf_font[0], unicode,
                       &minx, &maxx, &miny, &maxy, &advanced );
     //utils::printInfo("min %d %d %d %d %d %d\n", minx, maxx, miny, maxy, advanced,TTF_FontAscent((TTF_Font*)info->ttf_font[0])  );
