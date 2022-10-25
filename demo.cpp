@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <cstdio>
 
 // macosx https://discourse.libsdl.org/t/high-dpi-mode/34411
 // https://github.com/libsdl-org/SDL/blob/main/docs/README-ios.md#notes----retina--high-dpi-and-window-sizes
@@ -7,10 +8,13 @@
 SDL_Surface* DrawText(TTF_Font* font, const char* text) {
   static SDL_Color fcol={0xff, 0x00, 0x00}, bcol={0xff, 0xff, 0xff};
   SDL_Surface *text_surface;
-  text_surface = TTF_RenderUTF8_Shaded(font, text, fcol, bcol);
+  text_surface = TTF_RenderUTF8_Blended(font, text, fcol);
   return text_surface;
 }
 
+#define DEFAUTL_TTF "C:\\Windows\\Fonts\\msyh.ttc"
+
+#undef main
 int main()
 {
     int windowWidth = 800;
@@ -24,20 +28,20 @@ int main()
     bool run = true;
 
     TTF_Init();
-    TTF_Font *font = TTF_OpenFontDPI("/Users/zero/Documents/project/ONScripter-Jh/build/macosx/x86_64/release/default.ttf", 24, 72 * 2, 72 * 2);
+    TTF_Font *font = TTF_OpenFontDPI(DEFAUTL_TTF, 16, 72*2, 72*2);
 
-    // SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_ALLOW_HIGHDPI, &window, &renderer);
-    int rw = 0, rh = 0;
-    SDL_GetRendererOutputSize(renderer, &rw, &rh);
-    if(rw != windowWidth) {
-        float widthScale = (float)rw / (float) windowWidth;
-        float heightScale = (float)rh / (float) windowHeight;
-        if(widthScale != heightScale) {
-            fprintf(stderr, "WARNING: width scale != height scale\n");
-        }
-        SDL_RenderSetScale(renderer, widthScale, heightScale);
-    }
+    // int rw = 0, rh = 0;
+    // SDL_GetRendererOutputSize(renderer, &rw, &rh);
+    // if(rw != windowWidth) {
+    //     float widthScale = (float)rw / (float) windowWidth;
+    //     float heightScale = (float)rh / (float) windowHeight;
+    //     if(widthScale != heightScale) {
+    //         fprintf(stderr, "WARNING: width scale != height scale\n");
+    //     }
+    //     SDL_RenderSetScale(renderer, widthScale, heightScale);
+    // }
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer);
     SDL_Surface* screen = DrawText(font, "测试文章");
@@ -48,8 +52,7 @@ int main()
     // 获取贴图的宽和高
     SDL_QueryTexture(texture, nullptr, nullptr, &textureW, &textureH);
     SDL_Rect imageRect{ 0, 0, textureW, textureH };
-    SDL_Rect dstRect{ 130, 50, textureW/2, textureH/2 };
-    // SDL_RenderSetViewport(renderer, &viewport_rect);
+    SDL_Rect dstRect{ 130, 50, textureW, textureH };
     while (!exit)
     {
         while (SDL_PollEvent(&event))
