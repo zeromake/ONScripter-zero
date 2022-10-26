@@ -127,7 +127,7 @@ void ONScripter::proceedAnimation(int current_time)
     }
 }
 
-void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info )
+void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
 {
     if (anim->trans_mode != AnimationInfo::TRANS_STRING &&
         anim->file_name && anim->surface_name &&
@@ -153,7 +153,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info )
     }
     
     if ( anim->trans_mode == AnimationInfo::TRANS_STRING ){
-        FontInfo f_info = sentence_font;
+        _FontInfo f_info = sentence_font;
         if (info) f_info = *info;
         f_info.rubyon_flag = anim->is_ruby_drawable;
 

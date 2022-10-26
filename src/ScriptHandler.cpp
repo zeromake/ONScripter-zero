@@ -1149,7 +1149,7 @@ void ScriptHandler::readConfiguration()
             if (screen_height == 0) {
                 if (screen_width == 800 ){
                     screen_height = 600;
-                } else if (screen_width = 400){
+                } else if (screen_width == 400){
                     screen_height = 300;
                 } else if (screen_width == 320){
                     screen_height = 240;

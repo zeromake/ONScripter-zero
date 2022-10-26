@@ -71,7 +71,7 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface)
     }
     SDL_UnlockSurface( surface );
 }
-void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char* text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
+void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char* text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
 {
     unsigned short unicode;
     if (IS_TWO_BYTE(text[0])){
@@ -114,7 +114,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
     }
 
     bool rotate_flag = false;
-    if ( info->getTateyokoMode() == FontInfo::TATE_MODE && IS_ROTATION_REQUIRED(text) ) rotate_flag = true;
+    if ( info->getTateyokoMode() == _FontInfo::TATE_MODE && IS_ROTATION_REQUIRED(text) ) rotate_flag = true;
     
     dst_rect.x = xy[0];
     dst_rect.y = xy[1];
@@ -123,7 +123,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
 
     if ( rotate_flag ) dst_rect.x += miny - minx;
         
-    if ( info->getTateyokoMode() == FontInfo::TATE_MODE && IS_TRANSLATION_REQUIRED(text) ){
+    if ( info->getTateyokoMode() == _FontInfo::TATE_MODE && IS_TRANSLATION_REQUIRED(text) ){
         dst_rect.x += info->font_size_xy[0]/2;
         dst_rect.y -= info->font_size_xy[0]/2;
     }
@@ -178,7 +178,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
         SDL_FreeSurface(tmp_surface);
 }
 
-void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
+void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
 {
     //utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
     
@@ -250,7 +250,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     }
 }
 
-void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool pack_hankaku)
+void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool pack_hankaku)
 {
     int i;
 
@@ -366,7 +366,7 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
     text_info.fill( 0, 0, 0, 0 );
 
     char out_text[3] = { '\0','\0','\0' };
-    FontInfo f_info = sentence_font;
+    _FontInfo f_info = sentence_font;
     f_info.clear();
     for ( int i=0 ; i<current_page->text_count ; i++ ){
         if ( current_page->text[i] == 0x0a ){
@@ -598,7 +598,7 @@ bool ONScripter::clickNewPage( char *out_text )
     return true;
 }
 
-void ONScripter::startRuby(const char *buf, FontInfo &info)
+void ONScripter::startRuby(const char *buf, _FontInfo &info)
 {
     ruby_struct.stage = RubyStruct::BODY;
     ruby_font = info;
@@ -734,7 +734,7 @@ int ONScripter::textCommand()
     return RET_CONTINUE;
 }
 
-bool ONScripter::checkLineBreak(const char *buf, FontInfo *fi)
+bool ONScripter::checkLineBreak(const char *buf, _FontInfo *fi)
 {
     if (!is_kinsoku) return false;
     

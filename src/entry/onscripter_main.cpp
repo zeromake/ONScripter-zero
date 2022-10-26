@@ -49,6 +49,14 @@ Coding2UTF16 *coding2utf16 = NULL;
 #include "ScriptSelector.h"
 #endif
 
+#ifdef __APPLE__
+#if TARGET_OS_OSX
+#import <Cocoa/Cocoa.h>
+#else
+#import <UIKit/UIKit.h>
+#endif
+#endif
+
 void optionHelp()
 {
     printf( "Usage: onscripter [option ...]\n" );
@@ -444,6 +452,17 @@ int main(int argc, char *argv[])
     // ----------------------------------------
     // Run ONScripter
     if (ons.openScript()) exit(-1);
+#ifdef __APPLE__
+#ifdef TARGET_OS_OSX
+    CGFloat dpiScale = NSScreen.mainScreen.backingScaleFactor;
+#else
+    CGFloat dpiScale = UIScreen.mainScreen.scale;
+#endif
+    if (dpiScale > 1.0f) {
+        ons.force_render_ratio1 = 1;
+        ons.force_render_ratio2 = (int)dpiScale;
+    }
+#endif
     if (ons.init()) exit(-1);
     ons.executeLabel();
     exit(0);

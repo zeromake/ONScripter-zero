@@ -67,7 +67,7 @@ public:
     
     struct ButtonState{
         unsigned int event_type;
-        unsigned char event_button;
+        unsigned int event_button;
         int x, y, button;
         char str[16];
         bool down_flag;
@@ -431,6 +431,7 @@ public:
     AnimationInfo *getSprite2Info(int no){ return &sprite2_info[no]; };
     Uint32 getTextureFormat() { return texture_format; };
     bool prev_chunk_skip[ONS_MIX_CHANNELS+ONS_MIX_EXTRA_CHANNELS];
+    int force_render_ratio1, force_render_ratio2;
 private:
     int  parseLine();
     void deleteButtonLink();
@@ -439,7 +440,7 @@ private:
     void clearCurrentPage();
     void shadowTextDisplay( SDL_Surface *surface, SDL_Rect &clip );
     void newPage();
-    ButtonLink *getSelectableSentence( char *buffer, FontInfo *info, bool flush_flag = true, bool nofile_flag = false );
+    ButtonLink *getSelectableSentence( char *buffer, _FontInfo *info, bool flush_flag = true, bool nofile_flag = false );
     void decodeExbtnControl( const char *ctl_str, SDL_Rect *check_src_rect=NULL, SDL_Rect *check_dst_rect=NULL );
     void saveAll();
     void loadEnvData();
@@ -472,7 +473,7 @@ private:
     
     int  calcDurationToNextAnimation();
     void proceedAnimation(int current_time);
-    void setupAnimationInfo(AnimationInfo *anim, FontInfo *info=NULL);
+    void setupAnimationInfo(AnimationInfo *anim, _FontInfo *info=NULL);
     void parseTaggedString(AnimationInfo *anim );
     void drawTaggedSurface(SDL_Surface *dst_surface, AnimationInfo *anim, SDL_Rect &clip);
     void stopAnimation(int click);
@@ -795,19 +796,19 @@ private:
     
     void shiftHalfPixelX(SDL_Surface *surface);
     void shiftHalfPixelY(SDL_Surface *surface);
-    void drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char *text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect );
-    void drawChar( char* text, FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip=NULL );
-    void drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect = NULL, AnimationInfo *cache_info=NULL, bool pack_hankaku=true );
+    void drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char *text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect );
+    void drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip=NULL );
+    void drawString( const char *str, uchar3 color, _FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect = NULL, AnimationInfo *cache_info=NULL, bool pack_hankaku=true );
     void restoreTextBuffer(SDL_Surface *surface = NULL);
     void enterTextDisplayMode(bool text_flag = true);
     void leaveTextDisplayMode(bool force_leave_flag = false);
     bool doClickEnd();
     bool clickWait( char *out_text );
     bool clickNewPage( char *out_text );
-    void startRuby(const char *buf, FontInfo &info);
+    void startRuby(const char *buf, _FontInfo &info);
     void endRuby(bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info);
     int  textCommand();
-    bool checkLineBreak(const char *buf, FontInfo *fi);
+    bool checkLineBreak(const char *buf, _FontInfo *fi);
     void processEOT();
     bool processText();
 };
