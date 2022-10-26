@@ -379,7 +379,7 @@ int ONScripter::strspCommand()
     ai->orig_pos.y = script_h.readInt();
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
 
-    FontInfo fi;
+    _FontInfo fi;
     fi.is_newline_accepted = true;
     fi.num_xy[0] = script_h.readInt();
     fi.num_xy[1] = script_h.readInt();
@@ -2557,7 +2557,7 @@ int ONScripter::getcursorpos2Command()
 
 int ONScripter::getcursorposCommand()
 {
-    FontInfo fi = sentence_font;
+    _FontInfo fi = sentence_font;
     
     if ( fi.isEndOfLine() ){
         fi.newLine();
@@ -3164,7 +3164,7 @@ int ONScripter::cselbtnCommand()
     int csel_no   = script_h.readInt();
     int button_no = script_h.readInt();
 
-    FontInfo csel_info = sentence_font;
+    _FontInfo csel_info = sentence_font;
     csel_info.rubyon_flag = false;
     csel_info.top_xy[0] = script_h.readInt();
     csel_info.top_xy[1] = script_h.readInt();
@@ -3931,7 +3931,7 @@ void ONScripter::NSDCallCommand(int texnum, const char *str1, int proc, const ch
     NSDLoadCommand(texnum, str1);
 
     if (proc == 1){ // deffontd.dll, Font
-        FontInfo f_info = sentence_font;
+        _FontInfo f_info = sentence_font;
         f_info.rubyon_flag = false;
         f_info.setTateyokoMode(0);
         f_info.top_xy[0] = f_info.top_xy[1] = 0;

@@ -216,10 +216,17 @@ void ONScripter::initSDL()
 #if SDL_VERSION_ATLEAST(2,0,1)
     window_flag |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
-
     int window_x = SDL_WINDOWPOS_CENTERED, window_y = SDL_WINDOWPOS_CENTERED;
+    int window_w = screen_device_width;
+    int window_h = screen_device_height;
+    // macosx 需要强制缩小 render 的范围
+    if (force_render_ratio1 > 0 && force_render_ratio2 > 0 && force_render_ratio1 != force_render_ratio2) {
+        float force_render_ratio = (float)force_render_ratio1 / (float)force_render_ratio2;
+        window_w = int((float)window_w * force_render_ratio);
+        window_h = int((float)window_h * force_render_ratio);
+    }
 
-    window = SDL_CreateWindow(NULL, window_x, window_y, screen_device_width, screen_device_height, window_flag);
+    window = SDL_CreateWindow(NULL, window_x, window_y, window_w, window_h, window_flag);
     if (window == NULL) {
         utils::printError("Could not create window: %s\n", SDL_GetError());
         exit(-1);
@@ -263,8 +270,6 @@ void ONScripter::initSDL()
     memcpy( wm_icon_string, DEFAULT_WM_TITLE, strlen(DEFAULT_WM_ICON) + 1 );
     setCaption(wm_title_string, wm_icon_string);
 }
-
-typedef void (__cdecl *waveCallback_T)(int channel);
 
 void ONScripter::openAudio(int freq)
 {
@@ -542,7 +547,7 @@ int ONScripter::init()
     
     // ----------------------------------------
     // variables relevant to sound
-    this->cdaudio_flag = cdaudio_flag;
+    // this->cdaudio_flag = cdaudio_flag;
 #ifdef USE_CDROM
     cdrom_info = NULL;
     if ( cdaudio_flag ){
@@ -619,9 +624,9 @@ int ONScripter::init()
         font_cache = malloc(size);
         fontfp->read(fontfp, font_cache, 1, size);
         SDL_RWclose(fontfp);
-        FontInfo::cache_font_file = font_file;
-        FontInfo::font_cache = font_cache;
-        FontInfo::font_cache_size = size;
+        _FontInfo::cache_font_file = font_file;
+        _FontInfo::font_cache = font_cache;
+        _FontInfo::font_cache_size = size;
     }
 
     if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
@@ -1147,7 +1152,7 @@ void ONScripter::clearCurrentPage()
     sentence_font.clear();
 
     int num = (sentence_font.num_xy[0]*2+1)*sentence_font.num_xy[1];
-    if (sentence_font.getTateyokoMode() == FontInfo::TATE_MODE)
+    if (sentence_font.getTateyokoMode() == _FontInfo::TATE_MODE)
         num = (sentence_font.num_xy[1]*2+1)*sentence_font.num_xy[0];
     
     if ( current_page->text &&
@@ -1249,7 +1254,7 @@ void ONScripter::newPage()
     flush( refreshMode(), &sentence_font_info.pos );
 }
 
-ButtonLink *ONScripter::getSelectableSentence( char *buffer, FontInfo *info, bool flush_flag, bool nofile_flag )
+ButtonLink *ONScripter::getSelectableSentence( char *buffer, _FontInfo *info, bool flush_flag, bool nofile_flag )
 {
     int current_text_xy[2];
     current_text_xy[0] = info->xy[0];
@@ -1282,7 +1287,7 @@ ButtonLink *ONScripter::getSelectableSentence( char *buffer, FontInfo *info, boo
     bl->select_rect = bl->image_rect = ai->pos;
 
     info->newLine();
-    if (info->getTateyokoMode() == FontInfo::YOKO_MODE)
+    if (info->getTateyokoMode() == _FontInfo::YOKO_MODE)
         info->xy[0] = current_text_xy[0];
     else
         info->xy[1] = current_text_xy[1];

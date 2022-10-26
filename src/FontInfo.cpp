@@ -1,6 +1,6 @@
 /* -*- C++ -*-
  * 
- *  FontInfo.cpp - Font information storage class of ONScripter
+ *  _FontInfo.cpp - Font information storage class of ONScripter
  *
  *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *            (C) 2014 jh10001 <jh10001@live.cn>
@@ -55,11 +55,11 @@ static struct FontContainer{
     };
 } root_font_container;
 
-char *FontInfo::cache_font_file = NULL;
-void *FontInfo::font_cache = NULL;
-int FontInfo::font_cache_size = 0;
+char *_FontInfo::cache_font_file = NULL;
+void *_FontInfo::font_cache = NULL;
+int _FontInfo::font_cache_size = 0;
 
-FontInfo::FontInfo()
+_FontInfo::_FontInfo()
 {
     ttf_font[0] = ttf_font[1] = NULL;
 
@@ -74,7 +74,7 @@ FontInfo::FontInfo()
     reset();
 }
 
-void FontInfo::reset()
+void _FontInfo::reset()
 {
     tateyoko_mode = YOKO_MODE;
     clear();
@@ -85,7 +85,7 @@ void FontInfo::reset()
     is_newline_accepted = false;
 }
 
-void *FontInfo::openFont( char *font_file, int ratio1, int ratio2 )
+void *_FontInfo::openFont( char *font_file, int ratio1, int ratio2 )
 {
     int font_size;
     if ( font_size_xy[0] < font_size_xy[1] )
@@ -145,18 +145,18 @@ void *FontInfo::openFont( char *font_file, int ratio1, int ratio2 )
     return fc->next->font;
 }
 
-void FontInfo::setTateyokoMode( int tateyoko_mode )
+void _FontInfo::setTateyokoMode( int tateyoko_mode )
 {
     this->tateyoko_mode = tateyoko_mode;
     clear();
 }
 
-int FontInfo::getTateyokoMode()
+int _FontInfo::getTateyokoMode()
 {
     return tateyoko_mode;
 }
 
-int FontInfo::getRemainingLine()
+int _FontInfo::getRemainingLine()
 {
     if (tateyoko_mode == YOKO_MODE)
         return num_xy[1] - xy[1]/2;
@@ -164,7 +164,7 @@ int FontInfo::getRemainingLine()
         return num_xy[1] - num_xy[0] + xy[0]/2 + 1;
 }
 
-int FontInfo::x(bool use_ruby_offset)
+int _FontInfo::x(bool use_ruby_offset)
 {
     int x = xy[0]*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE) 
@@ -172,7 +172,7 @@ int FontInfo::x(bool use_ruby_offset)
     return x;
 }
 
-int FontInfo::y(bool use_ruby_offset)
+int _FontInfo::y(bool use_ruby_offset)
 {
     int y = xy[1]*pitch_xy[1]/2 + top_xy[1] + line_offset_xy[1];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == YOKO_MODE) 
@@ -180,13 +180,13 @@ int FontInfo::y(bool use_ruby_offset)
     return y;
 }
 
-void FontInfo::setXY( int x, int y )
+void _FontInfo::setXY( int x, int y )
 {
     if ( x != -1 ) xy[0] = x*2;
     if ( y != -1 ) xy[1] = y*2;
 }
 
-void FontInfo::clear()
+void _FontInfo::clear()
 {
     if (tateyoko_mode == YOKO_MODE)
         setXY(0, 0);
@@ -195,7 +195,7 @@ void FontInfo::clear()
     line_offset_xy[0] = line_offset_xy[1] = 0;
 }
 
-void FontInfo::newLine()
+void _FontInfo::newLine()
 {
     if (tateyoko_mode == YOKO_MODE){
         xy[0] = 0;
@@ -208,37 +208,37 @@ void FontInfo::newLine()
     line_offset_xy[0] = line_offset_xy[1] = 0;
 }
 
-void FontInfo::setLineArea(int num)
+void _FontInfo::setLineArea(int num)
 {
     num_xy[tateyoko_mode] = num;
     num_xy[1-tateyoko_mode] = 1;
 }
 
-bool FontInfo::isEndOfLine(int margin)
+bool _FontInfo::isEndOfLine(int margin)
 {
     if (xy[tateyoko_mode] + margin >= num_xy[tateyoko_mode]*2) return true;
 
     return false;
 }
 
-bool FontInfo::isLineEmpty()
+bool _FontInfo::isLineEmpty()
 {
     if (xy[tateyoko_mode] == 0) return true;
 
     return false;
 }
 
-void FontInfo::advanceCharInHankaku(int offset)
+void _FontInfo::advanceCharInHankaku(int offset)
 {
     xy[tateyoko_mode] += offset;
 }
 
-void FontInfo::addLineOffset(int offset)
+void _FontInfo::addLineOffset(int offset)
 {
     line_offset_xy[tateyoko_mode] += offset;
 }
 
-SDL_Rect FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
+SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
 {
     SDL_Rect rect;
     
@@ -273,7 +273,7 @@ SDL_Rect FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
     return rect;
 }
 
-void FontInfo::addShadeArea(SDL_Rect &rect, int dx, int dy, int dw, int dh)
+void _FontInfo::addShadeArea(SDL_Rect &rect, int dx, int dy, int dw, int dh)
 {
     rect.x += dx;
     rect.y += dy;
@@ -281,7 +281,7 @@ void FontInfo::addShadeArea(SDL_Rect &rect, int dx, int dy, int dw, int dh)
     rect.h += dh;
 }
 
-int FontInfo::initRuby(FontInfo &body_info, int body_count, int ruby_count)
+int _FontInfo::initRuby(_FontInfo &body_info, int body_count, int ruby_count)
 {
     if ((tateyoko_mode == YOKO_MODE &&
          body_count + body_info.xy[0]/2 >= body_info.num_xy[0]-1) ||

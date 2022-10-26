@@ -1,8 +1,13 @@
 add_rules("mode.debug", "mode.release")
 
 add_includedirs("src")
-add_defines("USE_SIMD_X86_AVX2=1")
 set_languages("c++17")
+add_defines(
+    "USE_SIMD_X86_AVX2=1",
+    "ONS_JH_VERSION=\"0.8.0\"",
+    "ONS_VERSION=\"20181218\"",
+    "NSC_VERSION=296"
+)
 
 if is_host("windows") then
     add_defines("XMD_H=1")
@@ -88,6 +93,7 @@ target("onscripter")
         "harfbuzz"
     )
     if is_host("macosx") then
+        add_files("src/entry/onscripter_main.mm")
         add_frameworks(
             "OpenGL",
             "CoreVideo",
@@ -107,7 +113,7 @@ target("onscripter")
         add_syslinks("iconv")
         add_defines("RENDER_COPY_RECT_FULL=1")
     elseif is_host("windows") then
-        add_files("src/resource.rc")
+        add_files("src/resource.rc", "src/entry/onscripter_main.cpp")
         add_syslinks("gdi32", "user32", "winmm", "shell32", "setupapi", "advapi32", "ole32", "version", "imm32", "oleaut32")
     end
     add_packages("libsdl_ttf", "libsdl_mixer")

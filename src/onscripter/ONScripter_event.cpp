@@ -44,9 +44,9 @@
 #define EDIT_MODE_PREFIX "[EDIT MODE]  "
 #define EDIT_SELECT_STRING "MP3 vol (m)  SE vol (s)  Voice vol (v)  Numeric variable (n)"
 
-static SDL_TimerID timer_id = NULL;
-SDL_TimerID timer_cdaudio_id = NULL;
-SDL_TimerID timer_bgmfade_id = NULL;
+static SDL_TimerID timer_id = 0;
+SDL_TimerID timer_cdaudio_id = 0;
+SDL_TimerID timer_bgmfade_id = 0;
 
 typedef SDL_Keycode ONS_Key;
 
@@ -65,7 +65,7 @@ extern "C" void musicFinishCallback()
 extern "C" Uint32 SDLCALL timerCallback( Uint32 interval, void *param )
 {
     SDL_RemoveTimer( timer_id );
-    timer_id = NULL;
+    timer_id = 0;
 
     SDL_Event event;
     event.type = ONS_TIMER_EVENT;
@@ -77,7 +77,7 @@ extern "C" Uint32 SDLCALL timerCallback( Uint32 interval, void *param )
 extern "C" Uint32 cdaudioCallback( Uint32 interval, void *param )
 {
     SDL_RemoveTimer( timer_cdaudio_id );
-    timer_cdaudio_id = NULL;
+    timer_cdaudio_id = 0;
 
     SDL_Event event;
     event.type = ONS_CDAUDIO_EVENT;
@@ -297,7 +297,7 @@ void ONScripter::flushEventSub( SDL_Event &event )
             Mix_VolumeMusic( tmp * MIX_MAX_VOLUME / 100 );
         } else {
             if (timer_bgmfade_id) SDL_RemoveTimer( timer_bgmfade_id );
-            timer_bgmfade_id = NULL;
+            timer_bgmfade_id = 0;
             mp3fadeout_duration_internal = 0;
 
             char *ext = NULL;
