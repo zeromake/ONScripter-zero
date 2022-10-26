@@ -616,7 +616,7 @@ int ONScripter::init()
     if (cacheFont) {
         FILE *fp = fopen(font_file, "rb");
         if (fp == NULL) {
-            utils::printError("can't open font file: %s\n", font_file);
+            utils::printError("can't open cache font file(%s): %s\n", strerror(errno), font_file);
             return -1;
         }
         SDL_RWops* fontfp = SDL_RWFromFP(fp, SDL_TRUE);
@@ -628,13 +628,23 @@ int ONScripter::init()
         _FontInfo::font_cache = font_cache;
         _FontInfo::font_cache_size = size;
     }
-
-    if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
-        utils::printError("can't open font file: %s\n", font_file);
+    
+    auto ff = generateFPath();
+    if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2, ff) == NULL ){
+        utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file);
         return -1;
     }
-    
+
     return 0;
+}
+
+std::function<const char*(const char*, bool)> ONScripter::generateFPath() {
+    std::function<const char*(const char*, bool)> ff = std::bind(
+        &ONScripter::fpath,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2);
+    return ff;
 }
 
 void ONScripter::reset()

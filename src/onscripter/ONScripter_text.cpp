@@ -181,17 +181,17 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
 {
     //utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
-    
+    auto ff = generateFPath();
     if ( info->ttf_font[0] == NULL ){
-        if ( info->openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
-            utils::printError("can't open font file: %s\n", font_file );
+        if ( info->openFont( font_file, screen_ratio1, screen_ratio2, ff ) == NULL ){
+            utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file );
             quit();
             exit(-1);
         }
     }
 #if defined(PSP)
     else
-        info->openFont( font_file, screen_ratio1, screen_ratio2 );
+        info->openFont( font_file, screen_ratio1, screen_ratio2, ff );
 #endif
 
     if ( info->isEndOfLine() ){

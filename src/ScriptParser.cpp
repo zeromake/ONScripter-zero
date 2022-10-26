@@ -737,6 +737,11 @@ FILE *ScriptParser::fopen(const char *path, const char *mode, bool use_save_dir)
     return script_h.fopen(path, mode, use_save_dir);
 }
 
+
+const char *ScriptParser::fpath(const char *path, bool use_save_dir) {
+    return script_h.fpath(path, use_save_dir);
+}
+
 void ScriptParser::createKeyTable( const char *key_exe )
 {
     if (!key_exe) return;

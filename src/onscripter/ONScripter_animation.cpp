@@ -174,8 +174,10 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
             f_info.ttf_font[1] = NULL;
         }
 
-        if (f_info.ttf_font[0] == NULL)
-            f_info.openFont( font_file, screen_ratio1, screen_ratio2 );
+        if (f_info.ttf_font[0] == NULL) {
+            auto ff = generateFPath();
+            f_info.openFont( font_file, screen_ratio1, screen_ratio2, ff);
+        }
 
         SDL_Rect pos;
         if (anim->is_tight_region){

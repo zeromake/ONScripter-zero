@@ -76,6 +76,7 @@ public:
     int getStringBufferOffset(){return string_buffer_offset;};
 
     FILE *fopen(const char *path, const char *mode, bool use_save_dir=false);
+    const char *fpath(const char *path, bool use_save_dir=false);
     void saveGlovalData();
 
     /* Command */
