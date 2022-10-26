@@ -147,7 +147,7 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
 
     ttf_font[0] = (void*)fc->next->font[0];
     ttf_font[1] = (void*)fc->next->font[1];
-    utils::printInfo("Use font File: %s\n", font_file);
+    // utils::printInfo("Use font File: %s\n", font_file);
     return fc->next->font;
 }
 
