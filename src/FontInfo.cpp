@@ -85,8 +85,14 @@ void _FontInfo::reset()
     is_newline_accepted = false;
 }
 
-void *_FontInfo::openFont( char *font_file, int ratio1, int ratio2 )
+void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f)
 {
+    const char* font_file;
+    if (f != nullptr) {
+        font_file = f(_font_file, false);
+    } else {
+        font_file = _font_file;
+    }
     int font_size;
     if ( font_size_xy[0] < font_size_xy[1] )
         font_size = font_size_xy[0];
@@ -141,7 +147,7 @@ void *_FontInfo::openFont( char *font_file, int ratio1, int ratio2 )
 
     ttf_font[0] = (void*)fc->next->font[0];
     ttf_font[1] = (void*)fc->next->font[1];
-    
+    utils::printInfo("Use font File: %s\n", font_file);
     return fc->next->font;
 }
 

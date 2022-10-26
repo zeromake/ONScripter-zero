@@ -26,6 +26,7 @@
 #define __FONT_INFO_H__
 
 #include <SDL.h>
+#include <functional>
 #include "BaseReader.h"
 
 typedef unsigned char uchar3[3];
@@ -60,7 +61,7 @@ public:
 
     _FontInfo();
     void reset();
-    void *openFont( char *font_file, int ratio1, int ratio2 );
+    void *openFont( char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr);
     void setTateyokoMode( int tateyoko_mode );
     int getTateyokoMode();
     int getRemainingLine();

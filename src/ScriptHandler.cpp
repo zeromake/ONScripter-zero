@@ -145,19 +145,34 @@ void ScriptHandler::setSaveDir(const char *path)
     strcpy(save_dir, path);
 }
 
-FILE *ScriptHandler::fopen( const char *path, const char *mode, bool use_save_dir )
+FILE *ScriptHandler::fopen(const char *path, const char *mode, bool use_save_dir)
 {
-    char filename[256];
-    if (use_save_dir && save_dir)
-        sprintf( filename, "%s%s", save_dir, path );
-    else
-        sprintf( filename, "%s%s", archive_path, path );
+    const auto filename = fpath(path, use_save_dir);
+    auto fp = ::fopen(filename, mode);
+    delete[] filename;
+    return fp;
+}
 
-    for ( unsigned int i=0 ; i<strlen( filename ) ; i++ )
-        if ( filename[i] == '/' || filename[i] == '\\' )
+const char* ScriptHandler::fpath(const char *path, bool use_save_dir) {
+    size_t pathCount = strlen(path) + 1;
+    if (save_dir && strlen(save_dir) > strlen(archive_path)) {
+        pathCount += strlen(save_dir);
+    } else {
+        pathCount += strlen(archive_path);
+    }
+    char *filename = new char[pathCount];
+    if (path[0] == '/' || path[0] == '.' || (strlen(path) > 1 && path[1] == ':')) {
+        strcpy(filename, path);
+    } else {
+        if (use_save_dir && save_dir)
+            sprintf(filename, "%s%s", save_dir, path);
+        else
+            sprintf(filename, "%s%s", archive_path, path);
+    }
+    for ( unsigned int i=0 ; i<strlen(filename) ; i++ )
+        if ((filename[i] == '/' || filename[i] == '\\') && filename[i] != DELIMITER)
             filename[i] = DELIMITER;
-
-    return ::fopen( filename, mode );
+    return filename;
 }
 
 void ScriptHandler::setKeyTable( const unsigned char *key_table )

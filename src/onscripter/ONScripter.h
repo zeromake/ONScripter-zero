@@ -449,6 +449,7 @@ private:
     void quit();
     void disableGetButtonFlag();
     int  getNumberFromBuffer( const char **buf );
+    std::function<const char*(const char*, bool)> generateFPath();
 
     // ----------------------------------------
     // variables and methods relevant to animation

@@ -104,7 +104,8 @@ public:
 
     void reset();
     void setSaveDir(const char *path);
-    FILE *fopen( const char *path, const char *mode, bool use_save_dir=false );
+    FILE *fopen(const char *path, const char *mode, bool use_save_dir=false);
+    const char *fpath(const char *path, bool use_save_dir=false);
     void setKeyTable( const unsigned char *key_table );
 
     // basic parser function

@@ -140,6 +140,7 @@ end
 
 target("sdl2")
     set_kind("static")
+    add_defines("HAVE_LIBC=1")
     add_includedirs(path.join(sdlPath, "include"), path.join(sdlPath, "src/video/khronos"))
     for _, f in ipairs(sdlSrc) do
         add_files(path.join(sdlPath, f))

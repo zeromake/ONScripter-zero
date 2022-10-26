@@ -5,7 +5,7 @@
 // macosx https://discourse.libsdl.org/t/high-dpi-mode/34411
 // https://github.com/libsdl-org/SDL/blob/main/docs/README-ios.md#notes----retina--high-dpi-and-window-sizes
 
-SDL_Surface* DrawText(TTF_Font* font, const char* text) {
+SDL_Surface* _DrawText(TTF_Font* font, const char* text) {
   static SDL_Color fcol={0xff, 0x00, 0x00}, bcol={0xff, 0xff, 0xff};
   SDL_Surface *text_surface;
   text_surface = TTF_RenderUTF8_Blended(font, text, fcol);
@@ -13,7 +13,8 @@ SDL_Surface* DrawText(TTF_Font* font, const char* text) {
 }
 #ifdef __APPLE__
 #define DEFAUTL_TTF "/System/Library/Fonts/PingFang.ttc"
-#elif defined(__WIN32)
+#elif defined(_WIN32)
+#include <windows.h>
 #define DEFAUTL_TTF "C:\\Windows\\Fonts\\msyh.ttc"
 #endif
 
@@ -34,6 +35,7 @@ int main()
 
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_ALLOW_HIGHDPI, &window, &renderer);
+    int windowScale = 1;
     int textScale = 1;
 #ifdef __APPLE__
     int rw = 0, rh = 0;
@@ -46,13 +48,16 @@ int main()
         }
         // SDL_RenderSetScale(renderer, widthScale, heightScale);
         textScale = (int)widthScale;
+        windowScale = textScale
     }
+#elif defined(_WIN32)
+    textScale = GetDpiForSystem() / 96;
 #endif
-    SDL_Rect viewport_rect = {0, 0, 400*textScale, 300*textScale};
+    SDL_Rect viewport_rect = {0, 0, 400*windowScale, 300*windowScale};
     TTF_Font *font = TTF_OpenFontDPI(DEFAUTL_TTF, 14, 72*textScale, 72*textScale);
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer);
-    SDL_Surface* screen = DrawText(font, "测试文章");
+    SDL_Surface* screen = (_DrawText)(font, "测试文章");
     auto texture = SDL_CreateTextureFromSurface(renderer, screen);
     int textureW = screen->w;
     int textureH = screen->h;
