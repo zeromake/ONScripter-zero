@@ -85,10 +85,27 @@ void optionHelp()
 
 void optionVersion()
 {
+    int count = SDL_GetNumRenderDrivers();
+    std::string renderDrivers = "";
+    SDL_RendererInfo info;
+    for (int i = 0; i < count; i++) {
+        SDL_GetRenderDriverInfo(i, &info);
+        renderDrivers += info.name;
+        renderDrivers += " ";
+    }
+    printf("\nSupport Render: %s\n", renderDrivers.c_str());
+    count = SDL_GetNumAudioDrivers();
+    std::string audioDrivers = "";
+    for (int i = 0; i < count; i++) {
+        auto audioDriverName = SDL_GetAudioDriver(i);
+        audioDrivers += audioDriverName;
+        audioDrivers += " ";
+    }
+    printf("Support Audio: %s\n\n", audioDrivers.c_str());
     printf("Written by Ogapee <ogapee@aqua.dti2.ne.jp>\n\n");
-    printf("Copyright (c) 2001-2018 Ogapee.\n\
-                              (C) 2014-2018 jh10001<jh10001@live.cn>\n");
+    printf("Copyright (c) 2001-2018 Ogapee.\t(C) 2014-2018 jh10001<jh10001@live.cn>\n");
     printf("This is free software; see the source for copying conditions.\n");
+
     exit(0);
 }
 
