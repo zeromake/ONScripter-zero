@@ -48,7 +48,7 @@ int main()
         }
         // SDL_RenderSetScale(renderer, widthScale, heightScale);
         textScale = (int)widthScale;
-        windowScale = textScale
+        windowScale = textScale;
     }
 #elif defined(_WIN32)
     textScale = GetDpiForSystem() / 96;

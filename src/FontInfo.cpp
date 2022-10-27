@@ -88,8 +88,10 @@ void _FontInfo::reset()
 void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f)
 {
     const char* font_file;
+    bool font_file_free = false;
     if (f != nullptr) {
         font_file = f(_font_file, false);
+        font_file_free = true;
     } else {
         font_file = _font_file;
     }
@@ -126,11 +128,10 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
         fc->next->power_resume_number = psp_power_resume_number;
         strcpy(fc->next->name, font_file);
 #else
-        unsigned int hdpi = 72,vdpi = 72;
-        if (useFile) fc->next->font[0] = TTF_OpenFontDPI(font_file, font_size * ratio1 / ratio2, hdpi, vdpi);
-        else fc->next->font[0] = TTF_OpenFontDPIRW(SDL_RWFromConstMem(font_cache, font_cache_size), 1, font_size * ratio1 / ratio2, hdpi, vdpi);
-        if (useFile) fc->next->font[1] = TTF_OpenFontDPI(font_file, font_size * ratio1 / ratio2, hdpi, vdpi);
-        else fc->next->font[1] = TTF_OpenFontDPIRW(SDL_RWFromConstMem(font_cache, font_cache_size), 1, font_size * ratio1 / ratio2, hdpi, vdpi);
+        if (useFile) fc->next->font[0] = TTF_OpenFont(font_file, font_size * ratio1 / ratio2);
+        else fc->next->font[0] = TTF_OpenFontRW(SDL_RWFromConstMem(font_cache, font_cache_size), 1, font_size * ratio1 / ratio2);
+        if (useFile) fc->next->font[1] = TTF_OpenFont(font_file, font_size * ratio1 / ratio2);
+        else fc->next->font[1] = TTF_OpenFontRW(SDL_RWFromConstMem(font_cache, font_cache_size), 1, font_size * ratio1 / ratio2);
         if (fc->next->font[1] == nullptr) {
             utils::printError("Open font failed: %s\n", TTF_GetError());
         }
@@ -148,6 +149,9 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
     ttf_font[0] = (void*)fc->next->font[0];
     ttf_font[1] = (void*)fc->next->font[1];
     // utils::printInfo("Use font File: %s\n", font_file);
+    if (font_file_free) {
+        delete []font_file;
+    }
     return fc->next->font;
 }
 
