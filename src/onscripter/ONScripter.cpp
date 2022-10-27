@@ -250,7 +250,7 @@ void ONScripter::initSDL()
 
     underline_value = script_h.screen_height;
 
-    utils::printInfo("Display(%s): %d x %d (%d bpp)\n", info.name, screen_width, screen_height, screen_bpp);
+    utils::printInfo("Display: %s %d x %d (%d bpp)\n", info.name, screen_width, screen_height, screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
     
     screen_rect.x = screen_rect.y = 0;

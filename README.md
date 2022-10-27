@@ -18,6 +18,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] `language.lua` 会把 `src/language/*.txt` 转换为带转义文字的 `cpp` 文件。
 - [x] `nscriptdecode` 工具改为流模式，支持更多参数，支持三种的加解密（由于用的是 xor 模式即是加密也是解密）。
 - [x] `nsadec` 工具支持 `-out` 设置输出目录, `-lower` 设置输出文件名是否为小写，`-v` 显示详细输出，默认也加入了进度查看。
+- [ ] 比较合并上游的 [onscripter](http://onscripter.osdn.jp/onscripter.html.en#package-source) 的 `20220816` 版本。
 
 ## 编译指南
 
@@ -25,7 +26,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 > 需要安装 Visual Studio
 
 ``` powershell
-./build-3rd.ps1
+.\build-3rd.ps1
 xmake f -c
 xmake build onscripter
 ```
