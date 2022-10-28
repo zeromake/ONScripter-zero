@@ -57,6 +57,19 @@ local downloads = {
         "libsdl_mixer",
         "https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.6.2/SDL2_mixer-2.6.2.tar.gz",
     },
+    {
+        "libde265",
+        "https://github.com/strukturag/libde265/releases/download/v1.0.9/libde265-1.0.9.tar.gz",
+    },
+    {
+        "mp4v2",
+        "https://github.com/enzo1982/mp4v2/releases/download/v2.1.1/mp4v2-2.1.1.tar.bz2",
+    },
+    {
+        "libwebp",
+        "https://github.com/webmproject/libwebp/archive/refs/tags/v1.2.4.tar.gz",
+        "libwebp-1.2.4.tar.gz",
+    },
 }
 
 local downloadDir = path.join(os.scriptdir(), "download")

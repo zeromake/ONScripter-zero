@@ -222,49 +222,49 @@ end
 local sdlImagePath = "libsdl_image/SDL2_image-2.6.2"
 target("sdl2_image")
     set_kind("static")
-    add_includedirs(path.join(sdlPath, "include"))
+    add_includedirs(
+        path.join(sdlPath, "include"),
+        "libwebp/libwebp-1.2.4/src"
+    )
     add_defines(
-        -- "HAVE_STDIO_H=1",
-        -- "HAVE_STDLIB_H=1",
-        -- "HAVE_STRING_H=1",
-        -- "HAVE_INTTYPES_H=1",
-        -- "HAVE_STDINT_H=1",
-        -- "HAVE_STRINGS_H=1",
-        -- "HAVE_SYS_STAT_H=1",
-        -- "HAVE_SYS_TYPES_H=1",
-        -- "HAVE_UNISTD_H=1",
-        -- "STDC_HEADERS=1",
-        -- "HAVE_DLFCN_H=1",
-        "USE_STBIMAGE=1",
-        -- "USE_IMAGEIO=1",
-        -- "LOAD_AVIF=1",
-        "LOAD_JPG=1",
-        -- "LOAD_JXL=1",
-        "LOAD_PNG=1",
-        -- "LOAD_WEBP=1",
-        "LOAD_BMP=1",
-        -- "LOAD_GIF=1",
-        -- "LOAD_LBM=1",
-        -- "LOAD_PCX=1",
-        -- "LOAD_PNM=1",
+        "HAVE_STDIO_H=1",
+        "HAVE_STRING_H=1",
+        "HAVE_STDINT_H=1",
         "LOAD_SVG=1",
-        -- "LOAD_TGA=1",
-        -- "LOAD_XCF=1",
-        -- "LOAD_XPM=1",
-        -- "LOAD_XV=1",
-        -- "LOAD_QOI=1",
+        "LOAD_WEBP=1",
+        "LOAD_GIF=1",
+        "LOAD_BMP=1",
+        "LOAD_LBM=1",
+        "LOAD_PCX=1",
+        "LOAD_PNM=1",
         "SDL_IMAGE_SAVE_PNG=1",
         "SDL_IMAGE_SAVE_JPG=1"
     )
     if is_host("macosx") then
         set_values("objc.build.arc", false)
         add_mxxflags("-fno-objc-arc")
+        add_defines(
+            "USING_IMAGEIO=1",
+            "JPG_USES_IMAGEIO=1",
+            "PNG_USES_IMAGEIO=1"
+        )
+    else
+        add_defines(
+            "USE_STBIMAGE=1",
+            "LOAD_JPG=1",
+            "LOAD_PNG=1"
+        )
     end
     local files = {
-        "*.c",
+        "*.c|IMG_png.c|IMG_jpg.c",
     }
     if is_host("macosx") then
-        table.join2(files, "*.m")
+        table.join2(files, {"IMG_ImageIO.m"})
+    else
+        table.join2(files, {
+            "IMG_png.c",
+            "IMG_jpg.c",
+        })
     end
     for _, f in ipairs(files) do
         add_files(path.join(sdlImagePath, f))
@@ -597,4 +597,47 @@ target("sdl2_mixer")
     )
     for _, f in ipairs(sdlMixerFiles) do
         add_files(path.join(sdlMixerPath, f))
+    end
+
+-- local de256Path = path.join(os.scriptdir(), "libde265/libde265-1.0.9")
+-- local de256Files = {
+--     "libde265/*.cc",
+--     "libde265/encoder/*.cc",
+--     "libde265/encoder/algo/*.cc",
+--     "libde265/x86/*.cc",
+-- }
+-- if is_host("windows") then
+--     table.join2(de256Files, {
+--         "extra/win32cond.cc"
+--     })
+-- end
+
+-- target("de265")
+--     set_kind("shared")
+--     if not is_host("windows") then
+--         add_cxflags("-msse2 -mssse3 -msse4.1")
+--         add_defines("HAVE_POSIX_MEMALIGN=1")
+--     end
+--     add_includedirs(de256Path, path.join(de256Path, "libde265"))
+--     add_defines("HAVE_SSE4_1=1", "HAVE_STDINT_H=1")
+--     for _, f in ipairs(de256Files) do
+--         add_files(path.join(de256Path, f))
+--     end
+
+local webpPath = path.join(os.scriptdir(), "libwebp/libwebp-1.2.4")
+local webpDirs = {
+    "sharpyuv",
+    "src/dec",
+    "src/demux",
+    "src/mux",
+    "src/dsp",
+    "src/enc",
+    "src/utils",
+}
+
+target("webp")
+    set_kind("static")
+    add_includedirs(webpPath)
+    for _, f in ipairs(webpDirs) do
+        add_files(path.join(webpPath, f, "*.c"))
     end
