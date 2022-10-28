@@ -90,7 +90,8 @@ target("onscripter")
         "sdl2_mixer",
         "freetype",
         "brotli",
-        "harfbuzz"
+        "harfbuzz",
+        "webp"
     )
     if is_host("macosx") then
         add_files("src/entry/onscripter_main.mm")
