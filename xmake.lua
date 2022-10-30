@@ -136,7 +136,8 @@ target("demo")
         "sdl2_mixer",
         "freetype",
         "brotli",
-        "harfbuzz"
+        "harfbuzz",
+        "webp"
     )
     if is_host("macosx") then
         add_frameworks(
