@@ -6,24 +6,28 @@ local is32bit = arch ~= "x64" and arch ~= "arm64"
 local isarm64 = arch == "arm64"
 
 local includeDir = path.join(os.scriptdir(), "include")
-local libDir = path.join(os.scriptdir(), "lib-"..arch)
+local libDir = path.join(os.scriptdir(), "lib-"..arch).."/"
 
 os.mkdir(includeDir)
 os.mkdir(libDir)
 
+local mode = "debug"
+
 if is_host("macosx") then
     if isarm64 then
-        os.cp(path.join(os.scriptdir(), "../build/macosx/arm64/release/*.a"), libDir)
+        os.cp(path.join(os.scriptdir(), "../build/macosx/arm64/"..mode.."/*.a"), libDir)
     else
-        os.cp(path.join(os.scriptdir(), "../build/macosx/x86_64/release/*.a"), libDir)
+        os.cp(path.join(os.scriptdir(), "../build/macosx/x86_64/"..mode.."/*.a"), libDir)
     end
 elseif is_host("windows") then
     if is32bit then
-        os.cp(path.join(os.scriptdir(), "build/mingw/x86/release/*.a"), libDir)
-        os.cp(path.join(os.scriptdir(), "build/windows/x86/release/*.lib"), libDir)
+        os.cp(path.join(os.scriptdir(), "build/mingw/x86/"..mode.."/*.a"), libDir)
+        os.cp(path.join(os.scriptdir(), "build/windows/x86/"..mode.."/*.lib"), libDir)
+        os.cp(path.join(os.scriptdir(), "build/windows/x86/"..mode.."/*.pdb"), libDir)
     else
-        os.cp(path.join(os.scriptdir(), "build/mingw/x86_64/release/*.a"), libDir)
-        os.cp(path.join(os.scriptdir(), "build/windows/x64/release/*.lib"), libDir)
+        os.cp(path.join(os.scriptdir(), "build/mingw/x86_64/"..mode.."/*.a"), libDir)
+        os.cp(path.join(os.scriptdir(), "build/windows/x64/"..mode.."/*.lib"), libDir)
+        os.cp(path.join(os.scriptdir(), "build/windows/x64/"..mode.."/*.pdb"), libDir)
     end
 end
 

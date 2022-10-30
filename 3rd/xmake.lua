@@ -237,6 +237,10 @@ target("sdl2_image")
         "LOAD_LBM=1",
         "LOAD_PCX=1",
         "LOAD_PNM=1",
+        "LOAD_XCF=1",
+        "LOAD_XPM=1",
+        "LOAD_XV=1",
+        "LOAD_TGA=1",
         "SDL_IMAGE_SAVE_PNG=1",
         "SDL_IMAGE_SAVE_JPG=1"
     )
@@ -550,30 +554,29 @@ target("smpeg")
         add_files(path.join(smpegPath, f))
     end
 
+local libFDKPath = path.join(os.scriptdir(), "fdk-aac/fdk-aac-2.0.2")
+
+local libFDKsubDirs = {
+    "libAACdec",
+    "libSBRdec",
+    "libSACdec",
+    "libMpegTPDec",
+    "libDRCdec",
+    "libArithCoding",
+    "libPCMutils",
+    "libSYS",
+    "libFDK"
+}
+target("fdk-aac")
+    set_kind("static")
+    for _, dir in ipairs(libFDKsubDirs) do
+        add_includedirs(path.join(libFDKPath, dir, "include"))
+        add_files(path.join(libFDKPath, dir, "src/*.cpp"))
+    end
+
 local sdlMixerFiles = {
-    "src/mixer.c",
-    "src/music.c",
-    "src/utils.c",
-    "src/effects_internal.c",
-    "src/effect_position.c",
-    "src/effect_stereoreverse.c",
-    "src/codecs/music_drflac.c",
-    "src/codecs/music_drmp3.c",
-    "src/codecs/music_ogg_stb.c",
-    "src/codecs/music_xmp.c",
-    "src/codecs/load_aiff.c",
-    "src/codecs/load_voc.c",
-    "src/codecs/mp3utils.c",
-    "src/codecs/music_cmd.c",
-    "src/codecs/music_flac.c",
-    "src/codecs/music_fluidsynth.c",
-    "src/codecs/music_modplug.c",
-    "src/codecs/music_mpg123.c",
-    "src/codecs/music_nativemidi.c",
-    "src/codecs/music_ogg.c",
-    "src/codecs/music_opus.c",
-    "src/codecs/music_timidity.c",
-    "src/codecs/music_wav.c",
+    "src/*.c",
+    "src/codecs/*.c",
     "src/codecs/native_midi/*.c",
 }
 
@@ -590,10 +593,14 @@ target("sdl2_mixer")
     add_defines(
         "MUSIC_WAV=1",
         "MUSIC_OGG=1",
-        -- "MUSIC_OPUS=1",
         "OGG_USE_STB=1",
         "MUSIC_MP3_DRMP3=1",
+        "MUSIC_FLAC_DRFLAC=1",
         "MUSIC_MID_NATIVE=1"
+        -- "MUSIC_OPUS=1",
+        -- "MUSIC_MP3_MPG123=1",
+        -- "MUSIC_MID_TIMIDITY=1",
+        -- "MUSIC_MOD_XMP=1"
     )
     for _, f in ipairs(sdlMixerFiles) do
         add_files(path.join(sdlMixerPath, f))

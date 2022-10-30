@@ -66,6 +66,11 @@ local downloads = {
         "https://github.com/enzo1982/mp4v2/releases/download/v2.1.1/mp4v2-2.1.1.tar.bz2",
     },
     {
+        "fdk-aac",
+        "https://sourceforge.net/projects/opencore-amr/files/fdk-aac/fdk-aac-2.0.2.tar.gz/download",
+        "fdk-aac-2.0.2.tar.gz",
+    },
+    {
         "libwebp",
         "https://github.com/webmproject/libwebp/archive/refs/tags/v1.2.4.tar.gz",
         "libwebp-1.2.4.tar.gz",
