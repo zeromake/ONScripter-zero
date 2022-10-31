@@ -149,9 +149,10 @@ end
 
 
 
-if targets["jpeg"] == true then
-
+local pngPath = path.join(os.scriptdir(), "png/lpng1638")
 local jpegSourceDir = path.join(os.scriptdir(), "jpeg/jpeg-9e")
+
+if targets["jpeg"] == true then
 
 target("jpeg")
     set_kind("static")
@@ -224,12 +225,16 @@ target("sdl2_image")
     set_kind("static")
     add_includedirs(
         path.join(sdlPath, "include"),
-        "libwebp/libwebp-1.2.4/src"
+        "libwebp/libwebp-1.2.4/src",
+        jpegSourceDir,
+        pngPath
     )
     add_defines(
         "HAVE_STDIO_H=1",
         "HAVE_STRING_H=1",
         "HAVE_STDINT_H=1",
+        "LOAD_JPG=1",
+        "LOAD_PNG=1",
         "LOAD_SVG=1",
         "LOAD_WEBP=1",
         "LOAD_GIF=1",
@@ -246,29 +251,13 @@ target("sdl2_image")
     )
     if is_host("macosx") then
         set_values("objc.build.arc", false)
-        add_mxxflags("-fno-objc-arc")
-        add_defines(
-            "USING_IMAGEIO=1",
-            "JPG_USES_IMAGEIO=1",
-            "PNG_USES_IMAGEIO=1"
-        )
-    else
-        add_defines(
-            "USE_STBIMAGE=1",
-            "LOAD_JPG=1",
-            "LOAD_PNG=1"
-        )
+        add_mflags("-fno-objc-arc")
     end
     local files = {
-        "*.c|IMG_png.c|IMG_jpg.c",
+        "*.c",
     }
     if is_host("macosx") then
         table.join2(files, {"IMG_ImageIO.m"})
-    else
-        table.join2(files, {
-            "IMG_png.c",
-            "IMG_jpg.c",
-        })
     end
     for _, f in ipairs(files) do
         add_files(path.join(sdlImagePath, f))
@@ -327,8 +316,6 @@ target("z")
 end
 
 
-
-local pngPath = path.join(os.scriptdir(), "png/lpng1637")
 
 if targets["png"] == true then
 

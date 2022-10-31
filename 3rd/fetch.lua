@@ -8,8 +8,12 @@ local downloads = {
         "https://github.com/madler/zlib/releases/download/v1.2.13/zlib1213.zip",
     },
     {
+        "libpng-apng",
+        "https://download.sourceforge.net/apng/libpng/libpng16/libpng-1.6.38-apng.zip",
+    },
+    {
         "png",
-        "https://download.sourceforge.net/libpng/lpng1637.zip",
+        "https://download.sourceforge.net/libpng/libpng-1.6.38.tar.gz",
     },
     {
         "bzip2",
@@ -114,6 +118,11 @@ for _, item in ipairs(downloads) do
             os.cp(f, target.."/")
         else
             archive.extract(f, target)
+        end
+        if item[1] == "png" and os.exists(path.join(os.scriptdir(), "libpng-apng/libpng-1.6.38-apng.patch")) then
+            os.cd(path.join(target, "libpng-1.6.38"))
+            os.exec("patch -p0 -i ../../libpng-apng/libpng-1.6.38-apng.patch")
+            os.cd("-")
         end
     end
 end
