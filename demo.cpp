@@ -20,18 +20,18 @@ SDL_Surface* _DrawText(TTF_Font* font, const char* text) {
 #define DEFAUTL_TTF "C:\\Windows\\Fonts\\msyh.ttc"
 #endif
 
-bool windowColorKey(SDL_Window *window, COLORREF colorKey) {
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);  // Initialize wmInfo
-    SDL_GetWindowWMInfo(window, &wmInfo);
-    HWND hWnd = wmInfo.info.win.window;
+// bool windowColorKey(SDL_Window *window, COLORREF colorKey) {
+//     SDL_SysWMinfo wmInfo;
+//     SDL_VERSION(&wmInfo.version);  // Initialize wmInfo
+//     SDL_GetWindowWMInfo(window, &wmInfo);
+//     HWND hWnd = wmInfo.info.win.window;
 
-    // Change window type to layered
-    SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+//     // Change window type to layered
+//     SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 
-    // Set transparency color
-    return SetLayeredWindowAttributes(hWnd, colorKey, 0, LWA_COLORKEY);
-}
+//     // Set transparency color
+//     return SetLayeredWindowAttributes(hWnd, colorKey, 0, LWA_COLORKEY);
+// }
 
 
 // IMG_Animation *IMG_LoadWEBPAnimation_RW(SDL_RWops *src)
@@ -199,7 +199,7 @@ int main()
 
     TTF_Init();
 
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11");
+    // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11");
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     window = SDL_CreateWindow("SDL Tutorial", mRect.x, mRect.y, mRect.w, mRect.h,

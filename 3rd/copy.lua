@@ -11,7 +11,7 @@ local libDir = path.join(os.scriptdir(), "lib-"..arch).."/"
 os.mkdir(includeDir)
 os.mkdir(libDir)
 
-local mode = "debug"
+local mode = "release"
 
 if is_host("macosx") then
     if isarm64 then
