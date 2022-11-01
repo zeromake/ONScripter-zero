@@ -1,6 +1,7 @@
 build
 .xmake
 .vscode
+.DS_Store
 *.a
 *.o
 

@@ -149,7 +149,7 @@ end
 
 
 
-local pngPath = path.join(os.scriptdir(), "png/lpng1638")
+local pngPath = path.join(os.scriptdir(), "png/libpng-1.6.38")
 local jpegSourceDir = path.join(os.scriptdir(), "jpeg/jpeg-9e")
 
 if targets["jpeg"] == true then

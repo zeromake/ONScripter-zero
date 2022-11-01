@@ -33,12 +33,15 @@
 #include "coding2utf16.h"
 #include "gbk2utf16.h"
 #ifdef _WIN32
+#include <io.h>
 #include <direct.h>
 #include <string>
 #include <algorithm>
 inline int mkdir(const char *pathname, int unused){
 	return _mkdir(pathname);
 }
+#else
+#include <unistd.h>
 #endif
 
 extern int errno;
@@ -82,6 +85,11 @@ int main( int argc, char **argv )
     if ( argc != 2 ){
         fprintf( stderr, "Usage: nsadec [-offset ##] [-ns2] [-out dir] [-lower] arc_file\n");
         exit(-1);
+    }
+    if (out) {
+        if (access(out, 0) != 0) {
+            mkdir(out, 0755);
+        }
     }
     cNR.openForConvert( argv[1], archive_type, nsa_offset );
     count = cNR.getNumFiles();
