@@ -83,12 +83,13 @@ local downloads = {
 
 local downloadDir = path.join(os.scriptdir(), "download")
 local curlBin = find_program("curl")
+local patchBin = find_program("patch")
 local proxyUrl = nil --"socks5://127.0.0.1:10800"
 
 os.mkdir(downloadDir)
 
 local function curlDowload(url, f)
-    local argv = {"-L", "-o", f}
+    local argv = {"-L", "--ssl-no-revoke", "-o", f}
     if proxyUrl ~= nil then
         table.insert(argv, "-x")
         table.insert(argv, proxyUrl)
@@ -119,9 +120,9 @@ for _, item in ipairs(downloads) do
         else
             archive.extract(f, target)
         end
-        if item[1] == "png" and os.exists(path.join(os.scriptdir(), "libpng-apng/libpng-1.6.38-apng.patch")) then
+        if item[1] == "png" and os.exists(path.join(os.scriptdir(), "libpng-apng/libpng-1.6.38-apng.patch")) and patchBin ~= nil then
             os.cd(path.join(target, "libpng-1.6.38"))
-            os.exec("patch -p0 -i ../../libpng-apng/libpng-1.6.38-apng.patch")
+            os.exec("patch -p 0 -i ../../libpng-apng/libpng-1.6.38-apng.patch")
             os.cd("-")
         end
     end
