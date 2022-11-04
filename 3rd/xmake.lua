@@ -133,7 +133,7 @@ elseif is_host("windows") then
         "src/audio/winmm/*.c",
         "src/audio/directsound/*.c",
         "src/filesystem/windows/*.c",
-        "src/thread/generic/*.c",
+        "src/thread/generic/SDL_syscond.c",
         "src/thread/windows/*.c",
         "src/core/windows/*.c",
         "src/timer/windows/*.c",
@@ -150,6 +150,9 @@ end
 target("sdl2")
     set_kind("static")
     add_defines("HAVE_LIBC=1")
+    if is_host("windows") then
+        add_defines("SDL_THREAD_WINDOWS=1")
+    end
     add_includedirs(path.join(sdlPath, "include"), path.join(sdlPath, "src/video/khronos"))
     for _, f in ipairs(sdlSrc) do
         add_files(path.join(sdlPath, f))

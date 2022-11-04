@@ -20,7 +20,7 @@
 */
 #pragma once
 #include <SDL.h>
-#ifndef __APPLE__
+#if !defined(__APPLE__) && (!defined(__MINGW64__) && !defined(__MINGW32__))
 #include <SDL_opengles2.h>
 #else
 // #include <OpenGLES/ES2/gl.h>
