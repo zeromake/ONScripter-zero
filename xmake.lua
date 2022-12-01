@@ -6,7 +6,8 @@ add_defines(
     "USE_SIMD_X86_AVX2=1",
     "ONS_JH_VERSION=\"0.8.0\"",
     "ONS_VERSION=\"20181218\"",
-    "NSC_VERSION=296"
+    "NSC_VERSION=296",
+    "WINVER=0x0606"
 )
 
 if is_host("windows") then
@@ -47,6 +48,9 @@ add_requires("sdl2_ttf", {configs={harfbuzz=true}})
 target("nsaconv")
     set_kind("binary")
     add_packages("bzip2", "jpeg")
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
     add_files(
         "src/tools/nsaconv.cpp",
         "src/coding2utf16.cpp",
@@ -63,6 +67,9 @@ target("nsaconv")
 target("nsadec")
     set_kind("binary")
     add_packages("bzip2")
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
     add_files(
         "src/tools/nsadec.cpp",
         "src/coding2utf16.cpp",
@@ -76,6 +83,9 @@ target("nsadec")
 
 target("nscriptdecode")
     set_kind("binary")
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
     add_files(
         "src/tools/nscriptdecode.cpp"
     )
@@ -83,6 +93,9 @@ target("nscriptdecode")
 target("sarconv")
     set_kind("binary")
     add_packages("bzip2", "jpeg")
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
     add_files(
         "src/tools/sarconv.cpp",
         "src/coding2utf16.cpp",
@@ -95,6 +108,9 @@ target("sarconv")
 target("sardec")
     set_kind("binary")
     add_packages("bzip2")
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
     add_files(
         "src/coding2utf16.cpp",
         "src/tools/sardec.cpp",
@@ -118,6 +134,9 @@ target("onscripter")
         "sdl2_mixer",
         "brotli"
     )
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
     if is_host("macosx") then
         add_files("src/entry/onscripter_main.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
@@ -145,7 +164,10 @@ target("demo")
         "harfbuzz",
         "webp"
     )
-    if is_host("windows") then
+    if is_plat("windows") ~= true and is_host("windows") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    if is_plat("windows") then
         add_files("src/resource.rc")
     end
     add_files("demo.cpp")

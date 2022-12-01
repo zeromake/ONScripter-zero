@@ -29,8 +29,19 @@ if is_host("macosx") then
 end
 
 
+local sdlPath = path.join(os.scriptdir(), "libsdl/SDL2-2.24.1")
+local sdlImagePath = path.join(os.scriptdir(), "libsdl_image/SDL2_image-2.6.2")
 local freetypePath = path.join(os.scriptdir(), "freetype/freetype-VER-2-12-1")
 local bzip2Path = path.join(os.scriptdir(), "bzip2/bzip2-1.0.6")
+local pngPath = path.join(os.scriptdir(), "png/libpng-1.6.38")
+local jpegSourceDir = path.join(os.scriptdir(), "jpeg/jpeg-9e")
+local harfbuzzPath = path.join(os.scriptdir(), "harfbuzz/harfbuzz-5.3.1")
+local zlibPath = path.join(os.scriptdir(), "zlib/zlib-1.2.13")
+local brotliPath = path.join(os.scriptdir(), "brotli/brotli-1.0.9")
+local smpegPath = path.join(os.scriptdir(), "smpeg/smpeg-main")
+local sdlMixerPath = path.join(os.scriptdir(), "libsdl_mixer/SDL2_mixer-2.6.2")
+local webpPath = path.join(os.scriptdir(), "libwebp/libwebp-1.2.4")
+local libFDKPath = path.join(os.scriptdir(), "fdk-aac/fdk-aac-2.0.2")
 
 if is_host("windows") then
     add_cxflags("/utf-8")
@@ -53,8 +64,6 @@ target("bzip2")
     end
 
 end
-
-local sdlPath = path.join(os.scriptdir(), "libsdl/SDL2-2.24.1")
 
 if targets["sdl2"] == true then
 local sdlSrc = {
@@ -124,7 +133,7 @@ elseif is_host("windows") then
         "src/audio/winmm/*.c",
         "src/audio/directsound/*.c",
         "src/filesystem/windows/*.c",
-        "src/thread/generic/*.c",
+        "src/thread/generic/SDL_syscond.c",
         "src/thread/windows/*.c",
         "src/core/windows/*.c",
         "src/timer/windows/*.c",
@@ -141,6 +150,9 @@ end
 target("sdl2")
     set_kind("static")
     add_defines("HAVE_LIBC=1")
+    if is_host("windows") then
+        add_defines("SDL_THREAD_WINDOWS=1")
+    end
     add_includedirs(path.join(sdlPath, "include"), path.join(sdlPath, "src/video/khronos"))
     for _, f in ipairs(sdlSrc) do
         add_files(path.join(sdlPath, f))
@@ -148,9 +160,6 @@ target("sdl2")
 end
 
 
-
-local pngPath = path.join(os.scriptdir(), "png/libpng-1.6.38")
-local jpegSourceDir = path.join(os.scriptdir(), "jpeg/jpeg-9e")
 
 if targets["jpeg"] == true then
 
@@ -219,13 +228,11 @@ target("jpeg")
     end
 
 end
-
-local sdlImagePath = "libsdl_image/SDL2_image-2.6.2"
 target("sdl2_image")
     set_kind("static")
     add_includedirs(
         path.join(sdlPath, "include"),
-        "libwebp/libwebp-1.2.4/src",
+        path.join(webpPath, "src"),
         jpegSourceDir,
         pngPath
     )
@@ -263,8 +270,6 @@ target("sdl2_image")
         add_files(path.join(sdlImagePath, f))
     end
 
-local harfbuzzPath = path.join(os.scriptdir(), "harfbuzz/harfbuzz-5.3.1")
-
 target("harfbuzz")
     set_kind("static")
     -- set_kind("shared")
@@ -279,16 +284,14 @@ target("harfbuzz")
         add_files(path.join(harfbuzzPath, f))
     end
 
-local zlibPath = "zlib/zlib-1.2.13"
-
 if targets["z"] == true then
 
 target("z")
     set_kind("static")
     on_config(function()
-        local libconfig = path.join(os.scriptdir(), zlibPath, "zconf.h")
+        local libconfig = path.join(zlibPath, "zconf.h")
         if not os.exists(libconfig) then
-            os.cp(path.join(os.scriptdir(), zlibPath, "zconf.h.in"), libconfig)
+            os.cp(path.join(zlibPath, "zconf.h.in"), libconfig)
         end
     end)
     for _, f in ipairs({
@@ -308,7 +311,7 @@ target("z")
         "gzread.c",
         "gzwrite.c",
     }) do
-        add_files(path.join(os.scriptdir(), zlibPath, f))
+        add_files(path.join(zlibPath, f))
     end
     if is_host("macosx") then
         add_defines("Z_HAVE_UNISTD_H=1")
@@ -322,7 +325,7 @@ if targets["png"] == true then
 target("png")
     set_kind("static")
     add_deps("z")
-    add_includedirs(path.join(os.scriptdir(), zlibPath))
+    add_includedirs(path.join(zlibPath))
     on_config(function()
         local libconfig = path.join(pngPath, "pnglibconf.h")
         if not os.exists(libconfig) then
@@ -389,7 +392,6 @@ target("png")
 end
 
 
-local brotliPath = path.join(os.scriptdir(), "brotli/brotli-1.0.9")
 
 target("brotli")
     set_kind("static")
@@ -515,7 +517,6 @@ local smpegFiles = {
     "audio/*.cpp",
 }
 
-local smpegPath = path.join(os.scriptdir(), "smpeg/smpeg-main")
 
 target("smpeg")
     set_kind("static")
@@ -541,8 +542,6 @@ target("smpeg")
         add_files(path.join(smpegPath, f))
     end
 
-local libFDKPath = path.join(os.scriptdir(), "fdk-aac/fdk-aac-2.0.2")
-
 local libFDKsubDirs = {
     "libAACdec",
     "libSBRdec",
@@ -566,8 +565,6 @@ local sdlMixerFiles = {
     "src/codecs/*.c",
     "src/codecs/native_midi/*.c",
 }
-
-local sdlMixerPath = path.join(os.scriptdir(), "libsdl_mixer/SDL2_mixer-2.6.2")
 
 target("sdl2_mixer")
     set_kind("static")
@@ -619,8 +616,6 @@ target("sdl2_mixer")
 --     for _, f in ipairs(de256Files) do
 --         add_files(path.join(de256Path, f))
 --     end
-
-local webpPath = path.join(os.scriptdir(), "libwebp/libwebp-1.2.4")
 local webpDirs = {
     "sharpyuv",
     "src/dec",
