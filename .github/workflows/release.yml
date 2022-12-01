@@ -53,6 +53,7 @@ jobs:
           sudo installer -pkg ./xmake.pkg -target /
           rm ./xmake.pkg
           xmake --version
+          brew install p7zip unzip
       - name: pre-env
         run: |
           sudo xmake update -s https://github.com/zeromake/xmake.git#master
