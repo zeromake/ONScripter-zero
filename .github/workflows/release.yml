@@ -28,7 +28,7 @@ jobs:
           xmake update -s https://github.com/zeromake/xmake.git#master
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - name: pre-repo
         shell: powershell
         run: |
@@ -60,11 +60,10 @@ jobs:
           xmake update -s https://github.com/zeromake/xmake.git#master
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - name: pre-repo
         run: |
-          git clone --depth 1 https://github.com/zeromake/xrepo.git .xrepo
-          xrepo add-repo local $PWD/.xrepo
+          xrepo add-repo local https://github.com/zeromake/xrepo.git
       - name: build-x64
         env:
           VERSION: ${{ github.ref_name }}
