@@ -63,7 +63,7 @@ jobs:
           fetch-depth: 0
       - name: pre-repo
         run: |
-          git clone --depth 0 https://github.com/zeromake/xrepo.git .xrepo
+          git clone --depth 1 https://github.com/zeromake/xrepo.git .xrepo
           xrepo add-repo local $PWD/.xrepo
       - name: build-x64
         env:
