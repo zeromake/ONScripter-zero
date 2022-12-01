@@ -58,7 +58,7 @@ int main( int argc, char **argv )
     int archive_type = BaseReader::ARCHIVE_TYPE_NSA;
     FILE *fp;
     struct stat file_stat;
-    char *out = "";
+    char *out;
     bool useLower = false;
     bool vLog = false;
     if ( argc >= 2 ){
