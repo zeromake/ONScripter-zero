@@ -19,7 +19,7 @@ end
 
 add_includedirs("src", "src/onscripter", "src/reader")
 
-add_requires(
+local deps = {
     "zlib",
     "bzip2",
     "jpeg",
@@ -29,21 +29,26 @@ add_requires(
     "sdl2_ttf",
     "sdl2_mixer",
     "brotli"
-)
-add_requires("freetype", {configs={
+}
+
+local dep_opt = {system=false}
+for _, dep_name in ipairs(deps) do
+    add_requires(dep_name, dep_opt)
+end
+add_requires("freetype", {system=false,configs={
     zlib=true,
     bzip2=true,
     brotli=true,
     png=true,
     harfbuzz=true
-}, lazy_options={configs={harfbuzz=false}}})
-add_requires("sdl2_image", {configs={
+}, lazy_options={system=false,configs={harfbuzz=false}}})
+add_requires("sdl2_image", {system=false,configs={
     png=true,
     jpeg=true,
     webp=true
 }})
-add_requires("harfbuzz", {configs={freetype=true}})
-add_requires("sdl2_ttf", {configs={harfbuzz=true}})
+add_requires("harfbuzz", {system=false,configs={freetype=true}})
+add_requires("sdl2_ttf", {system=false,configs={harfbuzz=true}})
 
 target("nsaconv")
     set_kind("binary")
