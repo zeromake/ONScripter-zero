@@ -10,9 +10,6 @@ jobs:
     name: windows build
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Setup Windows 10 SDK version 10.0.20348.0
         uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.8
         with:
@@ -29,6 +26,9 @@ jobs:
         run: |
           $env:path+=";$Home\scoop\shims"
           xmake update -s https://github.com/zeromake/xmake.git#master
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: build-x86_64
         env:
           VERSION: ${{ github.ref_name }}
@@ -38,8 +38,6 @@ jobs:
           xmake repo -a self https://github.com/zeromake/xrepo.git
           xmake f -c -y
           xmake build onscripter
-          mkdir dist
-          cp build\windows\x64\onscripter.exe dist\onscripter-windows-x86_64.exe
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-windows-${{ github.run_id }}
@@ -57,7 +55,7 @@ jobs:
           xmake --version
       - name: pre-env
         run: |
-          xmake update -s https://github.com/zeromake/xmake.git#master
+          sudo xmake update -s https://github.com/zeromake/xmake.git#master
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -68,18 +66,13 @@ jobs:
           xmake repo -a self https://github.com/zeromake/xrepo.git
           xmake f -c -y
           xmake build onscripter
-          mkdir -p dist
-          cp build/macosx/x86_64/onscripter dist/onscripter-darwin-x86_64
       - name: build-arm64
         env:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
-          ./build-3rd.sh
           xmake f -a arm64 -c -y
           xmake build onscripter
-          mkdir -p dist
-          cp build/macosx/arm64/onscripter dist/onscripter-darwin-arm64
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-osx-${{ github.run_id }}
@@ -106,6 +99,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            dist\onscripter-windows-x86_64.exe
+            dist/onscripter-windows-x86_64.exe
             dist/onscripter-darwin-x86_64
             dist/onscripter-darwin-arm64
