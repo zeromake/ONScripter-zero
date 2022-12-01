@@ -16,12 +16,37 @@ if is_host("windows") then
     add_defines("UNICODE", "_UNICODE")
 end
 
-add_includedirs("3rd/include", "src", "src/onscripter", "src/reader")
-add_linkdirs("3rd/lib-x64")
+add_includedirs("src", "src/onscripter", "src/reader")
+
+add_requires(
+    "zlib",
+    "bzip2",
+    "jpeg",
+    "png",
+    "webp",
+    "sdl2",
+    "sdl2_ttf",
+    "sdl2_mixer",
+    "brotli"
+)
+add_requires("freetype", {configs={
+    zlib=true,
+    bzip2=true,
+    brotli=true,
+    png=true,
+    harfbuzz=true
+}, lazy_options={configs={harfbuzz=false}}})
+add_requires("sdl2_image", {configs={
+    png=true,
+    jpeg=true,
+    webp=true
+}})
+add_requires("harfbuzz", {configs={freetype=true}})
+add_requires("sdl2_ttf", {configs={harfbuzz=true}})
 
 target("nsaconv")
     set_kind("binary")
-    add_links("bzip2", "jpeg")
+    add_packages("bzip2", "jpeg")
     add_files(
         "src/tools/nsaconv.cpp",
         "src/coding2utf16.cpp",
@@ -37,7 +62,7 @@ target("nsaconv")
 
 target("nsadec")
     set_kind("binary")
-    add_links("bzip2")
+    add_packages("bzip2")
     add_files(
         "src/tools/nsadec.cpp",
         "src/coding2utf16.cpp",
@@ -57,7 +82,7 @@ target("nscriptdecode")
 
 target("sarconv")
     set_kind("binary")
-    add_links("bzip2", "jpeg")
+    add_packages("bzip2", "jpeg")
     add_files(
         "src/tools/sarconv.cpp",
         "src/coding2utf16.cpp",
@@ -69,7 +94,7 @@ target("sarconv")
 
 target("sardec")
     set_kind("binary")
-    add_links("bzip2")
+    add_packages("bzip2")
     add_files(
         "src/coding2utf16.cpp",
         "src/tools/sardec.cpp",
@@ -79,45 +104,26 @@ target("sardec")
 
 target("onscripter")
     set_kind("binary")
-    add_links(
-        "z",
+    add_packages(
+        "zlib",
         "bzip2",
         "jpeg",
         "png",
+        "webp",
+        "freetype",
+        "harfbuzz",
         "sdl2",
         "sdl2_image",
         "sdl2_ttf",
         "sdl2_mixer",
-        "freetype",
-        "brotli",
-        "harfbuzz",
-        "webp"
+        "brotli"
     )
     if is_host("macosx") then
         add_files("src/entry/onscripter_main.mm")
-        add_frameworks(
-            "OpenGL",
-            "CoreVideo",
-            "CoreAudio",
-            "AudioToolbox",
-            "Carbon",
-            "CoreGraphics",
-            "ForceFeedback",
-            "Metal",
-            "AppKit",
-            "IOKit",
-            "CoreFoundation",
-            "Foundation",
-            "GameController",
-            "CoreHaptics"
-        )
-        add_syslinks("iconv")
         add_defines("RENDER_COPY_RECT_FULL=1")
     elseif is_host("windows") then
         add_files("src/resource.rc", "src/entry/onscripter_main.cpp")
-        add_syslinks("gdi32", "user32", "winmm", "shell32", "setupapi", "advapi32", "ole32", "version", "imm32", "oleaut32")
     end
-    add_packages("libsdl_ttf", "libsdl_mixer")
     add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
     remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")
@@ -125,8 +131,8 @@ target("onscripter")
 
 target("demo")
     set_kind("binary")
-    add_links(
-        "z",
+    add_packages(
+        "zlib",
         "bzip2",
         "jpeg",
         "png",
@@ -139,26 +145,7 @@ target("demo")
         "harfbuzz",
         "webp"
     )
-    if is_host("macosx") then
-        add_frameworks(
-            "OpenGL",
-            "CoreVideo",
-            "CoreAudio",
-            "AudioToolbox",
-            "Carbon",
-            "CoreGraphics",
-            "ForceFeedback",
-            "Metal",
-            "AppKit",
-            "IOKit",
-            "CoreFoundation",
-            "Foundation",
-            "GameController",
-            "CoreHaptics"
-        )
-        add_syslinks("iconv")
-    elseif is_host("windows") then
+    if is_host("windows") then
         add_files("src/resource.rc")
-        add_syslinks("gdi32", "user32", "winmm", "shell32", "setupapi", "advapi32", "ole32", "version", "imm32", "oleaut32")
     end
     add_files("demo.cpp")

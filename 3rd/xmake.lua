@@ -584,7 +584,9 @@ target("sdl2_mixer")
         "MUSIC_MP3_DRMP3=1",
         "MUSIC_FLAC_DRFLAC=1",
         "MUSIC_MID_NATIVE=1"
+        -- "MUSIC_MID_FLUIDSYNTH=1",
         -- "MUSIC_OPUS=1",
+        -- "MUSIC_MOD_MODPLUG=1",
         -- "MUSIC_MP3_MPG123=1",
         -- "MUSIC_MID_TIMIDITY=1",
         -- "MUSIC_MOD_XMP=1"
