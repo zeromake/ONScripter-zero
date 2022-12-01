@@ -64,8 +64,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake require -f -y --build
-          xmake f -c -y
+          xmake f -c -y -vD
           xmake build -y onscripter
       - name: build-arm64
         env:
