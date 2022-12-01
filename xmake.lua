@@ -158,7 +158,10 @@ target("onscripter")
         elseif target:is_arch("arm64") then
             out_name = out_name.."-arm64"
         end
-        os.cp(target:targetfile(), "dist/"..out_name)
+        if target:is_plat("windows", "mingw") then
+            out_name = out_name..".exe"
+        end
+        os.cp(target:targetfile(),  path.join(os.scriptdir(), "dist", out_name))
     end)
 
 target("demo")

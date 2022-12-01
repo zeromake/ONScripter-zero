@@ -57,11 +57,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: pre-repo
+        run: |
+          xmake repo -a self https://github.com/zeromake/xrepo.git
       - name: build-x64
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake repo -a self https://github.com/zeromake/xrepo.git
           xmake f -c -y
           xmake build -y onscripter
       - name: build-arm64
