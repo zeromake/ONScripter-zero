@@ -28,7 +28,7 @@ jobs:
         shell: powershell
         run: |
           $env:path+=";$Home\scoop\shims"
-          xmake update -s git@github.com:zeromake/xmake.git#master
+          xmake update -s https://github.com/zeromake/xmake.git#master
       - name: build-x86_64
         env:
           VERSION: ${{ github.ref_name }}
@@ -51,13 +51,13 @@ jobs:
     steps:
       - name: install-xmake
         run: |
-          curl -Lo ./xmake.pkg https://github.com/xmake-io/xmake/releases/download/v2.7.2/xmake-v2.7.3.macosx.pkg
+          curl -Lo ./xmake.pkg https://github.com/xmake-io/xmake/releases/download/v2.7.3/xmake-v2.7.3.macosx.pkg
           sudo installer -pkg ./xmake.pkg -target /
           rm ./xmake.pkg
           xmake --version
       - name: pre-env
         run: |
-          xmake update -s git@github.com:zeromake/xmake.git#master
+          xmake update -s https://github.com/zeromake/xmake.git#master
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
