@@ -11,3 +11,4 @@ build
 !3rd/xmake.lua
 !3rd/pre
 !3rd/.include
+dist

@@ -146,7 +146,20 @@ target("onscripter")
     add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
     remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")
-
+    after_build(function (target)
+        local out_name = "onscripter"
+        if target:is_plat("macosx") then
+            out_name = out_name.."-darwin"
+        elseif target:is_plat("windows", "mingw") then
+            out_name = out_name.."-windows"
+        end
+        if target:is_arch("x64", "x86_64") then
+            out_name = out_name.."-x86_64"
+        elseif target:is_arch("arm64") then
+            out_name = out_name.."-arm64"
+        end
+        os.cp(target:targetfile(), "dist/"..out_name)
+    end)
 
 target("demo")
     set_kind("binary")
