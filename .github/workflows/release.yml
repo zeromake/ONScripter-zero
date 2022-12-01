@@ -36,8 +36,8 @@ jobs:
         run: |
           $env:path+=";$Home\scoop\shims"
           xmake repo -a self https://github.com/zeromake/xrepo.git
-          xmake f -c -y
-          xmake build onscripter
+          xmake f -c -y -vD
+          xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-windows-${{ github.run_id }}
@@ -49,14 +49,11 @@ jobs:
     steps:
       - name: install-xmake
         run: |
-          curl -Lo ./xmake.pkg https://github.com/xmake-io/xmake/releases/download/v2.7.3/xmake-v2.7.3.macosx.pkg
-          sudo installer -pkg ./xmake.pkg -target /
-          rm ./xmake.pkg
+          brew install xmake
           xmake --version
-          brew install p7zip unzip
       - name: pre-env
         run: |
-          sudo xmake update -s https://github.com/zeromake/xmake.git#master
+          xmake update -s https://github.com/zeromake/xmake.git#master
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -66,14 +63,14 @@ jobs:
         run: |
           xmake repo -a self https://github.com/zeromake/xrepo.git
           xmake f -c -y
-          xmake build onscripter
+          xmake build -y onscripter
       - name: build-arm64
         env:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
           xmake f -a arm64 -c -y
-          xmake build onscripter
+          xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-osx-${{ github.run_id }}
