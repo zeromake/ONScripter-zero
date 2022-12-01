@@ -36,7 +36,7 @@ jobs:
         run: |
           $env:path+=";$Home\scoop\shims"
           xmake repo -a self https://github.com/zeromake/xrepo.git
-          xmake f -c -y -vD
+          xmake f -c -y
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
@@ -64,6 +64,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
+          xmake require -f -y --build
           xmake f -c -y
           xmake build -y onscripter
       - name: build-arm64
