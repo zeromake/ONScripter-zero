@@ -12,3 +12,4 @@ build
 !3rd/pre
 !3rd/.include
 dist
+.xrepo
