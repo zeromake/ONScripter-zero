@@ -22,31 +22,45 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 
 ## 编译指南
 
+**预先工作**
+> 由于 freetype, harfbuzz 的循环依赖，请使用我的 xmake 分支，已经向 xmake-io 提出 [issuse](https://github.com/xmake-io/xmake/issues/3118) 了，但是维护者没有空处理，我这边只是一个比较简单的实现。
+
+``` bash
+xmake update -s https://github.com/zeromake/xmake.git#master
+```
+
 **windows**
 > 需要安装 Visual Studio
 
 ``` powershell
-.\build-3rd.ps1
-xmake f -c
-xmake build onscripter
+xmake f -c -y
+xmake build -y onscripter
 ```
 
 **windows by mingw**
 > 安装 [llvm-mingw](https://github.com/mstorsjo/llvm-mingw/releases) 或者其它 `mingw` 的版本。
 ``` powershell
 $MINGW="D:\mingw64"
-.\build-3rd.ps1 "-p mingw --mingw=$MINGW"
-xmake f -p mingw --mingw=$MINGW -c
-xmake build onscripter
+xmake f -p mingw --mingw=$MINGW -y -c
+xmake build -y onscripter
 ```
 
 **osx**
 > 需要安装 xcode
 
 ``` bash
-./build-3rd.sh
-xmake f -c
-xmake build onscripter
+xmake f -y -c
+xmake build -y onscripter
+```
+
+**android**
+> 需要 android sdk + ndk
+
+``` bash
+ANDROID_SDK=~/Library/Android/sdk
+NDK_SDK=~/Library/Android/sdk/ndk/25.0.8775105
+xmake f -p android --ndk=${NDK_SDK} --android_sdk=${ANDROID_SDK} -y -c
+xmake build -y onscripter
 ```
 
 ## 吐槽
