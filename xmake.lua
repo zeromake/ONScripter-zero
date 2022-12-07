@@ -30,7 +30,7 @@ local deps = {
     "jpeg",
     "png",
     "webp",
-    "sdl2",
+    -- "sdl2",
     "sdl2_ttf",
     "sdl2_mixer",
     "brotli"
@@ -44,6 +44,8 @@ local dep_opt = {system=false}
 for _, dep_name in ipairs(deps) do
     add_requires(dep_name, dep_opt)
 end
+
+add_requires("sdl2")--, {configs={shared=true}})
 add_requires("freetype", {system=false,configs={
     zlib=true,
     bzip2=true,
@@ -183,21 +185,10 @@ target("onscripter")
         os.cp(target:targetfile(),  path.join(os.scriptdir(), "dist", out_name))
     end)
 
-target("demo")
-    set_kind("binary")
+target("main")
+    set_kind("shared")
     add_packages(
-        "zlib",
-        "bzip2",
-        "jpeg",
-        "png",
-        "sdl2",
-        "sdl2_image",
-        "sdl2_ttf",
-        "sdl2_mixer",
-        "freetype",
-        "brotli",
-        "harfbuzz",
-        "webp"
+        "sdl2"
     )
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
@@ -205,4 +196,28 @@ target("demo")
     if is_plat("windows") then
         add_files("src/resource.rc")
     end
-    add_files("demo.cpp")
+    add_files("demo.c")
+
+-- target("demo")
+--     set_kind("binary")
+--     add_packages(
+--         "zlib",
+--         "bzip2",
+--         "jpeg",
+--         "png",
+--         "sdl2",
+--         "sdl2_image",
+--         "sdl2_ttf",
+--         "sdl2_mixer",
+--         "freetype",
+--         "brotli",
+--         "harfbuzz",
+--         "webp"
+--     )
+--     if is_plat("mingw") then
+--         add_ldflags("-static-libgcc", "-static-libstdc++")
+--     end
+--     if is_plat("windows") then
+--         add_files("src/resource.rc")
+--     end
+--     add_files("demo.cpp")
