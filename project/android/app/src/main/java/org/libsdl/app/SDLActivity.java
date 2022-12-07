@@ -62,6 +62,10 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
     private static final int SDL_MAJOR_VERSION = 2;
     private static final int SDL_MINOR_VERSION = 26;
     private static final int SDL_MICRO_VERSION = 1;
+
+    protected boolean initWindowStyle() {
+        return false;
+    }
 /*
     // Display InputType.SOURCE/CLASS of events and devices
     //
@@ -414,7 +418,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         setContentView(mLayout);
 
-        setWindowStyle(false);
+        setWindowStyle(this.initWindowStyle());
 
         getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(this);
 
