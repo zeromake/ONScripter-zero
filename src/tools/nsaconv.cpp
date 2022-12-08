@@ -72,7 +72,7 @@ int main( int argc, char **argv )
         else if ( !strcmp( argv[0], "-j" ) )    bmp2jpeg_flag = true;
         else if ( !strcmp( argv[0], "-ns2" ) )  nsa_offset = 1;
         else if ( !strcmp( argv[0], "-ns3" ) )  nsa_offset = 2;
-        else if ( !strcmp( argv[0], "-q" ) ){
+        else if ( !strcmp( argv[0], "-q" ) ) {
             argc--;
             argv++;
             quality = atoi(argv[0]);

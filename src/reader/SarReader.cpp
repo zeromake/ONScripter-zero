@@ -63,6 +63,21 @@ int SarReader::open( const char *name )
     return 0;
 }
 
+SarReader::ArchiveInfo* SarReader::openForCreate( const char *name )
+{
+    ArchiveInfo* info = new ArchiveInfo();
+    if ( (info->file_handle = ::fopen(name, "wb")) == NULL ){
+        delete info;
+        return NULL;
+    }
+    info->file_name = new char[strlen(name)+1];
+    memcpy(info->file_name, name, strlen(name)+1);
+    last_archive_info->next = info;
+    last_archive_info = last_archive_info->next;
+    num_of_sar_archives++;
+    return info;
+}
+
 void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int offset )
 {
     unsigned int i;

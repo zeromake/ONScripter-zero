@@ -114,6 +114,17 @@ int NsaReader::openForConvert( char *nsa_name, int archive_type, unsigned int ns
     return 0;
 }
 
+NsaReader::ArchiveInfo* NsaReader::openForCreate( const char *nsa_name, int archive_type, int nsaoffset )
+{
+    sar_flag = false;
+    nsa_offset = nsaoffset;
+    if ( ( archive_info.file_handle = ::fopen( nsa_name, "wb" ) ) == NULL ){
+        utils::printError("can't open file %s\n", nsa_name );
+        return NULL;
+    }
+    return &archive_info;
+}
+
 int NsaReader::writeHeader( FILE *fp, int archive_type, int nsa_offset )
 {
     ArchiveInfo *ai = &archive_info;
