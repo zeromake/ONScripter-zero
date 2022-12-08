@@ -61,7 +61,7 @@ struct BaseReader
         LZSS_COMPRESSION = 2,
         NBZ_COMPRESSION  = 4
     };
-    
+
     enum {
         ARCHIVE_TYPE_NONE = 0,
         ARCHIVE_TYPE_SAR  = 1,
@@ -102,10 +102,10 @@ struct BaseReader
     };
 
     virtual ~BaseReader(){};
-    
+
     virtual int open( const char *name=NULL ) = 0;
     virtual int close() = 0;
-    
+
     virtual const char *getArchiveName() const = 0;
     virtual int  getNumFiles() = 0;
     virtual void registerCompressionType( const char *ext, int type ) = 0;

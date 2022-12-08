@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  DirtyRect.h - Invalid region on text_surface which should be updated
  *
  *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
@@ -32,7 +32,7 @@ struct DirtyRect
     DirtyRect( const DirtyRect &d );
     DirtyRect& operator =( const DirtyRect &d );
     ~DirtyRect();
-    
+
     void setDimension(int w, int h);
     void add( SDL_Rect src );
     void clear();

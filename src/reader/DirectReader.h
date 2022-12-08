@@ -50,7 +50,7 @@ public:
     static void convertCodingToEUC( char *buf );
     static void convertCodingToUTF8( char *dst_buf, const char *src_buf );
     static void convertFromUTF8ToCoding( char *dst_buf, const char *src_buf );
-    
+
 protected:
     char *file_full_path;
     char *file_sub_path;
@@ -66,7 +66,7 @@ protected:
     unsigned char *read_buf;
     unsigned char *decomp_buffer;
     size_t decomp_buffer_len;
-    
+
     struct RegisteredCompressionType{
         RegisteredCompressionType *next;
         char *ext;
@@ -106,7 +106,7 @@ protected:
     size_t decodeLZSS( struct ArchiveInfo *ai, int no, unsigned char *buf );
     int getRegisteredCompressionType( const char *file_name );
     size_t getDecompressedFileLength( int type, FILE *fp, size_t offset );
-    
+
 private:
     FILE *getFileHandle( const char *file_name, int &compression_type, size_t *length );
 };

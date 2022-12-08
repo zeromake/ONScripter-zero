@@ -65,7 +65,7 @@ namespace simd {
     return _mm256_srli_epi16(a, imm8);
 #endif
   }
-  
+
   inline uint16x16 operator>>(uint16x16 a, immint<8> imm8) { return shiftr<8>(a); }
   inline uint16x16 operator>>=(uint16x16 &a, immint<8> imm8) { return a = a >> imm8; }
 }

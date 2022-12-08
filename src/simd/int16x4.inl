@@ -81,7 +81,7 @@ namespace simd{
     return vshr_n_u16(a, imm8);
 #endif
   }
-  
+
   inline uint16x4 operator>>(uint16x4 a, immint<8> imm8) { return shiftr<8>(a); }
   inline uint16x4 operator>>=(uint16x4 &a, immint<8> imm8) { return a = a >> imm8; }
 }

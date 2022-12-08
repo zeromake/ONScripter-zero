@@ -118,7 +118,7 @@ AnimationInfo& AnimationInfo::operator =(const AnimationInfo &anim)
             duration_list = new int[ anim.num_of_cells ];
             memcpy(duration_list, anim.duration_list, sizeof(int)*anim.num_of_cells);
         }
-        
+
         if (image_surface){
             image_surface = allocSurface( anim.image_surface->w, anim.image_surface->h, texture_format );
             memcpy(image_surface->pixels, anim.image_surface->pixels, anim.image_surface->pitch*anim.image_surface->h);
@@ -223,7 +223,7 @@ bool AnimationInfo::proceedAnimation(int current_time)
     if (!visible || !is_animatable || next_time > current_time) return false;
 
     bool is_changed = false;
-    
+
 #ifdef USE_BUILTIN_LAYER_EFFECTS
     if (trans_mode == AnimationInfo::TRANS_LAYER) {
         if (layer_no >= 0) {
@@ -305,7 +305,7 @@ int AnimationInfo::doClipping( SDL_Rect *dst, SDL_Rect *clip, SDL_Rect *clipped 
     if ( clip->x + clip->w < dst->x + dst->w ){
         dst->w = clip->x + clip->w - dst->x;
     }
-    
+
     if ( dst->y < clip->y ){
         dst->h -= clip->y - dst->y;
         if ( clipped ) clipped->y = clip->y - dst->y;
@@ -481,7 +481,7 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
                                     SDL_Rect &clip, int alpha )
 {
     if ( image_surface == NULL ) return;
-    
+
     SDL_Rect dst_rect, src_rect;
     dst_rect.x = dst_x;
     dst_rect.y = dst_y;
@@ -491,11 +491,11 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
     if (alpha == 0) return;
 
     /* ---------------------------------------- */
-    
+
     SDL_mutexP(mutex);
     SDL_LockSurface( dst_surface );
     SDL_LockSurface( image_surface );
-    
+
     alpha &= 0xff;
     int pitch = image_surface->pitch / sizeof(ONSBuf);
 
@@ -601,7 +601,7 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
 
     // project corner point and calculate bounding box
     int min_xy[2]={bounding_rect.x, bounding_rect.y};
-    int max_xy[2]={bounding_rect.x+bounding_rect.w-1, 
+    int max_xy[2]={bounding_rect.x+bounding_rect.w-1,
                    bounding_rect.y+bounding_rect.h-1};
 
     // clip bounding box
@@ -620,7 +620,7 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
     SDL_mutexP(mutex);
     SDL_LockSurface( dst_surface );
     SDL_LockSurface( image_surface );
-    
+
     alpha &= 0xff;
     int pitch = image_surface->pitch / sizeof(ONSBuf);
     int cx2 = affine_pos.x*2 + affine_pos.w; // center x multiplied by 2
@@ -782,7 +782,7 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
 #else
     for (int y = min_xy[1]; y <= max_xy[1]; y++) blender(y);
 #endif
-    
+
     // unlock surface
     SDL_UnlockSurface( image_surface );
     SDL_UnlockSurface( dst_surface );
@@ -809,15 +809,15 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
     }                                                                   \
 }
 // Originally, the above looks like this.
-//        Uint32 alpha = *dst_buffer >> 24;                             
-//        Uint32 mask1 = ((0xff ^ mask2)*alpha) >> 8;                     
-//        alpha = 0xff ^ ((0xff ^ alpha)*(0xff ^ mask2) >> 8);            
-//        Uint32 mask_rb =  ((*dst_buffer & 0xff00ff) * mask1 +           
-//                           src_color1 * mask2);                         
-//        mask_rb = ((mask_rb / alpha) & 0x00ff0000) |                    
-//            (((mask_rb & 0xffff) / alpha) & 0xff);                      
-//        Uint32 mask_g  = (((*dst_buffer & 0x00ff00) * mask1 +           
-//                           src_color2 * mask2) / alpha) & 0x00ff00;     
+//        Uint32 alpha = *dst_buffer >> 24;
+//        Uint32 mask1 = ((0xff ^ mask2)*alpha) >> 8;
+//        alpha = 0xff ^ ((0xff ^ alpha)*(0xff ^ mask2) >> 8);
+//        Uint32 mask_rb =  ((*dst_buffer & 0xff00ff) * mask1 +
+//                           src_color1 * mask2);
+//        mask_rb = ((mask_rb / alpha) & 0x00ff0000) |
+//            (((mask_rb & 0xffff) / alpha) & 0xff);
+//        Uint32 mask_g  = (((*dst_buffer & 0x00ff00) * mask1 +
+//                           src_color2 * mask2) / alpha) & 0x00ff00;
 //        *dst_buffer = mask_rb | mask_g | (alpha << 24);
 
 // used to draw characters on text_surface
@@ -827,7 +827,7 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
                                SDL_Rect *clip, bool rotate_flag )
 {
     if (image_surface == NULL || surface == NULL) return;
-    
+
     SDL_Rect dst_rect;
     dst_rect.x = dst_x;
     dst_rect.y = dst_y;
@@ -848,7 +848,7 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
         src_rect.x += clipped_rect.x;
         src_rect.y += clipped_rect.y;
     }
-    
+
     /* ---------------------------------------- */
     /* 2nd clipping */
     SDL_Rect clip_rect;
@@ -856,16 +856,16 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
     clip_rect.w = image_surface->w;
     clip_rect.h = image_surface->h;
     if ( doClipping( &dst_rect, &clip_rect, &clipped_rect ) ) return;
-    
+
     src_rect.x += clipped_rect.x;
     src_rect.y += clipped_rect.y;
 
     /* ---------------------------------------- */
-    
+
     SDL_mutexP(mutex);
     SDL_LockSurface( surface );
     SDL_LockSurface( image_surface );
-    
+
     SDL_PixelFormat *fmt = image_surface->format;
 
     int pitch = image_surface->pitch / sizeof(ONSBuf);
@@ -877,7 +877,7 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
     ONSBuf *dst_buffer = (ONSBuf *)image_surface->pixels + pitch * dst_rect.y + image_surface->w*current_cell/num_of_cells + dst_rect.x;
 
     if (!rotate_flag){
-        unsigned char *src_buffer = (unsigned char*)surface->pixels + 
+        unsigned char *src_buffer = (unsigned char*)surface->pixels +
             surface->pitch*src_rect.y + src_rect.x;
         for (int i=dst_rect.h ; i!=0 ; i--){
             for (int j=dst_rect.w ; j!=0 ; j--){
@@ -891,7 +891,7 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
     }
     else{
         for (int i=0 ; i<dst_rect.h ; i++){
-            unsigned char *src_buffer = (unsigned char*)surface->pixels + 
+            unsigned char *src_buffer = (unsigned char*)surface->pixels +
                 surface->pitch*(surface->h - src_rect.x - 1) + src_rect.y + i;
             for (int j=dst_rect.w ; j!=0 ; j--){
                 BLEND_TEXT_ALPHA();
@@ -942,7 +942,7 @@ void AnimationInfo::calcAffineMatrix()
     bounding_rect.y = min_xy[1];
     bounding_rect.w = max_xy[0]-min_xy[0]+1;
     bounding_rect.h = max_xy[1]-min_xy[1]+1;
-    
+
     // calculate inverse matrix
     int denom = scale_x*scale_y;
     if (denom == 0) return;
@@ -986,7 +986,7 @@ void AnimationInfo::allocImage( int w, int h, Uint32 texture_format )
         this->texture_format = texture_format;
         SDL_mutexP(mutex);
         image_surface = allocSurface( w, h, texture_format );
-        SDL_mutexV(mutex);      
+        SDL_mutexV(mutex);
     }
 
     abs_flag = true;
@@ -1002,7 +1002,7 @@ void AnimationInfo::allocImage( int w, int h, Uint32 texture_format )
 void AnimationInfo::copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_Rect *dst_rect )
 {
     if (!image_surface || !surface) return;
-    
+
     SDL_Rect _dst_rect = {0, 0};
     if (dst_rect) _dst_rect = *dst_rect;
 
@@ -1014,12 +1014,12 @@ void AnimationInfo::copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_R
 
     if (_src_rect.x >= surface->w) return;
     if (_src_rect.y >= surface->h) return;
-    
+
     if (_src_rect.x+_src_rect.w >= surface->w)
         _src_rect.w = surface->w - _src_rect.x;
     if (_src_rect.y+_src_rect.h >= surface->h)
         _src_rect.h = surface->h - _src_rect.y;
-        
+
     if (_dst_rect.x+_src_rect.w > image_surface->w)
         _src_rect.w = image_surface->w - _dst_rect.x;
     if (_dst_rect.y+_src_rect.h > image_surface->h)
@@ -1043,7 +1043,7 @@ void AnimationInfo::copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_R
 void AnimationInfo::fill( Uint8 r, Uint8 g, Uint8 b, Uint8 a )
 {
     if (!image_surface) return;
-    
+
     SDL_mutexP(mutex);
     SDL_LockSurface( image_surface );
 
@@ -1092,7 +1092,7 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
         ref_color = *(buffer + surface->w - 1);
     }
     else if ( trans_mode == TRANS_DIRECT ) {
-        ref_color = 
+        ref_color =
             direct_color[0] << fmt->Rshift |
             direct_color[1] << fmt->Gshift |
             direct_color[2] << fmt->Bshift;
@@ -1180,7 +1180,7 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
                 *alphap = 0xff;
         }
     }
-    
+
     SDL_UnlockSurface( surface );
 
     return surface;
@@ -1202,7 +1202,7 @@ unsigned char AnimationInfo::getAlpha(int x, int y)
     x -= pos.x;
     y -= pos.y;
     int offset_x = (image_surface->w/num_of_cells)*current_cell;
-    
+
     unsigned char alpha = 0;
     int pitch = image_surface->pitch / 4;
     SDL_mutexP(mutex);
@@ -1228,7 +1228,7 @@ void AnimationInfo::convertFromYUV(SDL_Overlay *src)
         SDL_mutexV(mutex);
         return;
     }
-    
+
     SDL_Surface *ls = image_surface;
 
     SDL_LockSurface(ls);
@@ -1240,7 +1240,7 @@ void AnimationInfo::convertFromYUV(SDL_Overlay *src)
         Uint8 *v = src->pixels[1]+src->pitches[1]*i3;
         Uint8 *u = src->pixels[2]+src->pitches[2]*i3;
         ONSBuf *p = (ONSBuf*)ls->pixels + (ls->pitch/sizeof(ONSBuf))*i;
-        
+
         for (int j=0 ; j<ls->w ; j++){
             int j2 = src->w*j/ls->w;
             int j3 = (src->w/2)*j/ls->w;

@@ -53,7 +53,7 @@ int SarReader::open( const char *name )
 
     info->file_name = new char[strlen(name)+1];
     memcpy(info->file_name, name, strlen(name)+1);
-    
+
     readArchive( info );
 
     last_archive_info->next = info;
@@ -66,7 +66,7 @@ int SarReader::open( const char *name )
 void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int offset )
 {
     unsigned int i;
-    
+
     /* Read header */
     for (i=0; i<offset; i++)
         readChar( ai->file_handle ); // for commands "ns2" and "ns3"
@@ -121,10 +121,10 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
         // start (4byte), length (4byte))
         ai->num_of_files = readShort( ai->file_handle );
         ai->fi_list = new FileInfo[ ai->num_of_files ];
-    
+
         ai->base_offset = readLong( ai->file_handle );
         ai->base_offset += offset;
-    
+
         for ( i=0 ; i<ai->num_of_files ; i++ ){
             unsigned char ch;
             int count = 0;
@@ -172,13 +172,13 @@ int SarReader::writeHeaderSub( ArchiveInfo *ai, FILE *fp, int archive_type, int 
         fputc( 0, fp );
     writeShort( fp, ai->num_of_files  );
     writeLong( fp, ai->base_offset-nsa_offset );
-    
+
     for ( i=0 ; i<ai->num_of_files ; i++ ){
 
         for ( j=0 ; ai->fi_list[i].name[j] ; j++ )
             fputc( ai->fi_list[i].name[j], fp );
         fputc( ai->fi_list[i].name[j], fp );
-        
+
         if ( archive_type >= ARCHIVE_TYPE_NSA )
             writeChar( fp, ai->fi_list[i].compression_type );
 
@@ -235,7 +235,7 @@ size_t SarReader::putFileSub( ArchiveInfo *ai, FILE *fp, int no, size_t offset, 
     }
 
     ai->fi_list[no].offset = offset;
-    
+
     return ai->fi_list[no].length;
 }
 
@@ -248,7 +248,7 @@ size_t SarReader::putFile( FILE *fp, int no, size_t offset, size_t length, size_
 int SarReader::close()
 {
     ArchiveInfo *info = archive_info.next;
-    
+
     for ( int i=0 ; i<num_of_sar_archives ; i++ ){
         last_archive_info = info;
         info = info->next;
@@ -265,12 +265,12 @@ const char *SarReader::getArchiveName() const
 int SarReader::getNumFiles(){
     ArchiveInfo *info = archive_info.next;
     int num = 0;
-    
+
     for ( int i=0 ; i<num_of_sar_archives ; i++ ){
         num += info->num_of_files;
         info = info->next;
     }
-    
+
     return num;
 }
 
@@ -307,7 +307,7 @@ size_t SarReader::getFileLength( const char *file_name )
         info = info->next;
     }
     if ( !info ) return 0;
-    
+
     if ( info->fi_list[j].original_length != 0 )
         return info->fi_list[j].original_length;
 
@@ -317,7 +317,7 @@ size_t SarReader::getFileLength( const char *file_name )
     if ( type == NBZ_COMPRESSION || type == SPB_COMPRESSION ) {
         info->fi_list[j].original_length = getDecompressedFileLength( type, info->file_handle, info->fi_list[j].offset );
     }
-    
+
     return info->fi_list[j].original_length;
 }
 
@@ -366,7 +366,7 @@ size_t SarReader::getFile( const char *file_name, unsigned char *buf, int *locat
         info = info->next;
     }
     if ( location ) *location = ARCHIVE_TYPE_SAR;
-    
+
     return j;
 }
 

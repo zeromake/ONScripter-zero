@@ -318,7 +318,7 @@ int main(int argc, char* argv[])
                     exit = SDL_TRUE;
                     break;
             }
-        
+
 
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);

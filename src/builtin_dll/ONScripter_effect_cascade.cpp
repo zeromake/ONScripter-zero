@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ONScripter_effect_cascade.cpp
  *    - Emulation of Takashi Toyama's "cascade.dll" NScripter plugin effect
  *
@@ -44,7 +44,7 @@ void ONScripter::effectCascade( char *params, int duration )
     SDL_Rect src_rect={0, 0, screen_width, screen_height};
     SDL_Rect dst_rect={0, 0, screen_width, screen_height};
     int mode, width, start, end;
- 
+
     if (params[0] == 'u')
         mode = CASCADE_UP;
     else if (params[0] == 'd')

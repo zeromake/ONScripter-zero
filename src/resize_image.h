@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  resize_image.h - resize image using smoothing and resampling
  *
  *  Copyright (c) 2001-2004 Ogapee. All rights reserved.

@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  FontInfo.h - Font information storage class of ONScripter
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
@@ -65,7 +65,7 @@ public:
     void setTateyokoMode( int tateyoko_mode );
     int getTateyokoMode();
     int getRemainingLine();
-    
+
     int x(bool use_ruby_offset=true);
     int y(bool use_ruby_offset=true);
     void setXY( int x=-1, int y=-1 );

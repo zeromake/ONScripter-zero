@@ -97,7 +97,7 @@ void ONScripter::initSDL()
 {
     /* ---------------------------------------- */
     /* Initialize SDL */
-    // 
+    //
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0){
         utils::printError("Couldn't initialize SDL: %s\n", SDL_GetError());
         exit(-1);
@@ -152,7 +152,7 @@ void ONScripter::initSDL()
     }
 
     screen_bpp = 32;
-    
+
 #if (defined(IOS) || defined(ANDROID) || defined(WINRT))
     SDL_DisplayMode mode;
     SDL_GetDisplayMode(0, 0, &mode);
@@ -176,9 +176,9 @@ void ONScripter::initSDL()
         screen_device_width = screen_width;
         screen_device_height = screen_width/aspect_ratio;
     }
-    
+
     // use hardware scaling
-    
+
     if (script_h.screen_ratio1 > 0 && script_h.screen_ratio2 > 0) {
         screen_ratio1 = script_h.screen_ratio1;
         screen_ratio2 = script_h.screen_ratio2;
@@ -252,7 +252,7 @@ void ONScripter::initSDL()
 
     utils::printInfo("Display: %s %d x %d (%d bpp)\n", info.name, screen_width, screen_height, screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
-    
+
     screen_rect.x = screen_rect.y = 0;
     screen_rect.w = screen_width;
     screen_rect.h = screen_height;
@@ -263,7 +263,7 @@ void ONScripter::initSDL()
         float output_size[2] = {(float)render_view_rect.w, (float)render_view_rect.h};
         gles_renderer = new GlesRenderer(window, texture, input_size, output_size, sharpness);
     }
-    
+
     wm_title_string = new char[ strlen(DEFAULT_WM_TITLE) + 1 ];
     memcpy( wm_title_string, DEFAULT_WM_TITLE, strlen(DEFAULT_WM_TITLE) + 1 );
     wm_icon_string = new char[ strlen(DEFAULT_WM_ICON) + 1 ];
@@ -466,7 +466,7 @@ int ONScripter::openScript()
         archive_path = new char[1];
         archive_path[0] = 0;
     }
-    
+
     if (key_exe_file){
         createKeyTable( key_exe_file );
         script_h.setKeyTable( key_table );
@@ -525,11 +525,11 @@ int ONScripter::init()
 
             FcConfigSubstitute( NULL, pat, FcMatchPattern );
             FcDefaultSubstitute( pat );
-            
+
             FcResult result;
             FcPattern *p_pat = FcFontMatch( NULL, pat, &result );
             FcPatternDestroy( pat );
-            
+
             FcChar8* val_s;
             if (FcResultMatch == FcPatternGetString( p_pat, FC_FILE, 0, &val_s )){
                 delete[] font_file;
@@ -544,7 +544,7 @@ int ONScripter::init()
         }
 #endif
     }
-    
+
     // ----------------------------------------
     // variables relevant to sound
     // this->cdaudio_flag = cdaudio_flag;
@@ -591,7 +591,7 @@ int ONScripter::init()
 
     // ----------------------------------------
     // Initialize misc variables
-    
+
     breakup_cells = NULL;
     breakup_mask = breakup_cellforms = NULL;
 
@@ -628,7 +628,7 @@ int ONScripter::init()
         _FontInfo::font_cache = font_cache;
         _FontInfo::font_cache_size = size;
     }
-    
+
     auto ff = generateFPath();
     if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2, ff) == NULL ){
         utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file);
@@ -690,7 +690,7 @@ void ONScripter::reset()
 
     setStr(&getret_str, NULL);
     getret_int = 0;
-    
+
     // ----------------------------------------
     // variables relevant to sound
     wave_play_loop_flag = false;
@@ -705,7 +705,7 @@ void ONScripter::reset()
     mp3fadeout_duration_internal = 0;
     mp3fadein_duration_internal = 0;
     current_cd_track = -1;
-    
+
     resetSub();
     if (blt_texture != NULL) SDL_DestroyTexture(blt_texture);
     blt_texture = NULL;
@@ -739,7 +739,7 @@ void ONScripter::resetSub()
     line_enter_status = 0;
     page_enter_status = 0;
     in_textbtn_flag = false;
-    
+
     resetSentenceFont();
 
     deleteNestInfo();
@@ -809,14 +809,14 @@ void ONScripter::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag,
         if (dirty_rect.bounding_box.w * dirty_rect.bounding_box.h > 0)
             flushDirect( dirty_rect.bounding_box, refresh_mode );
     }
-    
+
     if ( clear_dirty_flag ) dirty_rect.clear();
 }
 
 void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
 {
     //utils::printInfo("flush %d: %d %d %d %d\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );
-    
+
     SDL_Rect dst_rect = rect;
     --dst_rect.x; --dst_rect.y; dst_rect.w += 2; dst_rect.h += 2;
     if (AnimationInfo::doClipping(&dst_rect, &screen_rect) || (dst_rect.w == 2 && dst_rect.h == 2)) return;
@@ -843,12 +843,12 @@ void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
 #ifdef USE_SMPEG
 void ONScripter::flushDirectYUV(SDL_Overlay *overlay)
 {
-    SDL_Rect dst_rect = {(device_width -screen_device_width )/2, 
+    SDL_Rect dst_rect = {(device_width -screen_device_width )/2,
                          (device_height-screen_device_height)/2,
                          screen_device_width, screen_device_height};
     SDL_UpdateTexture(texture, &screen_rect, overlay->pixels[0], overlay->pitches[0]);
     SDL_RenderCopy(renderer, texture, &screen_rect, &dst_rect);
-    SDL_RenderPresent(renderer);  
+    SDL_RenderPresent(renderer);
 }
 #endif
 
@@ -926,16 +926,16 @@ void ONScripter::mouseOverCheck( int x, int y )
         if ( is_exbtn_enabled && exbtn_d_button_link.exbtn_ctl[1] ){
             decodeExbtnControl( exbtn_d_button_link.exbtn_ctl[1], &check_src_rect, &check_dst_rect );
         }
-        
+
         if ( bl ){
             if ( system_menu_mode != SYSTEM_NULL ){
                 if ( menuselectvoice_file_name[MENUSELECTVOICE_OVER] )
-                    playSound(menuselectvoice_file_name[MENUSELECTVOICE_OVER], 
+                    playSound(menuselectvoice_file_name[MENUSELECTVOICE_OVER],
                               SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
             }
             else{
                 if ( selectvoice_file_name[SELECTVOICE_OVER] )
-                    playSound(selectvoice_file_name[SELECTVOICE_OVER], 
+                    playSound(selectvoice_file_name[SELECTVOICE_OVER],
                               SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
             }
             check_dst_rect = bl->image_rect;
@@ -960,7 +960,7 @@ void ONScripter::mouseOverCheck( int x, int y )
             current_button_link = bl;
             shortcut_mouse_line = c;
         }
-        
+
         flush( refreshMode() );
         dirty_rect = dirty;
     }
@@ -1031,7 +1031,7 @@ void ONScripter::executeLabel()
         readToken();
         goto executeLabelTop;
     }
-    
+
     utils::printError(" ***** End *****\n");
     endCommand();
 }
@@ -1117,7 +1117,7 @@ void ONScripter::deleteButtonLink()
         delete b2;
     }
     root_button_link.next = NULL;
-    
+
     for (int i=0 ; i<3 ; i++){
         if ( exbtn_d_button_link.exbtn_ctl[i] ){
             delete[] exbtn_d_button_link.exbtn_ctl[i];
@@ -1164,7 +1164,7 @@ void ONScripter::clearCurrentPage()
     int num = (sentence_font.num_xy[0]*2+1)*sentence_font.num_xy[1];
     if (sentence_font.getTateyokoMode() == _FontInfo::TATE_MODE)
         num = (sentence_font.num_xy[1]*2+1)*sentence_font.num_xy[0];
-    
+
     if ( current_page->text &&
          current_page->max_text != num ){
         delete[] current_page->text;
@@ -1269,13 +1269,13 @@ ButtonLink *ONScripter::getSelectableSentence( char *buffer, _FontInfo *info, bo
     int current_text_xy[2];
     current_text_xy[0] = info->xy[0];
     current_text_xy[1] = info->xy[1];
-    
+
     ButtonLink *bl = new ButtonLink();
     bl->button_type = ButtonLink::TMP_SPRITE_BUTTON;
     bl->show_flag = 1;
 
     AnimationInfo *ai = bl->anim[0] = new AnimationInfo();
-    
+
     ai->trans_mode = AnimationInfo::TRANS_STRING;
     ai->is_single_line = false;
     ai->num_of_cells = 2;
@@ -1303,7 +1303,7 @@ ButtonLink *ONScripter::getSelectableSentence( char *buffer, _FontInfo *info, bo
         info->xy[1] = current_text_xy[1];
 
     dirty_rect.add( bl->image_rect );
-    
+
     return bl;
 }
 
@@ -1387,7 +1387,7 @@ void ONScripter::loadEnvData()
     kidokumode_flag = true;
     setStr( &save_dir_envdata, NULL );
     automode_time = DEFAULT_AUTOMODE_TIME;
-    
+
     if (loadFileIOBuf( "envdata" ) > 0){
         if (readInt() == 1 && window_mode == false) {
             menu_fullCommand();

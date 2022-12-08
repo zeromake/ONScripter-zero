@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                 viewport_rect.x = 0;
             }
         }
-    
+
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
 

@@ -96,7 +96,7 @@ DirectReader::~DirectReader()
     delete[] capital_name_tmp;
     delete[] read_buf;
     delete[] decomp_buffer;
-    
+
     last_registered_compression_type = root_registered_compression_type.next;
     while ( last_registered_compression_type ){
         RegisteredCompressionType *cur = last_registered_compression_type;
@@ -137,12 +137,12 @@ FILE *DirectReader::fopen(const char *path, const char *mode)
             if (delim_p != cur_p) break;
             cur_p++;
         }
-        
+
         if (delim_p) len = delim_p - cur_p;
         else         len = strlen(cur_p);
         memcpy(file_sub_path, cur_p, len);
         file_sub_path[len] = '\0';
-        
+
         struct dirent *entp;
         while ( (entp = readdir(dp)) != NULL ){
             if ( !strcasecmp( file_sub_path, entp->d_name ) ){
@@ -171,7 +171,7 @@ FILE *DirectReader::fopen(const char *path, const char *mode)
 unsigned char DirectReader::readChar( FILE *fp )
 {
     unsigned char ret;
-    
+
     fread( &ret, 1, 1, fp );
     return key_table[ret];
 }
@@ -180,7 +180,7 @@ unsigned short DirectReader::readShort( FILE *fp )
 {
     unsigned short ret;
     unsigned char buf[2];
-    
+
     fread( &buf, 1, 2, fp );
     ret = key_table[buf[0]] << 8 | key_table[buf[1]];
     return ret;
@@ -190,7 +190,7 @@ unsigned long DirectReader::readLong( FILE *fp )
 {
     unsigned long ret;
     unsigned char buf[4];
-    
+
     fread( &buf, 1, 4, fp );
     ret = key_table[buf[0]];
     ret = ret << 8 | key_table[buf[1]];
@@ -216,7 +216,7 @@ void DirectReader::writeShort( FILE *fp, unsigned short ch )
 void DirectReader::writeLong( FILE *fp, unsigned long ch )
 {
     unsigned char buf[4];
-    
+
     buf[0] = (unsigned char)((ch>>24) & 0xff);
     buf[1] = (unsigned char)((ch>>16) & 0xff);
     buf[2] = (unsigned char)((ch>>8)  & 0xff);
@@ -254,24 +254,24 @@ int DirectReader::getNumFiles()
 {
     return 0;
 }
-    
+
 void DirectReader::registerCompressionType( const char *ext, int type )
 {
     last_registered_compression_type->next = new RegisteredCompressionType(ext, type);
     last_registered_compression_type = last_registered_compression_type->next;
 }
-    
+
 int DirectReader::getRegisteredCompressionType( const char *file_name )
 {
     const char *ext_buf = file_name + strlen(file_name);
     while( *ext_buf != '.' && ext_buf != file_name ) ext_buf--;
     ext_buf++;
-    
+
     strcpy( capital_name, ext_buf );
     for ( unsigned int i=0 ; i<strlen(ext_buf)+1 ; i++ )
         if ( capital_name[i] >= 'a' && capital_name[i] <= 'z' )
             capital_name[i] += 'A' - 'a';
-    
+
     RegisteredCompressionType *reg = root_registered_compression_type.next;
     while (reg){
         if ( !strcmp( capital_name, reg->ext ) ) return reg->type;
@@ -281,12 +281,12 @@ int DirectReader::getRegisteredCompressionType( const char *file_name )
 
     return NO_COMPRESSION;
 }
-    
+
 struct DirectReader::FileInfo DirectReader::getFileByIndex( unsigned int index )
 {
     DirectReader::FileInfo fi;
     memset(&fi, 0, sizeof(DirectReader::FileInfo));
-    
+
     return fi;
 }
 
@@ -325,7 +325,7 @@ FILE *DirectReader::getFileHandle( const char *file_name, int &compression_type,
             *length = ftell( fp );
         }
     }
-            
+
     return fp;
 }
 
@@ -336,7 +336,7 @@ size_t DirectReader::getFileLength( const char *file_name )
     FILE *fp = getFileHandle( file_name, compression_type, &len );
 
     if ( fp ) fclose( fp );
-    
+
     return len;
 }
 
@@ -345,7 +345,7 @@ size_t DirectReader::getFile( const char *file_name, unsigned char *buffer, int 
     int compression_type;
     size_t len, c, total = 0;
     FILE *fp = getFileHandle( file_name, compression_type, &len );
-    
+
     if ( fp ){
         if      ( compression_type & NBZ_COMPRESSION ) return decodeNBZ( fp, 0, buffer );
         else if ( compression_type & SPB_COMPRESSION ) return decodeSPB( fp, 0, buffer );
@@ -401,7 +401,7 @@ void DirectReader::convertCodingToUTF8( char *dst_buf, const char *src_buf )
     int i, c;
     unsigned short unicode;
     unsigned char utf8_buf[4];
-    
+
     while(*src_buf){
         if (IS_TWO_BYTE(*src_buf)){
             unsigned short index = *(unsigned char*)src_buf++;
@@ -438,7 +438,7 @@ size_t DirectReader::decodeNBZ( FILE *fp, size_t offset, unsigned char *buf )
 {
     if (key_table_flag)
         utils::printError("may not decode NBZ with key_table enabled.\n");
-    
+
     unsigned int original_length, count;
     BZFILE *bfp;
     void *unused;
@@ -486,7 +486,7 @@ size_t DirectReader::encodeNBZ( FILE *fp, size_t length, unsigned char *buf )
     }
 
     BZ2_bzWriteClose( &err, bfp, 0, &bytes_in, &bytes_out );
-    
+
     return bytes_out;
 }
 
@@ -494,7 +494,7 @@ int DirectReader::getbit( FILE *fp, int n )
 {
     int i, x = 0;
     static int getbit_buf;
-    
+
     for ( i=0 ; i<n ; i++ ){
         if ( getbit_mask == 0 ){
             if (getbit_len == getbit_count){
@@ -522,7 +522,7 @@ size_t DirectReader::decodeSPB( FILE *fp, size_t offset, unsigned char *buf )
 
     getbit_mask = 0;
     getbit_len = getbit_count = 0;
-    
+
     fseek( fp, offset, SEEK_SET );
     size_t width  = readShort( fp );
     size_t height = readShort( fp );
@@ -556,7 +556,7 @@ size_t DirectReader::decodeSPB( FILE *fp, size_t offset, unsigned char *buf )
         decomp_buffer_len = width*height+4;
         decomp_buffer = new unsigned char[decomp_buffer_len];
     }
-    
+
     for ( i=0 ; i<3 ; i++ ){
         count = 0;
         decomp_buffer[count++] = c = getbit( fp, 8 );
@@ -603,7 +603,7 @@ size_t DirectReader::decodeSPB( FILE *fp, size_t offset, unsigned char *buf )
             }
         }
     }
-    
+
     return total_size;
 }
 
@@ -642,7 +642,7 @@ size_t DirectReader::getDecompressedFileLength( int type, FILE *fp, size_t offse
 {
     size_t length=0;
     fseek( fp, offset, SEEK_SET );
-    
+
     if ( type == NBZ_COMPRESSION ){
         length = readLong( fp );
     }
@@ -650,7 +650,7 @@ size_t DirectReader::getDecompressedFileLength( int type, FILE *fp, size_t offse
         size_t width  = readShort( fp );
         size_t height = readShort( fp );
         size_t width_pad  = (4 - width * 3 % 4) % 4;
-            
+
         length = (width * 3 +width_pad) * height + 54;
     }
 

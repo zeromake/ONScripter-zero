@@ -38,7 +38,7 @@ int ScriptParser::zenkakkoCommand()
     if ( current_mode != DEFINE_MODE )
         errorAndExit( "zenkakko: not in the define section" );
     zenkakko_flag = true;
-    
+
     return RET_CONTINUE;
 }
 
@@ -123,10 +123,10 @@ int ScriptParser::timeCommand()
 
     script_h.readVariable();
     script_h.setInt( &script_h.current_variable, tm->tm_hour );
-    
+
     script_h.readVariable();
     script_h.setInt( &script_h.current_variable, tm->tm_min );
-    
+
     script_h.readVariable();
     script_h.setInt( &script_h.current_variable, tm->tm_sec );
 
@@ -169,13 +169,13 @@ int ScriptParser::straliasCommand()
 {
     if ( current_mode != DEFINE_MODE )
         errorAndExit( "stralias: not in the define section" );
-    
+
     script_h.readLabel();
     const char *save_buf = script_h.saveStringBuffer();
     const char *buf = script_h.readStr();
-    
+
     script_h.addStrAlias( save_buf, buf );
-    
+
     return RET_CONTINUE;
 }
 
@@ -197,7 +197,7 @@ int ScriptParser::soundpressplginCommand()
 
     while(*buf && *buf != '|') buf++;
     if (*buf == 0) return RET_CONTINUE;
-    
+
     buf++;
     script_h.cBR->registerCompressionType( buf, BaseReader::NBZ_COMPRESSION );
 
@@ -214,7 +214,7 @@ int ScriptParser::skipCommand()
     char *buf = script_h.getAddressByLine( line );
     current_label_info = script_h.getLabelByAddress( buf );
     current_line = script_h.getLineByAddress( buf );
-    
+
     script_h.setCurrent( buf );
 
     return RET_CONTINUE;
@@ -295,7 +295,7 @@ int ScriptParser::setkinsokuCommand()
     char *start = script_h.saveStringBuffer();
     const char *end = script_h.readStr();
     setKinsoku(start, end, false);
-    
+
     return RET_CONTINUE;
 }
 
@@ -317,7 +317,7 @@ int ScriptParser::selectcolorCommand()
 
     buf = script_h.readStr();
     readColor( &sentence_font.off_color, buf );
-    
+
     return RET_CONTINUE;
 }
 
@@ -360,15 +360,15 @@ int ScriptParser::savedirCommand()
             fprintf(stderr, "savedir: %s doesn't exist.\n", save_dir);
             delete[] save_dir;
             save_dir = NULL;
-        
+
             return RET_CONTINUE;
         }
 #endif
-        
+
         script_h.setSaveDir(save_dir);
         setStr(&save_dir_envdata, path);
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -434,7 +434,7 @@ int ScriptParser::rmenuCommand()
 
         comma_flag = script_h.getEndStatus() & ScriptHandler::END_COMMA;
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -442,7 +442,7 @@ int ScriptParser::returnCommand()
 {
     if ( !last_nest_info->previous || last_nest_info->nest_mode != NestInfo::LABEL )
         errorAndExit( "return: not in gosub" );
-    
+
     current_label_info = script_h.getLabelByAddress( last_nest_info->next_script );
     current_line = script_h.getLineByAddress( last_nest_info->next_script );
 
@@ -457,7 +457,7 @@ int ScriptParser::returnCommand()
     last_nest_info = last_nest_info->previous;
     delete last_nest_info->next;
     last_nest_info->next = NULL;
-    
+
     // if this is the end of the line, pretext becomes enabled
     if (textgosub_flag &&
         (textgosub_clickstr_state & (CLICK_NEWPAGE | CLICK_EOL))){
@@ -474,7 +474,7 @@ int ScriptParser::pretextgosubCommand()
         errorAndExit( "pretextgosub: not in the define section" );
 
     setStr( &pretextgosub_label, script_h.readStr()+1 );
-    
+
     return RET_CONTINUE;
 }
 
@@ -484,7 +484,7 @@ int ScriptParser::pagetagCommand()
         errorAndExit( "pagetag: not in the define section" );
 
     pagetag_flag = true;
-    
+
     return RET_CONTINUE;
 }
 
@@ -498,7 +498,7 @@ int ScriptParser::numaliasCommand()
 
     int no = script_h.readInt();
     script_h.addNumAlias( save_buf, no );
-    
+
     return RET_CONTINUE;
 }
 
@@ -508,7 +508,7 @@ int ScriptParser::nsadirCommand()
         errorAndExit( "nsadir: not in the define section" );
 
     const char *buf = script_h.readStr();
-    
+
     if ( nsa_path ) delete[] nsa_path;
     nsa_path = new char[ strlen(buf) + 2 ];
     sprintf( nsa_path, RELATIVEPATH "%s%c", buf, DELIMITER );
@@ -524,7 +524,7 @@ int ScriptParser::nsaCommand()
     else if ( script_h.isName("ns3") ){
         nsa_offset = 2;
     }
-    
+
     delete script_h.cBR;
     script_h.cBR = new NsaReader( nsa_offset, archive_path, BaseReader::ARCHIVE_TYPE_NSA|BaseReader::ARCHIVE_TYPE_NS2, key_table );
     if ( script_h.cBR->open( nsa_path ) ){
@@ -538,7 +538,7 @@ int ScriptParser::nextCommand()
 {
     if (!last_nest_info->previous || last_nest_info->nest_mode != NestInfo::FOR)
         errorAndExit("next: not in for loop\n");
-    
+
     int val;
     if ( !break_flag ){
         val = script_h.getVariableData(last_nest_info->var_no).num;
@@ -546,7 +546,7 @@ int ScriptParser::nextCommand()
     }
 
     val = script_h.getVariableData(last_nest_info->var_no).num;
-    
+
     if ( break_flag ||
          (last_nest_info->step > 0 && val > last_nest_info->to) ||
          (last_nest_info->step < 0 && val < last_nest_info->to) ){
@@ -561,7 +561,7 @@ int ScriptParser::nextCommand()
         current_label_info = script_h.getLabelByAddress( last_nest_info->next_script );
         current_line = script_h.getLineByAddress( last_nest_info->next_script );
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -569,7 +569,7 @@ int ScriptParser::mulCommand()
 {
     int val1 = script_h.readInt();
     script_h.pushVariable();
-    
+
     int val2 = script_h.readInt();
     script_h.setInt( &script_h.pushed_variable, val1*val2 );
 
@@ -579,7 +579,7 @@ int ScriptParser::mulCommand()
 int ScriptParser::movCommand()
 {
     int count = 1;
-    
+
     if ( script_h.isName( "mov10" ) ){
         count = 10;
     }
@@ -609,7 +609,7 @@ int ScriptParser::movCommand()
         setStr( &script_h.getVariableData(script_h.pushed_variable.var_no).str, buf );
     }
     else errorAndExit( "mov: no variable" );
-    
+
     return RET_CONTINUE;
 }
 
@@ -618,7 +618,7 @@ int ScriptParser::mode_wave_demoCommand()
     if (current_mode != DEFINE_MODE)
         errorAndExit("mode_wave_demo: not in the define section");
     mode_wave_demo_flag = true;
-    
+
     return RET_CONTINUE;
 }
 
@@ -644,7 +644,7 @@ int ScriptParser::modCommand()
 {
     int val1 = script_h.readInt();
     script_h.pushVariable();
-    
+
     int val2 = script_h.readInt();
     script_h.setInt( &script_h.pushed_variable, val1%val2 );
 
@@ -657,7 +657,7 @@ int ScriptParser::midCommand()
     if ( script_h.current_variable.type != ScriptHandler::VAR_STR )
         errorAndExit( "mid: no string variable" );
     int no = script_h.current_variable.var_no;
-    
+
     script_h.readStr();
     const char *save_buf = script_h.saveStringBuffer();
     unsigned int start = script_h.readInt();
@@ -719,10 +719,10 @@ int ScriptParser::menuselectcolorCommand()
 
     buf = script_h.readStr();
     readColor( &menu_font.off_color, buf );
-    
+
     buf = script_h.readStr();
     readColor( &menu_font.nofile_color, buf );
-    
+
     return RET_CONTINUE;
 }
 
@@ -746,7 +746,7 @@ int ScriptParser::luasubCommand()
         ufh.last->lua_flag = true;
         setStr( &ufh.last->command, cmd );
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -757,7 +757,7 @@ int ScriptParser::luacallCommand()
 #ifdef USE_LUA
     lua_handler.addCallback(label);
 #endif
-    
+
     return RET_CONTINUE;
 }
 
@@ -818,7 +818,7 @@ int ScriptParser::lenCommand()
 {
     script_h.readInt();
     script_h.pushVariable();
-    
+
     const char *buf = script_h.readStr();
 
     script_h.setInt( &script_h.pushed_variable, strlen( buf ) );
@@ -841,7 +841,7 @@ int ScriptParser::kidokuskipCommand()
 {
     kidokuskip_flag = true;
     script_h.loadKidokuData();
-    
+
     return RET_CONTINUE;
 }
 
@@ -861,7 +861,7 @@ int ScriptParser::itoaCommand()
 
     if ( script_h.isName( "itoa2" ) )
         itoa2_flag = true;
-    
+
     script_h.readVariable();
     if ( script_h.current_variable.type != ScriptHandler::VAR_STR )
         errorAndExit( "itoa: no string variable." );
@@ -875,7 +875,7 @@ int ScriptParser::itoaCommand()
     else
         sprintf( val_str, "%d", val );
     setStr( &script_h.getVariableData(no).str, val_str );
-    
+
     return RET_CONTINUE;
 }
 
@@ -883,7 +883,7 @@ int ScriptParser::intlimitCommand()
 {
     if ( current_mode != DEFINE_MODE )
         errorAndExit( "intlimit: not in the define section" );
-    
+
     int no = script_h.readInt();
 
     script_h.getVariableData(no).num_limit_flag  = true;
@@ -974,7 +974,7 @@ int ScriptParser::ifCommand()
                           op_buf[0] == '>' ||
                           op_buf[0] == '=' )
                     script_h.setCurrent(op_buf+1);
-            
+
                 buf = script_h.readStr();
 
                 int val = strcmp( save_buf, buf );
@@ -988,7 +988,7 @@ int ScriptParser::ifCommand()
                 else if (op_buf[0] == '=')                     f = (val == 0);
             }
         }
-        
+
         f = if_flag ? f : !f;
         condition_flag |= f;
         op_buf = script_h.getNext();
@@ -1001,12 +1001,12 @@ int ScriptParser::ifCommand()
             continue;
         }
 
-        if ((condition_status == 2 && !condition_flag) || 
+        if ((condition_status == 2 && !condition_flag) ||
             (condition_status != 2 && !f))
             return RET_SKIP_LINE;
 
         if ( op_buf[0] == '&' ){
-            if (condition_status == 2) 
+            if (condition_status == 2)
                 errorAndExit( "if: using & and | at the same time is not supported." );
             while(*op_buf == '&') op_buf++;
             script_h.setCurrent(op_buf);
@@ -1023,14 +1023,14 @@ int ScriptParser::ifCommand()
 int ScriptParser::humanzCommand()
 {
     z_order = script_h.readInt();
-    
+
     return RET_CONTINUE;
 }
 
 int ScriptParser::gotoCommand()
 {
     setCurrentLabel( script_h.readStr()+1 );
-    
+
     return RET_CONTINUE;
 }
 
@@ -1059,7 +1059,7 @@ int ScriptParser::globalonCommand()
     if ( current_mode != DEFINE_MODE )
         errorAndExit( "globalon: not in the define section" );
     globalon_flag = true;
-    
+
     return RET_CONTINUE;
 }
 
@@ -1070,14 +1070,14 @@ int ScriptParser::getparamCommand()
 
     bool getparam2_flag = false;
     if ( script_h.isName( "getparam2") ) getparam2_flag = true;
-    
+
     int end_status, end_status2;
     do{
         script_h.readVariable();
         end_status2 = script_h.getEndStatus();
-        
+
         script_h.pushVariable();
-        
+
         script_h.pushCurrent(last_nest_info->next_script);
 
         if ( script_h.pushed_variable.type & ScriptHandler::VAR_PTR ){
@@ -1092,9 +1092,9 @@ int ScriptParser::getparamCommand()
             const char *buf = script_h.readStr();
             setStr( &script_h.getVariableData(script_h.pushed_variable.var_no).str, buf );
         }
-        
+
         end_status = script_h.getEndStatus();
-        
+
         last_nest_info->next_script = script_h.getNext();
         script_h.popCurrent();
     }
@@ -1117,7 +1117,7 @@ int ScriptParser::getparamCommand()
             }
         }
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -1132,23 +1132,23 @@ int ScriptParser::forCommand()
     script_h.readVariable();
     if ( script_h.current_variable.type != ScriptHandler::VAR_INT )
         errorAndExit( "for: no integer variable." );
-    
+
     last_nest_info->var_no = script_h.current_variable.var_no;
 
     script_h.pushVariable();
 
-    if ( !script_h.compareString("=") ) 
+    if ( !script_h.compareString("=") )
         errorAndExit( "for: missing '='" );
 
     script_h.setCurrent(script_h.getNext() + 1);
     int from = script_h.readInt();
     script_h.setInt( &script_h.pushed_variable, from );
-    
+
     if ( !script_h.compareString("to") )
         errorAndExit( "for: missing 'to'" );
 
     script_h.readLabel();
-    
+
     last_nest_info->to = script_h.readInt();
 
     if ( script_h.compareString("step") ){
@@ -1164,7 +1164,7 @@ int ScriptParser::forCommand()
         break_flag = true;
     else
         break_flag = false;
-    
+
     /* ---------------------------------------- */
     /* Step forward callee's label info */
     last_nest_info->next_script = script_h.getNext();
@@ -1179,7 +1179,7 @@ int ScriptParser::filelogCommand()
 
     filelog_flag = true;
     readLog( script_h.log_info[ScriptHandler::FILE_LOG] );
-    
+
     return RET_CONTINUE;
 }
 
@@ -1187,10 +1187,10 @@ int ScriptParser::englishCommand()
 {
     if ( current_mode != DEFINE_MODE )
         errorAndExit( "english: not in the define section." );
-    
+
     //english_mode = true;
     script_h.setEnglishMode(true);
-    
+
     return RET_CONTINUE;
 }
 
@@ -1208,7 +1208,7 @@ int ScriptParser::effectblankCommand()
 {
     if ( current_mode != DEFINE_MODE )
         errorAndExit( "effectblank: not in the define section" );
-    
+
     effect_blank = script_h.readInt();
 
     return RET_CONTINUE;
@@ -1233,7 +1233,7 @@ int ScriptParser::effectCommand()
         last_effect_link->next = elink;
         last_effect_link = last_effect_link->next;
     }
-    
+
     readEffect( elink );
 
     return RET_CONTINUE;
@@ -1256,7 +1256,7 @@ int ScriptParser::dimCommand()
         errorAndExit( "dim: not in the define section" );
 
     script_h.declareDim();
-    
+
     return RET_CONTINUE;
 }
 
@@ -1277,7 +1277,7 @@ int ScriptParser::defsubCommand()
         ufh.last = ufh.last->next;
         setStr( &ufh.last->command, cmd );
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -1355,7 +1355,7 @@ int ScriptParser::cmpCommand()
 {
     script_h.readInt();
     script_h.pushVariable();
-    
+
     script_h.readStr();
     char *save_buf = script_h.saveStringBuffer();
 
@@ -1388,7 +1388,7 @@ int ScriptParser::clickstrCommand()
     clickstr_line = script_h.readInt();
 
     script_h.setClickstr( buf );
-           
+
     return RET_CONTINUE;
 }
 
@@ -1402,13 +1402,13 @@ int ScriptParser::breakCommand()
         last_nest_info = last_nest_info->previous;
         delete last_nest_info->next;
         last_nest_info->next = NULL;
-        
+
         setCurrentLabel( script_h.readStr()+1 );
     }
     else{
         break_flag = true;
     }
-    
+
     return RET_CONTINUE;
 }
 
@@ -1418,7 +1418,7 @@ int ScriptParser::autosaveoffCommand()
         errorAndExit( "autosaveoff: not in the define section" );
 
     autosaveoff_flag = true;
-    
+
     return RET_CONTINUE;
 }
 
@@ -1426,11 +1426,11 @@ int ScriptParser::atoiCommand()
 {
     script_h.readInt();
     script_h.pushVariable();
-    
+
     const char *buf = script_h.readStr();
-        
+
     script_h.setInt( &script_h.pushed_variable, atoi(buf) );
-    
+
     return RET_CONTINUE;
 }
 
@@ -1457,9 +1457,9 @@ int ScriptParser::arcCommand()
         }
     }
     // skip "arc" commands after "ns?" command
-    
+
     delete[] buf2;
-    
+
     return RET_CONTINUE;
 }
 
@@ -1472,14 +1472,14 @@ int ScriptParser::addkinsokuCommand()
     char *start = script_h.saveStringBuffer();
     const char *end = script_h.readStr();
     setKinsoku(start, end, true);
-    
+
     return RET_CONTINUE;
 }
 
 int ScriptParser::addCommand()
 {
     script_h.readVariable();
-    
+
     if ( script_h.current_variable.type == ScriptHandler::VAR_INT ||
          script_h.current_variable.type == ScriptHandler::VAR_ARRAY ){
         int val = script_h.getIntVariable( &script_h.current_variable );

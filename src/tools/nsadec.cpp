@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  nsadec.cpp - NSA archive decoder
  *
  *  Copyright (c) 2001-2015 Ogapee. All rights reserved.
@@ -93,7 +93,7 @@ int main( int argc, char **argv )
     }
     cNR.openForConvert( argv[1], archive_type, nsa_offset );
     count = cNR.getNumFiles();
-    
+
     SarReader::FileInfo sFI;
 
     for ( i=0 ; i<count ; i++ ){
@@ -128,7 +128,7 @@ int main( int argc, char **argv )
                     mkdir( dir_name, 00755 );
             }
         }
-    
+
         if (vLog) {
             printf("\033[Kouting %s\t\t%.2fkb\t\t%d/%d\r", file_name, float(length) / 1024.0f, i, count);
         } else {
@@ -141,9 +141,9 @@ int main( int argc, char **argv )
         else{
             printf("opening %s ... falied\n", file_name );
         }
-        
+
         delete[] buffer;
     }
-    
+
     exit(0);
 }

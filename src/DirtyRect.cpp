@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  DirtyRect.cpp - Invalid region on text_surface which should be updated
  *
  *  Copyright (c) 2001-2012 Ogapee. All rights reserved.

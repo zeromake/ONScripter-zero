@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  sarconv.cpp - Images in SAR archive are re-scaled to 320x240 size
  *
  *  Copyright (c) 2001-2006 Ogapee. All rights reserved.
@@ -79,9 +79,9 @@ int main( int argc, char **argv )
 
     scale_ratio_lower = atoi(argv[0]); // src width
     if (scale_ratio_lower!=640 && scale_ratio_lower!=800) help();
-    
+
     scale_ratio_upper = atoi(argv[1]); // dst width
-    
+
     if ( (fp = fopen( argv[3], "wb" ) ) == NULL ){
         fprintf( stderr, "can't open file %s for writing.\n", argv[3] );
         exit(-1);
@@ -93,7 +93,7 @@ int main( int argc, char **argv )
     count = cSR.getNumFiles();
 
     SarReader::FileInfo sFI;
-    
+
     for ( i=0 ; i<count ; i++ ){
         printf( "%d/%d\n", i, count );
         sFI = cSR.getFileByIndex( i );
@@ -126,7 +126,7 @@ int main( int argc, char **argv )
         else{
             cSR.putFile( fp, i, sFI.offset, sFI.length, sFI.original_length, false, buffer );
         }
-        
+
         offset += sFI.length;
     }
     cSR.writeHeader( fp );
@@ -135,6 +135,6 @@ int main( int argc, char **argv )
 
     if ( rescaled_buffer ) delete[] rescaled_buffer;
     if ( buffer ) delete[] buffer;
-    
+
     return 0;
 }
