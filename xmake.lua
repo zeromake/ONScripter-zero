@@ -134,6 +134,23 @@ target("sardec")
         "src/reader/DirectReader.cpp"
     )
 
+target("nsaenc")
+    set_kind("binary")
+    add_packages("bzip2", "jpeg")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    add_files(
+        "src/tools/nsaenc.cpp",
+        "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/reader/DirectReader.cpp",
+        "src/reader/SarReader.cpp",
+        "src/conv_shared.cpp",
+        "src/resize_image.cpp",
+        "src/language/*.cpp"
+    )
+
 target("onscripter")
     set_kind("binary")
     add_packages(
@@ -195,6 +212,9 @@ target("main")
     end
     if is_plat("windows") then
         add_files("src/resource.rc")
+    end
+    if is_plat("android") then
+        add_defines("ANDROID")
     end
     add_files("demo.c")
 

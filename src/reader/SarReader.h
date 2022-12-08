@@ -56,6 +56,7 @@ protected:
 
     int writeHeaderSub( ArchiveInfo *ai, FILE *fp, int archive_type = ARCHIVE_TYPE_SAR, int nsa_offset=0 );
     size_t putFileSub( ArchiveInfo *ai, FILE *fp, int no, size_t offset, size_t length, size_t original_length, int compression_type, bool modified_flag, unsigned char *buffer );
+    SarReader::ArchiveInfo* openForCreate(const char *name);
 };
 
 #endif // __SAR_READER_H__
