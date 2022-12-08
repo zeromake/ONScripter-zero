@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  AVIWrapper.cpp - avifile library wrapper class to play AVI video & audio stream
  *
  *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
@@ -123,7 +123,7 @@ int AVIWrapper::initAV( SDL_Surface *surface, bool audio_open_flag )
     WAVEFORMATEX wave_fmt;
     a_stream->GetAudioDecoder()->GetOutputFormat( &wave_fmt );
     if ( debug_flag ) printf(" format %d ch %d sample %d bit %d avg Bps %d\n", wave_fmt.wFormatTag, wave_fmt.nChannels, wave_fmt.nSamplesPerSec, wave_fmt.wBitsPerSample, wave_fmt.nAvgBytesPerSec );
-    
+
     if ( Mix_OpenAudio( wave_fmt.nSamplesPerSec, MIX_DEFAULT_FORMAT, wave_fmt.nChannels, DEFAULT_AUDIOBUF ) < 0 ){
         fprintf( stderr, "can't open audio device\n" );
         a_stream->StopStreaming();
@@ -164,7 +164,7 @@ void AVIWrapper::audioCallback( void *userdata, Uint8 *stream, int len )
             return;
         }
     }
-        
+
     while ( len > 0 && !a_stream->Eof() ){
         a_stream->ReadFrames( remaining_buffer, (size_t)len, (size_t)len, samples, ocnt );
         if ( (int)ocnt <= len ){
@@ -235,7 +235,7 @@ int AVIWrapper::playVideo( void *userdata )
 
         double current_time = v_stream->GetTime();
         double minimum_time = current_time;
-        
+
         // look for the nearest in the cache
         int nearest_cache=-1;
         for ( i=0 ; i<NUM_CACHES ; i++ ){
@@ -275,7 +275,7 @@ int AVIWrapper::playVideo( void *userdata )
                 continue;
             }
         }
-                
+
         if ( nearest_cache >= 0 && minimum_time == cache[nearest_cache].time ){
             //printf("draw cache %d %f\n", nearest_cache, cache[nearest_cache].time );
             //if ( async <= 0.033 ) // drop frame if necessary
@@ -308,7 +308,7 @@ int AVIWrapper::play( bool click_flag )
         thread_id = SDL_CreateThread( ::playVideo, this );
     if ( a_stream )
         Mix_HookMusic( ::audioCallback, this );
-    
+
     bool done_flag = false;
     while( !(done_flag & click_flag) && status == AVI_PLAYING ){
         SDL_Event event;
@@ -339,7 +339,7 @@ int AVIWrapper::play( bool click_flag )
         SDL_WaitThread( thread_id, NULL );
     if ( a_stream )
         Mix_HookMusic( NULL, NULL );
-    
+
     return ret;
 }
 
@@ -349,7 +349,7 @@ int AVIWrapper::drawFrame( avm::CImage *image )
 
     unsigned int i, j;
     uint32_t comp = image->GetFmt()->biCompression;
-        
+
     unsigned char *buf = image->Data();
     SDL_LockYUVOverlay( screen_overlay );
     Uint8 *dst_y = screen_overlay->pixels[0];
@@ -371,7 +371,7 @@ int AVIWrapper::drawFrame( avm::CImage *image )
     else if ( comp == IMG_FMT_YUY2 ){
         memcpy( dst_y, buf, width*height*2 );
     }
-    else if ( comp == IMG_FMT_YV12 ){ 
+    else if ( comp == IMG_FMT_YV12 ){
         memcpy( dst_y, buf, width*height+width*height/2 );
     }
     SDL_UnlockYUVOverlay( screen_overlay );

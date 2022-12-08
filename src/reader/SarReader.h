@@ -36,14 +36,14 @@ public:
     int close();
     const char *getArchiveName() const;
     int getNumFiles();
-    
+
     size_t getFileLength( const char *file_name );
     size_t getFile( const char *file_name, unsigned char *buf, int *location=NULL );
     FileInfo getFileByIndex( unsigned int index );
 
     int writeHeader( FILE *fp );
     size_t putFile( FILE *fp, int no, size_t offset, size_t length, size_t original_length, bool modified_flag, unsigned char *buffer );
-    
+
 protected:
     ArchiveInfo archive_info;
     ArchiveInfo *root_archive_info, *last_archive_info;

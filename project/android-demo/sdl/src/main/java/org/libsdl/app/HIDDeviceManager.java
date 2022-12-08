@@ -170,7 +170,7 @@ public class HIDDeviceManager {
                 Log.i(TAG,"  Interface protocol: " + mUsbInterface.getInterfaceProtocol());
                 Log.i(TAG,"  Endpoint count: " + mUsbInterface.getEndpointCount());
 
-                // Get endpoint details 
+                // Get endpoint details
                 for (int epi = 0; epi < mUsbInterface.getEndpointCount(); epi++)
                 {
                     UsbEndpoint mEndpoint = mUsbInterface.getEndpoint(epi);
@@ -524,7 +524,7 @@ public class HIDDeviceManager {
             for (HIDDevice device : mDevicesById.values()) {
                 device.setFrozen(frozen);
             }
-        }        
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////

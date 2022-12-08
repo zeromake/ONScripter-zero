@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ONScripter_text.cpp - Text parser of ONScripter
  *
  *  Copyright (c) 2001-2018 Ogapee. All rights reserved.
@@ -95,7 +95,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 
     static SDL_Color fcol={0xff, 0xff, 0xff}, bcol={0, 0, 0};
     SDL_Surface *tmp_surface = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[0], unicode, fcol, bcol);
-    
+
     SDL_Color scolor = {0, 0, 0};
     SDL_Surface *tmp_surface_s = tmp_surface;
     if (info->is_shadow && render_font_outline){
@@ -115,14 +115,14 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 
     bool rotate_flag = false;
     if ( info->getTateyokoMode() == _FontInfo::TATE_MODE && IS_ROTATION_REQUIRED(text) ) rotate_flag = true;
-    
+
     dst_rect.x = xy[0];
     dst_rect.y = xy[1];
 
     dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - info->font_size_xy[1]*screen_ratio1/screen_ratio2)/2;
 
     if ( rotate_flag ) dst_rect.x += miny - minx;
-        
+
     if ( info->getTateyokoMode() == _FontInfo::TATE_MODE && IS_TRANSLATION_REQUIRED(text) ){
         dst_rect.x += info->font_size_xy[0]/2;
         dst_rect.y -= info->font_size_xy[0]/2;
@@ -150,7 +150,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 
         if (cache_info)
             cache_info->blendText( tmp_surface_s, dst_rect_s.x, dst_rect_s.y, scolor, clip, rotate_flag );
-        
+
         if (dst_surface)
             alphaBlendText( dst_surface, dst_rect_s, tmp_surface_s, scolor, clip, rotate_flag );
     }
@@ -167,7 +167,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 
         if (cache_info)
             cache_info->blendText( tmp_surface, dst_rect.x, dst_rect.y, color, clip, rotate_flag );
-        
+
         if (dst_surface)
             alphaBlendText( dst_surface, dst_rect, tmp_surface, color, clip, rotate_flag );
     }
@@ -277,7 +277,7 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
         }
 #endif
 
-#ifndef FORCE_1BYTE_CHAR            
+#ifndef FORCE_1BYTE_CHAR
         if (cache_info && !cache_info->is_tight_region){
             if (*str == '('){
                 startRuby(str+1, *info);
@@ -354,10 +354,10 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
         else
             info->addShadeArea(scaled_clipped_rect, 0, 0, shade_distance[0], shade_distance[1]);
     }
-    
+
     if ( flush_flag )
         flush( refresh_shadow_text_mode, &scaled_clipped_rect );
-    
+
     if ( rect ) *rect = clipped_rect;
 }
 
@@ -374,7 +374,7 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
         }
         else{
             out_text[0] = current_page->text[i];
-#ifndef FORCE_1BYTE_CHAR            
+#ifndef FORCE_1BYTE_CHAR
             if (out_text[0] == '('){
                 startRuby(current_page->text + i + 1, f_info);
                 continue;
@@ -407,14 +407,14 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 
             if (IS_TWO_BYTE(out_text[0])){
                 out_text[1] = current_page->text[i+1];
-                
+
                 if ( checkLineBreak( current_page->text+i, &f_info ) )
                     f_info.newLine();
                 i++;
             }
             else{
                 out_text[1] = 0;
-                
+
                 if (i+1 != current_page->text_count &&
                     current_page->text[i+1] != 0x0a){
                     out_text[1] = current_page->text[i+1];
@@ -432,7 +432,7 @@ void ONScripter::enterTextDisplayMode(bool text_flag)
         storeSaveFile();
         internal_saveon_flag = false;
     }
-    
+
     if (!(display_mode & DISPLAY_MODE_TEXT)){
         dirty_rect.clear();
         dirty_rect.add( sentence_font_info.pos );
@@ -452,7 +452,7 @@ void ONScripter::leaveTextDisplayMode(bool force_leave_flag)
 
         dirty_rect.add(sentence_font_info.pos);
         display_mode = DISPLAY_MODE_NORMAL;
-            
+
         if (setEffect(&window_effect)) return;
         while(doEffect(&window_effect, false));
     }
@@ -461,7 +461,7 @@ void ONScripter::leaveTextDisplayMode(bool force_leave_flag)
 bool ONScripter::doClickEnd()
 {
     bool ret = false;
-    
+
     draw_cursor_flag = true;
 
     if ( automode_flag ){
@@ -556,7 +556,7 @@ bool ONScripter::clickNewPage( char *out_text )
 
     flush( REFRESH_NONE_MODE );
     skip_mode &= ~SKIP_TO_EOL;
-    
+
     if (script_h.checkClickstr(script_h.getStringBuffer() + string_buffer_offset) != 1) string_buffer_offset++;
     string_buffer_offset++;
 
@@ -612,7 +612,7 @@ void ONScripter::startRuby(const char *buf, _FontInfo &info)
         ruby_font.font_size_xy[1] = ruby_struct.font_size_xy[1];
     else
         ruby_font.font_size_xy[1] = info.font_size_xy[1]/2;
-                
+
     ruby_struct.body_count = 0;
     ruby_struct.ruby_count = 0;
 
@@ -665,7 +665,7 @@ int ONScripter::textCommand()
     bool tag_flag = true;
     if (buf[string_buffer_offset] == '[')
         string_buffer_offset++;
-    else if (zenkakko_flag && 
+    else if (zenkakko_flag &&
              buf[string_buffer_offset  ] == coding2utf16->bracket[0] &&
              buf[string_buffer_offset+1] == coding2utf16->bracket[1])
         string_buffer_offset += 2;
@@ -675,8 +675,8 @@ int ONScripter::textCommand()
     int start_offset = string_buffer_offset;
     int end_offset = start_offset;
     while (tag_flag && buf[string_buffer_offset]){
-        if (zenkakko_flag && 
-            buf[string_buffer_offset  ] == coding2utf16->bracket[2] && 
+        if (zenkakko_flag &&
+            buf[string_buffer_offset  ] == coding2utf16->bracket[2] &&
             buf[string_buffer_offset+1] == coding2utf16->bracket[3]){
             end_offset = string_buffer_offset;
             string_buffer_offset += 2;
@@ -728,7 +728,7 @@ int ONScripter::textCommand()
         processEOT();
     }
     else
-#endif    
+#endif
     while(processText());
 
     return RET_CONTINUE;
@@ -737,7 +737,7 @@ int ONScripter::textCommand()
 bool ONScripter::checkLineBreak(const char *buf, _FontInfo *fi)
 {
     if (!is_kinsoku) return false;
-    
+
     // check start kinsoku
     if (isStartKinsoku( buf+2 ) ||
         (buf[2]=='_' && isStartKinsoku( buf+3 ))){
@@ -753,7 +753,7 @@ bool ONScripter::checkLineBreak(const char *buf, _FontInfo *fi)
 
         if (fi->isEndOfLine(i)) return true;
     }
-        
+
     // check end kinsoku
     if (isEndKinsoku( buf )){
         const char *buf2 = buf;
@@ -807,7 +807,7 @@ bool ONScripter::processText()
     if (pagetag_flag) page_enter_status = 1;
 
     new_line_skip_flag = false;
-    
+
     char ch = script_h.getStringBuffer()[string_buffer_offset];
     if ( IS_TWO_BYTE(ch) ){ // Shift jis
         /* ---------------------------------------- */
@@ -820,7 +820,7 @@ bool ONScripter::processText()
                 sentence_font.advanceCharInHankaku(2);
             }
         }
-        
+
         out_text[0] = script_h.getStringBuffer()[string_buffer_offset];
         out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
 
@@ -844,7 +844,7 @@ bool ONScripter::processText()
             event_mode = WAIT_TIMER_MODE | WAIT_INPUT_MODE;
             waitEvent( wait_time );
         }
-        
+
         num_chars_in_sentence++;
         string_buffer_offset += 2;
 
@@ -871,7 +871,7 @@ bool ONScripter::processText()
             }
             string_buffer_offset += matched_len;
         }
-        
+
         return true;
     }
     else if ( ch == '!' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
@@ -921,12 +921,12 @@ bool ONScripter::processText()
         string_buffer_offset += 7;
         return true;
     }
-    else if ( ch == '(' && 
+    else if ( ch == '(' &&
               (!english_mode ||
                !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
         current_page->add('(');
         startRuby( script_h.getStringBuffer() + string_buffer_offset + 1, sentence_font );
-        
+
         string_buffer_offset++;
         return true;
     }
@@ -961,7 +961,7 @@ bool ONScripter::processText()
         ruby_struct.stage = RubyStruct::NONE;
         return true;
     }
-    else if ( ch == '<' && 
+    else if ( ch == '<' &&
               (!english_mode ||
                !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
         current_page->add('<');
@@ -985,7 +985,7 @@ bool ONScripter::processText()
     }
     else{
         out_text[0] = ch;
-        
+
         int matched_len = script_h.checkClickstr(script_h.getStringBuffer() + string_buffer_offset);
 
         if (matched_len > 0){
@@ -1019,7 +1019,7 @@ bool ONScripter::processText()
         else{
             clickstr_state = CLICK_NONE;
         }
-        
+
         bool flush_flag = true;
         if ( skip_mode || ctrl_pressed_status )
             flush_flag = false;

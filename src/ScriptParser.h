@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ScriptParser.h - Define block parser of ONScripter
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
@@ -174,7 +174,7 @@ public:
     int addkinsokuCommand();
     int addCommand();
     void setRescale(int scale1, int scale2);
-    
+
 protected:
     struct UserFuncLUT{
         struct UserFuncLUT *next;
@@ -261,7 +261,7 @@ protected:
     bool zenkakko_flag;
     bool pagetag_flag;
     int  windowchip_sprite_no;
-    
+
     int string_buffer_offset;
 
     NestInfo root_nest_info, *last_nest_info;
@@ -289,9 +289,9 @@ protected:
 
     void deleteNestInfo();
     void setStr( char **dst, const char *src, int num=-1 );
-    
+
     void readToken();
-    
+
     /* ---------------------------------------- */
     /* Effect related variables */
     struct EffectLink{
@@ -307,9 +307,9 @@ protected:
             duration = 0;
         };
     };
-    
+
     EffectLink root_effect_link, *last_effect_link, window_effect, tmp_effect;
-    
+
     int effect_blank;
     bool effect_cut_flag;
 
@@ -321,15 +321,15 @@ protected:
     //char *lookback_image_name[4];
     int lookback_sp[2];
     uchar3 lookback_color;
-    
+
     /* ---------------------------------------- */
     /* For loop related variables */
     bool break_flag;
-    
+
     /* ---------------------------------------- */
     /* Transmode related variables */
     int trans_mode;
-    
+
     /* ---------------------------------------- */
     /* Save/Load related variables */
     struct SaveFileInfo{
@@ -351,7 +351,7 @@ protected:
     size_t file_io_buf_ptr;
     size_t file_io_buf_len;
     size_t save_data_len;
-    
+
     /* ---------------------------------------- */
     /* Text related variables */
     bool render_font_outline;
@@ -405,7 +405,7 @@ protected:
     void setKinsoku(const char *start_chrs, const char *end_chrs, bool add);
     bool isStartKinsoku(const char *str);
     bool isEndKinsoku(const char *str);
-    
+
     /* ---------------------------------------- */
     /* Sound related variables */
     int music_volume;
@@ -435,7 +435,7 @@ protected:
            MENUSELECTVOICE_NUM    = 7
     };
     char *menuselectvoice_file_name[MENUSELECTVOICE_NUM];
-     
+
     /* ---------------------------------------- */
     /* Font related variables */
     _FontInfo *current_font, sentence_font, menu_font, ruby_font, dialog_font;
@@ -486,7 +486,7 @@ protected:
     int getSystemCallNo( const char *buffer );
     unsigned char convHexToDec( char ch );
     void readColor( uchar3 *color, const char *buf );
-    
+
     void errorAndExit( const char *str, const char *reason=NULL );
 
     void allocFileIOBuf();
@@ -515,7 +515,7 @@ protected:
     int  textgosub_clickstr_state;
 
     ScriptHandler script_h;
-    
+
     unsigned char *key_table;
 
     void createKeyTable( const char *key_exe );

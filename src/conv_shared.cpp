@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  conv_shared.cpp - Shared code of sarconv and nsaconv
  *
  *  Copyright (c) 2001-2006 Ogapee. All rights reserved.
@@ -62,7 +62,7 @@ void rescaleImage( unsigned char *original_buffer, int width, int height, int by
 {
     size_t width_pad = 0;
     if ( src_pad_flag ) width_pad = (4 - width * byte_per_pixel % 4) % 4;
-    
+
     size_t w = (int)(width  * scale_ratio_upper / scale_ratio_lower);
     size_t h = (int)(height * scale_ratio_upper / scale_ratio_lower);
     if ( w==0 ) w=1;
@@ -98,7 +98,7 @@ void init_source (j_decompress_ptr cinfo)
 boolean fill_input_buffer (j_decompress_ptr cinfo)
 {
     my_source_mgr *src = (my_source_mgr *)cinfo->src;
-    
+
     src->pub.next_input_byte = src->buf;
     src->pub.bytes_in_buffer = src->left;
 
@@ -108,7 +108,7 @@ boolean fill_input_buffer (j_decompress_ptr cinfo)
 void skip_input_data (j_decompress_ptr cinfo, long num_bytes)
 {
     my_source_mgr *src = (my_source_mgr *)cinfo->src;
-    
+
     src->pub.next_input_byte += (size_t) num_bytes;
     src->pub.bytes_in_buffer -= (size_t) num_bytes;
 }
@@ -131,7 +131,7 @@ boolean empty_output_buffer (j_compress_ptr cinfo)
 
     dest->pub.next_output_byte = dest->buf;
     dest->pub.free_in_buffer = dest->left;
-    
+
     return TRUE;
 }
 
@@ -145,7 +145,7 @@ size_t rescaleJPEGWrite( unsigned int width, unsigned int height, int byte_per_p
     jpeg_error_mgr jerr;
     struct jpeg_compress_struct cinfo2;
     JSAMPROW row_pointer[1];
-    
+
     cinfo2.err = jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo2);
 
@@ -214,7 +214,7 @@ size_t rescaleJPEG( unsigned char *original_buffer, size_t length, unsigned char
         (*cinfo.mem->alloc_small) ((j_common_ptr) &cinfo, JPOOL_PERMANENT,
                                    sizeof(my_source_mgr));
     my_source_mgr * src = (my_source_mgr *) cinfo.src;
-    
+
     src->buf = original_buffer;
     src->left = length;
 
@@ -319,7 +319,7 @@ size_t rescaleBMP( unsigned char *original_buffer, unsigned char **rescaled_buff
     size_t width2  = (int)(width * scale_ratio_upper / scale_ratio_lower);
     if ( width2 == 0 ) width2 = 1;
     size_t width2_pad = (4 - width2 * byte_per_pixel % 4) % 4;
-    
+
     size_t height2 = (int)(height * scale_ratio_upper / scale_ratio_lower);
     if ( height2 == 0 ) height2 = 1;
 

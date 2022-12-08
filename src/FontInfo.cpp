@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  _FontInfo.cpp - Font information storage class of ONScripter
  *
  *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
@@ -177,7 +177,7 @@ int _FontInfo::getRemainingLine()
 int _FontInfo::x(bool use_ruby_offset)
 {
     int x = xy[0]*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
-    if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE) 
+    if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE)
         x += font_size_xy[0] - pitch_xy[0];
     return x;
 }
@@ -185,7 +185,7 @@ int _FontInfo::x(bool use_ruby_offset)
 int _FontInfo::y(bool use_ruby_offset)
 {
     int y = xy[1]*pitch_xy[1]/2 + top_xy[1] + line_offset_xy[1];
-    if (use_ruby_offset && rubyon_flag && tateyoko_mode == YOKO_MODE) 
+    if (use_ruby_offset && rubyon_flag && tateyoko_mode == YOKO_MODE)
         y += pitch_xy[1] - font_size_xy[1];
     return y;
 }
@@ -251,7 +251,7 @@ void _FontInfo::addLineOffset(int offset)
 SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
 {
     SDL_Rect rect;
-    
+
     if (tateyoko_mode == YOKO_MODE){
         if (start_xy[1] == xy[1]){
             rect.x = top_xy[0] + pitch_xy[0]*start_xy[0]/2;
@@ -305,7 +305,7 @@ int _FontInfo::initRuby(_FontInfo &body_info, int body_count, int ruby_count)
     pitch_xy[1] = font_size_xy[1];
 
     int margin=0;
-    
+
     if (tateyoko_mode == YOKO_MODE){
         top_xy[1] -= font_size_xy[1];
         num_xy[0] = ruby_count;
@@ -316,19 +316,19 @@ int _FontInfo::initRuby(_FontInfo &body_info, int body_count, int ruby_count)
         num_xy[0] = 1;
         num_xy[1] = ruby_count;
     }
-    
+
     if (ruby_count*font_size_xy[tateyoko_mode] >= body_count*body_info.pitch_xy[tateyoko_mode]){
         margin = (ruby_count*font_size_xy[tateyoko_mode] - body_count*body_info.pitch_xy[tateyoko_mode] + 1)/2;
     }
     else{
         int offset = 0;
-        if (ruby_count > 0) 
+        if (ruby_count > 0)
             offset = (body_count*body_info.pitch_xy[tateyoko_mode] - ruby_count*font_size_xy[tateyoko_mode] + ruby_count) / (ruby_count*2);
         top_xy[tateyoko_mode] += offset;
         pitch_xy[tateyoko_mode] += offset*2;
     }
     body_info.line_offset_xy[tateyoko_mode] += margin;
-    
+
     clear();
 
     return margin;

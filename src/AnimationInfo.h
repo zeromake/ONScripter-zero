@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  AnimationInfo.h - General image storage class of ONScripter
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
@@ -69,7 +69,7 @@ public:
     bool is_single_line;
     bool is_tight_region; // valid under TRANS_STRING, if false, ruby is parsed
     bool is_ruby_drawable;
-        
+
     char *file_name;
     char *mask_file_name;
 
@@ -85,7 +85,7 @@ public:
     unsigned char *alpha_buf;
     Uint32 texture_format;
     SDL_mutex *mutex;
-        
+
     /* Variables for extended sprite (lsp2, drawsp2, etc.) */
     int scale_x, scale_y, rot;
     int mat[2][2], inv_mat[2][2];
@@ -106,7 +106,7 @@ public:
     int param; // used by prnum and bar
     int max_param; // used by bar
     int max_width; // used by bar
-    
+
     AnimationInfo();
     AnimationInfo(const AnimationInfo &anim);
     ~AnimationInfo();
@@ -121,9 +121,9 @@ public:
         pos.w = orig_pos.w * screen_ratio1 / screen_ratio2;
         pos.h = orig_pos.h * screen_ratio1 / screen_ratio2;
     };
-                 
+
     void reset();
-    
+
     void deleteImageName();
     void setImageName( const char *name );
     void deleteSurface(bool delete_surface_name=true);
@@ -138,10 +138,10 @@ public:
                          SDL_Rect &clip, int alpha=255 );
     void blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int dst_y,
                           SDL_Rect &clip, int alpha=255 );
-    void blendText( SDL_Surface *surface, int dst_x, int dst_y, 
+    void blendText( SDL_Surface *surface, int dst_x, int dst_y,
                     SDL_Color &color, SDL_Rect *clip, bool rotate_flag );
     void calcAffineMatrix();
-    
+
     static SDL_Surface *allocSurface( int w, int h, Uint32 texture_format );
     static SDL_Surface *alloc32bitSurface( int w, int h, Uint32 texture_format );
     void allocImage( int w, int h, Uint32 texture_format );

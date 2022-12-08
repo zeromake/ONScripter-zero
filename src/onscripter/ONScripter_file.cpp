@@ -64,7 +64,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     }
     time_t mtime = buf.st_mtime;
     tm = localtime( &mtime );
-        
+
     save_file_info.month  = tm->tm_mon + 1;
     save_file_info.day    = tm->tm_mday;
     save_file_info.hour   = tm->tm_hour;
@@ -101,7 +101,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
         save_file_info.valid = false;
         return;
     }
-            
+
     GetFileTime( handle, NULL, NULL, &tm );
     FileTimeToLocalFileTime( &tm, &ltm );
     FileTimeToSystemTime( &ltm, &stm );
@@ -181,13 +181,13 @@ char *ONScripter::readSaveStrFromFile( int no )
     int p = len - 1;
     if ( p < 3 || file_io_buf[p] != '*' || file_io_buf[p-1] != '"' ) return NULL;
     p -= 2;
-    
+
     while( file_io_buf[p] != '"' && p>0 ) p--;
     if ( file_io_buf[p] != '"' ) return NULL;
 
     len = len - p - 3;
     char *buf = new char[len+1];
-    
+
     unsigned int i;
     for (i=0 ; i<len ; i++)
         buf[i] = file_io_buf[p+i+1];
@@ -204,7 +204,7 @@ int ONScripter::loadSaveFile( int no )
         utils::printError("can't open save file %s\n", filename );
         return -1;
     }
-    
+
     /* ---------------------------------------- */
     /* Load magic number */
     int i;
@@ -216,7 +216,7 @@ int ONScripter::loadSaveFile( int no )
         printf("Save file version is unknown\n" );
         return loadSaveFile2( SAVEFILE_VERSION_MAJOR*100 + SAVEFILE_VERSION_MINOR );
     }
-    
+
     int file_version = readChar() * 100;
     file_version += readChar();
     printf("Save file version is %d.%d\n", file_version/100, file_version%100 );
@@ -227,7 +227,7 @@ int ONScripter::loadSaveFile( int no )
 
     if ( file_version >= 200 )
         return loadSaveFile2( file_version );
-    
+
     utils::printError("Save file is too old.\n");
 
     return -1;
@@ -259,7 +259,7 @@ int ONScripter::writeSaveFile( int no, const char *savestr )
 
     char filename[32];
     sprintf( filename, "save%d.dat", no );
-        
+
     memcpy(file_io_buf, save_data_buf, save_data_len);
     file_io_buf_ptr = save_data_len;
     if (saveFileIOBuf( filename, 0, savestr )){

@@ -28,9 +28,9 @@ int ONScripter::loadSaveFile2( int file_version )
 {
     stopSMPEG();
     deleteNestInfo();
-    
+
     int i, j;
-    
+
     readInt(); // 1 ... < 2.96, 2 ... >= 2.96
     if ( readInt() == 1 ) sentence_font.is_bold = true;
     else                  sentence_font.is_bold = false;
@@ -111,29 +111,29 @@ int ONScripter::loadSaveFile2( int file_version )
         }
     }
 
-    for ( i=0 ; i<3 ; i++ ) 
+    for ( i=0 ; i<3 ; i++ )
         tachi_info[i].orig_pos.x = readInt();
-    for ( i=0 ; i<3 ; i++ ) 
+    for ( i=0 ; i<3 ; i++ )
         tachi_info[i].orig_pos.y = readInt();
-    for ( i=0 ; i<3 ; i++ ) 
+    for ( i=0 ; i<3 ; i++ )
         tachi_info[i].scalePosXY( screen_ratio1, screen_ratio2 );
 
     readInt(); // 0
     readInt(); // 0
     readInt(); // 0
-    
+
     if (file_version >= 203){
         readInt(); // -1
         readInt(); // -1
         readInt(); // -1
     }
-    
+
     for (i=0 ; i<MAX_TEXTURE_NUM ; i++) texture_info[i].reset();
     smpeg_info = NULL;
 
     for ( i=0 ; i<MAX_SPRITE_NUM ; i++ ){
         AnimationInfo *ai = &sprite_info[i];
-        
+
         ai->remove();
         readStr( &ai->image_name );
         if ( ai->image_name ){
@@ -160,7 +160,7 @@ int ONScripter::loadSaveFile2( int file_version )
         while( num_nest > 0 ){
             NestInfo *info = new NestInfo();
             if (last_nest_info == &root_nest_info) last_nest_info = info;
-        
+
             i = readInt();
             if (i > 0){
                 info->nest_mode = NestInfo::LABEL;
@@ -198,7 +198,7 @@ int ONScripter::loadSaveFile2( int file_version )
         monocro_color_lut[i][2] = (monocro_color[2] * i) >> 8;
     }
     nega_mode = readInt();
-    
+
     // ----------------------------------------
     // Sound
     stopCommand();
@@ -218,7 +218,7 @@ int ONScripter::loadSaveFile2( int file_version )
     }
     else
         midi_play_loop_flag = false;
-    
+
     // wave, waveloop
     if ( readInt() == 1 ) wave_play_loop_flag = true;
     else                  wave_play_loop_flag = false;
@@ -335,7 +335,7 @@ int ONScripter::loadSaveFile2( int file_version )
 
     if ( file_version >= 202 )
         readArrayVariable();
-    
+
     readInt(); // 0
     if ( readChar() == 1 ) erase_text_window_mode = 2;
     readChar(); // 0
@@ -361,7 +361,7 @@ int ONScripter::loadSaveFile2( int file_version )
 
     if (file_version >= 204){
         readInt();
-        
+
         for ( i=0 ; i<MAX_SPRITE2_NUM ; i++ ){
             ai = &sprite2_info[i];
 
@@ -387,7 +387,7 @@ int ONScripter::loadSaveFile2( int file_version )
             ai->affine_pos.h = ai->pos.h;
             ai->calcAffineMatrix();
         }
-        
+
         readInt();
         readInt();
         if (file_version >= 205) readInt(); // 1
@@ -408,7 +408,7 @@ int ONScripter::loadSaveFile2( int file_version )
         else
             readInt(); // 480
     }
-    
+
     int text_num = readInt();
     start_page = current_page;
     for ( i=0 ; i<text_num ; i++ ){
@@ -432,13 +432,13 @@ int ONScripter::loadSaveFile2( int file_version )
         readInt();
         readInt();
     }
-    
+
     i = readInt();
     current_label_info = script_h.getLabelByLine( i );
     current_line = i - current_label_info.start_line;
     //utils::printInfo("load %d:%d(%d-%d)\n", current_label_info.start_line, current_line, i, current_label_info.start_line);
     char *buf = script_h.getAddressByLine( i );
-    
+
     j = readInt();
     for ( i=0 ; i<j ; i++ ){
         while( *buf != ':' ) buf++;
@@ -449,14 +449,14 @@ int ONScripter::loadSaveFile2( int file_version )
     display_mode = shelter_display_mode = DISPLAY_MODE_TEXT;
     clickstr_state = CLICK_NONE;
     draw_cursor_flag = false;
-    
+
     return 0;
 }
 
 void ONScripter::saveSaveFile2( bool output_flag )
 {
     int i, j;
-    
+
     writeInt( 2, output_flag ); // changed in version 208
     writeInt( (sentence_font.is_bold?1:0), output_flag );
     writeInt( (sentence_font.is_shadow?1:0), output_flag );
@@ -472,7 +472,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( window_effect.effect, output_flag );
     writeInt( window_effect.duration, output_flag );
     writeStr( window_effect.anim.image_name, output_flag ); // probably
-    
+
     writeInt( sentence_font.top_xy[0], output_flag );
     writeInt( sentence_font.top_xy[1], output_flag );
     writeInt( sentence_font.num_xy[0], output_flag );
@@ -483,7 +483,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( sentence_font.pitch_xy[1], output_flag );
     for ( i=0 ; i<3 ; i++ )
         writeChar( sentence_font.window_color[2-i], output_flag );
-    writeChar( ( sentence_font.is_transparent )?0x00:0xff, output_flag ); 
+    writeChar( ( sentence_font.is_transparent )?0x00:0xff, output_flag );
     writeInt( sentence_font.wait_time, output_flag );
     writeInt( sentence_font_info.orig_pos.x, output_flag );
     writeInt( sentence_font_info.orig_pos.y, output_flag );
@@ -497,7 +497,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( cursor_info[1].orig_pos.x, output_flag );
     writeInt( cursor_info[0].orig_pos.y, output_flag );
     writeInt( cursor_info[1].orig_pos.y, output_flag );
-    
+
     writeStr( bg_info.file_name, output_flag );
     for ( i=0 ; i<3 ; i++ )
         writeStr( tachi_info[i].image_name, output_flag );
@@ -515,7 +515,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( -1, output_flag );
     writeInt( -1, output_flag );
     writeInt( -1, output_flag );
-    
+
     for ( i=0 ; i<MAX_SPRITE_NUM ; i++ ){
         AnimationInfo *ai = &sprite_info[i];
         writeStr( ai->image_name,   output_flag );
@@ -550,7 +550,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
         }
         info = info->next;
     }
-    
+
     writeInt( (monocro_flag)?1:0, output_flag );
     for ( i=0 ; i<3 ; i++ )
         writeInt( monocro_color[2-i], output_flag );
@@ -575,10 +575,10 @@ void ONScripter::saveSaveFile2( bool output_flag )
         writeStr( music_file_name, output_flag );
     else
         writeStr( NULL, output_flag );
-    
+
     writeInt( (erase_text_window_mode>0)?1:0, output_flag );
     writeInt( 1, output_flag );
-    
+
     for ( i=0 ; i<MAX_PARAM_NUM ; i++ ){
         if ( bar_info[i] ){
             writeInt( bar_info[i]->param,      output_flag );
@@ -601,7 +601,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
             writeInt( 0, output_flag );
         }
     }
-    
+
     for ( i=0 ; i<MAX_PARAM_NUM ; i++ ){
         if ( prnum_info[i] ){
             writeInt( prnum_info[i]->param, output_flag );
@@ -629,7 +629,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeStr( btndef_info.image_name, output_flag );
 
     writeArrayVariable(output_flag);
-    
+
     writeInt( 0, output_flag );
     writeChar( (erase_text_window_mode==2)?1:0, output_flag );
     writeChar( 0, output_flag );
@@ -642,9 +642,9 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( ruby_struct.font_size_xy[0], output_flag );
     writeInt( ruby_struct.font_size_xy[1], output_flag );
     writeStr( ruby_struct.font_name, output_flag );
-    
+
     writeInt( 0, output_flag );
-    
+
     for ( i=0 ; i<MAX_SPRITE2_NUM ; i++ ){
         AnimationInfo *ai = &sprite2_info[i];
         writeStr( ai->image_name,  output_flag );
@@ -672,7 +672,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( script_h.screen_width/2,   output_flag ); // added in version 206, changed in version 208
     writeInt( script_h.screen_width*3/4, output_flag ); // added in version 206, changed in version 208
     writeInt( underline_value, output_flag ); // changed in version 207
-    
+
     Page *page = current_page;
     int num_page = 0;
     while( page != start_page ){
@@ -697,7 +697,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
         writeChar( 0, output_flag );
         page = page->next;
     }
-    
+
     writeInt( current_label_info.start_line + current_line, output_flag );
     char *buf = script_h.getAddressByLine( current_label_info.start_line + current_line );
     //utils::printInfo("save %d:%d\n", current_label_info.start_line, current_line);

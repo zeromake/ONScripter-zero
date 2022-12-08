@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ONScripter_effect_breakup.cpp
  *    - Emulation of Takashi Toyama's "breakup.dll" NScripter plugin effect
  *
@@ -42,8 +42,8 @@
 #define BREAKUP_MODE_PILEUP 4
 #define BREAKUP_MODE_JUMBLE 8
 
-const int breakup_disp_x[BREAKUP_DIRECTIONS] = { -7,-7,-5,-4,-2,1,3,5 }; 
-const int breakup_disp_y[BREAKUP_DIRECTIONS] = {  0, 2, 4, 6, 7,7,6,5 }; 
+const int breakup_disp_x[BREAKUP_DIRECTIONS] = { -7,-7,-5,-4,-2,1,3,5 };
+const int breakup_disp_y[BREAKUP_DIRECTIONS] = {  0, 2, 4, 6, 7,7,6,5 };
 int n_cells, tot_frames, last_frame;
 int breakup_mode;
 SDL_Rect breakup_window;  // window of _cells_, not pixels
@@ -223,13 +223,13 @@ void ONScripter::effectBreakup( char *params, int duration )
 {
     while (*params != 0 && *params != '/') params++;
     if (*params == '/') params++;
-    
+
     int x_dir = -1;
     int y_dir = -1;
 
     int frame = tot_frames * effect_counter / duration;
     int frame_diff = frame - last_frame;
-    if (frame_diff == 0) 
+    if (frame_diff == 0)
         return;
 
     SDL_Surface *bg = effect_dst_surface;

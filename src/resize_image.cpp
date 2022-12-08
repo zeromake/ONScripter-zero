@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  resize_image.cpp - resize image using smoothing and resampling
  *
  *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
@@ -69,7 +69,7 @@ static void calcWeightedSumColumn(unsigned char **src, int y,
                 (*pan++)--;
             }
         }
-        
+
         if ((y_end-1)>=0 && (y_end-1)<image_height){
             unsigned long *pa = pixel_accum + image_width*s;
             unsigned long *pan = pixel_accum_num + image_width*s;
@@ -88,7 +88,7 @@ static void calcWeightedSum(unsigned char **dst, unsigned char **src, int x,
 {
     int x_start = x-interpolation_width/2;
     int x_end   = x-interpolation_width/2+interpolation_width;
-    
+
     for (int s=0 ; s<byte_per_pixel ; s++){
         if ((x_start-1)>=0 && (x_start-1)<image_width){
             tmp_acc[s] -= pixel_accum[image_width*s+x_start-1];
@@ -107,7 +107,7 @@ void resizeImage( unsigned char *dst_buffer, int dst_width, int dst_height, int 
                   int byte_per_pixel, unsigned char *tmp_buffer, int tmp_total_width, bool palette_flag )
 {
     if (dst_width == 0 || dst_height == 0) return;
-    
+
     unsigned char *tmp_buf = tmp_buffer;
     unsigned char *src_buf = src_buffer;
 
@@ -149,7 +149,7 @@ void resizeImage( unsigned char *dst_buffer, int dst_width, int dst_height, int 
                     tmp_acc_num[s] += pixel_accum_num[src_width*s+j];
                 }
             }
-            
+
             for ( j=0 ; j<src_width ; j++ )
                 calcWeightedSum(&tmp_buf, &src_buf, j,
                                 interpolation_width,
@@ -160,7 +160,7 @@ void resizeImage( unsigned char *dst_buffer, int dst_width, int dst_height, int 
     else{
         tmp_buffer = src_buffer;
     }
-    
+
     /* resampling */
     unsigned char *dst_buf = dst_buffer;
     int dh1 = dst_height-1; if (dh1==0) dh1 = 1;
@@ -175,7 +175,7 @@ void resizeImage( unsigned char *dst_buffer, int dst_width, int dst_height, int 
             x >>= 3;
 
             int k = tmp_total_width * y + x * byte_per_pixel;
-            
+
             if (palette_flag){ //assuming byte_per_pixel=1
                 *dst_buf++ = tmp_buffer[k];
             }

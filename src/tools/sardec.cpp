@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  sardec.cpp - SAR archive decoder
  *
  *  Copyright (c) 2001-2004 Ogapee. All rights reserved.
@@ -62,10 +62,10 @@ int main( int argc, char **argv )
     count = cSR.getNumFiles();
 
     SarReader::FileInfo sFI;
-    
+
     for ( i=0 ; i<count ; i++ ){
         sFI = cSR.getFileByIndex( i );
-        
+
         length = cSR.getFileLength( sFI.name );
 
         if ( length > buffer_length ){
@@ -77,7 +77,7 @@ int main( int argc, char **argv )
             fprintf( stderr, "file %s can't be retrieved\n", sFI.name );
             continue;
         }
-        
+
         strcpy( file_name, sFI.name );
         for ( j=0 ; j<strlen(file_name) ; j++ ){
             if ( file_name[j] == '\\' ){
@@ -90,7 +90,7 @@ int main( int argc, char **argv )
                     mkdir( dir_name, 00755 );
             }
         }
-    
+
         printf("opening %s\n", file_name );
         if ( (fp = fopen( file_name, "wb" ) )){
             fwrite( buffer, 1, length, fp );
@@ -100,8 +100,8 @@ int main( int argc, char **argv )
             printf(" ... falied\n");
         }
     }
-    
+
     if ( buffer ) delete[] buffer;
-    
+
     exit(0);
 }

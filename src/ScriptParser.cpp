@@ -68,7 +68,7 @@ ScriptParser::ScriptParser()
     nsa_offset = 0;
     key_table = NULL;
     force_button_shortcut_flag = false;
-    
+
     save_menu_name = NULL;
     load_menu_name = NULL;
     save_item_name = NULL;
@@ -195,7 +195,7 @@ void ScriptParser::reset()
     current_font = &sentence_font;
     shade_distance[0] = 1;
     shade_distance[1] = 1;
-    
+
     default_text_speed[0] = DEFAULT_TEXT_SPEED_LOW;
     default_text_speed[1] = DEFAULT_TEXT_SPEED_MIDDLE;
     default_text_speed[2] = DEFAULT_TEXT_SPEED_HIGHT;
@@ -206,12 +206,12 @@ void ScriptParser::reset()
         page_list = NULL;
     }
     current_page = start_page = NULL;
-    
+
     clickstr_line = 0;
     clickstr_state = CLICK_NONE;
     linepage_mode = 0;
     english_mode = false;
-    
+
     /* ---------------------------------------- */
     /* Sound related variables */
     for ( i=0 ; i<     CLICKVOICE_NUM ; i++ )
@@ -283,7 +283,7 @@ int ScriptParser::openScript()
         script_h.cBR = new DirectReader( archive_path, key_table );
         script_h.cBR->open();
     }
-    
+
     if ( script_h.openScript( archive_path ) ) return -1;
 
     screen_width  = script_h.screen_width;
@@ -384,10 +384,10 @@ int ScriptParser::saveFileIOBuf( const char *filename, int offset, const char *s
 {
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
-    
+
     FILE *fp;
     if ( (fp = fopen( filename, "wb", use_save_dir )) == NULL ) return -1;
-    
+
     size_t ret = fwrite(file_io_buf+offset, 1, file_io_buf_ptr-offset, fp);
 
     if (savestr){
@@ -412,7 +412,7 @@ size_t ScriptParser::loadFileIOBuf( const char *filename )
     FILE *fp;
     if ( (fp = fopen( filename, "rb", use_save_dir )) == NULL )
         return 0;
-    
+
     fseek(fp, 0, SEEK_END);
     size_t len = ftell(fp);
     file_io_buf_ptr = len;
@@ -454,7 +454,7 @@ void ScriptParser::writeInt(int i, bool output_flag)
 int ScriptParser::readInt()
 {
     if (file_io_buf_ptr+3 >= file_io_buf_len ) return 0;
-    
+
     int i =
         (unsigned int)file_io_buf[file_io_buf_ptr+3] << 24 |
         (unsigned int)file_io_buf[file_io_buf_ptr+2] << 16 |
@@ -484,10 +484,10 @@ void ScriptParser::readStr(char **s)
     while (file_io_buf_ptr+counter < file_io_buf_len){
         if (file_io_buf[file_io_buf_ptr+counter++] == 0) break;
     }
-    
+
     if (*s) delete[] *s;
     *s = NULL;
-    
+
     if (counter > 1){
         *s = new char[counter];
         memcpy(*s, file_io_buf + file_io_buf_ptr, counter);
@@ -519,7 +519,7 @@ void ScriptParser::writeArrayVariable( bool output_flag )
         int i, dim = 1;
         for ( i=0 ; i<av->num_dim ; i++ )
             dim *= av->dim[i];
-        
+
         for ( i=0 ; i<dim ; i++ ){
             unsigned long ch = av->data[i];
             if (output_flag){
@@ -542,7 +542,7 @@ void ScriptParser::readArrayVariable()
         int i, dim = 1;
         for ( i=0 ; i<av->num_dim ; i++ )
             dim *= av->dim[i];
-        
+
         for ( i=0 ; i<dim ; i++ ){
             unsigned long ret;
             if (file_io_buf_ptr+3 >= file_io_buf_len ) return;
@@ -592,7 +592,7 @@ void ScriptParser::writeLog( ScriptHandler::LogInfo &info )
 void ScriptParser::readLog( ScriptHandler::LogInfo &info )
 {
     script_h.resetLog( info );
-    
+
     if (loadFileIOBuf( info.filename ) > 0){
         int i, j, ch, count = 0;
         char buf[100];
@@ -603,7 +603,7 @@ void ScriptParser::readLog( ScriptHandler::LogInfo &info )
 
         for ( i=0 ; i<count ; i++ ){
             readChar();
-            j = 0; 
+            j = 0;
             while( (ch = readChar()) != '"' ) buf[j++] = ch ^ 0x84;
             buf[j] = '\0';
 
@@ -643,7 +643,7 @@ void ScriptParser::setStr( char **dst, const char *src, int num )
 {
     if ( *dst ) delete[] *dst;
     *dst = NULL;
-    
+
     if ( src ){
         if (num >= 0){
             *dst = new char[ num + 1 ];
@@ -689,7 +689,7 @@ void ScriptParser::readToken()
 int ScriptParser::readEffect( EffectLink *effect )
 {
     int num = 1;
-    
+
     effect->effect = script_h.readInt();
     if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
         num++;
@@ -745,7 +745,7 @@ const char *ScriptParser::fpath(const char *path, bool use_save_dir) {
 void ScriptParser::createKeyTable( const char *key_exe )
 {
     if (!key_exe) return;
-    
+
     FILE *fp = ::fopen(key_exe, "rb");
     if (fp == NULL){
         utils::printError( "createKeyTable: can't open EXE file %s\n", key_exe);
@@ -759,7 +759,7 @@ void ScriptParser::createKeyTable( const char *key_exe )
 
     unsigned char ring_buffer[256];
     int ring_start = 0, ring_last = 0;
-    
+
     int ch, count;
     while((ch = fgetc(fp)) != EOF){
         i = ring_start;

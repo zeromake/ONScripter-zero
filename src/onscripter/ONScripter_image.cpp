@@ -48,7 +48,7 @@ SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha, int *locatio
 
     SDL_Surface *ret;
     if((tmp->w * tmp->format->BytesPerPixel == tmp->pitch) &&
-       (tmp->format->BitsPerPixel == image_surface->format->BitsPerPixel) && 
+       (tmp->format->BitsPerPixel == image_surface->format->BitsPerPixel) &&
        (tmp->format->Rmask == image_surface->format->Rmask) &&
        (tmp->format->Gmask == image_surface->format->Gmask) &&
        (tmp->format->Bmask == image_surface->format->Bmask) &&
@@ -59,7 +59,7 @@ SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha, int *locatio
         ret = SDL_ConvertSurface(tmp, image_surface->format, SDL_SWSURFACE);
         SDL_FreeSurface(tmp);
     }
-    
+
     return ret;
 }
 
@@ -89,7 +89,7 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
         }
         c++;
     }
-        
+
     while (filename[c] == ' ' || filename[c] == '\t') c++;
     int n=0, c2 = c;
     while(filename[c] == '#'){
@@ -110,7 +110,7 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
         readColor(&col, filename+c);
         c += 7;
         while (filename[c] == ' ' || filename[c] == '\t') c++;
-        
+
         SDL_Rect rect;
         rect.x = w*i/n;
         rect.y = 0;
@@ -126,7 +126,7 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
         else
             *has_alpha = false;
     }
-    
+
     return tmp;
 }
 
@@ -163,7 +163,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
         if (!tmp_image_buf) tmp_image_buf = new unsigned char[tmp_image_buf_length];
         buffer = tmp_image_buf;
     }
-        
+
     script_h.cBR->getFile(filename, buffer, location);
     char *ext = strrchr(filename, '.');
 
@@ -510,7 +510,7 @@ void ONScripter::alphaBlend(SDL_Surface *mask_surface,
         for (int i = 0; i < rect.h; i++) blender(i);
 #endif //USE_PARALLEL
     }
-    
+
     if ( mask_surface ) SDL_UnlockSurface( mask_surface );
     SDL_UnlockSurface(dst);
     SDL_UnlockSurface(src2);
@@ -568,7 +568,7 @@ void ONScripter::alphaBlendText( SDL_Surface *dst_surface, SDL_Rect dst_rect,
     clip_rect.w = dst_surface->w;
     clip_rect.h = dst_surface->h;
     if ( AnimationInfo::doClipping( &dst_rect, &clip_rect, &clipped_rect ) ) return;
-    
+
     x2 += clipped_rect.x;
     y2 += clipped_rect.y;
 
@@ -642,7 +642,7 @@ void ONScripter::alphaBlendText( SDL_Surface *dst_surface, SDL_Rect dst_rect,
             }
         }
     }
-    
+
     SDL_UnlockSurface( src_surface );
     SDL_UnlockSurface( dst_surface );
 }
@@ -672,7 +672,7 @@ void ONScripter::makeMonochromeSurface( SDL_Surface *surface, SDL_Rect &clip )
         for ( int j=clip.x ; j<clip.x + clip.w ; j++ ){
             c = ((((*buf & fmt->Rmask) >> fmt->Rshift) << fmt->Rloss) * 77 +
                  (((*buf & fmt->Gmask) >> fmt->Gshift) << fmt->Gloss) * 151 +
-                 (((*buf & fmt->Bmask) >> fmt->Bshift) << fmt->Bloss) * 28 ) >> 8; 
+                 (((*buf & fmt->Bmask) >> fmt->Bshift) << fmt->Bloss) * 28 ) >> 8;
             *buf++ = ((monocro_color_lut[c][0] >> fmt->Rloss) << surface->format->Rshift |
                       (monocro_color_lut[c][1] >> fmt->Gloss) << surface->format->Gshift |
                       (monocro_color_lut[c][2] >> fmt->Bloss) << surface->format->Bshift);
@@ -695,7 +695,7 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
 
     int i, top;
     SDL_BlitSurface( bg_info.image_surface, &clip, surface, &clip );
-    
+
     if ( !all_sprite_hide_flag ){
         if ( z_order < 10 && refresh_mode & REFRESH_SAYA_MODE )
             top = 9;
@@ -725,7 +725,7 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
                     drawTaggedSurface( surface, &sprite2_info[i], clip );
             }
         }
-    
+
         if (refresh_mode & REFRESH_SHADOW_MODE)
             shadowTextDisplay( surface, clip );
         if (refresh_mode & REFRESH_TEXT_MODE)
@@ -755,7 +755,7 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
         if ( monocro_flag )   makeMonochromeSurface( surface, clip );
         if ( nega_mode == 2 ) makeNegaSurface( surface, clip );
     }
-    
+
     if ( !( refresh_mode & REFRESH_SAYA_MODE ) ){
         for ( i=0 ; i<MAX_PARAM_NUM ; i++ ){
             if ( bar_info[i] )
@@ -795,7 +795,7 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
 void ONScripter::refreshSprite( int sprite_no, bool active_flag, int cell_no,
                                 SDL_Rect *check_src_rect, SDL_Rect *check_dst_rect )
 {
-    if ( sprite_info[sprite_no].image_surface && 
+    if ( sprite_info[sprite_no].image_surface &&
          ( sprite_info[ sprite_no ].visible != active_flag ||
            (cell_no >= 0 && sprite_info[ sprite_no ].current_cell != cell_no ) ||
            AnimationInfo::doClipping(check_src_rect, &sprite_info[ sprite_no ].pos) == 0 ||

@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ONScripter_lut.cpp - command lookup-table for ONScripter
  *
  *  Copyright (c) 2001-2016 Ogapee. All rights reserved.
@@ -366,10 +366,10 @@ static ONScripter::FuncLUT func_lut[] = {
     {"blt",				&ONScripter::bltCommand},
     {"bgmvol",			&ONScripter::mp3volCommand},
     {"bgmstop",			&ONScripter::mp3stopCommand},
-    {"bgmonce",			&ONScripter::mp3Command}, 
+    {"bgmonce",			&ONScripter::mp3Command},
     {"bgmfadeout",		&ONScripter::mp3fadeoutCommand},
     {"bgmfadein",		&ONScripter::mp3fadeinCommand},
-    {"bgm",				&ONScripter::mp3Command}, 
+    {"bgm",				&ONScripter::mp3Command},
     {"bgcpy",			&ONScripter::bgcopyCommand},
     {"bgcopy",			&ONScripter::bgcopyCommand},
     {"bg",				&ONScripter::bgCommand},

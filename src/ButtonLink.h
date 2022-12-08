@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ButtonLink.h - Base button class
  *
  *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
@@ -52,7 +52,7 @@ struct ButtonLink{
     };
 
     ~ButtonLink(){
-        if ( (button_type == NORMAL_BUTTON || button_type == TMP_SPRITE_BUTTON) && 
+        if ( (button_type == NORMAL_BUTTON || button_type == TMP_SPRITE_BUTTON) &&
              anim[0] ) delete anim[0];
         for (int i=0 ; i<3 ; i++)
             if ( exbtn_ctl[i] ) delete[] exbtn_ctl[i];

@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  simple_aviplay.cpp - sample program for AVIWrapper class
  *
  *  Copyright (c) 2001-2004 Ogapee. All rights reserved.

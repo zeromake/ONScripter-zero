@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  AVIWrapper.h - avifile library wrapper class to play AVI video & audio stream
  *
  *  Copyright (c) 2001-2008 Ogapee. All rights reserved.
@@ -49,7 +49,7 @@ public:
     unsigned int getWidth(){ return width; };
     unsigned int getHeight(){ return height; };
 
-private:    
+private:
     double getAudioTime();
     int drawFrame( avm::CImage *image );
 

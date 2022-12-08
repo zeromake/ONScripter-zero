@@ -56,14 +56,14 @@ int NsaReader::open( const char *nsa_path )
     char archive_name[256], archive_name2[256];
 
     if ( !SarReader::open( "arc.sar" ) ) return 0;
-    
+
     sar_flag = false;
 
     if (archive_type & ARCHIVE_TYPE_NS2){
         for ( i=0 ; i<MAX_NS2_ARCHIVE ; i++ ){
             sprintf( archive_name, "%s%02d.%s", nsa_path?nsa_path:"", i, ns2_archive_ext );
             if ( ( archive_info_ns2[i].file_handle = fopen( archive_name, "rb" ) ) == NULL ) break;
-        
+
             archive_found = true;
             archive_info_ns2[i].file_name = new char[strlen(archive_name)+1];
             memcpy(archive_info_ns2[i].file_name, archive_name, strlen(archive_name)+1);
@@ -75,7 +75,7 @@ int NsaReader::open( const char *nsa_path )
     if (num_of_ns2_archives ==0 && archive_type & ARCHIVE_TYPE_NSA){
         for ( i=-1 ; i<MAX_EXTRA_ARCHIVE ; i++ ){
             ArchiveInfo *ai;
-        
+
             if (i == -1){
                 sprintf( archive_name, "%s%s.%s", nsa_path?nsa_path:"", NSA_ARCHIVE_NAME, nsa_archive_ext );
                 ai = &archive_info;
@@ -85,7 +85,7 @@ int NsaReader::open( const char *nsa_path )
                 sprintf( archive_name, "%s%s.%s", nsa_path?nsa_path:"", archive_name2, nsa_archive_ext );
                 ai = &archive_info2[i];
             }
-        
+
             if ( ( ai->file_handle = fopen( archive_name, "rb" ) ) == NULL ) break;
 
             archive_found = true;
@@ -136,7 +136,7 @@ int NsaReader::getNumFiles(){
 
     for ( i=0 ; i<num_of_nsa_archives ; i++ ) total += archive_info2[i].num_of_files;
     for ( i=0 ; i<num_of_ns2_archives ; i++ ) total += archive_info_ns2[i].num_of_files;
-    
+
     return total;
 }
 
@@ -155,7 +155,7 @@ size_t NsaReader::getFileLengthSub( ArchiveInfo *ai, const char *file_name )
     if ( type == NBZ_COMPRESSION || type == SPB_COMPRESSION ) {
         ai->fi_list[i].original_length = getDecompressedFileLength( type, ai->file_handle, ai->fi_list[i].offset );
     }
-    
+
     return ai->fi_list[i].original_length;
 }
 
@@ -165,13 +165,13 @@ size_t NsaReader::getFileLength( const char *file_name )
 
     size_t ret;
     int i;
-    
+
     if ( ( ret = DirectReader::getFileLength( file_name ) ) ) return ret;
-    
+
     for ( i=0 ; i<num_of_ns2_archives ; i++ ){
         if ( (ret = getFileLengthSub( &archive_info_ns2[i], file_name )) ) return ret;
     }
-    
+
     if ( ( ret = getFileLengthSub( &archive_info, file_name )) ) return ret;
 
     for ( i=0 ; i<num_of_nsa_archives ; i++ ){
@@ -214,7 +214,7 @@ size_t NsaReader::getFile( const char *file_name, unsigned char *buffer, int *lo
 NsaReader::FileInfo NsaReader::getFileByIndex( unsigned int index )
 {
     int i;
-    
+
     for ( i=0 ; i<num_of_ns2_archives ; i++ ){
         if ( index < archive_info_ns2[i].num_of_files ) return archive_info_ns2[i].fi_list[index];
         index -= archive_info_ns2[i].num_of_files;

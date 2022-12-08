@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ONScripter_effect_trig.cpp - for ONScripter trig-tables,
  *    emulation of Takashi Toyama's "whirl.dll" and "trvswave.dll"
  *    NScripter plugin effects
@@ -157,7 +157,7 @@ void ONScripter::effectWhirl( char *params, int duration )
             theta %= TRIG_TABLE_SIZE;
             theta = ((rad_amp * sin_table[theta] / TRIG_FACTOR) + rad_base) *
                     direction;
-            //float theta = direction * (rad_base + rad_amp * 
+            //float theta = direction * (rad_base + rad_amp *
             //                           sin(sqrt(x * x + y * y) * OMEGA));
 
             //perform rotation

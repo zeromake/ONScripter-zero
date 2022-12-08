@@ -22,7 +22,7 @@ uint8_t* createKeyTable(const char* key_exe) {
 
     unsigned char ring_buffer[256];
     int ring_start = 0, ring_last = 0;
-    
+
     int ch, count;
     while((ch = std::fgetc(fp)) != EOF){
         i = ring_start;

@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  onscripter_main.cpp -- main function of ONScripter
  *
  *  Copyright (c) 2001-2018 Ogapee. All rights reserved.
@@ -149,13 +149,13 @@ JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks) (JNI
     return 0;
 }
 
-JNIEXPORT jint JNICALL 
+JNIEXPORT jint JNICALL
 JAVA_EXPORT_NAME(ONScripter_nativeGetWidth) ( JNIEnv*  env, jobject thiz )
 {
     return ons.getWidth();
 }
 
-JNIEXPORT jint JNICALL 
+JNIEXPORT jint JNICALL
 JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
 {
     return ons.getHeight();
@@ -189,7 +189,7 @@ FILE *fopen_ons(const char *path, const char *mode)
 
     FILE *fp = fopen(path, mode);
     if (fp) return fp;
-    
+
     JNIEnv * jniEnv = NULL;
     jniVM->AttachCurrentThread(&jniEnv, NULL);
 

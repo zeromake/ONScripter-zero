@@ -1,5 +1,5 @@
 /* -*- C++ -*-
- * 
+ *
  *  ONScripter_effect.cpp - Effect executer of ONScripter
  *
  *  Copyright (c) 2001-2018 Ogapee. All rights reserved.
@@ -48,16 +48,16 @@ void ONScripter::generateEffectDst(int effect_no)
 bool ONScripter::setEffect( EffectLink *effect )
 {
     if ( effect->effect == 0 ) return true;
-    
+
     int effect_no = effect->effect;
-    if (effect_cut_flag && (skip_mode & SKIP_NORMAL || ctrl_pressed_status)) 
+    if (effect_cut_flag && (skip_mode & SKIP_NORMAL || ctrl_pressed_status))
         effect_no = 1;
 
     SDL_BlitSurface( accumulation_surface, NULL, effect_src_surface, NULL );
 
     generateEffectDst(effect_no);
     update_effect_dst = false;
-    
+
     /* Load mask image */
     if ( effect_no == 15 || effect_no == 18 ){
         if ( !effect->anim.image_surface ){
@@ -102,7 +102,7 @@ bool ONScripter::setEffect( EffectLink *effect )
             effect_duration = 1;
         }
     }
-    
+
     return false;
 }
 
@@ -113,16 +113,16 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
     //utils::printInfo("effect_counter %d timer between %d %d\n",effect_counter,effect_start_time,effect_start_time_old);
     effect_timer_resolution = effect_start_time - effect_start_time_old;
     effect_start_time_old = effect_start_time;
-    
+
     int effect_no = effect->effect;
-    if (effect_cut_flag && (skip_mode & SKIP_NORMAL || ctrl_pressed_status)) 
+    if (effect_cut_flag && (skip_mode & SKIP_NORMAL || ctrl_pressed_status))
         effect_no = 1;
-    
+
     if (update_effect_dst){
         generateEffectDst(effect_no);
         update_effect_dst = false;
     }
-    
+
     int i, amp;
     int width, width2;
     int height, height2;
@@ -243,12 +243,12 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
 
       default:
         not_implemented = true;
-        
+
       case 10: // Cross fade
         height = 256 * effect_counter / effect_duration;
         alphaBlend( NULL, ALPHA_BLEND_CONST, height, &dirty_rect.bounding_box );
         break;
-        
+
       case 11: // Left scroll
         width = screen_width * effect_counter / effect_duration;
         src_rect.x = 0;
@@ -257,7 +257,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         src_rect.w = dst_rect.w = screen_width - width;
         src_rect.h = dst_rect.h = screen_height;
         drawEffect(&dst_rect, &src_rect, effect_src_surface);
-        
+
         src_rect.x = screen_width - width - 1;
         dst_rect.x = 0;
         src_rect.y = dst_rect.y = 0;
@@ -324,11 +324,11 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
       case 16: // Mosaic out
         generateMosaic( effect_src_surface, 5 - 6 * effect_counter / effect_duration );
         break;
-        
+
       case 17: // Mosaic in
         generateMosaic( effect_dst_surface, 6 * effect_counter / effect_duration );
         break;
-        
+
       case 18: // Cross fade with mask
         alphaBlend( effect->anim.image_surface, ALPHA_BLEND_CROSSFADE_MASK, 256 * effect_counter * 2 / effect_duration, &dirty_rect.bounding_box );
         break;
@@ -352,7 +352,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         }
         SDL_FillRect( accumulation_surface, &quake_rect, SDL_MapRGBA( accumulation_surface->format, 0, 0, 0, 0xff ) );
         break;
-        
+
       case (MAX_EFFECT_NUM + 1): // quakex
         if ( effect_timer_resolution > effect_duration / 4 / effect->no )
             effect_timer_resolution = effect_duration / 4 / effect->no;
@@ -372,7 +372,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         }
         SDL_FillRect( accumulation_surface, &quake_rect, SDL_MapRGBA( accumulation_surface->format, 0, 0, 0, 0xff ) );
         break;
-        
+
       case (MAX_EFFECT_NUM + 2): // quake
         dst_rect.x = effect->no*((int)(3.0*rand()/(RAND_MAX+1.0)) - 1) * 2;
         dst_rect.y = effect->no*((int)(3.0*rand()/(RAND_MAX+1.0)) - 1) * 2;
@@ -446,7 +446,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         utils::printInfo("effect No. %d not implemented; substituting crossfade\n", effect_no);
 
     //utils::printInfo("effect conut %d / dur %d\n", effect_counter, effect_duration);
-    
+
     effect_counter += effect_timer_resolution;
 
     event_mode = WAIT_INPUT_MODE;
@@ -459,7 +459,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
 
     if ( effect_counter < effect_duration && effect_no != 1 ){
         if ( effect_no != 0 ) flush( REFRESH_NONE_MODE, NULL, false );
-    
+
         return true;
     }
     else{
@@ -472,7 +472,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         event_mode = IDLE_EVENT_MODE;
         if (effect_blank != 0 && effect_counter != 0)
             waitEvent(effect_blank);
-        
+
         return false;
     }
 }
@@ -487,7 +487,7 @@ void ONScripter::drawEffect(SDL_Rect *dst_rect, SDL_Rect *src_rect, SDL_Surface 
         src_rect->w = clipped_rect.w;
         src_rect->h = clipped_rect.h;
     }
-    
+
     SDL_BlitSurface(surface, src_rect, accumulation_surface, dst_rect);
 }
 
@@ -501,7 +501,7 @@ void ONScripter::generateMosaic( SDL_Surface *src_surface, int level )
     int total_width = accumulation_surface->pitch / 2;
 #else
     int total_width = accumulation_surface->pitch / 4;
-#endif    
+#endif
     SDL_LockSurface( src_surface );
     SDL_LockSurface( accumulation_surface );
     ONSBuf *src_buffer = (ONSBuf *)src_surface->pixels;
@@ -523,7 +523,7 @@ void ONScripter::generateMosaic( SDL_Surface *src_surface, int level )
             }
         }
     }
-    
+
     SDL_UnlockSurface( accumulation_surface );
     SDL_UnlockSurface( src_surface );
 }
