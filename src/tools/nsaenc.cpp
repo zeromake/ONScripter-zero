@@ -20,60 +20,74 @@ void help()
 #undef main
 #endif
 
+bool startsWith(const std::string& str, const std::string prefix) {
+    return (str.rfind(prefix, 0) == 0);
+}
+
+bool endsWith(const std::string& str, const std::string suffix) {
+    if (suffix.length() > str.length()) { return false; }
+    return (str.rfind(suffix) == (str.length() - suffix.length()));
+}
+
+std::string normalPath(const std::string p) {
+    std::filesystem::path path(p);
+    return path.string();
+}
+
 int processFile(
     NsaReader::ArchiveInfo *ai,
     NsaReader::FileInfo *fi,
-    const char *fullname,
-    const char *name,
+    const std::string &fullname,
+    const std::string &name,
     unsigned long &offset,
     bool enhanced_flag,
-    int base_offset)
-{
-    FILE *fp = NULL;
+    int base_offset
+) {
+    std::FILE *fp = NULL;
     char magic[5];
-    char fullpath[512];
-    if (*name == '/' || *name == '\\') {
-        strcpy(fi->name, name+1);
+    const char* cc = name.c_str();
+    if (*cc == '/' || *cc == '\\') {
+        strcpy(fi->name, cc+1);
     } else {
-        strcpy(fi->name, name);
+        strcpy(fi->name, cc);
     }
-    for (unsigned int j=0; j<strlen(fi->name); j++){
-        if (fi->name[j] == '/')
-            fi->name[j] = '\\';
-    }
-    strcpy(fullpath, fullname);
-    for (unsigned int j=0; j<strlen(fullpath); j++){
-        if ( (fullpath[j] == '/') || (fullpath[j] == '\\') )
-            fullpath[j] = DELIMITER;
-    }
-    if ( (fp = fopen( fullpath, "rb" ) ) == NULL ){
-        fprintf( stderr, "can't open file %s, skipping\n", fullpath );
+    std::string fullpath = normalPath(fullname);
+    if ( (fp = std::fopen(fullpath.c_str(), "rb") ) == NULL ){
+        fprintf(stderr, "can't open file %s, skipping\n", fullpath.c_str());
         return -1;
     }
-    fseek( fp, 0, SEEK_END );
-    fi->length = ftell( fp );
-    fseek( fp, 0, SEEK_SET );
+    std::fseek( fp, 0, SEEK_END );
+    fi->length = std::ftell( fp );
+    std::fseek( fp, 0, SEEK_SET );
     magic[0] = 0;
-    int len = fread(magic, 1, 4, fp);
+    int len = std::fread(magic, 1, 4, fp);
     magic[len] = 0;
-    fclose(fp);
+    std::fclose(fp);
 
-    if ( (strstr( fi->name, ".nbz" ) != NULL) ||
-         (strstr( fi->name, ".NBZ" ) != NULL) )
-        fi->compression_type = BaseReader::NBZ_COMPRESSION;
-    else if (enhanced_flag &&
-             ( (( (strstr( fi->name, ".bmp" ) != NULL) ||
-                  (strstr( fi->name, ".BMP" ) != NULL) ) &&
-                (magic[0] == 'B') && (magic[1] == 'M')) ||
-               (( (strstr( fi->name, ".wav" ) != NULL) ||
-                  (strstr( fi->name, ".WAV" ) != NULL) ) &&
-                (magic[0] == 'R') && (magic[1] == 'I') &&
-                (magic[2] == 'F') && (magic[3] == 'F')) )){
-        // If enhanced, use NBZ compression on (true) BMP & WAV files in NSA archive
+    if (enhanced_flag) {
         fi->compression_type = BaseReader::NBZ_COMPRESSION;
     }
-    else
+
+    // if ( (strstr( fi->name, ".nbz" ) != NULL) ||
+    //      (strstr( fi->name, ".NBZ" ) != NULL) )
+    //     fi->compression_type = BaseReader::NBZ_COMPRESSION;
+    // else if (enhanced_flag &&
+    //          ( (( (strstr( fi->name, ".bmp" ) != NULL) ||
+    //               (strstr( fi->name, ".BMP" ) != NULL) ) &&
+    //             (magic[0] == 'B') && (magic[1] == 'M')) ||
+    //            (( (strstr( fi->name, ".wav" ) != NULL) ||
+    //               (strstr( fi->name, ".WAV" ) != NULL) ) &&
+    //             (magic[0] == 'R') && (magic[1] == 'I') &&
+    //             (magic[2] == 'F') && (magic[3] == 'F')) )){
+    //     // If enhanced, use NBZ compression on (true) BMP & WAV files in NSA archive
+    //     fi->compression_type = BaseReader::NBZ_COMPRESSION;
+    // } else {
+    //     fi->compression_type = BaseReader::NO_COMPRESSION;
+    // }
+
+    if (fi->compression_type > BaseReader::NO_COMPRESSION && fi->length < 10 * 1024) {
         fi->compression_type = BaseReader::NO_COMPRESSION;
+    }
 
     fi->original_length = fi->length;
     fi->offset = offset;
@@ -87,6 +101,9 @@ int processFile(
 int file_iterator(std::filesystem::path dirPath, std::vector<std::string> &files) {
     int code = 0;
     for (auto &itr : std::filesystem::directory_iterator(dirPath)) {
+        if (!startsWith(itr.path(), "..") && startsWith(itr.path(), ".")) {
+            continue;
+        }
         if (std::filesystem::is_directory(itr.status())) {
             code = file_iterator(itr.path(), files);
             if (code != 0) {
@@ -100,7 +117,6 @@ int file_iterator(std::filesystem::path dirPath, std::vector<std::string> &files
 }
 
 // https://github.com/playmer/onscripter-en/blob/22135bb2ac543cfad5b9e6b6b5820cb219a48ca3/tools/arcmake.cpp
-
 int main(int argc, char *argv[]) {
     argc--; // skip command name
     argv++;
@@ -161,16 +177,17 @@ int main(int argc, char *argv[]) {
         sFI++;
     }
     sFI = sAI->fi_list;
-    for (int i = 0 ; i < sAI->num_of_files; i++, sFI++ )
+    for (int i = 0; i < sAI->num_of_files; i++, sFI++) {
         sFI->offset += sAI->base_offset;
-    cSR.writeHeader(sAI->file_handle, archive_type);
+    }
+    cSR.writeHeader(sAI->file_handle, archive_type, nsa_offset);
 
     unsigned long offset_sub = 0;
     unsigned long length, buffer_length = 0;
     unsigned char *buffer = NULL;
-    char *fnptr = new char[512];
-    char *file_path = new char[512];
-    for (int i=0 ; i<sAI->num_of_files; i++, sFI++ ){
+    std::FILE *fp = nullptr;
+    sFI = sAI->fi_list;
+    for (int i = 0; i < sAI->num_of_files; i++, sFI++ ){
         printf( "adding %d of %d (%s), length=%d\n", i+1, sAI->num_of_files, sFI->name, (int)sFI->original_length );
         length = sFI->original_length;
         if ( length > buffer_length ){
@@ -178,17 +195,25 @@ int main(int argc, char *argv[]) {
             buffer = new unsigned char[length];
             buffer_length = length;
         }
-        sprintf(fnptr, "%s", sFI->name);
-        sprintf(file_path, "%s", file_name);
-        for (unsigned int j=0; j<strlen(file_path); j++) {
-            if ( (file_path[j] == '\\') || (file_path[j] == '/') )
-                file_path[j] = DELIMITER;
-        }
-        if ( (fp = fopen( file_path, "rb" ) ) == NULL ){
-            fprintf( stderr, "can't open file %s, exiting\n", file_path );
+        std::string file_path = files.at(i);
+        if ((fp = fopen(file_path.c_str(),"rb")) == NULL){
+            fprintf(stderr, "can't open file %s, exiting\n", file_path.c_str());
             exit(-1);
         }
-
+        if (!enhanced_flag) {
+            sFI->compression_type = BaseReader::NO_COMPRESSION;
+        }
+        sFI->offset -= offset_sub;
+        cSR.addFile(sAI, fp, i, sFI->offset, buffer);
+        if (sFI->original_length != sFI->length){
+            offset_sub += sFI->original_length - sFI->length;
+            printf( "    NBZ compressed: %d -> %d (%d%%)\n",
+                    (int)sFI->original_length, (int)sFI->length,
+                    (int)(sFI->length * 100 / sFI->original_length) );
+        }
+        fclose(fp);
     }
+    cSR.writeHeader(sAI->file_handle, archive_type, nsa_offset);
+    if ( buffer ) delete[] buffer;
     return 0;
 }

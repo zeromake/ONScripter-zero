@@ -82,6 +82,9 @@ int main( int argc, char **argv )
             argv++;
         }
     }
+    if (archive_type == BaseReader::ARCHIVE_TYPE_NS2 && nsa_offset == 0) {
+        nsa_offset = 1;
+    }
     if ( argc != 2 ){
         fprintf( stderr, "Usage: nsadec [-offset ##] [-ns2] [-out dir] [-lower] arc_file\n");
         exit(-1);
@@ -91,14 +94,14 @@ int main( int argc, char **argv )
             mkdir(out, 0755);
         }
     }
-    cNR.openForConvert( argv[1], archive_type, nsa_offset );
+    cNR.openForConvert(argv[1], archive_type, nsa_offset);
     count = cNR.getNumFiles();
 
     SarReader::FileInfo sFI;
 
     for ( i=0 ; i<count ; i++ ){
-        sFI = cNR.getFileByIndex( i );
-        length = cNR.getFileLength( sFI.name );
+        sFI = cNR.getFileByIndex(i);
+        length = cNR.getFileLength(sFI.name);
         buffer = new unsigned char[length];
         unsigned int len;
         if ( (len = cNR.getFile( sFI.name, buffer )) != length ){
@@ -118,13 +121,12 @@ int main( int argc, char **argv )
             strcpy(file_name, s.c_str());
         }
         for ( j=0 ; j<strlen(file_name) ; j++ ){
-            if ( file_name[j] == '\\' ){
-                file_name[j] = '/';
-                strncpy( dir_name, file_name, j );
+            if (file_name[j] == '\\' || file_name[j] == '/'){
+                file_name[j] = DELIMITER;
+                strncpy(dir_name, file_name, j);
                 dir_name[j] = '\0';
-
                 /* If the directory does'nt exist, create it */
-                if ( stat ( dir_name, &file_stat ) == -1 && errno == ENOENT )
+                if (stat(dir_name, &file_stat) == -1 && errno == ENOENT)
                     mkdir( dir_name, 00755 );
             }
         }

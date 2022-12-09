@@ -44,8 +44,8 @@ public:
 
     int openForConvert( char *nsa_name, int archive_type=ARCHIVE_TYPE_NSA, unsigned int nsa_offset=0 );
     NsaReader::ArchiveInfo* openForCreate(const char *nsa_name, int archive_type, int nsaoffset);
-    int writeHeader( FILE *fp, int archive_type=ARCHIVE_TYPE_NSA, int nsa_offset=0 );
-    size_t putFile( FILE *fp, int no, size_t offset, size_t length, size_t original_length, int compression_type, bool modified_flag, unsigned char *buffer );
+    int writeHeader(FILE *fp, int archive_type=ARCHIVE_TYPE_NSA, int nsa_offset=0);
+    size_t putFile(FILE *fp, int no, size_t offset, size_t length, size_t original_length, int compression_type, bool modified_flag, unsigned char *buffer);
 
 private:
     bool sar_flag;

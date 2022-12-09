@@ -43,6 +43,7 @@ public:
 
     int writeHeader( FILE *fp );
     size_t putFile( FILE *fp, int no, size_t offset, size_t length, size_t original_length, bool modified_flag, unsigned char *buffer );
+    size_t addFile(ArchiveInfo *ai, FILE *newfp, int no, size_t offset, unsigned char *buffer);
 
 protected:
     ArchiveInfo archive_info;

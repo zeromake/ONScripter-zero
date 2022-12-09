@@ -114,7 +114,7 @@ int NsaReader::openForConvert( char *nsa_name, int archive_type, unsigned int ns
     return 0;
 }
 
-NsaReader::ArchiveInfo* NsaReader::openForCreate( const char *nsa_name, int archive_type, int nsaoffset )
+BaseReader::ArchiveInfo* NsaReader::openForCreate(const char *nsa_name, int archive_type, int nsaoffset)
 {
     sar_flag = false;
     nsa_offset = nsaoffset;

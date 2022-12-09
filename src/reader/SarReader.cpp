@@ -184,24 +184,39 @@ int SarReader::writeHeaderSub( ArchiveInfo *ai, FILE *fp, int archive_type, int 
 
     fseek( fp, 0L, SEEK_SET );
     for (int k=0 ; k<nsa_offset ; k++)
-        fputc( 0, fp );
-    writeShort( fp, ai->num_of_files  );
-    writeLong( fp, ai->base_offset-nsa_offset );
+        fputc(0, fp);
+
+    if ( archive_type == ARCHIVE_TYPE_NS2 ) {
+        writeLong(fp, swapLong(ai->base_offset - nsa_offset));
+    } else {
+        writeShort( fp, ai->num_of_files  );
+        writeLong( fp, ai->base_offset-nsa_offset );
+    }
 
     for ( i=0 ; i<ai->num_of_files ; i++ ){
+        if ( archive_type == ARCHIVE_TYPE_NS2 )
+            fputc( '"', fp );
 
         for ( j=0 ; ai->fi_list[i].name[j] ; j++ )
             fputc( ai->fi_list[i].name[j], fp );
-        fputc( ai->fi_list[i].name[j], fp );
 
-        if ( archive_type >= ARCHIVE_TYPE_NSA )
+        if (archive_type == ARCHIVE_TYPE_NS2)
+            fputc( '"', fp );
+        else
+            fputc( ai->fi_list[i].name[j], fp );
+
+        if (archive_type >= ARCHIVE_TYPE_NSA)
             writeChar( fp, ai->fi_list[i].compression_type );
 
-        writeLong( fp, ai->fi_list[i].offset  - ai->base_offset );
-        writeLong( fp, ai->fi_list[i].length );
+        if (archive_type == ARCHIVE_TYPE_NS2)
+            writeLong( fp, swapLong(ai->fi_list[i].length) );
+        else {
+            writeLong( fp, ai->fi_list[i].offset  - ai->base_offset );
+            writeLong( fp, ai->fi_list[i].length );
 
-        if ( archive_type >= ARCHIVE_TYPE_NSA ){
-            writeLong( fp, ai->fi_list[i].original_length );
+            if (archive_type >= ARCHIVE_TYPE_NSA){
+                writeLong( fp, ai->fi_list[i].original_length );
+            }
         }
     }
 
@@ -260,6 +275,46 @@ size_t SarReader::putFile( FILE *fp, int no, size_t offset, size_t length, size_
     return putFileSub( ai, fp, no, offset, length, original_length, ai->fi_list[no].compression_type, modified_flag, buffer );
 }
 
+size_t SarReader::addFile( ArchiveInfo *ai, FILE *newfp, int no, size_t offset, unsigned char *buffer )
+{
+    fseek( newfp, 0L, SEEK_SET );
+    if (fread( buffer, 1, ai->fi_list[no].length, newfp ) !=
+        ai->fi_list[no].length) {
+        if (ferror(newfp))
+            fprintf(stderr, "Read error on adding item %d\n", no);
+    }
+
+    if (ai->fi_list[no].compression_type == NBZ_COMPRESSION){
+        bool is_nbz = false;
+        if ((ai->fi_list[no].length > 3) && (buffer[2] == 'B') && (buffer[3] == 'Z')){
+            is_nbz = true;
+            ai->fi_list[no].original_length =
+                getDecompressedFileLength( ai->fi_list[no].compression_type,
+                                           newfp, 0 );
+        }
+        fseek( ai->file_handle, offset, SEEK_SET );
+        writeLong( ai->file_handle, ai->fi_list[no].original_length );
+        if (!is_nbz){
+            // in case the original is not compressed in NBZ
+            ai->fi_list[no].length = encodeNBZ( ai->file_handle, ai->fi_list[no].length, buffer ) + 4;
+            ai->fi_list[no].offset = offset;
+            return ai->fi_list[no].length;
+        }
+    }
+
+    size_t len = ai->fi_list[no].length, c;
+    fseek(ai->file_handle, offset, SEEK_SET);
+    while( len > 0 ){
+        if ( len > WRITE_LENGTH ) c = WRITE_LENGTH;
+        else                      c = len;
+        len -= c;
+        if ( fwrite( buffer, 1, c, ai->file_handle ) != c )
+            fprintf(stderr, "Write error adding archive item %d\n", no);
+        buffer += c;
+    }
+    return ai->fi_list[no].length;
+}
+
 int SarReader::close()
 {
     ArchiveInfo *info = archive_info.next;
@@ -300,12 +355,11 @@ int SarReader::getIndexFromFile( ArchiveInfo *ai, const char *file_name )
 
     for ( i=0 ; i<len ; i++ ){
         if ( 'a' <= capital_name[i] && capital_name[i] <= 'z' ) capital_name[i] += 'A' - 'a';
-        else if ( capital_name[i] == '/' ) capital_name[i] = '\\';
+        else if (capital_name[i] == '/' || capital_name[i] == '\\') capital_name[i] = DELIMITER;
     }
     for ( i=0 ; i<ai->num_of_files ; i++ ){
         if ( !strcmp( capital_name, ai->fi_list[i].name ) ) break;
     }
-
     return i;
 }
 
