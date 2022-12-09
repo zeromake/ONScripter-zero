@@ -145,6 +145,7 @@ target("nsaenc")
         "src/coding2utf16.cpp",
         "src/gbk2utf16.cpp",
         "src/reader/DirectReader.cpp",
+        "src/reader/NsaReader.cpp",
         "src/reader/SarReader.cpp",
         "src/conv_shared.cpp",
         "src/resize_image.cpp",
