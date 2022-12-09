@@ -1,6 +1,6 @@
 build
 .xmake
-.vscode
+.vscode/*.json
 .DS_Store
 .idea
 *.a
@@ -12,5 +12,6 @@ build
 !3rd/xmake.lua
 !3rd/pre
 !3rd/.include
+!.vscode/launch.json
 dist
 .xrepo
