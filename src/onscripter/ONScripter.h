@@ -308,6 +308,10 @@ public:
     int allsphideCommand();
     int amspCommand();
 
+    int sefadetimeCommand();
+    int sprintfCommand();
+    int checkspCommand();
+
     void NSDCallCommand(int texnum, const char *str1, int proc, const char *str2);
     void NSDDeleteCommand(int texnum);
     void NSDLoadCommand(int texnum, const char *str);
@@ -330,7 +334,9 @@ private:
            WAIT_VOICE_MODE  = 128,
            WAIT_TEXT_MODE   = 256 // clickwait, newpage, select
     };
-    int  event_mode;
+    int event_mode;
+    int sefadetime;
+
 
     bool is_script_read;
     char *wm_title_string;
@@ -729,10 +735,10 @@ private:
     SMPEG_Filter layer_smpeg_filter;
 #endif
 
-    int playSound(const char *filename, int format, bool loop_flag, int channel=0);
+    int playSound(const char *filename, int format, bool loop_flag, int channel=0, int fadetime = 0);
     void playCDAudio();
     int playWave(Mix_Chunk *chunk, int format, bool loop_flag, int channel);
-    int playMIDI(bool loop_flag);
+    int playMIDI(bool loop_flag, int fadetime = 0);
 
     int playMPEG(const char *filename, bool click_flag, bool loop_flag=false);
     int playAVI( const char *filename, bool click_flag );

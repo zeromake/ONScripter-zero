@@ -398,7 +398,16 @@ static ONScripter::FuncLUT func_lut[] = {
     {"add",				&ONScripter::addCommand},
     {"abssetcursor",	&ONScripter::setcursorCommand},
 
-    {"", NULL}
+    {"else",            &ONScripter::elseCommand},
+    {"elseif",          &ONScripter::ifCommand},
+    {"elif",            &ONScripter::ifCommand},
+    {"sefadetime",      &ONScripter::sefadetimeCommand},
+    {"sprintf",         &ONScripter::sprintfCommand},
+    {"checksp",         &ONScripter::checkspCommand},
+    {"cspstep",         &ONScripter::cspCommand},
+    {"csp2step",        &ONScripter::cspCommand},
+
+    {"", NULL},
 };
 
 void ONScripter::makeFuncLUT()

@@ -173,6 +173,7 @@ public:
     int arcCommand();
     int addkinsokuCommand();
     int addCommand();
+    int elseCommand();
     void setRescale(int scale1, int scale2);
 
 protected:

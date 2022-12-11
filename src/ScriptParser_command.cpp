@@ -903,6 +903,10 @@ int ScriptParser::incCommand()
 
 int ScriptParser::ifCommand()
 {
+    if ((script_h.isName("elif") || script_h.isName("elseif")) && script_h.current_if_continue == 1) {
+        return RET_SKIP_LINE;
+    }
+    script_h.current_if_continue = 0;
     //utils::printInfo("ifCommand\n");
     int condition_status = 0; // 0 ... none, 1 ... and, 2 ... or
     bool f = false, condition_flag = false;
@@ -1016,6 +1020,7 @@ int ScriptParser::ifCommand()
         break;
     };
 
+    script_h.current_if_continue = 1;
     /* Execute command */
     return RET_CONTINUE;
 }
@@ -1507,5 +1512,12 @@ int ScriptParser::addCommand()
     }
     else errorAndExit( "add: no variable." );
 
+    return RET_CONTINUE;
+}
+
+int ScriptParser::elseCommand() {
+    if (script_h.current_if_continue == 1) {
+        return RET_SKIP_LINE;
+    }
     return RET_CONTINUE;
 }
