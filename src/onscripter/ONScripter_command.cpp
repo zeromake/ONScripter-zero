@@ -31,6 +31,7 @@
 #endif
 #include "version.h"
 #include "Utils.h"
+#include <vector>
 
 #if defined(MACOSX) && (SDL_COMPILEDVERSION >= 1208)
 #include <CoreFoundation/CoreFoundation.h>
@@ -108,7 +109,7 @@ int ONScripter::waveCommand()
     wavestopCommand();
 
     setStr(&wave_file_name, script_h.readStr());
-    playSound(wave_file_name, SOUND_CHUNK, wave_play_loop_flag, MIX_WAVE_CHANNEL);
+    playSound(wave_file_name, SOUND_CHUNK, wave_play_loop_flag, MIX_WAVE_CHANNEL, sefadetime);
 
     return RET_CONTINUE;
 }
@@ -3095,9 +3096,24 @@ int ONScripter::cspCommand()
     leaveTextDisplayMode();
 
     bool csp2_flag = false;
-    if (script_h.isName("csp2")) csp2_flag = true;
+    bool step_flag = false;
+    if (script_h.isName("csp2")) {
+        csp2_flag = true;
+    } else if (script_h.isName("cspstep")) {
+        step_flag = true;
+    } else if (script_h.isName("csp2step")) {
+        csp2_flag = true;
+        step_flag = true;
+    }
 
-    int no = script_h.readInt();
+    std::vector<int> nos;
+    int first_no = script_h.readInt();
+    bool isAll = first_no == -1;
+    nos.push_back(first_no);
+    while(script_h.getEndStatus() & ScriptHandler::END_COMMA) {
+        int no = script_h.readInt();
+        nos.push_back(no);
+    }
     AnimationInfo *si = NULL;
     int num = 0;
     if (csp2_flag) {
@@ -3109,7 +3125,7 @@ int ONScripter::cspCommand()
         si = sprite_info;
     }
 
-    if ( no == -1 )
+    if (isAll)
         for ( int i=0 ; i<num ; i++ ){
             if ( si[i].visible ){
                 if (csp2_flag)
@@ -3125,17 +3141,38 @@ int ONScripter::cspCommand()
             if (!csp2_flag) root_button_link.removeSprite(i);
             si[i].remove();
         }
-    else if (no >= 0 && no < MAX_SPRITE_NUM){
-        if ( si[no].visible ){
-            if (csp2_flag)
-                dirty_rect.add( si[no].bounding_rect );
-            else
-                dirty_rect.add( si[no].pos );
+    else if (nos.size() > 0) {
+        auto it = nos.begin();
+        if (step_flag && nos.size() >= 2) {
+            it += 2;
+            for (int no = nos.at(0); no <= nos.at(1); no++) {
+                if (no >= 0 && no < MAX_SPRITE_NUM){
+                    if ( si[no].visible ){
+                        if (csp2_flag)
+                            dirty_rect.add( si[no].bounding_rect );
+                        else
+                            dirty_rect.add( si[no].pos );
+                    }
+                    if (!csp2_flag) root_button_link.removeSprite(no);
+                    si[no].remove();
+                }
+            }
         }
-        if (!csp2_flag) root_button_link.removeSprite(no);
-        si[no].remove();
-    }
 
+        for (; it != nos.end(); it++ ) {
+            int no = *it;
+            if (no >= 0 && no < MAX_SPRITE_NUM){
+                if ( si[no].visible ){
+                    if (csp2_flag)
+                        dirty_rect.add( si[no].bounding_rect );
+                    else
+                        dirty_rect.add( si[no].pos );
+                }
+                if (!csp2_flag) root_button_link.removeSprite(no);
+                si[no].remove();
+            }
+        }
+    }
     return RET_CONTINUE;
 }
 
@@ -4126,4 +4163,66 @@ void ONScripter::stopSMPEG()
         layer_smpeg_buffer = NULL;
     }
 #endif
+}
+
+
+int ONScripter::sefadetimeCommand()
+{
+    sefadetime = script_h.readInt();
+    return RET_CONTINUE;
+}
+
+int ONScripter::checkspCommand() {
+    script_h.readVariable();
+    auto variable = script_h.current_variable;
+    int sprite_no = script_h.readInt();
+    int value = 0;
+    if (sprite_no < 0 ||
+        sprite_no >= MAX_SPRITE_NUM) {
+        auto ai = sprite_info[sprite_no];
+        if (ai.image_surface != NULL && ai.visible) {
+            value = 1;
+        }
+    }
+    script_h.setInt(&variable, value);
+    return RET_CONTINUE;
+}
+
+int ONScripter::sprintfCommand() {
+    script_h.readVariable();
+    const char* format = script_h.readStr();
+    auto out_variable = script_h.current_variable;
+    std::vector<ScriptHandler::VariableInfo> args;
+    while(script_h.getEndStatus() & ScriptHandler::END_COMMA) {
+        script_h.readVariable();
+        args.push_back(script_h.current_variable);
+    }
+    union va_list_wrap {
+        char *pa;
+        va_list al;
+    } al;
+    size_t ptr_size = sizeof(uintptr_t);
+    size_t arg_size = ptr_size * args.size();
+    al.pa = new char[arg_size];
+    memset(al.pa, 0, arg_size);
+    int offset = 0;
+    for(auto it = args.begin(); it != args.end(); it++){
+        auto variable = *it;
+        uintptr_t value = 0;
+        if (variable.type == ScriptHandler::VAR_STR) {
+            value = (uintptr_t)script_h.getVariableData(variable.var_no).str;
+        } else if (variable.type == ScriptHandler::VAR_INT) {
+            value = (uintptr_t)script_h.getVariableData(variable.var_no).num;
+        }
+        // TODO va_list 每种编译器可能完全不同
+        memcpy(al.pa+offset, &value, ptr_size);
+        offset += ptr_size;
+    }
+    size_t buff_size = strlen(format) * 50;
+    char *buff = new char[buff_size];
+    memset(buff, 0, buff_size);
+    vsprintf(buff, format, al.al);
+    setStr(&script_h.getVariableData(out_variable.var_no).str, buff);
+    delete[] buff;
+    return RET_CONTINUE;
 }

@@ -996,6 +996,12 @@ int ScriptHandler::readScript( char *path )
     }
     else if ((fp = fopen("nscript.dat", "rb")) != NULL){
         encrypt_mode = 1;
+    } else if ((fp = fopen("onscript.nt", "rb")) != NULL){
+        encrypt_mode = 15;
+    } else if ((fp = fopen("onscript.nt2", "rb")) != NULL){
+        encrypt_mode = 16;
+    } else if ((fp = fopen("onscript.nt3", "rb")) != NULL){
+        encrypt_mode = 17;
     }
 
     if (fp == NULL){
@@ -1054,6 +1060,16 @@ int ScriptHandler::readScript( char *path )
     return 0;
 }
 
+unsigned long getfilesize(FILE* file_ptr) {
+	unsigned long posCur=0;
+	unsigned long posEnd=0;
+	posCur = ftell(file_ptr);
+	fseek(file_ptr, 0L, SEEK_END);
+	posEnd = ftell(file_ptr);
+	fseek(file_ptr, posCur, SEEK_SET);
+	return posEnd;
+}
+
 int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
 {
     unsigned char magic[5] = {0x79, 0x57, 0x0d, 0x80, 0x04 };
@@ -1062,10 +1078,17 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
     bool cr_flag = false;
     bool newlabel_flag = false;
 
+    int size = getfilesize(fp);
+
     if (encrypt_mode == 3 && !key_table_flag)
         errorAndExit("readScriptSub: the EXE file must be specified with --key-exe option.");
 
     size_t len=0, count=0;
+    size_t offset = -1;
+    unsigned char key_buf[4];
+    int32_t key = 0;
+    int32_t tmp = 0;
+    size_t data_size = size - 0x920;
     while(1){
         if (len == count){
             len = fread(tmp_script_buf, 1, TMP_SCRIPT_BUF_LEN, fp);
@@ -1076,12 +1099,33 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
             count = 0;
         }
         unsigned char ch = tmp_script_buf[count++];
-        if      ( encrypt_mode == 1 ) ch ^= 0x84;
-        else if ( encrypt_mode == 2 ){
+        offset++;
+        if (encrypt_mode == 1) ch ^= 0x84;
+        else if (encrypt_mode == 15) {
+            ch ^= 0x85&0x97;
+            ch -= 1;
+        } else if (encrypt_mode == 16) {
+            ch ^= 0x85&0x97;
+            ch -= 1;
+        } else if (encrypt_mode == 17) {
+            if (offset < 0x91C) {
+                continue;
+            } else if (offset < 0x920) {
+                int index = offset-0x91C;
+                key_buf[index] = ch;
+            } else {
+                if (0x920 == offset) {
+                    memcpy(&key, key_buf, 4);
+                }
+                key ^= ch;
+                tmp = key + (ch)*(data_size+1-(offset - 0x91f)) + 0x5D588B65;
+                key = tmp;
+                ch ^= tmp;
+            }
+        } else if (encrypt_mode == 2){
             ch = (ch ^ magic[magic_counter++]) & 0xff;
-            if ( magic_counter == 5 ) magic_counter = 0;
-        }
-        else if ( encrypt_mode == 3){
+            if (magic_counter == 5) magic_counter = 0;
+        } else if (encrypt_mode == 3){
             ch = key_table[(unsigned char)ch] ^ 0x84;
         }
 
@@ -1339,13 +1383,18 @@ void ScriptHandler::parseStr( char **buf )
             parseStr(buf);
         }
         current_variable.type |= VAR_CONST;
-    }
-    else if ( **buf == '$' ){
+    } else if (**buf == '$'){
         (*buf)++;
-        int no = parseInt(buf);
+        int no;
+        // 支持 int 表达式，例如在循环时的 $(%i + 10), $1 = 5 的情况下会被解释为 $15
+        if (**buf == '(') {
+            no = parseIntExpression(buf);
+        } else {
+            no = parseInt(buf);
+        }
         VariableData &vd = getVariableData(no);
 
-        if ( vd.str )
+        if (vd.str)
             strcpy( str_string_buffer, vd.str );
         else
             str_string_buffer[0] = '\0';
@@ -1452,11 +1501,17 @@ int ScriptHandler::parseInt( char **buf )
 
     if ( **buf == '%' ){
         (*buf)++;
-        current_variable.var_no = parseInt(buf);
+        int no;
+        if (**buf == '(') {
+            // 支持 int 表达式，例如在循环时的 %(%i + 10), $1 = 5 的情况下会被解释为 %15
+            no = parseIntExpression(buf);
+        } else {
+            no = parseInt(buf);
+        }
+        current_variable.var_no = no;
         current_variable.type = VAR_INT;
         return getVariableData(current_variable.var_no).num;
-    }
-    else if ( **buf == '?' ){
+    } else if ( **buf == '?' ){
         ArrayVariable av;
         current_variable.var_no = parseArray( buf, av );
         current_variable.type = VAR_ARRAY;

@@ -235,6 +235,8 @@ public:
 
     VariableInfo current_variable, pushed_variable;
 
+    int current_if_continue;
+
     int screen_width;
     int screen_height;
     int screen_ratio1;

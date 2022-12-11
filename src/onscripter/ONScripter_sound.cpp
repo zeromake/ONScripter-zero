@@ -65,7 +65,7 @@ extern "C" Uint32 SDLCALL bgmfadeCallback( Uint32 interval, void *param );
 
 #define TMP_MUSIC_FILE "tmp.mus"
 
-int ONScripter::playSound(const char *filename, int format, bool loop_flag, int channel)
+int ONScripter::playSound(const char *filename, int format, bool loop_flag, int channel, int fadetime)
 {
     if ( !audio_open_flag ) return SOUND_NONE;
 
@@ -103,7 +103,7 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag, int 
             utils::printError("can't load music \"%s\": %s\n", filename, Mix_GetError());
         }
         Mix_VolumeMusic( music_volume );
-        if ( Mix_PlayMusic( music_info, (music_play_loop_flag&&music_loopback_offset==0.0)?-1:0 ) == 0 ){
+        if ( Mix_FadeInMusic(music_info, (music_play_loop_flag&&music_loopback_offset==0.0)?-1:0, fadetime) == 0 ){
             music_buffer = buffer;
             music_buffer_length = length;
             return SOUND_MUSIC;
@@ -201,7 +201,7 @@ int ONScripter::playWave(Mix_Chunk *chunk, int format, bool loop_flag, int chann
     return 0;
 }
 
-int ONScripter::playMIDI(bool loop_flag)
+int ONScripter::playMIDI(bool loop_flag, int fadetime)
 {
     Mix_SetMusicCMD(midi_cmd);
 
@@ -217,7 +217,7 @@ int ONScripter::playMIDI(bool loop_flag)
 #endif
 
     Mix_VolumeMusic(music_volume);
-    Mix_PlayMusic(midi_info, midi_looping);
+    Mix_FadeInMusic(midi_info, midi_looping, fadetime);
     current_cd_track = -2;
 
     return 0;
