@@ -190,7 +190,7 @@ char *ONScripter::readSaveStrFromFile( int no )
     sprintf( filename, "save%d.dat", no );
     size_t len = loadFileIOBuf( filename );
     if (len == 0){
-        utils::printError("readSaveStrFromFile: can't open save file %s\n", filename );
+        // utils::printError("readSaveStrFromFile: can't open save file %s\n", filename );
         return NULL;
     }
 
