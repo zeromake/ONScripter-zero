@@ -248,6 +248,15 @@ static void smpeg_filter_destroy( struct SMPEG_Filter * filter )
 }
 #endif
 
+int call_system(void* data) {
+#if !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
+    int code = system((const char*)data);
+    delete[] data;
+    return code;
+#endif
+    return 0;
+}
+
 int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
 {
     unsigned long length = script_h.cBR->getFileLength( filename );
@@ -367,12 +376,13 @@ int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
     SDL_DestroyMutex(oi.mutex);
     texture = SDL_CreateTextureFromSurface(renderer, accumulation_surface);
 #elif !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
-    char filename2[256];
+    char *filename2 = new char[256];
     strcpy(filename2, filename);
     for (unsigned int i=0; i<strlen(filename2); i++)
         if (filename2[i] == '/' || filename2[i] == '\\')
             filename2[i] = DELIMITER;
-    system(filename2);
+    SDL_CreateThread(call_system, "play-video", filename2);
+    // system(filename2);
 #elif !defined(IOS)
     utils::printError( "mpegplay command is disabled.\n" );
 #endif

@@ -385,14 +385,17 @@ int ScriptParser::saveFileIOBuf(const char *filename, int offset, const char *sa
 {
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
-
     // check dir
     std::filesystem::path pp(filename);
-    const char* dir = pp.parent_path().c_str();
-    dir = fpath(dir, use_save_dir);
-    if (!std::filesystem::exists(std::filesystem::status(dir))) {
-        std::filesystem::create_directory(dir);
+    auto parent_path = pp.parent_path().string();
+    if (parent_path.length() > 0) {
+        const char* dir = parent_path.c_str();
+        dir = fpath(dir, use_save_dir);
+        if (!std::filesystem::exists(std::filesystem::status(dir))) {
+            std::filesystem::create_directory(dir);
+        }
     }
+
     FILE *fp;
     if ( (fp = fopen(filename, "wb", use_save_dir)) == NULL ) return -1;
 

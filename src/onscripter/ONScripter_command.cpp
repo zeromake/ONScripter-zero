@@ -981,8 +981,8 @@ int ONScripter::savescreenshotCommand()
 
     const char *buf = script_h.readStr();
     const char *capital_name = script_h.fpath(buf);
-    auto dir = std::filesystem::path(capital_name).parent_path();
-    if (!std::filesystem::exists(std::filesystem::status(dir))) {
+    auto dir = std::filesystem::path(capital_name).parent_path().string();
+    if (dir.length() > 0 && !std::filesystem::exists(std::filesystem::status(dir))) {
         std::filesystem::create_directory(dir);
     }
     SDL_RWops *rwops = SDL_RWFromFile(capital_name, "wb");
