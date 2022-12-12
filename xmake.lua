@@ -159,6 +159,14 @@ target("nt3dec")
     end
     add_files("src/tools/nt3dec.c")
 
+
+target("va")
+    set_kind("binary")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    add_files("demo/va.cpp")
+
 target("onscripter")
     set_kind("binary")
     add_packages(
