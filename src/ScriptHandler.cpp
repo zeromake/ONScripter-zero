@@ -70,6 +70,7 @@ ScriptHandler::~ScriptHandler()
     delete[] str_string_buffer;
     delete[] saved_string_buffer;
     if (variable_data) delete[] variable_data;
+    if (path_string_buffer) delete[] path_string_buffer;
 }
 
 void ScriptHandler::reset()
@@ -145,11 +146,9 @@ void ScriptHandler::setSaveDir(const char *path)
     strcpy(save_dir, path);
 }
 
-FILE *ScriptHandler::fopen(const char *path, const char *mode, bool use_save_dir)
-{
-    const auto filename = fpath(path, use_save_dir);
+FILE *ScriptHandler::fopen(const char *path, const char *mode, bool use_save_dir) {
+    auto filename = fpath(path, use_save_dir);
     auto fp = ::fopen(filename, mode);
-    delete[] filename;
     return fp;
 }
 
@@ -160,19 +159,22 @@ const char* ScriptHandler::fpath(const char *path, bool use_save_dir) {
     } else {
         pathCount += strlen(archive_path);
     }
-    char *filename = new char[pathCount];
+    if (!path_string_buffer) {
+        path_string_buffer = new char[STRING_BUFFER_LENGTH];
+    }
+    memset(path_string_buffer, 0, STRING_BUFFER_LENGTH);
     if (path[0] == '/' || path[0] == '.' || (strlen(path) > 1 && path[1] == ':')) {
-        strcpy(filename, path);
+        strcpy(path_string_buffer, path);
     } else {
         if (use_save_dir && save_dir)
-            sprintf(filename, "%s%s", save_dir, path);
+            sprintf(path_string_buffer, "%s%s", save_dir, path);
         else
-            sprintf(filename, "%s%s", archive_path, path);
+            sprintf(path_string_buffer, "%s%s", archive_path, path);
     }
-    for ( unsigned int i=0 ; i<strlen(filename) ; i++ )
-        if ((filename[i] == '/' || filename[i] == '\\') && filename[i] != DELIMITER)
-            filename[i] = DELIMITER;
-    return filename;
+    for ( unsigned int i=0 ; i<strlen(path_string_buffer) ; i++ )
+        if ((path_string_buffer[i] == '/' || path_string_buffer[i] == '\\') && path_string_buffer[i] != DELIMITER)
+            path_string_buffer[i] = DELIMITER;
+    return path_string_buffer;
 }
 
 void ScriptHandler::setKeyTable( const unsigned char *key_table )

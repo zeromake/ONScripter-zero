@@ -97,23 +97,24 @@ int main( int argc, char **argv )
     cNR.openForConvert(argv[1], archive_type, nsa_offset);
     count = cNR.getNumFiles();
 
-    SarReader::FileInfo sFI;
+    BaseReader::ArchiveInfo* sAI;
+    BaseReader::FileInfo sFI;
 
     for ( i=0 ; i<count ; i++ ){
-        sFI = cNR.getFileByIndex(i);
-        length = cNR.getFileLength(sFI.name);
+        sAI = cNR.getArchiveInfoByIndex(i);
+        sFI = sAI->fi_list[i];
+        length = cNR.getFileLengthSubByIndex(sAI, i);
         buffer = new unsigned char[length];
         unsigned int len;
-        if ( (len = cNR.getFile( sFI.name, buffer )) != length ){
-            //fprintf( stderr, "file %s can't be retrieved\n", sFI.name );
-            fprintf( stderr, "file %s is not fully retrieved %d %lu\n", sFI.name, len, length  );
+        if ((len = cNR.getFileSubByIndex(sAI, i, buffer)) != length){
+            fprintf( stderr, "file %s is not fully retrieved %d %lu\n", sFI.original_name, len, length  );
             length = sFI.length;
-            //continue;
+            continue;
         }
         if (out[0] != '\0') {
-            sprintf(file_name, "%s/%s", out, sFI.name);
+            sprintf(file_name, "%s/%s", out, sFI.original_name);
         } else {
-            strcpy(file_name, sFI.name);
+            strcpy(file_name, sFI.original_name);
         }
         if (useLower) {
             std::string s = file_name;

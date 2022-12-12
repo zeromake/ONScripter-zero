@@ -32,6 +32,7 @@
 #include "version.h"
 #include "Utils.h"
 #include <vector>
+#include <filesystem>
 
 #if defined(MACOSX) && (SDL_COMPILEDVERSION >= 1208)
 #include <CoreFoundation/CoreFoundation.h>
@@ -109,8 +110,7 @@ int ONScripter::waveCommand()
     wavestopCommand();
 
     setStr(&wave_file_name, script_h.readStr());
-    playSound(wave_file_name, SOUND_CHUNK, wave_play_loop_flag, MIX_WAVE_CHANNEL, sefadetime);
-
+    playSound(wave_file_name, SOUND_CHUNK, wave_play_loop_flag, MIX_WAVE_CHANNEL);
     return RET_CONTINUE;
 }
 
@@ -169,7 +169,6 @@ int ONScripter::vCommand()
 
     sprintf(buf, RELATIVEPATH "wav%c%s.wav", DELIMITER, script_h.getStringBuffer()+1);
     playSound(buf, SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
-
     return RET_CONTINUE;
 }
 
@@ -655,16 +654,24 @@ void ONScripter::setwindowCore()
 {
     sentence_font.ttf_font[0] = NULL;
     sentence_font.ttf_font[1] = NULL;
+    // 设置文字渲染矩形
     sentence_font.top_xy[0] = script_h.readInt();
     sentence_font.top_xy[1] = script_h.readInt();
     sentence_font.num_xy[0] = script_h.readInt();
     sentence_font.num_xy[1] = script_h.readInt();
+    // 设置文字大小
     sentence_font.font_size_xy[0] = script_h.readInt();
     sentence_font.font_size_xy[1] = script_h.readInt();
+    // 字符高宽
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
     sentence_font.pitch_xy[1] = script_h.readInt() + sentence_font.font_size_xy[1];
+
+    // 等待时间
     sentence_font.wait_time = script_h.readInt();
+
+    // 粗体
     sentence_font.is_bold = script_h.readInt()?true:false;
+    // 阴影
     sentence_font.is_shadow = script_h.readInt()?true:false;
 
     const char *buf = script_h.readStr();
@@ -802,7 +809,7 @@ int ONScripter::selectCommand()
 
     if ( selectvoice_file_name[SELECTVOICE_OPEN] )
         playSound(selectvoice_file_name[SELECTVOICE_OPEN],
-                  SOUND_CHUNK, false, MIX_WAVE_CHANNEL );
+                  SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
 
     last_select_link = &root_select_link;
 
@@ -903,7 +910,7 @@ int ONScripter::selectCommand()
 
     if ( selectvoice_file_name[SELECTVOICE_SELECT] )
         playSound(selectvoice_file_name[SELECTVOICE_SELECT],
-                  SOUND_CHUNK, false, MIX_WAVE_CHANNEL );
+                  SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
 
     deleteButtonLink();
 
@@ -962,7 +969,7 @@ int ONScripter::savetimeCommand()
 int ONScripter::savescreenshotCommand()
 {
     bool delete_flag = true;
-    if      ( script_h.isName( "savescreenshot2" ) ){
+    if (script_h.isName("savescreenshot2")){
         delete_flag = false;
     }
 
@@ -973,16 +980,15 @@ int ONScripter::savescreenshotCommand()
     resizeSurface( screenshot_surface, surface );
 
     const char *buf = script_h.readStr();
-#ifdef ANDROID
-    FILE *fp = fopen(buf, "wb");
-    SDL_RWops *rwops = SDL_RWFromFP(fp, SDL_TRUE);
-#else
-    SDL_RWops *rwops = SDL_RWFromFile(buf, "wb");
-#endif
+    const char *capital_name = script_h.fpath(buf);
+    auto dir = std::filesystem::path(capital_name).parent_path();
+    if (!std::filesystem::exists(std::filesystem::status(dir))) {
+        std::filesystem::create_directory(dir);
+    }
+    SDL_RWops *rwops = SDL_RWFromFile(capital_name, "wb");
     if (rwops == nullptr || SDL_SaveBMP_RW(surface, rwops, 1) != 0)
         utils::printError("Save screenshot failed: %s\n", SDL_GetError());
     SDL_FreeSurface(surface);
-
     return RET_CONTINUE;
 }
 
@@ -2890,12 +2896,13 @@ int ONScripter::dwaveCommand()
     else if (ch >= ONS_MIX_CHANNELS) ch = ONS_MIX_CHANNELS-1;
 
     if (play_mode == WAVE_PLAY_LOADED){
-        Mix_PlayChannel(ch, wave_sample[ch], loop_flag?-1:0);
+        // Mix_PlayChannel(ch, wave_sample[ch], loop_flag?-1:0);
+        Mix_FadeInChannel(ch, wave_sample[ch], loop_flag?-1:0, consumeSeFadetime());
     } else{
         const char *buf = script_h.readStr();
         int fmt = SOUND_CHUNK;
         if (play_mode == WAVE_PRELOAD) fmt |= SOUND_PRELOAD;
-        playSound(buf, fmt, loop_flag, ch);
+        playSound(buf, fmt, loop_flag, ch, consumeSeFadetime());
     }
     return RET_CONTINUE;
 }
@@ -4340,4 +4347,13 @@ int ONScripter::sprintfCommand() {
     setStr(&script_h.getVariableData(out_variable.var_no).str, buff);
     delete[] buff;
     return RET_CONTINUE;
+}
+
+
+int ONScripter::consumeSeFadetime() {
+    int v = sefadetime;
+    if (sefadetime != 0) {
+        sefadetime = 0;
+    }
+    return v;
 }

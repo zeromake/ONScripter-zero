@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int decodeNT3(void *sh, char **buf, unsigned int size, FILE *fp)
 {

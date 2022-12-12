@@ -88,10 +88,8 @@ void _FontInfo::reset()
 void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f)
 {
     const char* font_file;
-    bool font_file_free = false;
     if (f != nullptr) {
         font_file = f(_font_file, false);
-        font_file_free = true;
     } else {
         font_file = _font_file;
     }
@@ -148,10 +146,6 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
 
     ttf_font[0] = (void*)fc->next->font[0];
     ttf_font[1] = (void*)fc->next->font[1];
-    // utils::printInfo("Use font File: %s\n", font_file);
-    if (font_file_free) {
-        delete []font_file;
-    }
     return fc->next->font;
 }
 

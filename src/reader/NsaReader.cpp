@@ -151,6 +151,22 @@ int NsaReader::getNumFiles(){
     return total;
 }
 
+size_t NsaReader::getFileLengthSubByIndex( ArchiveInfo *ai, unsigned int i)
+{
+    if ( i == ai->num_of_files ) return 0;
+
+    if ( ai->fi_list[i].original_length != 0 )
+        return ai->fi_list[i].original_length;
+
+    int type = ai->fi_list[i].compression_type;
+    if ( type == NO_COMPRESSION )
+        type = getRegisteredCompressionType(ai->fi_list[i].name);
+    if ( type == NBZ_COMPRESSION || type == SPB_COMPRESSION ) {
+        ai->fi_list[i].original_length = getDecompressedFileLength( type, ai->file_handle, ai->fi_list[i].offset );
+    }
+    return ai->fi_list[i].original_length;
+}
+
 size_t NsaReader::getFileLengthSub( ArchiveInfo *ai, const char *file_name )
 {
     unsigned int i = getIndexFromFile( ai, file_name );
@@ -200,7 +216,7 @@ size_t NsaReader::getFile( const char *file_name, unsigned char *buffer, int *lo
 
     if ( ( ret = DirectReader::getFile( file_name, buffer, location ) ) ) return ret;
 
-    for ( int i=0 ; i<num_of_ns2_archives ; i++ ){
+    for (int i=0 ; i<num_of_ns2_archives ; i++){
         if ( (ret = getFileSub( &archive_info_ns2[i], file_name, buffer )) ){
             if ( location ) *location = ARCHIVE_TYPE_NS2;
             return ret;
@@ -220,6 +236,25 @@ size_t NsaReader::getFile( const char *file_name, unsigned char *buffer, int *lo
     }
 
     return 0;
+}
+
+
+BaseReader::ArchiveInfo* NsaReader::getArchiveInfoByIndex(unsigned int index) {
+    int i;
+
+    for (i=0; i<num_of_ns2_archives; i++){
+        if ( index < archive_info_ns2[i].num_of_files ) return &archive_info_ns2[i];
+        index -= archive_info_ns2[i].num_of_files;
+    }
+    if ( index < archive_info.num_of_files ) return &archive_info;
+    index -= archive_info.num_of_files;
+
+    for ( i=0 ; i<num_of_nsa_archives ; i++ ){
+        if ( index < archive_info2[i].num_of_files ) return &archive_info2[i];
+        index -= archive_info2[i].num_of_files;
+    }
+    utils::printError("NsaReader::getFileByIndex  Index %d is out of range\n", index );
+    return &archive_info;
 }
 
 NsaReader::FileInfo NsaReader::getFileByIndex( unsigned int index )

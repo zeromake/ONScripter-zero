@@ -24,6 +24,8 @@
 
 #include "ONScripter.h"
 #include "Utils.h"
+#include <chrono>
+#include <filesystem>
 
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
 #include <sys/types.h>
@@ -48,6 +50,16 @@ extern "C" void c2pstrcpy(Str255 dst, const char *src);	//#include <TextUtils.h>
 #define SAVEFILE_VERSION_MINOR 8
 
 #define READ_LENGTH 4096
+
+
+template <typename TP>
+std::time_t to_time_t(TP tp)
+{
+    using namespace std::chrono;
+    auto sctp = time_point_cast<std::chrono::system_clock::duration>(tp - TP::clock::now()
+              + std::chrono::system_clock::now());
+    return std::chrono::system_clock::to_time_t(sctp);
+}
 
 void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 {
@@ -138,7 +150,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 #elif defined(PSP)
     sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     SceIoStat buf;
-    if ( sceIoGetstat(file_name, &buf)<0 ){
+    if (sceIoGetstat(file_name, &buf) < 0){
         save_file_info.valid = false;
         return;
     }
@@ -150,16 +162,20 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 #else
     sprintf( file_name, "save%d.dat", no );
     FILE *fp;
-    if ( (fp = fopen( file_name, "rb", true )) == NULL ){
+    if ( (fp = fopen(file_name, "rb", true)) == NULL ){
         save_file_info.valid = false;
         return;
     }
-    fclose( fp );
+    fclose(fp);
+    const char *name_path = fpath(file_name);
+    auto ftime = std::filesystem::last_write_time(name_path);
+    std::time_t tt = to_time_t(ftime);
+    struct tm* ptm = localtime(&tt);
 
-    save_file_info.month  = 1;
-    save_file_info.day    = 1;
-    save_file_info.hour   = 0;
-    save_file_info.minute = 0;
+    save_file_info.month  = ptm->tm_mon +1;
+    save_file_info.day    = ptm->tm_mday;
+    save_file_info.hour   = ptm->tm_hour;
+    save_file_info.minute = ptm->tm_min;
 #endif
     save_file_info.valid = true;
     script_h.getStringFromInteger( save_file_info.sjis_month,  save_file_info.month,  2 );
@@ -258,7 +274,7 @@ int ONScripter::writeSaveFile( int no, const char *savestr )
     saveAll();
 
     char filename[32];
-    sprintf( filename, "save%d.dat", no );
+    sprintf(filename, "save%d.dat", no);
 
     memcpy(file_io_buf, save_data_buf, save_data_len);
     file_io_buf_ptr = save_data_len;
@@ -268,8 +284,8 @@ int ONScripter::writeSaveFile( int no, const char *savestr )
     }
 
     size_t magic_len = strlen(SAVEFILE_MAGIC_NUMBER)+2;
-    sprintf( filename, RELATIVEPATH "sav%csave%d.dat", DELIMITER, no );
-    if (saveFileIOBuf( filename, magic_len, savestr ))
+    sprintf(filename, RELATIVEPATH "sav%csave%d.dat", DELIMITER, no);
+    if (saveFileIOBuf(filename, magic_len, savestr))
         utils::printError("can't open save file %s for writing (not an error)\n", filename );
 
     return 0;

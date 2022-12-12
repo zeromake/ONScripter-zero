@@ -39,7 +39,8 @@ public:
 
     size_t getFileLength( const char *file_name );
     size_t getFile( const char *file_name, unsigned char *buf, int *location=NULL );
-    FileInfo getFileByIndex( unsigned int index );
+    FileInfo getFileByIndex(unsigned int index);
+    size_t getFileSubByIndex(ArchiveInfo *ai, unsigned int index, unsigned char *buf);
 
     int writeHeader( FILE *fp );
     size_t putFile( FILE *fp, int no, size_t offset, size_t length, size_t original_length, bool modified_flag, unsigned char *buffer );

@@ -189,6 +189,7 @@ target("onscripter")
     if is_plat("macosx") then
         add_files("src/entry/onscripter_main.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
+        add_frameworks("AudioToolbox", "Cocoa")
     elseif is_plat("windows") then
         add_files("src/resource.rc", "src/entry/onscripter_main.cpp")
     elseif is_plat("android") then
