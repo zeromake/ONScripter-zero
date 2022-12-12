@@ -3096,14 +3096,9 @@ int ONScripter::cspCommand()
     leaveTextDisplayMode();
 
     bool csp2_flag = false;
-    bool step_flag = false;
+    bool step_flag = true;
     if (script_h.isName("csp2")) {
         csp2_flag = true;
-    } else if (script_h.isName("cspstep")) {
-        step_flag = true;
-    } else if (script_h.isName("csp2step")) {
-        csp2_flag = true;
-        step_flag = true;
     }
 
     std::vector<int> nos;

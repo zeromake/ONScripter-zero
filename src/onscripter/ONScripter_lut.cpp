@@ -404,8 +404,6 @@ static ONScripter::FuncLUT func_lut[] = {
     {"sefadetime",      &ONScripter::sefadetimeCommand},
     {"sprintf",         &ONScripter::sprintfCommand},
     {"checksp",         &ONScripter::checkspCommand},
-    {"cspstep",         &ONScripter::cspCommand},
-    {"csp2step",        &ONScripter::cspCommand},
 
     {"", NULL},
 };
