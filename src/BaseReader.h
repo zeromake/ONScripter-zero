@@ -37,6 +37,9 @@ extern "C" int mkdir_ons(const char *pathname, mode_t mode);
 #define SEEK_END 2
 #endif
 
+#define DEFAULT_DELIMITER '/'
+#define REPLACE_DELIMITER '\\'
+
 #if defined(LINUX) || defined(MACOSX)
 #define DELIMITER '/'
 #elif defined(WIN32) || defined(_WIN32)
@@ -75,6 +78,7 @@ struct BaseReader
         size_t offset;
         size_t length;
         size_t original_length;
+        char original_name[256];
     };
 
     struct ArchiveInfo{

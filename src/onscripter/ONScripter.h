@@ -514,6 +514,7 @@ private:
     void buildBreakupMask();
     void initBreakup( char *params );
     void effectBreakup( char *params, int duration );
+    int consumeSeFadetime();
 
 #ifdef USE_BUILTIN_EFFECTS
     //cascade

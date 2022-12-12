@@ -337,6 +337,7 @@ private:
     int  string_counter;
     char *saved_string_buffer; // updated only by saveStringBuffer
     char *str_string_buffer; // updated only by readStr
+    char *path_string_buffer;
 
     LabelInfo *label_info;
     int num_of_labels;

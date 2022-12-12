@@ -41,6 +41,8 @@ public:
     size_t getFileLength( const char *file_name );
     size_t getFile( const char *file_name, unsigned char *buf, int *location=NULL );
     FileInfo getFileByIndex( unsigned int index );
+    ArchiveInfo* getArchiveInfoByIndex(unsigned int index);
+    size_t getFileLengthSubByIndex(ArchiveInfo *ai, unsigned int i);
 
     int openForConvert( char *nsa_name, int archive_type=ARCHIVE_TYPE_NSA, unsigned int nsa_offset=0 );
     NsaReader::ArchiveInfo* openForCreate(const char *nsa_name, int archive_type, int nsaoffset);

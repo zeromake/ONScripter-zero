@@ -8,6 +8,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复高版本的 sdl 的音乐播放回调会取消音频播放（点击跳过上一个音频时会导致下一个音频无法播放）。
 - [x] 修复 osx 系统上无法编译 `gbk`，`shift-jis` 编码的 `cpp` 源码（使用 lua 脚本直接生成 \x 转义字符串）。
 - [x] 修复 osx 上的 sdl 的 `render` 在高 `dpi` 模式下被放大了 `dpi` 的倍数导致文字渲染模糊（通过 oc 代码获得 dpi 倍数把 render 缩小）。
+- [x] 修复在 osx 上的 `savescreenshot` 命令是向执行目录下写的，并修复脚本里的是 win 的风格路径。
 - [ ] 自动播放会导致音频播放不完整。
 
 ## feture
@@ -18,6 +19,16 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] `language.lua` 会把 `src/language/*.txt` 转换为带转义文字的 `cpp` 文件。
 - [x] `nscriptdecode` 工具改为流模式，支持更多参数，支持三种的加解密（由于用的是 xor 模式即是加密也是解密）。
 - [x] `nsadec` 工具支持 `-out` 设置输出目录, `-lower` 设置输出文件名是否为小写，`-v` 显示详细输出，默认也加入了进度查看。
+- [x] 修复在 `超级糖果` 的 `ons` 移植版的各种指令问题。
+    - [x] 添加 `else`, `elseif`, `elif` 指令，与 `if`, `notif` 指令配合使用。
+    - [x] 添加 `sefadetime` 指令，可以控制语音的淡入时间支持，播放一个语音后自动设置回 0。
+    - [x] 添加 `checksp` 指令，检查精灵是否显示。
+    - [x] 修改 `csp` 指令支持多参数，`csp 1,10` 代表清理 `1-10` 的精灵。
+    - [x] 添加 `sprintf` 指令，参考 `c` 的 `sprintf`，示例 `mov %1,100:sprintf $1,"%d_xxx.jpg",%1`，参数上限为 32 个。
+    - [x] 支持 onscript.nt 的脚步格式，支持版本 1-3。
+- [ ] 抽象文件操作(文件读写，文件目录遍历，文件路径自动拼接，文件是否存在判断，目录创建)，以便于移植到各种平台下，考虑使用 `c++17` 的 `std::filesystem` 的通用方法，移动端平台可能需要手动编写。
+- [ ] 支持读取压缩包里的 ons 游戏，无需解压。
+- [ ] 代码里描述指令说明并生成文档, [onscripter-api](https://07th-mod.github.io/ponscripter-fork/api/)
 - [ ] 比较合并上游的 [onscripter](http://onscripter.osdn.jp/onscripter.html.en#package-source) 的 `20220816` 版本。
 
 ## 编译指南

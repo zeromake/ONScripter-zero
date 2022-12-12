@@ -302,7 +302,7 @@ FILE *DirectReader::getFileHandle( const char *file_name, int &compression_type,
     capital_name[ len ] = '\0';
 
     for ( i=0 ; i<len ; i++ ){
-        if ( capital_name[i] == '/' || capital_name[i] == '\\' ) capital_name[i] = (char)DELIMITER;
+        if ( capital_name[i] == '/' || capital_name[i] == '\\' ) capital_name[i] = DELIMITER;
         if ( (unsigned char)capital_name[i] > 0x80 ) i++;
     }
 

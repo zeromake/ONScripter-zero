@@ -161,8 +161,9 @@ void AnimationInfo::deleteImageName(){
 
 void AnimationInfo::setImageName( const char *name ){
     deleteImageName();
-    image_name = new char[ strlen(name) + 1 ];
-    strcpy( image_name, name );
+    size_t len = strlen(name);
+    image_name = new char[len + 1];
+    strcpy(image_name, name);
 }
 
 void AnimationInfo::deleteSurface(bool delete_surface_name)

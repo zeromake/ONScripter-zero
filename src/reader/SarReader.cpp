@@ -120,11 +120,19 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
             unsigned int count = 0;
             //skip the beginning double-quote
             unsigned char ch = key_table[fgetc( ai->file_handle )];
+            unsigned char origin_ch;
             while( (ch = key_table[fgetc( ai->file_handle )] ) != '"' ){
+                origin_ch = ch;
                 if ( 'a' <= ch && ch <= 'z' ) ch += 'A' - 'a';
-                ai->fi_list[i].name[count++] = ch;
+                else if (REPLACE_DELIMITER == ch) {
+                    ch = DEFAULT_DELIMITER;
+                }
+                ai->fi_list[i].name[count] = ch;
+                ai->fi_list[i].original_name[count] = origin_ch;
+                count++;
             }
             ai->fi_list[i].name[count] = '\0';
+            ai->fi_list[i].original_name[count] = '\0';
             ai->fi_list[i].compression_type = getRegisteredCompressionType( ai->fi_list[i].name );
             ai->fi_list[i].offset = cur_offset;
             ai->fi_list[i].length = swapLong( readLong( ai->file_handle ) );
@@ -142,13 +150,21 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
 
         for ( i=0 ; i<ai->num_of_files ; i++ ){
             unsigned char ch;
+            unsigned char origin_ch;
             int count = 0;
 
             while( (ch = key_table[fgetc( ai->file_handle )] ) ){
+                origin_ch = ch;
                 if ( 'a' <= ch && ch <= 'z' ) ch += 'A' - 'a';
-                ai->fi_list[i].name[count++] = ch;
+                else if (REPLACE_DELIMITER == ch) {
+                    ch = DEFAULT_DELIMITER;
+                }
+                ai->fi_list[i].name[count] = ch;
+                ai->fi_list[i].original_name[count] = origin_ch;
+                count++;
             }
             ai->fi_list[i].name[count] = ch;
+            ai->fi_list[i].original_name[count] = ch;
 
             if ( archive_type == ARCHIVE_TYPE_NSA )
                 ai->fi_list[i].compression_type = readChar( ai->file_handle );
@@ -353,12 +369,12 @@ int SarReader::getIndexFromFile( ArchiveInfo *ai, const char *file_name )
     memcpy( capital_name, file_name, len );
     capital_name[ len ] = '\0';
 
-    for ( i=0 ; i<len ; i++ ){
+    for (i=0; i<len; i++){
         if ( 'a' <= capital_name[i] && capital_name[i] <= 'z' ) capital_name[i] += 'A' - 'a';
-        else if (capital_name[i] == '/' || capital_name[i] == '\\') capital_name[i] = DELIMITER;
+        else if (capital_name[i] == REPLACE_DELIMITER) capital_name[i] = DEFAULT_DELIMITER;
     }
-    for ( i=0 ; i<ai->num_of_files ; i++ ){
-        if ( !strcmp( capital_name, ai->fi_list[i].name ) ) break;
+    for (i=0; i<ai->num_of_files ;i++){
+        if (!strcmp(capital_name, ai->fi_list[i].name) ) break;
     }
     return i;
 }
@@ -390,9 +406,8 @@ size_t SarReader::getFileLength( const char *file_name )
     return info->fi_list[j].original_length;
 }
 
-size_t SarReader::getFileSub( ArchiveInfo *ai, const char *file_name, unsigned char *buf )
+size_t SarReader::getFileSubByIndex( ArchiveInfo *ai, unsigned int i, unsigned char *buf )
 {
-    unsigned int i = getIndexFromFile( ai, file_name );
     if ( i == ai->num_of_files ) return 0;
 
 #if defined(PSP)
@@ -404,7 +419,7 @@ size_t SarReader::getFileSub( ArchiveInfo *ai, const char *file_name, unsigned c
 #endif
 
     int type = ai->fi_list[i].compression_type;
-    if ( type == NO_COMPRESSION ) type = getRegisteredCompressionType( file_name );
+    if ( type == NO_COMPRESSION ) type = getRegisteredCompressionType(ai->fi_list[i].name);
 
     if      ( type == NBZ_COMPRESSION ){
         return decodeNBZ( ai->file_handle, ai->fi_list[i].offset, buf );
@@ -421,6 +436,12 @@ size_t SarReader::getFileSub( ArchiveInfo *ai, const char *file_name, unsigned c
     if (key_table_flag)
         for (size_t j=0 ; j<ret ; j++) buf[j] = key_table[buf[j]];
     return ret;
+}
+
+size_t SarReader::getFileSub( ArchiveInfo *ai, const char *file_name, unsigned char *buf )
+{
+    unsigned int i = getIndexFromFile( ai, file_name );
+    return getFileSubByIndex(ai, i, buf);
 }
 
 size_t SarReader::getFile( const char *file_name, unsigned char *buf, int *location )
