@@ -11,6 +11,13 @@
             "program": "${workspaceFolder}/build/macosx/x86_64/debug/nsaenc",
             "args": ["-e", "-ns", "2", "./src", "./build/macosx/x86_64/debug/arc.ns2"],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "onscripter-debug",
+            "program": "${workspaceFolder}/build/macosx/x86_64/debug/onscripter",
+            "args": ["--rescale", "2", "--fontcache", "--render-font-outline", "-r", "/Users/zero/Documents/超级糖果A"]
         }
     ]
 }
