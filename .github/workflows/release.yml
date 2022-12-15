@@ -25,7 +25,7 @@ jobs:
         shell: powershell
         run: |
           $env:path+=";$Home\scoop\shims"
-          xmake update -s https://github.com/zeromake/xmake.git#master
+          xmake update -s https://github.com/zeromake/xmake.git#feature/dependency_loop
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
@@ -57,7 +57,7 @@ jobs:
           xmake --version
       - name: pre-env
         run: |
-          xmake update -s https://github.com/zeromake/xmake.git#master
+          xmake update -s https://github.com/zeromake/xmake.git#feature/dependency_loop
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
