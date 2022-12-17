@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="36dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="18dp"
+            android:layout_marginRight="9dp"
+            android:contentDescription="@string/alt_icon"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:src="@drawable/test_icon_0"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="9dp" />
+
+        <TextView
+            android:id="@+id/caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="9dp"
+            android:layout_marginRight="18dp"
+            android:layout_toRightOf="@+id/icon"
+            android:singleLine="true"
+            android:textColor="#757575"
+            android:textSize="24dp"
+            android:typeface="sans" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/start_panel"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:clickable="true"
+        android:paddingLeft="40dp"
+        android:paddingRight="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/btn_play"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:clickable="true"
+            android:contentDescription="@string/alt_play"
+            android:src="@drawable/play_button" />
+
+        <ImageView
+            android:id="@+id/btn_config"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/btn_play"
+            android:clickable="true"
+            android:contentDescription="@string/alt_config"
+            android:src="@drawable/config_button" />
+    </RelativeLayout>
+</RelativeLayout>

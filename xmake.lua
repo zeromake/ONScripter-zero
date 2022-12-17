@@ -168,7 +168,11 @@ target("va")
     add_files("demo/va.cpp")
 
 target("onscripter")
-    set_kind("binary")
+    if is_plat("android") then
+        set_kind("shared")
+    else
+        set_kind("binary")
+    end
     add_packages(
         "zlib",
         "bzip2",
@@ -195,6 +199,9 @@ target("onscripter")
     elseif is_plat("android") then
         add_packages("ndk-cpufeatures")
         add_files("src/entry/onscripter_main.cpp")
+        add_defines("SDL_JAVA_PACKAGE_PATH=com_zeromake_onscripter", "ANDROID")
+        add_cxflags("-fPIC", {force = true})
+        add_ldflags("-fPIC", {force = true})
     else
         add_files("src/entry/onscripter_main.cpp")
     end

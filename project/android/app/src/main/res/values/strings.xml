@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">ONScripter</string>
+
+    <string name="alt_about">关于</string>
+    <string name="alt_background">背景</string>
+    <string name="alt_config">选项</string>
+    <string name="alt_cover">封面图片</string>
+    <string name="alt_icon">图标</string>
+    <string name="alt_play">运行</string>
+    <string name="alt_settings">设置</string>
+    <string name="Launch_ChooseDirectory">选择目录</string>
+    <string name="Launch_SetDirectory">设置目录</string>
+    <string name="Launch_CouldNotOpenDirectory">无法打开目录</string>
+    <string name="Other">其它</string>
+    <string name="OK">确定</string>
+    <string name="Cancel">取消</string>
+    <string name="Error">错误</string>
 </resources>

@@ -16,3 +16,4 @@ rootProject.name = "onscripter"
 rootProject.buildFileName = "build.gradle.kts"
 
 include(":app")
+include(":XXPermissions")

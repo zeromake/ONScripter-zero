@@ -4192,9 +4192,9 @@ int ONScripter::checkspCommand() {
 
 void ons_sprintf(char* buff, const char* format, int argc, void* args[]) {
     switch (argc)
-    {
+    {   
         case 0:
-            sprintf(buff, format);
+            strcpy(buff, format);
             break;
         case 1:
             sprintf(buff, format, args[0]);

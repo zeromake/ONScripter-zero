@@ -1230,73 +1230,70 @@ void ONScripter::runEventLoop()
 
             event = tmp_event;
         }
-
+        // if (event.type < ONS_TIMER_EVENT) {
+        //     utils::printInfo("WaitEvent: %d\n", event.type);
+        // }
         switch (event.type) {
 #if defined(IOS) || defined(ANDROID) || defined(WINRT)
         case SDL_FINGERMOTION:
         {
-            if (!btndown_flag && convTouchKey(event.tfinger)) return;
-            tmp_event.motion.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
-            tmp_event.motion.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
-            if (mouseMoveEvent( &tmp_event.motion )) return;
-            if (btndown_flag){
-                event.button.type = SDL_MOUSEBUTTONDOWN;
-                event.button.button = SDL_BUTTON_LEFT;
-                if (SDL_GetNumTouchFingers(event.tfinger.touchId) >= 2)
-                    event.button.button = SDL_BUTTON_RIGHT;
-                event.button.x = tmp_event.motion.x;
-                event.button.y = tmp_event.motion.y;
-                ret = mousePressEvent( &event.button );
-                if (ret) return;
-            }
+            break;
+            // if (!btndown_flag && convTouchKey(event.tfinger)) return;
+            // tmp_event.motion.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
+            // tmp_event.motion.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
+            // if (mouseMoveEvent( &tmp_event.motion )) return;
+            // if (btndown_flag){
+            //     event.button.type = SDL_MOUSEBUTTONDOWN;
+            //     event.button.button = SDL_BUTTON_LEFT;
+            //     if (SDL_GetNumTouchFingers(event.tfinger.touchId) >= 2)
+            //         event.button.button = SDL_BUTTON_RIGHT;
+            //     event.button.x = tmp_event.motion.x;
+            //     event.button.y = tmp_event.motion.y;
+            //     ret = mousePressEvent( &event.button );
+            //     if (ret) return;
+            // }
         }
             break;
         case SDL_FINGERDOWN:
         {
             convTouchKey(event.tfinger);
-            tmp_event.motion.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
-            tmp_event.motion.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
-            if (mouseMoveEvent( &tmp_event.motion )) return;
-            if ( btndown_flag ){
+            num_fingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
+            if (num_fingers <= 1) break;
+            // if (mouseMoveEvent( &tmp_event.motion )) return;
+            if (btndown_flag && num_fingers == 2) {
                 tmp_event.button.type = SDL_MOUSEBUTTONDOWN;
-                tmp_event.button.button = SDL_BUTTON_LEFT;
-                if (SDL_GetNumTouchFingers(event.tfinger.touchId) >= 2)
-                    tmp_event.button.button = SDL_BUTTON_RIGHT;
+                tmp_event.button.button = SDL_BUTTON_RIGHT;
                 tmp_event.button.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
                 tmp_event.button.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
                 ret = mousePressEvent( &tmp_event.button );
             }
-            {
-                num_fingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
-                if (num_fingers >= 3){
-                    tmp_event.key.keysym.sym = SDLK_LCTRL;
-                    ret |= keyDownEvent( &tmp_event.key );
-                }
+            if (num_fingers >= 3) {
+                tmp_event.key.keysym.sym = SDLK_LCTRL;
+                ret |= keyDownEvent( &tmp_event.key );
             }
             if (ret) return;
         }
             break;
         case SDL_FINGERUP:
         {
-            if (num_fingers == 0) break;
-            {
+            if (num_fingers == 2) {
                 tmp_event.button.type = SDL_MOUSEBUTTONUP;
-                tmp_event.button.button = SDL_BUTTON_LEFT;
-                if (num_fingers == 2)
-                    tmp_event.button.button = SDL_BUTTON_RIGHT;
+                tmp_event.button.button = SDL_BUTTON_RIGHT;
                 tmp_event.button.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
                 tmp_event.button.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
                 ret = mousePressEvent( &tmp_event.button );
+            } else if (num_fingers == 3) {
+                tmp_event.key.keysym.sym = SDLK_LCTRL;
+                keyUpEvent( &tmp_event.key );
             }
-            tmp_event.key.keysym.sym = SDLK_LCTRL;
-            keyUpEvent( &tmp_event.key );
             num_fingers = 0;
             if (ret) return;
         }
             break;
 #endif
-#if !defined(ANDROID) && !defined(IOS) && !defined(WINRT)
+#if 1
           case SDL_MOUSEMOTION:
+            if (num_fingers > 1) break;
             if (mouseMoveEvent( &event.motion )) return;
             if (btndown_flag){
                 if (event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
@@ -1311,12 +1308,13 @@ void ONScripter::runEventLoop()
                 if (ret) return;
             }
             break;
-
           case SDL_MOUSEBUTTONDOWN:
+            if (num_fingers > 1) break;
             current_button_state.event_type = event.type;
             current_button_state.event_button = event.button.button;
             if ( !btndown_flag ) break;
           case SDL_MOUSEBUTTONUP:
+            if (num_fingers > 1) break;
             current_button_state.event_type = event.type;
             current_button_state.event_button = event.button.button;
             ret = mousePressEvent( &event.button );
@@ -1440,10 +1438,15 @@ void ONScripter::runEventLoop()
               }
               break;
           case SDL_APP_WILLENTERBACKGROUND:
-              gles_renderer->pause();
+              if (gles_renderer != nullptr) {
+                gles_renderer->pause();
+              }
               break;
           case SDL_APP_DIDENTERFOREGROUND:
-              gles_renderer->resume();
+              if (gles_renderer != nullptr) {
+                gles_renderer->resume();
+              }
+              SDL_Delay(1);
               repaintCommand();
               break;
           case SDL_QUIT:

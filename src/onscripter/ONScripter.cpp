@@ -105,6 +105,8 @@ void ONScripter::initSDL()
     int count = SDL_GetNumAudioDrivers();
     #if defined(_WIN32)
     const char* firstAudioDriver = "directsound";
+    #elif defined(ANDROID)
+    const char* firstAudioDriver = "openslES";
     #else
     const char* firstAudioDriver = "";
     #endif

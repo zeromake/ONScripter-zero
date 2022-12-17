@@ -26,12 +26,12 @@
 #define __BASE_READER_H__
 
 #include <stdio.h>
-#ifdef ANDROID
-extern "C" FILE *fopen_ons(const char *str, const char *mode);
-#define fopen fopen_ons
-extern "C" int mkdir_ons(const char *pathname, mode_t mode);
-#define mkdir mkdir_ons
-#endif
+// #ifdef ANDROID
+// extern "C" FILE *fopen_ons(const char *str, const char *mode);
+// #define fopen fopen_ons
+// extern "C" int mkdir_ons(const char *pathname, mode_t mode);
+// #define mkdir mkdir_ons
+// #endif
 
 #ifndef SEEK_END
 #define SEEK_END 2

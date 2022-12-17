@@ -5,4 +5,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+
+    <style name="Animation">
+    </style>
+    <style name="Animation.ConfigPanelAnimation" parent="@style/Animation">
+        <item name="android:windowEnterAnimation">@anim/gameconfig_enter</item>
+        <item name="android:windowExitAnimation">@anim/gameconfig_exit</item>
+    </style>
+
 </resources>
