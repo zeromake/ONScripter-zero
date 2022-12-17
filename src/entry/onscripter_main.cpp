@@ -115,22 +115,15 @@ extern "C"
 #include <jni.h>
 #include <android/log.h>
 #include <errno.h>
-static JavaVM *jniVM = NULL;
 static jobject JavaONScripter = NULL;
 static jmethodID JavaPlayVideo = NULL;
-static jmethodID JavaGetFD = NULL;
-static jmethodID JavaMkdir = NULL;
+// static jmethodID JavaGetFD = NULL;
+// static jmethodID JavaMkdir = NULL;
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
-{
-    jniVM = vm;
-    return JNI_VERSION_1_2;
-};
-
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
-{
-    jniVM = vm;
-};
+// JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
+// {
+//     jniVM = vm;
+// };
 
 #ifndef SDL_JAVA_PACKAGE_PATH
 #error You have to define SDL_JAVA_PACKAGE_PATH to your package path with dots replaced with underscores, for example "com_example_SanAngeles"
@@ -144,8 +137,8 @@ JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks) (JNI
     JavaONScripter = jniEnv->NewGlobalRef(thiz);
     jclass JavaONScripterClass = jniEnv->GetObjectClass(JavaONScripter);
     JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
-    JavaGetFD = jniEnv->GetMethodID(JavaONScripterClass, "getFD", "([CI)I");
-    JavaMkdir = jniEnv->GetMethodID(JavaONScripterClass, "mkdir", "([C)I");
+    // JavaGetFD = jniEnv->GetMethodID(JavaONScripterClass, "getFD", "([CI)I");
+    // JavaMkdir = jniEnv->GetMethodID(JavaONScripterClass, "mkdir", "([C)I");
     return 0;
 }
 
@@ -161,10 +154,11 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
     return ons.getHeight();
 }
 
+
 void playVideoAndroid(const char *filename)
 {
     JNIEnv * jniEnv = NULL;
-    jniVM->AttachCurrentThread(&jniEnv, NULL);
+    // mJavaVM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
         __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::playVideoAndroid: Java VM AttachCurrentThread() failed");
@@ -180,7 +174,9 @@ void playVideoAndroid(const char *filename)
     jniEnv->DeleteLocalRef(jca);
     delete[] jc;
 }
-
+}
+#endif
+#if 0
 #undef fopen
 FILE *fopen_ons(const char *path, const char *mode)
 {
@@ -191,7 +187,7 @@ FILE *fopen_ons(const char *path, const char *mode)
     if (fp) return fp;
 
     JNIEnv * jniEnv = NULL;
-    jniVM->AttachCurrentThread(&jniEnv, NULL);
+    mJavaVM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
         __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::getFD: Java VM AttachCurrentThread() failed");
@@ -217,7 +213,7 @@ int mkdir_ons(const char *pathname, mode_t mode)
     if (mkdir(pathname, mode) == 0 || errno != EACCES) return 0;
 
     JNIEnv * jniEnv = NULL;
-    jniVM->AttachCurrentThread(&jniEnv, NULL);
+    mJavaVM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
         __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::mkdir: Java VM AttachCurrentThread() failed");
@@ -376,9 +372,12 @@ void parseOption(int argc, char *argv[]) {
     }
 }
 
+#ifdef ANDROID
+int SDL_main(int argc, char *argv[])
+#else
 #undef main
-
 int main(int argc, char *argv[])
+#endif
 {
     utils::printInfo("ONScripter-Jh version %s (%s, %d.%02d)\n", ONS_JH_VERSION, ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);
 

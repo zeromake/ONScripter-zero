@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <color name="black">#ff000000</color>
+    <color name="sao_white">#ffffffff</color>
+    <color name="sao_grey">#757575</color>
+    <color name="sao_orange">#fbad06</color>
+    <color name="sao_transparent_white">#bfffffff</color>
 </resources>

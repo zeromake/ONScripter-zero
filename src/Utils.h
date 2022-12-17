@@ -48,7 +48,7 @@ namespace utils{
 		va_list ap;
 		va_start(ap, format);
 #ifdef ANDROID
-		__android_log_vprint(ANDROID_LOG_VERBOSE, "Info", format, ap);
+		__android_log_vprint(ANDROID_LOG_VERBOSE, "INFO", format, ap);
 #elif defined(WINRT)
 		char *buf = new char[256];
 		vsprintf(buf, format, ap);
