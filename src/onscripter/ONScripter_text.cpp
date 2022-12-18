@@ -824,13 +824,13 @@ bool ONScripter::processText()
         out_text[0] = script_h.getStringBuffer()[string_buffer_offset];
         out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
 
-        if (script_h.checkClickstr(&script_h.getStringBuffer()[string_buffer_offset]) > 0){
+        bool isClickStr = script_h.checkCountClickstr(&script_h.getStringBuffer()[string_buffer_offset]) > 0;
+        if (isClickStr) {
             if (sentence_font.getRemainingLine() <= clickstr_line)
                 return clickNewPage( out_text );
             else
                 return clickWait( out_text );
-        }
-        else{
+        } else {
             clickstr_state = CLICK_NONE;
         }
 

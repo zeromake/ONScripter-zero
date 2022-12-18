@@ -6,12 +6,9 @@ import android.widget.ListView;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 
-/* loaded from: classes.dex */
 public class U {
-    public static final int SCROLL_LIST_FOR_DISTANCE_IN_ANY_MILLIS = 10;
 
     public static String read(File file) {
         try {
@@ -30,20 +27,6 @@ public class U {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public static void write(File file, String str) {
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            file.createNewFile();
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            fileOutputStream.write(str.getBytes());
-            fileOutputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

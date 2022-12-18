@@ -549,6 +549,7 @@ private:
     int  shift_pressed_status;
     int  ctrl_pressed_status;
     int  num_fingers; // numbur of fingers touching on the screen
+    int  finger_flags; // fingers touching flag
 
     void flushEventSub( SDL_Event &event );
     void flushEvent();

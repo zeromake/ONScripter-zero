@@ -283,10 +283,10 @@ int ONScripter::writeSaveFile( int no, const char *savestr )
         return -1;
     }
 
-    size_t magic_len = strlen(SAVEFILE_MAGIC_NUMBER)+2;
-    sprintf(filename, RELATIVEPATH "sav%csave%d.dat", DELIMITER, no);
-    if (saveFileIOBuf(filename, magic_len, savestr))
-        utils::printError("can't open save file %s for writing (not an error)\n", filename );
+    // size_t magic_len = strlen(SAVEFILE_MAGIC_NUMBER)+2;
+    // sprintf(filename, RELATIVEPATH "sav%csave%d.dat", DELIMITER, no);
+    // if (saveFileIOBuf(filename, magic_len, savestr))
+    //     utils::printError("can't open save file %s for writing (not an error)\n", filename );
 
     return 0;
 }

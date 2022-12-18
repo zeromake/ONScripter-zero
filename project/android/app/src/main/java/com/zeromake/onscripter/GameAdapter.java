@@ -1,5 +1,6 @@
 package com.zeromake.onscripter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ public class GameAdapter extends ArrayAdapter<Game> implements ListAdapter {
         this.selectedPos = -1;
     }
 
+    @SuppressLint("InflateParams")
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -41,13 +43,13 @@ public class GameAdapter extends ArrayAdapter<Game> implements ListAdapter {
         if (position == selectedPos) {
             holder.startPanel.setVisibility(View.VISIBLE);
             holder.startPanel.setClickable(true);
-            holder.icon.setImageResource(R.drawable.test_icon_1);
+            holder.icon.setImageResource(R.drawable.game_controller_1);
             holder.caption.setTextColor(getContext().getResources().getColor(R.color.sao_white));
             view.setBackgroundColor(getContext().getResources().getColor(R.color.sao_orange));
         } else {
             holder.startPanel.setVisibility(View.GONE);
             holder.startPanel.setClickable(false);
-            holder.icon.setImageResource(R.drawable.test_icon_0);
+            holder.icon.setImageResource(R.drawable.game_controller_0);
             holder.caption.setTextColor(getContext().getResources().getColor(R.color.sao_grey));
             view.setBackgroundColor(getContext().getResources().getColor(R.color.sao_transparent_white));
         }

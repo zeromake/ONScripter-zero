@@ -1258,33 +1258,35 @@ void ONScripter::runEventLoop()
         {
             convTouchKey(event.tfinger);
             num_fingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
-            if (num_fingers <= 1) break;
-            // if (mouseMoveEvent( &tmp_event.motion )) return;
-            if (btndown_flag && num_fingers == 2) {
+            if (num_fingers == 2) {
+                finger_flags |= 1;
                 tmp_event.button.type = SDL_MOUSEBUTTONDOWN;
                 tmp_event.button.button = SDL_BUTTON_RIGHT;
                 tmp_event.button.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
                 tmp_event.button.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
-                ret = mousePressEvent( &tmp_event.button );
-            }
-            if (num_fingers >= 3) {
+                ret = mousePressEvent(&tmp_event.button);
+            } else if (num_fingers >= 3) {
+                finger_flags |= 2;
                 tmp_event.key.keysym.sym = SDLK_LCTRL;
-                ret |= keyDownEvent( &tmp_event.key );
+                ret |= keyDownEvent(&tmp_event.key);
             }
             if (ret) return;
         }
             break;
         case SDL_FINGERUP:
         {
-            if (num_fingers == 2) {
+            if ((finger_flags & 1) && num_fingers <= 1) {
+                finger_flags = finger_flags & 0b11111110;
                 tmp_event.button.type = SDL_MOUSEBUTTONUP;
                 tmp_event.button.button = SDL_BUTTON_RIGHT;
                 tmp_event.button.x = (device_width * event.tfinger.x - render_view_rect.x) * screen_scale_ratio1;
                 tmp_event.button.y = (device_height * event.tfinger.y - render_view_rect.y) * screen_scale_ratio2;
                 ret = mousePressEvent( &tmp_event.button );
-            } else if (num_fingers == 3) {
+            }
+            if ((finger_flags & 2) && num_fingers <= 1) {
+                finger_flags = finger_flags & 0b11111101;
                 tmp_event.key.keysym.sym = SDLK_LCTRL;
-                keyUpEvent( &tmp_event.key );
+                keyUpEvent(&tmp_event.key);
             }
             num_fingers = 0;
             if (ret) return;
@@ -1293,7 +1295,7 @@ void ONScripter::runEventLoop()
 #endif
 #if 1
           case SDL_MOUSEMOTION:
-            if (num_fingers > 1) break;
+            if (finger_flags > 0) break;
             if (mouseMoveEvent( &event.motion )) return;
             if (btndown_flag){
                 if (event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
@@ -1309,12 +1311,12 @@ void ONScripter::runEventLoop()
             }
             break;
           case SDL_MOUSEBUTTONDOWN:
-            if (num_fingers > 1) break;
+            if (finger_flags > 0) break;
             current_button_state.event_type = event.type;
             current_button_state.event_button = event.button.button;
             if ( !btndown_flag ) break;
           case SDL_MOUSEBUTTONUP:
-            if (num_fingers > 1) break;
+            if (finger_flags > 0) break;
             current_button_state.event_type = event.type;
             current_button_state.event_button = event.button.button;
             ret = mousePressEvent( &event.button );
