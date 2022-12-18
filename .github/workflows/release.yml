@@ -101,7 +101,7 @@ jobs:
         run: |
           xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c
           xmake build -y onscripter
-      - name:
+      - name: build-apk
         run: |
           export JAVA_HOME=$JAVA_HOME_11_X64
           cd project/android
