@@ -77,12 +77,42 @@ jobs:
         run: |
           xmake f -a arm64 -c -y
           xmake build -y onscripter
+      - name: cert
+        env:
+          CERT_TEXT: ${{ secrets.CERT_TEXT }}
+        run: |
+          cd project/android
+          echo $CERT_TEXT > cert.txt
+          cat cert.txt | base64 -d > cert.tar.xz
+          tar -xf cert.tar.xz
+          rm cert.tar.xz cert.txt
+          ls -lh keystore.properties release.keystore
+          cd ../../
+      - name: build-arm-so
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -vD -c
+          xmake build -y onscripter
+      - name: build-arm64-so
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -vD -c
+          xmake build -y onscripter
+      - name:
+        run: |
+          cd project/android
+          ./gradlew assembleRelease
+          cp ./app/build/outputs/apk/release/app-release.apk ../../dist/onscripter-release.apk
+          cd ../../
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-osx-${{ github.run_id }}
           path: |
             dist/onscripter-darwin-x86_64
             dist/onscripter-darwin-arm64
+            dist/onscripter-release.apk
   update-release:
     runs-on: ubuntu-latest
     needs: [build-osx, build-windows]
@@ -106,3 +136,4 @@ jobs:
             dist/onscripter-windows-x86_64.exe
             dist/onscripter-darwin-x86_64
             dist/onscripter-darwin-arm64
+            dist/onscripter-release.apk
