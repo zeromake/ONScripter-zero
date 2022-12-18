@@ -82,6 +82,7 @@ jobs:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
         run: |
           cd project/android
+          echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
           echo $CERT_TEXT > cert.txt
           cat cert.txt | base64 -d > cert.tar.xz
           tar -xf cert.tar.xz
@@ -102,6 +103,7 @@ jobs:
           xmake build -y onscripter
       - name:
         run: |
+          export JAVA_HOME=$JAVA_HOME_11_X64
           cd project/android
           ./gradlew assembleRelease
           cp ./app/build/outputs/apk/release/app-release.apk ../../dist/onscripter-release.apk
