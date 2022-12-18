@@ -35,8 +35,7 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
             signingConfig = signingConfigs.findByName("config")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
