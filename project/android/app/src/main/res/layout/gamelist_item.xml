@@ -9,8 +9,8 @@
 
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="36dp"
-            android:layout_height="60dp"
+            android:layout_width="46dp"
+            android:layout_height="80dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="18dp"
@@ -40,16 +40,16 @@
     <RelativeLayout
         android:id="@+id/start_panel"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="80dp"
         android:clickable="true"
         android:paddingLeft="40dp"
-        android:paddingRight="20dp"
+        android:paddingRight="10dp"
         android:visibility="gone">
 
         <ImageView
             android:id="@+id/btn_play"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
@@ -59,8 +59,8 @@
 
         <ImageView
             android:id="@+id/btn_config"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/btn_play"
