@@ -209,6 +209,10 @@ target("onscripter")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
     remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")
     after_build(function (target)
+        if target:is_plat("android") then
+            os.cp(target:targetfile(), "project/android/app/libs/"..target:arch().."/")
+            return
+        end
         local out_name = "onscripter"
         if target:is_plat("macosx") then
             out_name = out_name.."-darwin"

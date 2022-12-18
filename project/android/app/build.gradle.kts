@@ -1,6 +1,16 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
 //    id("org.jetbrains.kotlin.android")
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+var keystoreProperties: Properties? = null
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties = Properties()
+    keystoreProperties!!.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -11,15 +21,34 @@ android {
         minSdk = 16
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
+    }
+    signingConfigs {
+        keystoreProperties?.let {
+            create("config") {
+                keyAlias = it["keyAlias"] as String?
+                keyPassword = it["keyPassword"] as String?
+                storeFile = file((it["storeFile"] as String).replace("\${root}", rootProject.projectDir.absolutePath, false))
+                storePassword = it["storePassword"] as String?
+            }
+        }
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.findByName("config")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isDebuggable = false
+        }
+        debug {
+            signingConfig = signingConfigs.findByName("config")
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     sourceSets {

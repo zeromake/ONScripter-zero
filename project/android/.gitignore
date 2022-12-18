@@ -13,4 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+keystore.properties
 /app/libs
+*.keystore
+/app/jni
+cert.txt
