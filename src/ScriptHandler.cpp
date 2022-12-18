@@ -233,7 +233,7 @@ const char *ScriptHandler::readToken()
                 addStringBuffer( ch );
                 buf++;
                 if (!wait_script && !ignore_clickstr_flag &&
-                    checkClickstr(buf-2) > 0)
+                    checkCountClickstr(buf-2) > 0)
                     wait_script = buf;
                 ignore_clickstr_flag = false;
             }
@@ -672,6 +672,34 @@ void ScriptHandler::setClickstr(const char *list)
     clickstr_list = new char[strlen(list)+2];
     memcpy( clickstr_list, list, strlen(list)+1 );
     clickstr_list[strlen(list)+1] = '\0';
+}
+
+
+int ScriptHandler::checkCountClickstr(const char *buf, bool recursive_flag) {
+    int result = checkClickstr(buf, recursive_flag);
+    int offset = result;
+    bool nextClickStr = false;
+    if (offset > 0) {
+        for (int i = 0; i < 5; i++) {
+            if (buf[offset] == 0x00) {
+                break;
+            }
+            int ret = checkClickstr(buf+offset);
+            if (ret > 0) {
+                nextClickStr = true;
+                break;
+            }
+            if (IS_TWO_BYTE(buf[offset])) {
+                offset += 2;
+            } else {
+                offset += 1;
+            }
+        }
+    }
+    if (nextClickStr) {
+        result = 0;
+    }
+    return result;
 }
 
 int ScriptHandler::checkClickstr(const char *buf, bool recursive_flag)

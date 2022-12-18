@@ -163,7 +163,8 @@ public:
     void declareDim();
 
     void setClickstr( const char *list );
-    int  checkClickstr(const char *buf, bool recursive_flag=false);
+    int checkClickstr(const char *buf, bool recursive_flag=false);
+    int checkCountClickstr(const char *buf, bool recursive_flag=false);
 
     void setInt( VariableInfo *var_info, int val, int offset=0 );
     void setNumVariable( int no, int val );

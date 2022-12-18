@@ -3,6 +3,7 @@
 #include <cstring>
 #include <filesystem>
 #include <vector>
+#include <string>
 #include "NsaReader.h"
 #include "gbk2utf16.h"
 

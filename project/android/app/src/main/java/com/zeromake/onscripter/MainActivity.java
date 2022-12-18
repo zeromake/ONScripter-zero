@@ -31,7 +31,6 @@ import com.hjq.permissions.XXPermissions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -58,8 +57,6 @@ public class MainActivity extends Activity implements
     private File[] mDirBrowserDirFileArray;
     private File[] mDirFileArray;
     private GameAdapter items;
-    private boolean isSelect = false;
-    private String myname;
 
     private PopupWindow settingPopupWindow;
 
@@ -150,11 +147,7 @@ public class MainActivity extends Activity implements
             settingPopupWindow.setAnimationStyle(R.style.Animation_ConfigPanelAnimation);
             settingPopupWindow.setTouchable(true);
             settingPopupWindow.setOutsideTouchable(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.config_upper, getTheme()));
-            } else {
-                settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.config_upper));
-            }
+            settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.config_upper));
             settingPopupWindow.showAtLocation(this.cover, 5, 0, 0);
         }
         Button okCancelButton3 = new Button(this);
@@ -189,11 +182,8 @@ public class MainActivity extends Activity implements
         try {
             this.items.clear();
             this.items.notifyDataSetChanged();
-            this.mDirFileArray = new File(Globals.CurrentDirectoryPathForLauncher).listFiles(new FileFilter() { // from class: cn.natdon.onscripterv2.ONScripter.13
-                @Override // java.io.FileFilter
-                public boolean accept(File file) {
-                    return !file.isHidden() && file.isDirectory() && file.canRead() && file.canWrite();
-                }
+            this.mDirFileArray = new File(Globals.CurrentDirectoryPathForLauncher).listFiles(file -> {
+                return !file.isHidden() && file.isDirectory() && file.canRead() && file.canWrite();
             });
             assert this.mDirFileArray != null;
             Arrays.sort(this.mDirFileArray, (file, file2) -> file.getName().compareTo(file2.getName()));
@@ -219,7 +209,7 @@ public class MainActivity extends Activity implements
             builder.setMessage(getString(R.string.Launch_CouldNotOpenDirectory) + "\n" + Globals.CurrentDirectoryPathForLauncher);
             builder.setPositiveButton(getString(R.string.OK), (DialogInterface.OnClickListener) null);
             builder.create().show();
-            this.games.setAdapter((ListAdapter) new ArrayAdapter<String>(this, R.layout.gamelist_item, new String[0]));
+            this.games.setAdapter((ListAdapter) new ArrayAdapter<>(this, R.layout.gamelist_item, new String[0]));
         }
     }
 
@@ -297,13 +287,11 @@ public class MainActivity extends Activity implements
             this.items.setSelectedPosition(i);
             loadGameItem(this.items.getSelectedItem());
             Globals.CurrentDirectoryPath = this.mDirFileArray[i].getAbsolutePath();
-            this.isSelect = true;
         }
     }
 
     private void loadGameItem(Game game) {
         this.gameTitle.setText(game.title);
-        this.myname = this.gameTitle.getText().toString().trim();
         if (game.background != null) {
             updateBackground(game.background);
         }
