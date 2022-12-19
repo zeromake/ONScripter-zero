@@ -20,11 +20,13 @@
 */
 #pragma once
 #include <SDL.h>
-#if !defined(__APPLE__) && (!defined(__MINGW64__) && !defined(__MINGW32__))
+
+#if  defined(IOS)
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
+#elif !defined(__APPLE__) && (!defined(__MINGW64__) && !defined(__MINGW32__))
 #include <SDL_opengles2.h>
 #else
-// #include <OpenGLES/ES2/gl.h>
-// #include <OpenGLES/ES2/glext.h>
 #include <SDL_opengl.h>
 #endif
 
