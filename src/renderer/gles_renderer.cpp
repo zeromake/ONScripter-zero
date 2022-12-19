@@ -23,7 +23,10 @@
 #include "../Utils.h"
 #include "shader/post_cas.h"
 
-#if (defined(IOS) || defined(ANDROID))
+#ifdef IOS
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
+#elif defined(ANDROID)
 #include <GLES2/gl2.h>
 #endif
 

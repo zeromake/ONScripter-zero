@@ -35,10 +35,10 @@ Coding2UTF16 *coding2utf16 = NULL;
 #if defined(IOS)
 #import <Foundation/NSArray.h>
 #import <UIKit/UIKit.h>
-#import "DataCopier.h"
-#import "DataDownloader.h"
-#import "ScriptSelector.h"
-#import "MoviePlayer.h"
+// #import "DataCopier.h"
+// #import "DataDownloader.h"
+// #import "ScriptSelector.h"
+// #import "MoviePlayer.h"
 #endif
 
 #ifdef ANDROID
@@ -237,10 +237,10 @@ int mkdir_ons(const char *pathname, mode_t mode)
 #if defined(IOS)
 extern "C" void playVideoIOS(const char *filename, bool click_flag, bool loop_flag)
 {
-    NSString *str = [[NSString alloc] initWithUTF8String:filename];
-    id obj = [MoviePlayer alloc];
-    [[obj init] play:str click : click_flag loop : loop_flag];
-    [obj release];
+    // NSString *str = [[NSString alloc] initWithUTF8String:filename];
+    // id obj = [MoviePlayer alloc];
+    // [[obj init] play:str click : click_flag loop : loop_flag];
+    // [obj release];
 }
 #endif
 
@@ -372,7 +372,7 @@ void parseOption(int argc, char *argv[]) {
     }
 }
 
-#ifdef ANDROID
+#if defined(ANDROID)
 int SDL_main(int argc, char *argv[])
 #else
 #undef main
@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
     // Run ONScripter
     if (ons.openScript()) exit(-1);
 #ifdef __APPLE__
-#ifdef TARGET_OS_OSX
+#if TARGET_OS_OSX
     CGFloat dpiScale = NSScreen.mainScreen.backingScaleFactor;
 #else
     CGFloat dpiScale = UIScreen.mainScreen.scale;

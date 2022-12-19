@@ -386,6 +386,7 @@ int ScriptParser::saveFileIOBuf(const char *filename, int offset, const char *sa
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
     // check dir
+#ifndef IOS
     std::filesystem::path pp(filename);
     auto parent_path = pp.parent_path().string();
     if (parent_path.length() > 0) {
@@ -395,6 +396,7 @@ int ScriptParser::saveFileIOBuf(const char *filename, int offset, const char *sa
             std::filesystem::create_directory(dir);
         }
     }
+#endif
 
     FILE *fp;
     if ( (fp = fopen(filename, "wb", use_save_dir)) == NULL ) return -1;
