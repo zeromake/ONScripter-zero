@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
+#include <infra/filesystem.hpp>
 #include <vector>
 #include <string>
 #include "NsaReader.h"
@@ -31,7 +31,7 @@ bool endsWith(const std::string& str, const std::string suffix) {
 }
 
 std::string normalPath(const std::string p) {
-    std::filesystem::path path(p);
+    std::fs::path path(p);
     return path.string();
 }
 
@@ -99,13 +99,13 @@ int processFile(
 }
 
 
-int file_iterator(std::filesystem::path dirPath, std::vector<std::string> &files) {
+int file_iterator(std::fs::path dirPath, std::vector<std::string> &files) {
     int code = 0;
-    for (auto &itr : std::filesystem::directory_iterator(dirPath)) {
+    for (auto &itr : std::fs::directory_iterator(dirPath)) {
         if (!startsWith(itr.path(), "..") && startsWith(itr.path(), ".")) {
             continue;
         }
-        if (std::filesystem::is_directory(itr.status())) {
+        if (std::fs::is_directory(itr.status())) {
             code = file_iterator(itr.path(), files);
             if (code != 0) {
                 return code;
@@ -144,9 +144,9 @@ int main(int argc, char *argv[]) {
     std::error_code ec;
     std::string basePath = argv[0];
 
-    std::filesystem::path dirPath(basePath);
+    std::fs::path dirPath(basePath);
 
-    if (!std::filesystem::exists(dirPath)) {
+    if (!std::fs::exists(dirPath)) {
         fprintf(stderr, "can't find dir %s.\n", basePath.c_str());
         exit(-1);
     }
