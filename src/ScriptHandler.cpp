@@ -25,6 +25,8 @@
 #include "ScriptHandler.h"
 #include "Utils.h"
 #include "coding2utf16.h"
+#include <vector>
+#include <infra/filesystem.hpp>
 
 extern Coding2UTF16 *coding2utf16;
 
@@ -1039,23 +1041,38 @@ int ScriptHandler::readScript( char *path )
         return -1;
     }
 
-    fseek( fp, 0, SEEK_END );
-    int estimated_buffer_length = ftell( fp ) + 1;
+    int estimated_buffer_length;
+    if (encrypt_mode != 0) {
+        fseek( fp, 0, SEEK_END );
+        int estimated_buffer_length = ftell( fp ) + 1;
+    }
 
+    std::vector<std::string> unencrypt;
+    std::fs::path root_dir(archive_path);
     if (encrypt_mode == 0){
         fclose(fp);
-        for (i=1 ; i<100 ; i++){
-            sprintf(filename, "%d.txt", i);
-            if ((fp = fopen(filename, "rb")) == NULL && strlen(filename) == 1){
-                sprintf(filename, "%02d.txt", i);
-                fp = fopen(filename, "rb");
-            }
-            if (fp){
-                fseek( fp, 0, SEEK_END );
-                estimated_buffer_length += ftell(fp)+1;
-                fclose(fp);
+        estimated_buffer_length = 1;
+        for (auto f : std::fs::directory_iterator(root_dir)) {
+            auto _fp = f.path();
+            if (f.is_regular_file() && _fp.extension() == ".txt") {
+                auto str = _fp.filename().string().c_str();
+                bool skip = false;
+                while (*str != '\0' && *str != '.')
+                {
+                    if (*str > '9' || *str < '0') {
+                        skip = true;
+                        break;
+                    }
+                    str++;
+                }
+                if (skip) {
+                    continue;
+                }
+                unencrypt.push_back(_fp.filename());
+                estimated_buffer_length += f.file_size();
             }
         }
+        std::sort(unencrypt.begin(), unencrypt.end());
     }
 
     if ( script_buffer ) delete[] script_buffer;
@@ -1071,12 +1088,8 @@ int ScriptHandler::readScript( char *path )
         fclose( fp );
     }
     else{
-        for (i=0 ; i<100 ; i++){
-            sprintf(filename, "%d.txt", i);
-            if ((fp = fopen(filename, "rb")) == NULL && strlen(filename) == 1){
-                sprintf(filename, "%02d.txt", i);
-                fp = fopen(filename, "rb");
-            }
+        for (auto f: unencrypt){
+            fp = fopen(f.c_str(), "rb");
             if (fp){
                 readScriptSub( fp, &p_script_buffer, 0 );
                 fclose(fp);
@@ -1084,9 +1097,7 @@ int ScriptHandler::readScript( char *path )
         }
     }
     delete[] tmp_script_buf;
-
     script_buffer_length = p_script_buffer - script_buffer;
-
     return 0;
 }
 

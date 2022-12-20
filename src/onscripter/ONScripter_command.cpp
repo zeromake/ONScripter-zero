@@ -32,7 +32,7 @@
 #include "version.h"
 #include "Utils.h"
 #include <vector>
-#include <filesystem>
+#include <infra/filesystem.hpp>
 
 #if defined(MACOSX) && (SDL_COMPILEDVERSION >= 1208)
 #include <CoreFoundation/CoreFoundation.h>
@@ -982,12 +982,11 @@ int ONScripter::savescreenshotCommand()
     const char *buf = script_h.readStr();
     const char *capital_name = script_h.fpath(buf);
 
-#ifndef IOS
-    auto dir = std::filesystem::path(capital_name).parent_path().string();
-    if (dir.length() > 0 && !std::filesystem::exists(std::filesystem::status(dir))) {
-        std::filesystem::create_directory(dir);
+    auto dir = std::fs::path(capital_name).parent_path().string();
+    if (dir.length() > 0 && !std::fs::exists(std::fs::status(dir))) {
+        std::fs::create_directory(dir);
     }
-#endif
+
     SDL_RWops *rwops = SDL_RWFromFile(capital_name, "wb");
     if (rwops == nullptr || SDL_SaveBMP_RW(surface, rwops, 1) != 0)
         utils::printError("Save screenshot failed: %s\n", SDL_GetError());

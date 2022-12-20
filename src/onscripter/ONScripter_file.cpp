@@ -25,7 +25,7 @@
 #include "ONScripter.h"
 #include "Utils.h"
 #include <chrono>
-#include <filesystem>
+#include <infra/filesystem.hpp>
 
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
 #include <sys/types.h>
@@ -168,7 +168,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     }
     fclose(fp);
     const char *name_path = fpath(file_name);
-    auto ftime = std::filesystem::last_write_time(name_path);
+    auto ftime = std::fs::last_write_time(name_path);
     std::time_t tt = to_time_t(ftime);
     struct tm* ptm = localtime(&tt);
 

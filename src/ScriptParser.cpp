@@ -24,7 +24,7 @@
 
 #include "ScriptParser.h"
 #include "Utils.h"
-#include <filesystem>
+#include <infra/filesystem.hpp>
 #ifdef USE_BUILTIN_LAYER_EFFECTS
 #include "builtin_layer.h"
 LayerInfo layer_info[MAX_LAYER_NUM];
@@ -386,17 +386,15 @@ int ScriptParser::saveFileIOBuf(const char *filename, int offset, const char *sa
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
     // check dir
-#ifndef IOS
-    std::filesystem::path pp(filename);
+    std::fs::path pp(filename);
     auto parent_path = pp.parent_path().string();
     if (parent_path.length() > 0) {
         const char* dir = parent_path.c_str();
         dir = fpath(dir, use_save_dir);
-        if (!std::filesystem::exists(std::filesystem::status(dir))) {
-            std::filesystem::create_directory(dir);
+        if (!std::fs::exists(std::fs::status(dir))) {
+            std::fs::create_directory(dir);
         }
     }
-#endif
 
     FILE *fp;
     if ( (fp = fopen(filename, "wb", use_save_dir)) == NULL ) return -1;

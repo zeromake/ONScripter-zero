@@ -22,7 +22,7 @@ if is_plat("windows") then
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
 end
 
-add_includedirs("src", "src/onscripter", "src/reader")
+add_includedirs("src", "src/onscripter", "src/reader", "include")
 
 local deps = {
     "zlib",
@@ -33,7 +33,8 @@ local deps = {
     -- "sdl2",
     "sdl2_ttf",
     "sdl2_mixer",
-    "brotli"
+    "brotli",
+    "ghc_filesystem"
 }
 
 if is_plat("android") then
@@ -185,7 +186,8 @@ target("onscripter")
         "sdl2_image",
         "sdl2_ttf",
         "sdl2_mixer",
-        "brotli"
+        "brotli",
+        "ghc_filesystem"
     )
     if is_plat("windows") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
@@ -196,7 +198,7 @@ target("onscripter")
         add_frameworks("AudioToolbox", "Cocoa")
     elseif is_plat("iphoneos") then
         add_files("src/entry/onscripter_main.mm")
-        add_defines("IOS")
+        add_defines("IOS", "INFRA_FORCE_GHC_FS", "GLES_SILENCE_DEPRECATION")
     elseif is_plat("windows") then
         add_files("src/resource.rc", "src/entry/onscripter_main.cpp")
     elseif is_plat("android") then
@@ -246,8 +248,11 @@ target("main")
     end
     if is_plat("android") then
         add_defines("ANDROID")
+    elseif is_plat("iphoneos") then
+        add_defines("IOS")
     end
-    add_files("demo.c")
+    add_files("demo/hello.c")
+
 
 -- target("demo")
 --     set_kind("binary")
