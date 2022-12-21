@@ -23,6 +23,10 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="360" id="Ub9-fk-ScM"/>
                                 </constraints>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="VnC-M0-iiv"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="PsC-DJ-oMR"/>
+                                </connections>
                             </tableView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="XHH-yX-wVH">
                                 <rect key="frame" x="742" y="311" width="48" height="48"/>
@@ -74,6 +78,9 @@
                             <constraint firstItem="nd6-GR-fZX" firstAttribute="leading" secondItem="0Cw-XD-fMS" secondAttribute="trailing" constant="10" id="qlc-7H-TgZ"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="0Cw-XD-fMS" id="kiU-e1-pCS"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
