@@ -46,7 +46,7 @@ for _, dep_name in ipairs(deps) do
     add_requires(dep_name, dep_opt)
 end
 
-add_requires("sdl2")--, {configs={shared=true}})
+add_requires("sdl2", {system=false})
 add_requires("freetype", {system=false,configs={
     zlib=true,
     bzip2=true,
