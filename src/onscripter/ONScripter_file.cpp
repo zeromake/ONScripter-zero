@@ -66,8 +66,8 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     char file_name[256];
 
     script_h.getStringFromInteger( save_file_info.sjis_no, no, (num_save_file >= 10)?2:1 );
+    sprintf(file_name, "%ssave%d.dat", save_dir ? save_dir : archive_path, no);
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
-    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     struct stat buf;
     struct tm *tm;
     if ( stat( file_name, &buf ) != 0 ){
@@ -77,12 +77,12 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     time_t mtime = buf.st_mtime;
     tm = localtime( &mtime );
 
+    save_file_info.year   = tm->tm_year;
     save_file_info.month  = tm->tm_mon + 1;
     save_file_info.day    = tm->tm_mday;
     save_file_info.hour   = tm->tm_hour;
     save_file_info.minute = tm->tm_min;
 #elif defined(WINRT)
-    sprintf(file_name, "%ssave%d.dat", save_dir ? save_dir : archive_path, no);
     WCHAR file_nameW[256];
     MultiByteToWideChar(CP_ACP, 0, file_name, -1, file_nameW, 256);
     WIN32_FILE_ATTRIBUTE_DATA wfad;
@@ -94,12 +94,12 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     SYSTEMTIME stm;
     FileTimeToSystemTime( &wfad.ftLastWriteTime, &stm);
 
+    save_file_info.year   = stm.wYear;
     save_file_info.month  = stm.wMonth;
     save_file_info.day    = stm.wDay;
     save_file_info.hour   = stm.wHour;
     save_file_info.minute = stm.wMinute;
 #elif defined(WIN32) || defined(_WIN32)
-    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     HANDLE  handle;
     FILETIME    tm, ltm;
     SYSTEMTIME  stm;
@@ -119,12 +119,12 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     FileTimeToSystemTime( &ltm, &stm );
     CloseHandle( handle );
 
+    save_file_info.year   = stm.wYear;
     save_file_info.month  = stm.wMonth;
     save_file_info.day    = stm.wDay;
     save_file_info.hour   = stm.wHour;
     save_file_info.minute = stm.wMinute;
 #elif defined(MACOS9)
-    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     CInfoPBRec  pb;
     Str255      p_file_name;
     FSSpec      file_spec;
@@ -143,33 +143,33 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
         return;
     }
     SecondsToDate( pb.hFileInfo.ioFlMdDat, &tm );
+    save_file_info.year   = tm.year;
     save_file_info.month  = tm.month;
     save_file_info.day    = tm.day;
     save_file_info.hour   = tm.hour;
     save_file_info.minute = tm.minute;
 #elif defined(PSP)
-    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     SceIoStat buf;
     if (sceIoGetstat(file_name, &buf) < 0){
         save_file_info.valid = false;
         return;
     }
 
+    save_file_info.year   = buf.st_mtime.year;
     save_file_info.month  = buf.st_mtime.month;
     save_file_info.day    = buf.st_mtime.day;
     save_file_info.hour   = buf.st_mtime.hour;
     save_file_info.minute = buf.st_mtime.minute;
 #else
-    sprintf(file_name, "save%d.dat", no);
-    const char *name_path = fpath(file_name);
-    if (!std::fs::exists(name_path)) {
+    if (!std::fs::exists(file_name)) {
         save_file_info.valid = false;
         return;
     }
-    auto ftime = std::fs::last_write_time(name_path);
+    auto ftime = std::fs::last_write_time(file_name);
     std::time_t tt = to_time_t(ftime);
     struct tm* ptm = localtime(&tt);
 
+    save_file_info.year   = ptm->tm_year;
     save_file_info.month  = ptm->tm_mon +1;
     save_file_info.day    = ptm->tm_mday;
     save_file_info.hour   = ptm->tm_hour;

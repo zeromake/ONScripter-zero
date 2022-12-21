@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.lang.reflect.Field;
@@ -26,7 +24,7 @@ final class PermissionChecker {
      * @param checkMode         是否是检查模式
      * @return                  是否检查通过
      */
-    static boolean checkActivityStatus(@Nullable Activity activity, boolean checkMode) {
+    static boolean checkActivityStatus(Activity activity, boolean checkMode) {
         // 检查当前 Activity 状态是否是正常的，如果不是则不请求权限
         if (activity == null) {
             if (checkMode) {
@@ -66,7 +64,7 @@ final class PermissionChecker {
      * @param checkMode                 是否是检查模式
      * @return                          是否检查通过
      */
-    static boolean checkPermissionArgument(@Nullable List<String> requestPermissions, boolean checkMode) {
+    static boolean checkPermissionArgument(List<String> requestPermissions, boolean checkMode) {
         if (requestPermissions == null || requestPermissions.isEmpty()) {
             if (checkMode) {
                 // 不传任何权限，就想动态申请权限？
@@ -113,7 +111,7 @@ final class PermissionChecker {
     /**
      * 检查读取媒体位置权限
      */
-    static void checkMediaLocationPermission(@NonNull Context context, @NonNull List<String> requestPermissions) {
+    static void checkMediaLocationPermission(Context context, List<String> requestPermissions) {
         // 如果请求的权限中没有包含外部读取媒体位置权限，那么就不符合条件，停止检查
         if (!PermissionUtils.containsPermission(requestPermissions, Permission.ACCESS_MEDIA_LOCATION)) {
             return;
@@ -153,8 +151,8 @@ final class PermissionChecker {
     /**
      * 检查存储权限
      */
-    static void checkStoragePermission(@NonNull Context context, @NonNull List<String> requestPermissions,
-                                       @Nullable AndroidManifestInfo androidManifestInfo) {
+    static void checkStoragePermission(Context context, List<String> requestPermissions,
+                                       AndroidManifestInfo androidManifestInfo) {
         // 如果请求的权限中没有包含外部存储相关的权限，那么就不符合条件，停止检查
         if (!PermissionUtils.containsPermission(requestPermissions, Permission.READ_MEDIA_IMAGES) &&
                 !PermissionUtils.containsPermission(requestPermissions, Permission.READ_MEDIA_VIDEO) &&
@@ -229,7 +227,7 @@ final class PermissionChecker {
     /**
      * 检查传感器权限
      */
-    static void checkBodySensorsPermission(@NonNull List<String> requestPermissions) {
+    static void checkBodySensorsPermission(List<String> requestPermissions) {
         // 判断是否包含后台传感器权限
         if (!PermissionUtils.containsPermission(requestPermissions, Permission.BODY_SENSORS_BACKGROUND)) {
             return;
@@ -259,7 +257,7 @@ final class PermissionChecker {
     /**
      * 检查定位权限
      */
-    static void checkLocationPermission(@NonNull List<String> requestPermissions) {
+    static void checkLocationPermission(List<String> requestPermissions) {
         // 为什么要注释这段代码，因为经过测试，没有官方说得那么严重，我用 Android 模拟器做测试
         // 愣是没测出来只申请 ACCESS_FINE_LOCATION 会有什么异常，估计是 Google 将代码改回去了，但是文档忘记改了
         // 总结出来：耳听为虚，眼见不一定为实，要自己动手实践，实践出真理，光说不练假把式
@@ -311,8 +309,8 @@ final class PermissionChecker {
     /**
      * 检查蓝牙和 WIFI 权限申请是否符合规范
      */
-    static void checkNearbyDevicesPermissions(@NonNull List<String> requestPermissions,
-                                                    @Nullable AndroidManifestInfo androidManifestInfo) {
+    static void checkNearbyDevicesPermissions(List<String> requestPermissions,
+                                                    AndroidManifestInfo androidManifestInfo) {
         // 如果请求的权限中没有蓝牙权限并且 WIFI 权限，那么就不符合条件，停止检查
         if (!PermissionUtils.containsPermission(requestPermissions, Permission.BLUETOOTH_SCAN) &&
                 !PermissionUtils.containsPermission(requestPermissions, Permission.NEARBY_WIFI_DEVICES)) {
@@ -365,8 +363,8 @@ final class PermissionChecker {
     /**
      * 检查通知栏监听权限
      */
-    static void checkNotificationListenerPermission(@NonNull List<String> requestPermissions,
-                                                    @Nullable AndroidManifestInfo androidManifestInfo) {
+    static void checkNotificationListenerPermission(List<String> requestPermissions,
+                                                    AndroidManifestInfo androidManifestInfo) {
         // 如果请求的权限中没有通知栏监听权限，那么就不符合条件，停止检查
         if (!PermissionUtils.containsPermission(requestPermissions, Permission.BIND_NOTIFICATION_LISTENER_SERVICE)) {
             return;
@@ -395,8 +393,8 @@ final class PermissionChecker {
     /**
      * 检查通知栏监听权限
      */
-    static void checkPictureInPicturePermission(Activity activity, @NonNull List<String> requestPermissions,
-                                                @Nullable AndroidManifestInfo androidManifestInfo) {
+    static void checkPictureInPicturePermission(Activity activity, List<String> requestPermissions,
+                                                AndroidManifestInfo androidManifestInfo) {
         // 如果请求的权限中没有画中画权限，那么就不符合条件，停止检查
         if (!PermissionUtils.containsPermission(requestPermissions, Permission.PICTURE_IN_PICTURE)) {
             return;
@@ -427,7 +425,7 @@ final class PermissionChecker {
      *
      * @param requestPermissions            请求的权限组
      */
-    static void checkTargetSdkVersion(@NonNull Context context, @NonNull List<String> requestPermissions) {
+    static void checkTargetSdkVersion(Context context, List<String> requestPermissions) {
         // targetSdk 最低版本要求
         int targetSdkMinVersion;
         if (PermissionUtils.containsPermission(requestPermissions, Permission.POST_NOTIFICATIONS) ||
@@ -473,8 +471,8 @@ final class PermissionChecker {
      *
      * @param requestPermissions            请求的权限组
      */
-    static void checkManifestPermissions(@NonNull Context context, @NonNull List<String> requestPermissions,
-                                         @Nullable AndroidManifestInfo androidManifestInfo) {
+    static void checkManifestPermissions(Context context, List<String> requestPermissions,
+                                         AndroidManifestInfo androidManifestInfo) {
         if (androidManifestInfo == null) {
             return;
         }
@@ -590,7 +588,7 @@ final class PermissionChecker {
         }
     }
 
-    static void checkManifestPermission(@NonNull List<AndroidManifestInfo.PermissionInfo> permissionInfoList,
+    static void checkManifestPermission(List<AndroidManifestInfo.PermissionInfo> permissionInfoList,
                                         String checkPermission) {
         checkManifestPermission(permissionInfoList, checkPermission, Integer.MAX_VALUE);
     }
@@ -602,7 +600,7 @@ final class PermissionChecker {
      * @param checkPermission           被检查的权限
      * @param maxSdkVersion             最低要求的 maxSdkVersion
      */
-    static void checkManifestPermission(@NonNull List<AndroidManifestInfo.PermissionInfo> permissionInfoList,
+    static void checkManifestPermission(List<AndroidManifestInfo.PermissionInfo> permissionInfoList,
                                         String checkPermission, int maxSdkVersion) {
         AndroidManifestInfo.PermissionInfo permissionInfo = null;
         for (AndroidManifestInfo.PermissionInfo info : permissionInfoList) {
@@ -645,7 +643,7 @@ final class PermissionChecker {
      *
      * @param requestPermissions            请求的权限组
      */
-    static void optimizeDeprecatedPermission(@NonNull List<String> requestPermissions) {
+    static void optimizeDeprecatedPermission(List<String> requestPermissions) {
         // 如果本次申请包含了 Android 13 WIFI 权限
         if (!AndroidVersion.isAndroid13()) {
             if (PermissionUtils.containsPermission(requestPermissions, Permission.POST_NOTIFICATIONS) &&

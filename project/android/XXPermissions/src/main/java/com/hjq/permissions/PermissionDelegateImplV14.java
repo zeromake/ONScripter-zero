@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
 /**
@@ -17,11 +15,10 @@ import android.text.TextUtils;
  *    time   : 2022/06/11
  *    desc   : Android 4.0 权限委托实现
  */
-@RequiresApi(api = AndroidVersion.ANDROID_4_0)
 class PermissionDelegateImplV14 implements PermissionDelegate {
 
    @Override
-   public boolean isGrantedPermission(@NonNull Context context, @NonNull String permission) {
+   public boolean isGrantedPermission(Context context, String permission) {
       // 检测通知栏权限
       if (PermissionUtils.equalsPermission(permission, Permission.NOTIFICATION_SERVICE)) {
          return isGrantedNotifyPermission(context);
@@ -58,12 +55,12 @@ class PermissionDelegateImplV14 implements PermissionDelegate {
    }
 
    @Override
-   public boolean isPermissionPermanentDenied(@NonNull Activity activity, @NonNull String permission) {
+   public boolean isPermissionPermanentDenied(Activity activity, String permission) {
       return false;
    }
 
    @Override
-   public Intent getPermissionIntent(@NonNull Context context, @NonNull String permission) {
+   public Intent getPermissionIntent(Context context, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.NOTIFICATION_SERVICE)) {
          return getNotifyPermissionIntent(context);
       }
@@ -98,14 +95,14 @@ class PermissionDelegateImplV14 implements PermissionDelegate {
    /**
     * 是否有通知栏权限
     */
-   private static boolean isGrantedNotifyPermission(@NonNull Context context) {
+   private static boolean isGrantedNotifyPermission(Context context) {
       return false;
    }
 
    /**
     * 获取通知栏权限设置界面意图
     */
-   private static Intent getNotifyPermissionIntent(@NonNull Context context) {
+   private static Intent getNotifyPermissionIntent(Context context) {
       Intent intent = null;
       if (AndroidVersion.isAndroid8()) {
          intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
@@ -121,14 +118,14 @@ class PermissionDelegateImplV14 implements PermissionDelegate {
    /**
     * 是否通知栏监听的权限
     */
-   private static boolean isGrantedNotificationListenerPermission(@NonNull Context context) {
+   private static boolean isGrantedNotificationListenerPermission(Context context) {
       return true;
    }
 
    /**
     * 获取通知监听设置界面意图
     */
-   private static Intent getNotificationListenerIntent(@NonNull Context context) {
+   private static Intent getNotificationListenerIntent(Context context) {
       Intent intent = null;
       if (AndroidVersion.isAndroid11()) {
          AndroidManifestInfo androidManifestInfo = PermissionUtils.getAndroidManifestInfo(context);
@@ -176,7 +173,7 @@ class PermissionDelegateImplV14 implements PermissionDelegate {
    /**
     * 是否有使用统计权限
     */
-   private static boolean isGrantedPackagePermission(@NonNull Context context) {
+   private static boolean isGrantedPackagePermission(Context context) {
       if (AndroidVersion.isAndroid5()) {
          AppOpsManager appOps = (AppOpsManager)
                  context.getSystemService(Context.APP_OPS_SERVICE);
@@ -196,7 +193,7 @@ class PermissionDelegateImplV14 implements PermissionDelegate {
    /**
     * 获取使用统计权限设置界面意图
     */
-   private static Intent getPackagePermissionIntent(@NonNull Context context) {
+   private static Intent getPackagePermissionIntent(Context context) {
       Intent intent = null;
       if (AndroidVersion.isAndroid5()) {
          intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
@@ -215,14 +212,14 @@ class PermissionDelegateImplV14 implements PermissionDelegate {
    /**
     * 是否有 VPN 权限
     */
-   private static boolean isGrantedVpnPermission(@NonNull Context context) {
+   private static boolean isGrantedVpnPermission(Context context) {
       return VpnService.prepare(context) == null;
    }
 
    /**
     * 获取 VPN 权限设置界面意图
     */
-   private static Intent getVpnPermissionIntent(@NonNull Context context) {
+   private static Intent getVpnPermissionIntent(Context context) {
       Intent intent = VpnService.prepare(context);
       if (intent == null || !PermissionUtils.areActivityIntent(context, intent)) {
          intent = PermissionUtils.getApplicationDetailsIntent(context);

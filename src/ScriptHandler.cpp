@@ -1041,10 +1041,10 @@ int ScriptHandler::readScript( char *path )
         return -1;
     }
 
-    int estimated_buffer_length;
+    size_t estimated_buffer_length;
     if (encrypt_mode != 0) {
         fseek( fp, 0, SEEK_END );
-        int estimated_buffer_length = ftell( fp ) + 1;
+        estimated_buffer_length = ftell( fp ) + 1;
     }
 
     std::vector<std::string> unencrypt;
@@ -1068,13 +1068,17 @@ int ScriptHandler::readScript( char *path )
                 if (skip) {
                     continue;
                 }
-                unencrypt.push_back(_fp.filename());
+                unencrypt.push_back(_fp.filename().string());
                 estimated_buffer_length += f.file_size();
             }
         }
         std::sort(unencrypt.begin(), unencrypt.end());
     }
-
+    if (estimated_buffer_length > (1024 * 1024 * 1024 * 100)) {
+        // 超过 100MB 的大小可能是 bug
+        utils::printError( "can't open buffer_length: %d\n", estimated_buffer_length);
+        return -1;
+    }
     if ( script_buffer ) delete[] script_buffer;
     script_buffer = new char[ estimated_buffer_length ];
 

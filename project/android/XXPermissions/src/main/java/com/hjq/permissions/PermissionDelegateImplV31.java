@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 /**
  *    author : Android 轮子哥
@@ -14,11 +13,10 @@ import android.support.annotation.RequiresApi;
  *    time   : 2022/06/11
  *    desc   : Android 12 权限委托实现
  */
-@RequiresApi(api = AndroidVersion.ANDROID_12)
 class PermissionDelegateImplV31 extends PermissionDelegateImplV30 {
 
    @Override
-   public boolean isGrantedPermission(@NonNull Context context, @NonNull String permission) {
+   public boolean isGrantedPermission(Context context, String permission) {
       // 检测闹钟权限
       if (PermissionUtils.equalsPermission(permission, Permission.SCHEDULE_EXACT_ALARM)) {
          return isGrantedAlarmPermission(context);
@@ -33,7 +31,7 @@ class PermissionDelegateImplV31 extends PermissionDelegateImplV30 {
    }
 
    @Override
-   public boolean isPermissionPermanentDenied(@NonNull Activity activity, @NonNull String permission) {
+   public boolean isPermissionPermanentDenied(Activity activity, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.SCHEDULE_EXACT_ALARM)) {
          return false;
       }
@@ -60,7 +58,7 @@ class PermissionDelegateImplV31 extends PermissionDelegateImplV30 {
    }
 
    @Override
-   public Intent getPermissionIntent(@NonNull Context context, @NonNull String permission) {
+   public Intent getPermissionIntent(Context context, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.SCHEDULE_EXACT_ALARM)) {
          return getAlarmPermissionIntent(context);
       }
@@ -71,14 +69,17 @@ class PermissionDelegateImplV31 extends PermissionDelegateImplV30 {
    /**
     * 是否有闹钟权限
     */
-   private static boolean isGrantedAlarmPermission(@NonNull Context context) {
-      return context.getSystemService(AlarmManager.class).canScheduleExactAlarms();
+   private static boolean isGrantedAlarmPermission(Context context) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+         return context.getSystemService(AlarmManager.class).canScheduleExactAlarms();
+      }
+      return false;
    }
 
    /**
     * 获取闹钟权限设置界面意图
     */
-   private static Intent getAlarmPermissionIntent(@NonNull Context context) {
+   private static Intent getAlarmPermissionIntent(Context context) {
       Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
       intent.setData(PermissionUtils.getPackageNameUri(context));
       if (!PermissionUtils.areActivityIntent(context, intent)) {

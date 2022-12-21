@@ -335,7 +335,7 @@ protected:
     /* Save/Load related variables */
     struct SaveFileInfo{
         bool valid;
-        int  month, day, hour, minute;
+        int  year, month, day, hour, minute;
         char sjis_no[5];
         char sjis_month[5];
         char sjis_day[5];

@@ -2,8 +2,6 @@ package com.zeromake.onscripter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +23,8 @@ public class GameAdapter extends ArrayAdapter<Game> implements ListAdapter {
     }
 
     @SuppressLint("InflateParams")
-    @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         View view;
         if (convertView == null) {

@@ -102,7 +102,7 @@ int processFile(
 int file_iterator(std::fs::path dirPath, std::vector<std::string> &files) {
     int code = 0;
     for (auto &itr : std::fs::directory_iterator(dirPath)) {
-        if (!startsWith(itr.path(), "..") && startsWith(itr.path(), ".")) {
+        if (!startsWith(itr.path().string(), "..") && startsWith(itr.path().string(), ".")) {
             continue;
         }
         if (std::fs::is_directory(itr.status())) {

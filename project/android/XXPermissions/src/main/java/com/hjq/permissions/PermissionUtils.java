@@ -16,9 +16,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.view.Surface;
 
@@ -42,7 +39,7 @@ final class PermissionUtils {
     /**
      * 判断某个权限是否是特殊权限
      */
-    public static boolean isSpecialPermission(@NonNull String permission) {
+    public static boolean isSpecialPermission(String permission) {
         return equalsPermission(permission, Permission.MANAGE_EXTERNAL_STORAGE) ||
                 equalsPermission(permission, Permission.REQUEST_INSTALL_PACKAGES) ||
                 equalsPermission(permission, Permission.SYSTEM_ALERT_WINDOW) ||
@@ -60,9 +57,11 @@ final class PermissionUtils {
     /**
      * 判断某个危险权限是否授予了
      */
-    @RequiresApi(api = AndroidVersion.ANDROID_6)
-    public static boolean checkSelfPermission(@NonNull Context context, @NonNull String permission) {
-        return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    public static boolean checkSelfPermission(Context context, String permission) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
     }
 
     /**
@@ -72,32 +71,34 @@ final class PermissionUtils {
      *
      * issues 地址：https://github.com/getActivity/XXPermissions/issues/133
      */
-    @RequiresApi(api = AndroidVersion.ANDROID_6)
     @SuppressWarnings({"JavaReflectionMemberAccess", "ConstantConditions", "BooleanMethodIsAlwaysInverted"})
-    public static boolean shouldShowRequestPermissionRationale(@NonNull Activity activity, @NonNull String permission) {
-        if (AndroidVersion.getAndroidVersionCode() == AndroidVersion.ANDROID_12) {
-            try {
-                PackageManager packageManager = activity.getApplication().getPackageManager();
-                Method method = PackageManager.class.getMethod("shouldShowRequestPermissionRationale", String.class);
-                return (boolean) method.invoke(packageManager, permission);
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
+    public static boolean shouldShowRequestPermissionRationale(Activity activity, String permission) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (AndroidVersion.getAndroidVersionCode() == AndroidVersion.ANDROID_12) {
+                try {
+                    PackageManager packageManager = activity.getApplication().getPackageManager();
+                    Method method = PackageManager.class.getMethod("shouldShowRequestPermissionRationale", String.class);
+                    return (boolean) method.invoke(packageManager, permission);
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
+            return activity.shouldShowRequestPermissionRationale(permission);
         }
-        return activity.shouldShowRequestPermissionRationale(permission);
+        return false;
     }
 
     /**
      * 延迟一段时间执行
      */
-    static void postDelayed(@NonNull Runnable runnable, long delayMillis) {
+    static void postDelayed(Runnable runnable, long delayMillis) {
         HANDLER.postDelayed(runnable, delayMillis);
     }
 
     /**
      * 延迟一段时间执行 OnActivityResult，避免有些机型明明授权了，但还是回调失败的问题
      */
-    static void postActivityResult(@NonNull List<String> permissions, @NonNull Runnable runnable) {
+    static void postActivityResult(List<String> permissions, Runnable runnable) {
         long delayMillis;
         if (AndroidVersion.isAndroid11()) {
             delayMillis = 200;
@@ -130,11 +131,10 @@ final class PermissionUtils {
     /**
      * 当前是否处于 debug 模式
      */
-    static boolean isDebugMode(@NonNull Context context) {
+    static boolean isDebugMode(Context context) {
         return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
-    @Nullable
     static AndroidManifestInfo getAndroidManifestInfo(Context context) {
         int apkPathCookie = PermissionUtils.findApkPathCookie(context, context.getApplicationInfo().sourceDir);
         // 如果 cookie 为 0，证明获取失败
@@ -222,8 +222,7 @@ final class PermissionUtils {
      * 第二是返回的 ArrayList 对象是只读的，也就是不能添加任何元素，否则会抛异常
      */
     @SuppressWarnings("all")
-    @NonNull
-    static <T> ArrayList<T> asArrayList(@Nullable T... array) {
+    static <T> ArrayList<T> asArrayList(T... array) {
         int initialCapacity = 0;
         if (array != null) {
             initialCapacity = array.length;
@@ -239,8 +238,7 @@ final class PermissionUtils {
     }
 
     @SafeVarargs
-    @NonNull
-    static <T> ArrayList<T> asArrayLists(@Nullable T[]... arrays) {
+    static <T> ArrayList<T> asArrayLists(T[]... arrays) {
         ArrayList<T> list = new ArrayList<>();
         if (arrays == null || arrays.length == 0) {
             return list;
@@ -254,8 +252,7 @@ final class PermissionUtils {
     /**
      * 寻找上下文中的 Activity 对象
      */
-    @Nullable
-    static Activity findActivity(@NonNull Context context) {
+    static Activity findActivity(Context context) {
         do {
             if (context instanceof Activity) {
                 return (Activity) context;
@@ -276,7 +273,7 @@ final class PermissionUtils {
      */
     @SuppressWarnings("JavaReflectionMemberAccess")
     @SuppressLint("PrivateApi")
-    static int findApkPathCookie(@NonNull Context context, @NonNull String apkPath) {
+    static int findApkPathCookie(Context context, String apkPath) {
         AssetManager assets = context.getAssets();
         Integer cookie;
         try {
@@ -329,7 +326,7 @@ final class PermissionUtils {
     /**
      * 判断是否适配了分区存储
      */
-    static boolean isScopedStorage(@NonNull Context context) {
+    static boolean isScopedStorage(Context context) {
         try {
             String metaKey = "ScopedStorage";
             Bundle metaData = context.getPackageManager().getApplicationInfo(
@@ -347,7 +344,7 @@ final class PermissionUtils {
      * 锁定当前 Activity 的方向
      */
     @SuppressLint("SwitchIntDef")
-    static void lockActivityOrientation(@NonNull Activity activity) {
+    static void lockActivityOrientation(Activity activity) {
         try {
             // 兼容问题：在 Android 8.0 的手机上可以固定 Activity 的方向，但是这个 Activity 不能是透明的，否则就会抛出异常
             // 复现场景：只需要给 Activity 主题设置 <item name="android:windowIsTranslucent">true</item> 属性即可
@@ -374,7 +371,7 @@ final class PermissionUtils {
     /**
      * 判断 Activity 是否反方向旋转了
      */
-    static boolean isActivityReverse(@NonNull Activity activity) {
+    static boolean isActivityReverse(Activity activity) {
         // 获取 Activity 旋转的角度
         int activityRotation;
         if (AndroidVersion.isAndroid11()) {
@@ -397,14 +394,14 @@ final class PermissionUtils {
      * 判断这个意图的 Activity 是否存在
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    static boolean areActivityIntent(@NonNull Context context, @NonNull Intent intent) {
+    static boolean areActivityIntent(Context context, Intent intent) {
         return intent.resolveActivity(context.getPackageManager()) != null;
     }
 
     /**
      * 获取应用详情界面意图
      */
-    public static Intent getApplicationDetailsIntent(@NonNull Context context) {
+    public static Intent getApplicationDetailsIntent(Context context) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(getPackageNameUri(context));
         if (!PermissionUtils.areActivityIntent(context, intent)) {
@@ -420,7 +417,7 @@ final class PermissionUtils {
     /**
      * 获取包名 uri
      */
-    public static Uri getPackageNameUri(@NonNull Context context) {
+    public static Uri getPackageNameUri(Context context) {
         return Uri.parse("package:" + context.getPackageName());
     }
 
@@ -429,7 +426,7 @@ final class PermissionUtils {
      *
      * @param permissions                 请求失败的权限
      */
-    static Intent getSmartPermissionIntent(@NonNull Context context, @Nullable List<String> permissions) {
+    static Intent getSmartPermissionIntent(Context context, List<String> permissions) {
         // 如果失败的权限里面不包含特殊权限
         if (permissions == null || permissions.isEmpty() ||
                 !PermissionApi.containsSpecialPermission(permissions)) {
@@ -464,7 +461,7 @@ final class PermissionUtils {
     /**
      * 判断两个权限字符串是否为同一个
      */
-    static boolean equalsPermission(@NonNull String permission1, @NonNull String permission2) {
+    static boolean equalsPermission(String permission1, String permission2) {
         int length = permission1.length();
         if (length != permission2.length()) {
             return false;
@@ -483,7 +480,7 @@ final class PermissionUtils {
     /**
      * 判断权限集合中是否包含某个权限
      */
-    static boolean containsPermission(@NonNull Collection<String> permissions, @NonNull String permission) {
+    static boolean containsPermission(Collection<String> permissions, String permission) {
         if (permissions.isEmpty()) {
             return false;
         }

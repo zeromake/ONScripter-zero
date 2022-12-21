@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.os.Bundle;
@@ -126,13 +125,13 @@ public class MainActivity extends Activity implements
         }
     }
     @Override
-    public void onGranted(@NonNull List<String> permissions, boolean all) {
+    public void onGranted(List<String> permissions, boolean all) {
         Toast.makeText(MainActivity.this, "权限申请成功", Toast.LENGTH_SHORT).show();
         Settings.LoadGlobals(this, true);
     }
 
     @Override
-    public void onDenied(@NonNull List<String> permissions, boolean never) {
+    public void onDenied(List<String> permissions, boolean never) {
         Toast.makeText(MainActivity.this, "权限申请失败", Toast.LENGTH_SHORT).show();
     }
 

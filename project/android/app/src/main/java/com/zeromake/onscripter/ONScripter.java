@@ -2,8 +2,10 @@ package com.zeromake.onscripter;
 
 import org.libsdl.app.SDLActivity;
 
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +24,10 @@ public class ONScripter extends SDLActivity {
 
     @Override
     protected String[] getLibraries() {
-        return new String[]{"onscripter"};
+        return new String[]{
+//                "sdl2",
+                "onscripter"
+        };
     }
 
     @Override
@@ -33,6 +38,7 @@ public class ONScripter extends SDLActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        nativeInitJavaCallbacks();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -44,20 +50,21 @@ public class ONScripter extends SDLActivity {
         }
     }
 
-    public static int getFD(char[] name, int mode) {
-        return 0;
+    public void playVideo(char[] name) {
+        Log.d("ONScripter", "playVideo");
     }
 
-    public static void playVideo(char[] name) {
-
-    }
+//    public static void onNativeCrashed() {
+//        new RuntimeException("crashed here (native trace should follow after the Java trace)").printStackTrace();
+//        Application.getInstance().startActivity(new Intent(Application.getInstance(), CrashHandler.class));
+//    }
 
     public static int mkdir(char[] name) {
         File f = new File(new String(name));
         return f.mkdirs() ? 0 : 1;
     }
 
-    public static native int nativeInitJavaCallbacks();
+    public native int nativeInitJavaCallbacks();
     public static native int nativeGetWidth();
     public static native int nativeGetHeight();
 

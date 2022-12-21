@@ -1,8 +1,6 @@
 package com.hjq.permissions;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +19,8 @@ public interface IPermissionInterceptor {
      * @param allPermissions            申请的权限
      * @param callback                  权限申请回调
      */
-    default void launchPermissionRequest(@NonNull Activity activity, @NonNull List<String> allPermissions,
-                                         @Nullable OnPermissionCallback callback) {
+    default void launchPermissionRequest(Activity activity, List<String> allPermissions,
+                                         OnPermissionCallback callback) {
         PermissionFragment.launch(activity, new ArrayList<>(allPermissions), this, callback);
     }
 
@@ -34,9 +32,9 @@ public interface IPermissionInterceptor {
      * @param all                        是否全部授予
      * @param callback                   权限申请回调
      */
-    default void grantedPermissionRequest(@NonNull Activity activity, @NonNull List<String> allPermissions,
-                                          @NonNull List<String> grantedPermissions, boolean all,
-                                          @Nullable OnPermissionCallback callback) {
+    default void grantedPermissionRequest(Activity activity, List<String> allPermissions,
+                                          List<String> grantedPermissions, boolean all,
+                                          OnPermissionCallback callback) {
         if (callback == null) {
             return;
         }
@@ -51,9 +49,9 @@ public interface IPermissionInterceptor {
      * @param never                     是否勾选了不再询问选项
      * @param callback                  权限申请回调
      */
-    default void deniedPermissionRequest(@NonNull Activity activity, @NonNull List<String> allPermissions,
-                                         @NonNull List<String> deniedPermissions, boolean never,
-                                         @Nullable OnPermissionCallback callback) {
+    default void deniedPermissionRequest(Activity activity, List<String> allPermissions,
+                                         List<String> deniedPermissions, boolean never,
+                                         OnPermissionCallback callback) {
         if (callback == null) {
             return;
         }
@@ -68,6 +66,6 @@ public interface IPermissionInterceptor {
      * @param skipRequest               是否跳过了申请过程
      * @param callback                  权限申请回调
      */
-    default void finishPermissionRequest(@NonNull Activity activity, @NonNull List<String> allPermissions,
-                                         boolean skipRequest, @Nullable OnPermissionCallback callback) {}
+    default void finishPermissionRequest(Activity activity, List<String> allPermissions,
+                                         boolean skipRequest, OnPermissionCallback callback) {}
 }
