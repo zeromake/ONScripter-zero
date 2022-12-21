@@ -3,10 +3,9 @@ package com.hjq.permissions;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 /**
  *    author : Android 轮子哥
@@ -14,11 +13,10 @@ import android.support.annotation.RequiresApi;
  *    time   : 2022/06/11
  *    desc   : Android 11 权限委托实现
  */
-@RequiresApi(api = AndroidVersion.ANDROID_11)
 class PermissionDelegateImplV30 extends PermissionDelegateImplV29 {
 
    @Override
-   public boolean isGrantedPermission(@NonNull Context context, @NonNull String permission) {
+   public boolean isGrantedPermission(Context context, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.MANAGE_EXTERNAL_STORAGE)) {
          return isGrantedManageStoragePermission();
       }
@@ -26,7 +24,7 @@ class PermissionDelegateImplV30 extends PermissionDelegateImplV29 {
    }
 
    @Override
-   public boolean isPermissionPermanentDenied(@NonNull Activity activity, @NonNull String permission) {
+   public boolean isPermissionPermanentDenied(Activity activity, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.MANAGE_EXTERNAL_STORAGE)) {
          return false;
       }
@@ -34,7 +32,7 @@ class PermissionDelegateImplV30 extends PermissionDelegateImplV29 {
    }
 
    @Override
-   public Intent getPermissionIntent(@NonNull Context context, @NonNull String permission) {
+   public Intent getPermissionIntent(Context context, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.MANAGE_EXTERNAL_STORAGE)) {
          return getManageStoragePermissionIntent(context);
       }
@@ -45,13 +43,16 @@ class PermissionDelegateImplV30 extends PermissionDelegateImplV29 {
     * 是否有所有文件的管理权限
     */
    private static boolean isGrantedManageStoragePermission() {
-      return Environment.isExternalStorageManager();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+         return Environment.isExternalStorageManager();
+      }
+      return false;
    }
 
    /**
     * 获取所有文件的管理权限设置界面意图
     */
-   private static Intent getManageStoragePermissionIntent(@NonNull Context context) {
+   private static Intent getManageStoragePermissionIntent(Context context) {
       Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
       intent.setData(PermissionUtils.getPackageNameUri(context));
 

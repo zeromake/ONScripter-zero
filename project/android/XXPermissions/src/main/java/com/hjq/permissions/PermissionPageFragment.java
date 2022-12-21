@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +23,8 @@ public final class PermissionPageFragment extends Fragment implements Runnable {
     /**
      * 开启权限申请
      */
-    public static void beginRequest(@NonNull Activity activity, @NonNull ArrayList<String> permissions,
-                                    @Nullable OnPermissionPageCallback callback) {
+    public static void beginRequest(Activity activity, ArrayList<String> permissions,
+                                    OnPermissionPageCallback callback) {
         PermissionPageFragment fragment = new PermissionPageFragment();
         Bundle bundle = new Bundle();
         bundle.putStringArrayList(REQUEST_PERMISSIONS, permissions);
@@ -42,7 +40,6 @@ public final class PermissionPageFragment extends Fragment implements Runnable {
     }
 
     /** 权限回调对象 */
-    @Nullable
     private OnPermissionPageCallback mCallBack;
 
     /** 权限申请标记 */
@@ -54,21 +51,21 @@ public final class PermissionPageFragment extends Fragment implements Runnable {
     /**
      * 绑定 Activity
      */
-    public void attachActivity(@NonNull Activity activity) {
+    public void attachActivity(Activity activity) {
         activity.getFragmentManager().beginTransaction().add(this, this.toString()).commitAllowingStateLoss();
     }
 
     /**
      * 解绑 Activity
      */
-    public void detachActivity(@NonNull Activity activity) {
+    public void detachActivity(Activity activity) {
         activity.getFragmentManager().beginTransaction().remove(this).commitAllowingStateLoss();
     }
 
     /**
      * 设置权限监听回调监听
      */
-    public void setCallBack(@Nullable OnPermissionPageCallback callback) {
+    public void setCallBack(OnPermissionPageCallback callback) {
         mCallBack = callback;
     }
 
@@ -105,7 +102,7 @@ public final class PermissionPageFragment extends Fragment implements Runnable {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != XXPermissions.REQUEST_CODE) {
             return;
         }

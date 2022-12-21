@@ -1,7 +1,5 @@
 package com.hjq.permissions;
 
-import android.support.annotation.NonNull;
-
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ public interface OnPermissionCallback {
      * @param permissions           请求成功的权限组
      * @param all                   是否全部授予了
      */
-    void onGranted(@NonNull List<String> permissions, boolean all);
+    void onGranted(List<String> permissions, boolean all);
 
     /**
      * 有权限被拒绝授予时回调
@@ -26,5 +24,5 @@ public interface OnPermissionCallback {
      * @param permissions            请求失败的权限组
      * @param never                  是否勾选了不再询问选项
      */
-    default void onDenied(@NonNull List<String> permissions, boolean never) {}
+    default void onDenied(List<String> permissions, boolean never) {}
 }

@@ -31,5 +31,4 @@ android {
 }
 
 dependencies {
-    implementation("com.android.support:support-annotations:28.0.0")
 }

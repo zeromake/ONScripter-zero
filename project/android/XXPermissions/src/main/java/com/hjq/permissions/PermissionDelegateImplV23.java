@@ -4,10 +4,9 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 /**
  *    author : Android 轮子哥
@@ -15,11 +14,10 @@ import android.support.annotation.RequiresApi;
  *    time   : 2022/06/11
  *    desc   : Android 6.0 权限委托实现
  */
-@RequiresApi(api = AndroidVersion.ANDROID_6)
 class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
 
    @Override
-   public boolean isGrantedPermission(@NonNull Context context, @NonNull String permission) {
+   public boolean isGrantedPermission(Context context, String permission) {
       // 判断是否是特殊权限
       if (PermissionUtils.isSpecialPermission(permission)) {
 
@@ -143,7 +141,7 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    }
 
    @Override
-   public boolean isPermissionPermanentDenied(@NonNull Activity activity, @NonNull String permission) {
+   public boolean isPermissionPermanentDenied(Activity activity, String permission) {
       if (PermissionUtils.isSpecialPermission(permission)) {
          // 特殊权限不算，本身申请方式和危险权限申请方式不同，因为没有永久拒绝的选项，所以这里返回 false
          return false;
@@ -247,7 +245,7 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    }
 
    @Override
-   public Intent getPermissionIntent(@NonNull Context context, @NonNull String permission) {
+   public Intent getPermissionIntent(Context context, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.SYSTEM_ALERT_WINDOW)) {
          return getWindowPermissionIntent(context);
       }
@@ -270,14 +268,17 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    /**
     * 是否授予了悬浮窗权限
     */
-   private static boolean isGrantedWindowPermission(@NonNull Context context) {
-      return Settings.canDrawOverlays(context);
+   private static boolean isGrantedWindowPermission(Context context) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+         return Settings.canDrawOverlays(context);
+      }
+      return false;
    }
 
    /**
     * 获取悬浮窗权限设置界面意图
     */
-   private static Intent getWindowPermissionIntent(@NonNull Context context) {
+   private static Intent getWindowPermissionIntent(Context context) {
       Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
       // 在 Android 11 加包名跳转也是没有效果的，官方文档链接：
       // https://developer.android.google.cn/reference/android/provider/Settings#ACTION_MANAGE_OVERLAY_PERMISSION
@@ -292,7 +293,7 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    /**
     * 是否有系统设置权限
     */
-   private static boolean isGrantedSettingPermission(@NonNull Context context) {
+   private static boolean isGrantedSettingPermission(Context context) {
       if (AndroidVersion.isAndroid6()) {
          return Settings.System.canWrite(context);
       }
@@ -302,7 +303,7 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    /**
     * 获取系统设置权限界面意图
     */
-   private static Intent getSettingPermissionIntent(@NonNull Context context) {
+   private static Intent getSettingPermissionIntent(Context context) {
       Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
       intent.setData(PermissionUtils.getPackageNameUri(context));
       if (!PermissionUtils.areActivityIntent(context, intent)) {
@@ -314,14 +315,17 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    /**
     * 是否有勿扰模式权限
     */
-   private static boolean isGrantedNotDisturbPermission(@NonNull Context context) {
-      return context.getSystemService(NotificationManager.class).isNotificationPolicyAccessGranted();
+   private static boolean isGrantedNotDisturbPermission(Context context) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+         return context.getSystemService(NotificationManager.class).isNotificationPolicyAccessGranted();
+      }
+      return false;
    }
 
    /**
     * 获取勿扰模式设置界面意图
     */
-   private static Intent getNotDisturbPermissionIntent(@NonNull Context context) {
+   private static Intent getNotDisturbPermissionIntent(Context context) {
       Intent intent = null;
 
       if (AndroidVersion.isAndroid10()) {
@@ -343,14 +347,17 @@ class PermissionDelegateImplV23 extends PermissionDelegateImplV14 {
    /**
     * 是否忽略电池优化选项
     */
-   private static boolean isGrantedIgnoreBatteryPermission(@NonNull Context context) {
-      return context.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(context.getPackageName());
+   private static boolean isGrantedIgnoreBatteryPermission(Context context) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+         return context.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(context.getPackageName());
+      }
+      return false;
    }
 
    /**
     * 获取电池优化选项设置界面意图
     */
-   private static Intent getIgnoreBatteryPermissionIntent(@NonNull Context context) {
+   private static Intent getIgnoreBatteryPermissionIntent(Context context) {
       Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
       intent.setData(PermissionUtils.getPackageNameUri(context));
 

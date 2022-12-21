@@ -1,8 +1,6 @@
 package com.hjq.permissions;
 
 import android.content.pm.PackageInfo;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,22 +17,18 @@ final class AndroidManifestInfo {
    String packageName;
 
    /** 使用 sdk 信息 */
-   @Nullable
    UsesSdkInfo usesSdkInfo;
 
    /** 权限节点信息 */
-   @NonNull
    final List<PermissionInfo> permissionInfoList = new ArrayList<>();
 
    /** Application 节点信息 */
    ApplicationInfo applicationInfo;
 
    /** Activity 节点信息 */
-   @NonNull
    final List<ActivityInfo> activityInfoList = new ArrayList<>();
 
    /** Service 节点信息 */
-   @NonNull
    final List<ServiceInfo> serviceInfoList = new ArrayList<>();
 
    static final class UsesSdkInfo {

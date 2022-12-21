@@ -397,7 +397,7 @@ int ScriptParser::saveFileIOBuf(const char *filename, int offset, const char *sa
     }
 
     FILE *fp;
-    if ( (fp = fopen(filename, "wb", use_save_dir)) == NULL ) return -1;
+    if ((fp = fopen(filename, "wb", use_save_dir)) == NULL) return -1;
 
     size_t ret = fwrite(file_io_buf+offset, 1, file_io_buf_ptr-offset, fp);
 

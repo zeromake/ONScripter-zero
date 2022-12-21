@@ -3,12 +3,11 @@ package com.zeromake.onscripter;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 
 public class UiThread {
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
-        public void handleMessage(@NonNull Message msg) {
+        public void handleMessage(Message msg) {
             if (msg.obj instanceof Runnable) {
                 ((Runnable) msg.obj).run();
             }

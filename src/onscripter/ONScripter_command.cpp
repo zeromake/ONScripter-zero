@@ -945,7 +945,7 @@ int ONScripter::savetimeCommand()
     int no = script_h.readInt();
 
     SaveFileInfo info;
-    searchSaveFile( info, no );
+    searchSaveFile(info, no);
 
     script_h.readVariable();
     if ( !info.valid ){
@@ -1033,7 +1033,7 @@ int ONScripter::savegameCommand()
         savestr = script_h.readStr();
 
     if (saveon_flag && internal_saveon_flag) storeSaveFile();
-    writeSaveFile( no, savestr );
+    writeSaveFile(no, savestr);
 
     return RET_CONTINUE;
 }

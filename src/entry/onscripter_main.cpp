@@ -117,6 +117,7 @@ extern "C"
 #include <errno.h>
 static jobject JavaONScripter = NULL;
 static jmethodID JavaPlayVideo = NULL;
+static JavaVM *jniVM = NULL;
 // static jmethodID JavaGetFD = NULL;
 // static jmethodID JavaMkdir = NULL;
 
@@ -158,7 +159,7 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
 void playVideoAndroid(const char *filename)
 {
     JNIEnv * jniEnv = NULL;
-    // mJavaVM->AttachCurrentThread(&jniEnv, NULL);
+    // jniVM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
         __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::playVideoAndroid: Java VM AttachCurrentThread() failed");
@@ -170,66 +171,9 @@ void playVideoAndroid(const char *filename)
         jc[i] = filename[i];
     jcharArray jca = jniEnv->NewCharArray(strlen(filename));
     jniEnv->SetCharArrayRegion(jca, 0, strlen(filename), jc);
-    jniEnv->CallVoidMethod( JavaONScripter, JavaPlayVideo, jca );
+    jniEnv->CallVoidMethod(JavaONScripter, JavaPlayVideo, jca);
     jniEnv->DeleteLocalRef(jca);
     delete[] jc;
-}
-}
-#endif
-#if 0
-#undef fopen
-FILE *fopen_ons(const char *path, const char *mode)
-{
-    int mode2 = 0;
-    if (mode[0] == 'w') mode2 = 1;
-
-    FILE *fp = fopen(path, mode);
-    if (fp) return fp;
-
-    JNIEnv * jniEnv = NULL;
-    mJavaVM->AttachCurrentThread(&jniEnv, NULL);
-
-    if (!jniEnv){
-        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::getFD: Java VM AttachCurrentThread() failed");
-        return NULL;
-    }
-
-    jchar *jc = new jchar[strlen(path)];
-    for (int i=0 ; i<strlen(path) ; i++)
-        jc[i] = path[i];
-    jcharArray jca = jniEnv->NewCharArray(strlen(path));
-    jniEnv->SetCharArrayRegion(jca, 0, strlen(path), jc);
-    int fd = jniEnv->CallIntMethod( JavaONScripter, JavaGetFD, jca, mode2 );
-    jniEnv->DeleteLocalRef(jca);
-    delete[] jc;
-
-    return fdopen(fd, mode);
-}
-
-#undef mkdir
-extern int mkdir(const char *pathname, mode_t mode);
-int mkdir_ons(const char *pathname, mode_t mode)
-{
-    if (mkdir(pathname, mode) == 0 || errno != EACCES) return 0;
-
-    JNIEnv * jniEnv = NULL;
-    mJavaVM->AttachCurrentThread(&jniEnv, NULL);
-
-    if (!jniEnv){
-        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::mkdir: Java VM AttachCurrentThread() failed");
-        return -1;
-    }
-
-    jchar *jc = new jchar[strlen(pathname)];
-    for (int i=0 ; i<strlen(pathname) ; i++)
-        jc[i] = pathname[i];
-    jcharArray jca = jniEnv->NewCharArray(strlen(pathname));
-    jniEnv->SetCharArrayRegion(jca, 0, strlen(pathname), jc);
-    int ret = jniEnv->CallIntMethod( JavaONScripter, JavaMkdir, jca );
-    jniEnv->DeleteLocalRef(jca);
-    delete[] jc;
-
-    return ret;
 }
 }
 #endif
@@ -372,13 +316,51 @@ void parseOption(int argc, char *argv[]) {
     }
 }
 
+#if 0
+
+struct sigaction old_handlers[18];
+#define CATCHSIG(X) sigaction(X, &handler, &old_handlers[X])
+
+void android_sigaction(int signal, siginfo_t *info, void *reserved) {
+    // utils::printInfo("sigaction: %d", signal);
+    // JNIEnv * jniEnv = NULL;
+    // gJvm->AttachCurrentThread(&jniEnv, NULL);
+    // if (!jniEnv) {  
+    //     return;
+    // }
+    // utils::printInfo("onNativeCrashed");
+    // jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaOnNativeCrashed);
+    // utils::printInfo("onNativeCrashed done");
+    old_handlers[signal].sa_sigaction(signal, info, reserved);
+} 
+
+void InitCrashReport(){
+    utils::printInfo("InitCrashReport");
+    // Try to catch crashes...
+    struct sigaction handler;
+    memset(&handler, 0, sizeof(struct sigaction));
+    handler.sa_sigaction = android_sigaction;
+    handler.sa_flags = SA_RESETHAND;
+
+    CATCHSIG(SIGILL);
+    CATCHSIG(SIGABRT);
+    CATCHSIG(SIGBUS);
+    CATCHSIG(SIGFPE);
+    CATCHSIG(SIGSEGV);
+    CATCHSIG(SIGSTKFLT);
+    CATCHSIG(SIGPIPE);
+}  
+#endif
+
 #if defined(ANDROID)
 int SDL_main(int argc, char *argv[])
+{
+    // InitCrashReport();
 #else
 #undef main
 int main(int argc, char *argv[])
-#endif
 {
+#endif
     utils::printInfo("ONScripter-Jh version %s (%s, %d.%02d)\n", ONS_JH_VERSION, ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);
 
 #if defined(PSP)

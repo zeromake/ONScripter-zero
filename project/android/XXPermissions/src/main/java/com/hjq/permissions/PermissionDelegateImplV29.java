@@ -2,9 +2,8 @@ package com.hjq.permissions;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 /**
  *    author : Android 轮子哥
@@ -12,11 +11,10 @@ import android.support.annotation.RequiresApi;
  *    time   : 2022/06/11
  *    desc   : Android 10 权限委托实现
  */
-@RequiresApi(api = AndroidVersion.ANDROID_10)
 class PermissionDelegateImplV29 extends PermissionDelegateImplV28 {
 
    @Override
-   public boolean isGrantedPermission(@NonNull Context context, @NonNull String permission) {
+   public boolean isGrantedPermission(Context context, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.ACCESS_MEDIA_LOCATION)) {
          return hasReadStoragePermission(context) &&
                  PermissionUtils.checkSelfPermission(context, Permission.ACCESS_MEDIA_LOCATION);
@@ -42,7 +40,7 @@ class PermissionDelegateImplV29 extends PermissionDelegateImplV28 {
    }
 
    @Override
-   public boolean isPermissionPermanentDenied(@NonNull Activity activity, @NonNull String permission) {
+   public boolean isPermissionPermanentDenied(Activity activity, String permission) {
       if (PermissionUtils.equalsPermission(permission, Permission.ACCESS_BACKGROUND_LOCATION)) {
          if (!PermissionUtils.checkSelfPermission(activity, Permission.ACCESS_FINE_LOCATION)) {
             return !PermissionUtils.shouldShowRequestPermissionRationale(activity, Permission.ACCESS_FINE_LOCATION);
@@ -80,13 +78,16 @@ class PermissionDelegateImplV29 extends PermissionDelegateImplV28 {
     */
    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
    private static boolean isUseDeprecationExternalStorage() {
-      return Environment.isExternalStorageLegacy();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+         return Environment.isExternalStorageLegacy();
+      }
+      return false;
    }
 
    /**
     * 是否有读取文件的权限
     */
-   private boolean hasReadStoragePermission(@NonNull Context context) {
+   private boolean hasReadStoragePermission(Context context) {
       if (AndroidVersion.isAndroid13() && AndroidVersion.getTargetSdkVersionCode(context) >= AndroidVersion.ANDROID_13) {
          return PermissionUtils.checkSelfPermission(context, Permission.READ_MEDIA_IMAGES) ||
                  isGrantedPermission(context, Permission.MANAGE_EXTERNAL_STORAGE);
