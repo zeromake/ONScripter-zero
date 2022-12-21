@@ -160,14 +160,12 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     save_file_info.hour   = buf.st_mtime.hour;
     save_file_info.minute = buf.st_mtime.minute;
 #else
-    sprintf( file_name, "save%d.dat", no );
-    FILE *fp;
-    if ( (fp = fopen(file_name, "rb", true)) == NULL ){
+    sprintf(file_name, "save%d.dat", no);
+    const char *name_path = fpath(file_name);
+    if (!std::fs::exists(name_path)) {
         save_file_info.valid = false;
         return;
     }
-    fclose(fp);
-    const char *name_path = fpath(file_name);
     auto ftime = std::fs::last_write_time(name_path);
     std::time_t tt = to_time_t(ftime);
     struct tm* ptm = localtime(&tt);
@@ -178,13 +176,13 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     save_file_info.minute = ptm->tm_min;
 #endif
     save_file_info.valid = true;
-    script_h.getStringFromInteger( save_file_info.sjis_month,  save_file_info.month,  2 );
-    script_h.getStringFromInteger( save_file_info.sjis_day,    save_file_info.day,    2 );
-    script_h.getStringFromInteger( save_file_info.sjis_hour,   save_file_info.hour,   2 );
-    script_h.getStringFromInteger( save_file_info.sjis_minute, save_file_info.minute, 2, true );
+    script_h.getStringFromInteger(save_file_info.sjis_month,  save_file_info.month,  2);
+    script_h.getStringFromInteger(save_file_info.sjis_day,    save_file_info.day,    2);
+    script_h.getStringFromInteger(save_file_info.sjis_hour,   save_file_info.hour,   2);
+    script_h.getStringFromInteger(save_file_info.sjis_minute, save_file_info.minute, 2, true);
 }
 
-char *ONScripter::readSaveStrFromFile( int no )
+char *ONScripter::readSaveStrFromFile(int no)
 {
     char filename[32];
     sprintf( filename, "save%d.dat", no );
