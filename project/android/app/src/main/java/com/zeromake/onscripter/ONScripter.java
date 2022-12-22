@@ -12,10 +12,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.FileSystem;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 public class ONScripter extends SDLActivity {
     public static String ARGS_KEY = "args";
     private String[]  arguments;
+    private String rootPath = null;
 
     @Override
     protected boolean initWindowStyle() {
@@ -25,7 +28,7 @@ public class ONScripter extends SDLActivity {
     @Override
     protected String[] getLibraries() {
         return new String[]{
-//                "sdl2",
+                "sdl2",
                 "onscripter"
         };
     }
@@ -38,7 +41,7 @@ public class ONScripter extends SDLActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        nativeInitJavaCallbacks();
+        nativeInitJavaCallbacks();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -46,15 +49,25 @@ public class ONScripter extends SDLActivity {
             if (args != null && args.length > 0) {
                 Globals.CurrentGameRunning = true;
                 arguments = args;
+                boolean hasRoot = false;
+                for (String arg : args) {
+                    if (arg.equals("-r")) {
+                        hasRoot = true;
+                    }
+                    if (hasRoot) {
+                        rootPath = arg;
+                        break;
+                    }
+                }
             }
         }
     }
 
     public void playVideo(char[] name) {
-        Log.d("ONScripter", "playVideo");
+        Log.d("ONScripter", "playVideo: " + rootPath + "/" + String.copyValueOf(name));
     }
 
-//    public static void onNativeCrashed() {
+//    public void onNativeCrashed() {
 //        new RuntimeException("crashed here (native trace should follow after the Java trace)").printStackTrace();
 //        Application.getInstance().startActivity(new Intent(Application.getInstance(), CrashHandler.class));
 //    }

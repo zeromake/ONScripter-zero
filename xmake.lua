@@ -39,9 +39,11 @@ local deps = {
     "brotli",
     "ghc_filesystem"
 }
+local sdlConfigs = {}
 
 if is_plat("android") then
     table.insert(deps, "ndk-cpufeatures")
+    sdlConfigs["shared"] = true
 end
 
 local dep_opt = {system=false}
@@ -49,7 +51,7 @@ for _, dep_name in ipairs(deps) do
     add_requires(dep_name, dep_opt)
 end
 
-add_requires("sdl2", {system=false})
+add_requires("sdl2", {system=false, configs=sdlConfigs})
 add_requires("freetype", {system=false,configs={
     zlib=true,
     bzip2=true,
@@ -210,6 +212,7 @@ target("onscripter")
         add_defines("SDL_JAVA_PACKAGE_PATH=com_zeromake_onscripter", "ANDROID")
         add_cxflags("-fPIC", {force = true})
         add_ldflags("-fPIC", {force = true})
+        add_cxflags("-funwind-tables", {force = true})
     else
         add_files("src/entry/onscripter_main.cpp")
     end
@@ -218,7 +221,14 @@ target("onscripter")
     remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")
     after_build(function (target)
         if target:is_plat("android") then
-            os.cp(target:targetfile(), "project/android/app/libs/"..target:arch().."/")
+            local outDir = "project/android/app/libs/"..target:arch().."/"
+            for _, pkg in pairs(target:pkgs()) do
+                if pkg:has_shared() then
+                    os.cp(pkg:libraryfiles(), outDir)
+                    print("cp "..pkg:libraryfiles().." "..outDir)
+                end
+            end
+            os.cp(target:targetfile(), outDir)
             return
         end
         local out_name = "onscripter"

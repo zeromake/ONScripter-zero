@@ -117,14 +117,39 @@ extern "C"
 #include <errno.h>
 static jobject JavaONScripter = NULL;
 static jmethodID JavaPlayVideo = NULL;
+static jint JNI_VERSION = JNI_VERSION_1_4;
 static JavaVM *jniVM = NULL;
-// static jmethodID JavaGetFD = NULL;
-// static jmethodID JavaMkdir = NULL;
+static jmethodID JavaGetFD = NULL;
+static jmethodID JavaMkdir = NULL;
 
-// JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
-// {
-//     jniVM = vm;
-// };
+JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved) {
+    jniVM = jvm;
+    return JNI_VERSION;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
+    jniVM = vm;
+};
+
+JNIEnv *GetJniEnv() {
+    JNIEnv *m_pJniEnv;
+    int nEnvStat = jniVM->GetEnv(reinterpret_cast<void **>(&m_pJniEnv), JNI_VERSION);
+    if (nEnvStat == JNI_EDETACHED) {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION;
+        if (jniVM->AttachCurrentThread(&m_pJniEnv, &args) != 0) {
+            return nullptr;
+        }
+        thread_local struct DetachJniOnExit {
+            ~DetachJniOnExit() {
+                jniVM->DetachCurrentThread();
+            }
+        };
+    } else if (nEnvStat == JNI_EVERSION) {
+        return nullptr;
+    }
+    return m_pJniEnv;
+}
 
 #ifndef SDL_JAVA_PACKAGE_PATH
 #error You have to define SDL_JAVA_PACKAGE_PATH to your package path with dots replaced with underscores, for example "com_example_SanAngeles"
@@ -158,11 +183,9 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
 
 void playVideoAndroid(const char *filename)
 {
-    JNIEnv * jniEnv = NULL;
-    // jniVM->AttachCurrentThread(&jniEnv, NULL);
-
+    JNIEnv * jniEnv = GetJniEnv();
     if (!jniEnv){
-        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::playVideoAndroid: Java VM AttachCurrentThread() failed");
+        utils::printError("ONScripter::playVideoAndroid: Java VM AttachCurrentThread() failed");
         return;
     }
 
@@ -175,6 +198,47 @@ void playVideoAndroid(const char *filename)
     jniEnv->DeleteLocalRef(jca);
     delete[] jc;
 }
+}
+
+#include <dlfcn.h>
+#include <iomanip>
+#include <unwind.h>
+#include <iostream>
+
+struct BacktraceState
+{
+    void** current;
+    void** end;
+};
+
+static _Unwind_Reason_Code unwindCallback(struct _Unwind_Context* context, void* arg)
+{
+    BacktraceState* state = static_cast<BacktraceState*>(arg);
+    uintptr_t pc = _Unwind_GetIP(context);
+    if (pc) {
+        if (state->current == state->end) {
+            return _URC_END_OF_STACK;
+        } else {
+            *state->current++ = reinterpret_cast<void*>(pc);
+        }
+    }
+    return _URC_NO_REASON;
+}
+
+void dumpBacktrace(std::ostream& os, void** buffer, size_t max)
+{
+    BacktraceState state = {buffer, buffer + max};
+    _Unwind_Backtrace(unwindCallback, &state);
+    size_t count = state.current - buffer;
+    for (size_t idx = 0; idx < count; ++idx) {
+        const void* addr = buffer[idx];
+        const char* symbol = "";
+        Dl_info info;
+        if (dladdr(addr, &info) && info.dli_sname) {
+            symbol = info.dli_sname;
+        }
+        os << "  #" << std::setw(2) << idx << ": " << addr << "  " << symbol << "\n";
+    }
 }
 #endif
 
@@ -353,9 +417,15 @@ void InitCrashReport(){
 #endif
 
 #if defined(ANDROID)
+#include <sstream>
+
 int SDL_main(int argc, char *argv[])
 {
-    // InitCrashReport();
+    // const size_t max = 30;
+    // void* buffer[max];
+    // std::ostringstream oss;
+    // dumpBacktrace(oss, buffer, max);
+    // utils::printInfo("dumpBacktrace: %s", oss.str().c_str());
 #else
 #undef main
 int main(int argc, char *argv[])
