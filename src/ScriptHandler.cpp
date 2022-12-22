@@ -1074,9 +1074,10 @@ int ScriptHandler::readScript( char *path )
         }
         std::sort(unencrypt.begin(), unencrypt.end());
     }
-    if (estimated_buffer_length > (1024 * 1024 * 1024 * 100)) {
+    static size_t BUFFER_MAX = 1024 * 1024 * 100;
+    if (estimated_buffer_length > BUFFER_MAX) {
         // 超过 100MB 的大小可能是 bug
-        utils::printError( "can't open buffer_length: %d\n", estimated_buffer_length);
+        utils::printError( "can't open buffer_length: %d > %d\n", estimated_buffer_length, BUFFER_MAX);
         return -1;
     }
     if ( script_buffer ) delete[] script_buffer;

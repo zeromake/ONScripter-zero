@@ -60,7 +60,7 @@ android {
 
 dependencies {
     implementation(project(":XXPermissions"))
-    implementation("com.android.support:support-annotations:28.0.0")
+//    implementation("com.android.support:support-annotations:28.0.0")
 //    implementation("androidx.core:core:1.9.0")
 //    implementation("com.squareup.picasso:picasso:2.8")
     implementation("com.nostra13.universalimageloader:universal-image-loader:1.9.5")
