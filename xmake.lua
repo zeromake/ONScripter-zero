@@ -21,10 +21,6 @@ if is_plat("windows") then
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
 end
 
-if is_arch("x86", "x86_64") then
-    add_defines("USE_SIMD=1", "USE_SIMD_X86_AVX2=1")
-end
-
 add_includedirs("src", "src/onscripter", "src/reader", "include")
 
 local deps = {
@@ -215,6 +211,13 @@ target("onscripter")
         add_cxflags("-funwind-tables", {force = true})
     else
         add_files("src/entry/onscripter_main.cpp")
+    end
+
+    if is_arch("x86", "x64", "i386", "x86_64") then
+        add_vectorexts("avx2")
+        add_defines("USE_SIMD=1", "USE_SIMD_X86_AVX2=1")
+    elseif is_arch("arm.*") then
+        add_vectorexts("neon")
     end
     add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
