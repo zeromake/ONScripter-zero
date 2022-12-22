@@ -2,18 +2,12 @@ package com.zeromake.onscripter;
 
 import org.libsdl.app.SDLActivity;
 
-import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.Paths;
-import java.util.Objects;
 
 public class ONScripter extends SDLActivity {
     public static String ARGS_KEY = "args";
@@ -53,8 +47,7 @@ public class ONScripter extends SDLActivity {
                 for (String arg : args) {
                     if (arg.equals("-r")) {
                         hasRoot = true;
-                    }
-                    if (hasRoot) {
+                    } else if (hasRoot) {
                         rootPath = arg;
                         break;
                     }
@@ -65,6 +58,19 @@ public class ONScripter extends SDLActivity {
 
     public void playVideo(char[] name) {
         Log.d("ONScripter", "playVideo: " + rootPath + "/" + String.copyValueOf(name));
+//        Intent intent = new Intent();
+//        intent.setAction(Intent.ACTION_VIEW);
+//        Uri uri = null;
+//        String file = rootPath + "/" + String.copyValueOf(name);
+//        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N){
+//            uri = FileProvider.getUriForFile(this,"com.zeromake.onscripter", new File(file));
+//        } else {
+//            Uri.parse("file://" + file);
+//        }
+//        intent.setDataAndType(uri, "video/*");
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//        startActivity(intent);
     }
 
 //    public void onNativeCrashed() {
@@ -72,10 +78,6 @@ public class ONScripter extends SDLActivity {
 //        Application.getInstance().startActivity(new Intent(Application.getInstance(), CrashHandler.class));
 //    }
 
-    public static int mkdir(char[] name) {
-        File f = new File(new String(name));
-        return f.mkdirs() ? 0 : 1;
-    }
 
     public native int nativeInitJavaCallbacks();
     public static native int nativeGetWidth();
