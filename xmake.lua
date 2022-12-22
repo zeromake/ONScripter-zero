@@ -9,7 +9,6 @@ if VERSION:startswith("v") then
 end
 
 add_defines(
-    "USE_SIMD_X86_AVX2=1",
     "ONS_JH_VERSION=\""..VERSION.."\"",
     "ONS_VERSION=\"20181218\"",
     "NSC_VERSION=296"
@@ -20,6 +19,10 @@ if is_plat("windows") then
     add_cxflags("/utf-8")
     add_cxflags("/UNICODE")
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
+end
+
+if is_arch("x86", "x86_64") then
+    add_defines("USE_SIMD=1", "USE_SIMD_X86_AVX2=1")
 end
 
 add_includedirs("src", "src/onscripter", "src/reader", "include")
