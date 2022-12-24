@@ -322,6 +322,7 @@ void ONScripter::openAudio(int freq)
 ONScripter::ONScripter()
 {
     is_script_read = false;
+    fontRatio = 1.0f;
 
     cdrom_drive_number = 0;
     cdaudio_flag = false;
@@ -436,6 +437,10 @@ void ONScripter::setVsyncOff() {
 
 void ONScripter::setScaleToWindow() {
     scaleToWindow = true;
+}
+
+void ONScripter::setFontRatio(const float ratio) {
+    fontRatio = ratio;
 }
 
 void ONScripter::setFontCache()
@@ -801,8 +806,8 @@ void ONScripter::resetSub()
 void ONScripter::resetSentenceFont()
 {
     sentence_font.reset();
-    sentence_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
-    sentence_font.font_size_xy[1] = DEFAULT_FONT_SIZE;
+    sentence_font.font_size_xy[0] = (float)DEFAULT_FONT_SIZE * fontRatio;
+    sentence_font.font_size_xy[1] = (float)DEFAULT_FONT_SIZE * fontRatio;
     sentence_font.top_xy[0] = 21;
     sentence_font.top_xy[1] = 16;// + sentence_font.font_size;
     sentence_font.num_xy[0] = 23;

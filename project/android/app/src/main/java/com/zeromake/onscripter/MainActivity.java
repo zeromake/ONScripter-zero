@@ -327,6 +327,8 @@ public class MainActivity extends Activity implements
                     "3",
                     "--font-outline-color",
                     "#03a9f4",
+                    "--font-ratio",
+                    "1.5",
             });
             intent.putExtras(extras);
             startActivity(intent);

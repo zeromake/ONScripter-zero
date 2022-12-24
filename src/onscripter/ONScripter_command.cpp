@@ -657,11 +657,11 @@ void ONScripter::setwindowCore()
     // 设置文字渲染矩形
     sentence_font.top_xy[0] = script_h.readInt();
     sentence_font.top_xy[1] = script_h.readInt();
-    sentence_font.num_xy[0] = script_h.readInt();
-    sentence_font.num_xy[1] = script_h.readInt();
+    sentence_font.num_xy[0] = (float)script_h.readInt() / fontRatio;
+    sentence_font.num_xy[1] = (float)script_h.readInt() / fontRatio;;
     // 设置文字大小
-    sentence_font.font_size_xy[0] = script_h.readInt();
-    sentence_font.font_size_xy[1] = script_h.readInt();
+    sentence_font.font_size_xy[0] = (float)script_h.readInt() * fontRatio;
+    sentence_font.font_size_xy[1] = (float)script_h.readInt() * fontRatio;
     // 字符高宽
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
     sentence_font.pitch_xy[1] = script_h.readInt() + sentence_font.font_size_xy[1];

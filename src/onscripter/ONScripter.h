@@ -99,6 +99,7 @@ public:
     void setFontOutlineColor(const char* color);
     void enableEdit();
     void setKeyEXE(const char *path);
+    void setFontRatio(const float ratio);
     const char* getArchivePath() { return archive_path; }
     void setWindowWidth(int width);
     void setWindowHeight(int height);
@@ -361,6 +362,7 @@ private:
     char *key_exe_file;
     bool vsync;
     bool scaleToWindow;
+    float fontRatio;
     bool cacheFont;
     bool screen_dirty_flag;
 
