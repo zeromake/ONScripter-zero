@@ -320,17 +320,6 @@ void parseOption(int argc, char *argv[]) {
                 ons.disableRescale();
             }
             else if ( !strcmp( argv[0]+1, "-render-font-outline" ) ){
-                ons.renderFontOutline();
-            }
-            else if ( !strcmp( argv[0]+1, "-font-outline-size" ) ){
-                argc--;
-                argv++;
-                ons.setFontOutlineSize(atoi(argv[0]));
-            }
-            else if ( !strcmp( argv[0]+1, "-font-outline-color" ) ){
-                argc--;
-                argv++;
-                ons.setFontOutlineColor(argv[0]);
             }
             else if ( !strcmp( argv[0]+1, "-edit" ) ){
                 ons.enableEdit();
@@ -349,17 +338,8 @@ void parseOption(int argc, char *argv[]) {
             else if (!strcmp(argv[0]+1, "-rescale")) {
                 argc--;
                 argv++;
-                int screen_ratio1 = 0;
-                int screen_ratio2 = 1;
-                char* buf = argv[0];
-                while (*buf >= '0' && *buf <= '9') {
-                    screen_ratio1 *= 10;
-                    screen_ratio1 += (*buf - '0');
-                    buf += 1;
-                }
-                if (screen_ratio1 == 0) {
-                    screen_ratio1 = 1;
-                }
+                int screen_ratio1 = atof(argv[0]) * 100;
+                int screen_ratio2 = 100;
                 ons.setRescale(screen_ratio1, screen_ratio2);
             }
             else if (!strcmp(argv[0]+1, "-debug:1")){
@@ -375,10 +355,10 @@ void parseOption(int argc, char *argv[]) {
                 // 强制缩放渲染到窗口大小，与 rescale 选项同时用时 rescale 生效，scale-window 失效
 			    ons.setScaleToWindow();
 			}
-			else if (!strcmp(argv[0]+1, "-font-ratio")){
+			else if (!strcmp(argv[0]+1, "-font-config")){
                 argc--;
                 argv++;
-			    ons.setFontRatio(atof(argv[0]));
+                ons.setFontConfig(argv[0]);
 			}
 #if defined(ANDROID)
             else if ( !strcmp(argv[0]+1, "-save-dir") ){

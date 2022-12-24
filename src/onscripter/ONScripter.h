@@ -94,12 +94,8 @@ public:
     void enableButtonShortCut();
     void enableWheelDownAdvance();
     void disableRescale();
-    void renderFontOutline();
-    void setFontOutlineSize(int size);
-    void setFontOutlineColor(const char* color);
     void enableEdit();
     void setKeyEXE(const char *path);
-    void setFontRatio(const float ratio);
     const char* getArchivePath() { return archive_path; }
     void setWindowWidth(int width);
     void setWindowHeight(int height);
@@ -362,7 +358,6 @@ private:
     char *key_exe_file;
     bool vsync;
     bool scaleToWindow;
-    float fontRatio;
     bool cacheFont;
     bool screen_dirty_flag;
 
@@ -811,7 +806,7 @@ private:
 
     void shiftHalfPixelX(SDL_Surface *surface);
     void shiftHalfPixelY(SDL_Surface *surface);
-    void drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char *text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect );
+    void drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char *text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect, const ons_font::FontConfig* fontConfig);
     void drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip=NULL );
     void drawString( const char *str, uchar3 color, _FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect = NULL, AnimationInfo *cache_info=NULL, bool pack_hankaku=true );
     void restoreTextBuffer(SDL_Surface *surface = NULL);

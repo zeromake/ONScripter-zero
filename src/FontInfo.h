@@ -28,6 +28,7 @@
 #include <SDL.h>
 #include <functional>
 #include "BaseReader.h"
+#include "FontConfig.h"
 
 typedef unsigned char uchar3[3];
 
@@ -58,11 +59,12 @@ public:
     int line_offset_xy[2]; // ruby offset for each line
     bool rubyon_flag;
     int tateyoko_mode;
+    ons_font::FONT_TYPE types;
 
     _FontInfo();
     void reset();
-    void *openFont( char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr, int outline_size = 1);
-    void setTateyokoMode( int tateyoko_mode );
+    void *openFont(char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr, const ons_font::FontConfig* fontConfig = nullptr);
+    void setTateyokoMode(int tateyoko_mode);
     int getTateyokoMode();
     int getRemainingLine();
 

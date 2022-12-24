@@ -156,6 +156,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
         _FontInfo f_info = sentence_font;
         if (info) f_info = *info;
         f_info.rubyon_flag = anim->is_ruby_drawable;
+        f_info.types = ons_font::ANIM_FONT;
 
         if ( anim->font_size_xy[0] >= 0 ){ // in case of Sprite, not rclick menu
             f_info.setTateyokoMode(0);
@@ -176,7 +177,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
 
         if (f_info.ttf_font[0] == NULL) {
             auto ff = generateFPath();
-            f_info.openFont(font_file, screen_ratio1, screen_ratio2, ff, font_outline_size);
+            f_info.openFont(font_file, screen_ratio1, screen_ratio2, ff, getFontConfig(f_info.types));
         }
 
         SDL_Rect pos;
@@ -292,8 +293,8 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
                 script_h.getNext();
 
                 script_h.pushCurrent( buffer );
-                anim->font_size_xy[0] = script_h.readInt();
-                anim->font_size_xy[1] = script_h.readInt();
+                anim->font_size_xy[0] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
+                anim->font_size_xy[1] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
                 anim->font_pitch[0] = anim->font_size_xy[0];
                 anim->font_pitch[1] = anim->font_size_xy[0]; // dummy
                 if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
