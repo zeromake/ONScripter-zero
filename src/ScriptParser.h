@@ -356,6 +356,8 @@ protected:
     /* ---------------------------------------- */
     /* Text related variables */
     bool render_font_outline;
+    int font_outline_size;
+    uchar3 font_outline_color;
     char *default_env_font;
     int default_text_speed[3];
     struct Page{

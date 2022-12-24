@@ -269,7 +269,10 @@ target("main")
     end
     add_files("demo/hello.c")
 
-
+target("example2")
+    set_kind("binary")
+    add_packages("freetype")
+    add_files("demo/example2.cpp")
 -- target("demo")
 --     set_kind("binary")
 --     add_packages(

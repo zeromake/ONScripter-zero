@@ -61,7 +61,7 @@ public:
 
     _FontInfo();
     void reset();
-    void *openFont( char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr);
+    void *openFont( char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr, int outline_size = 1);
     void setTateyokoMode( int tateyoko_mode );
     int getTateyokoMode();
     int getRemainingLine();

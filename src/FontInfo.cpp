@@ -85,7 +85,7 @@ void _FontInfo::reset()
     is_newline_accepted = false;
 }
 
-void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f)
+void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f, int outline_size)
 {
     const char* font_file;
     if (f != nullptr) {
@@ -121,7 +121,7 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
         fc->next->font[0] = TTF_OpenFontRW( fc->next->rw_ops, SDL_TRUE, font_size * ratio1 / ratio2 );
 #if (SDL_TTF_MAJOR_VERSION>=2) && (SDL_TTF_MINOR_VERSION>=0) && (SDL_TTF_PATCHLEVEL>=10)
         fc->next->font[1] = TTF_OpenFontRW( fc->next->rw_ops, SDL_TRUE, font_size * ratio1 / ratio2 );
-        TTF_SetFontOutline(fc->next->font[1], 1);
+        TTF_SetFontOutline(fc->next->font[1], outline_size);
 #endif
         fc->next->power_resume_number = psp_power_resume_number;
         strcpy(fc->next->name, font_file);
@@ -133,7 +133,8 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
         if (fc->next->font[1] == nullptr) {
             utils::printError("Open font failed: %s\n", TTF_GetError());
         }
-        TTF_SetFontOutline(fc->next->font[1], 1);
+        TTF_SetFontOutline(fc->next->font[1], outline_size);
+        
 #endif
     }
 #if defined(PSP)

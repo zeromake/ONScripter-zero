@@ -81,6 +81,7 @@ ScriptParser::ScriptParser()
     save_data_len = 0;
 
     render_font_outline = false;
+    font_outline_size = 1;
     page_list = NULL;
 
     /* ---------------------------------------- */

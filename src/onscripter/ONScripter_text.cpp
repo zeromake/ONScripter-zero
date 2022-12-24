@@ -40,6 +40,11 @@ extern Coding2UTF16 *coding2utf16;
 #define IS_TRANSLATION_REQUIRED(x)	\
         ( *(x) == (char)0x81 && *((x)+1) >= 0x41 && *((x)+1) <= 0x44 )
 
+
+int calcFontRatio(int v, int screen_ratio1, int screen_ratio2) {
+    return (int)((float)v * (((float)screen_ratio1 / (float)screen_ratio2)));
+}
+
 void ONScripter::shiftHalfPixelX(SDL_Surface *surface)
 {
     SDL_LockSurface( surface );
@@ -96,16 +101,9 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
     static SDL_Color fcol={0xff, 0xff, 0xff}, bcol={0, 0, 0};
     SDL_Surface *tmp_surface = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[0], unicode, fcol, bcol);
 
-    SDL_Color scolor = {0, 0, 0};
+    SDL_Color scolor = {font_outline_color[0], font_outline_color[1], font_outline_color[2]};
     SDL_Surface *tmp_surface_s = tmp_surface;
     if (info->is_shadow && render_font_outline){
-        unsigned char max_color = color.r;
-        if (max_color < color.g) max_color = color.g;
-        if (max_color < color.b) max_color = color.b;
-        if (max_color < 0x80) scolor.r = 0xff;
-        else                  scolor.r = 0;
-        scolor.g = scolor.b = scolor.r;
-
         tmp_surface_s = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[1], unicode, fcol, bcol);
         if (tmp_surface && tmp_surface_s){
             if ((tmp_surface_s->w-tmp_surface->w) & 1) shiftHalfPixelX(tmp_surface_s);
@@ -119,7 +117,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
     dst_rect.x = xy[0];
     dst_rect.y = xy[1];
 
-    dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - info->font_size_xy[1]*screen_ratio1/screen_ratio2)/2;
+    dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - calcFontRatio(info->font_size_xy[1], screen_ratio1,screen_ratio2))/2;
 
     if ( rotate_flag ) dst_rect.x += miny - minx;
 
@@ -183,7 +181,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
     //utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
     auto ff = generateFPath();
     if ( info->ttf_font[0] == NULL ){
-        if ( info->openFont( font_file, screen_ratio1, screen_ratio2, ff ) == NULL ){
+        if ( info->openFont(font_file, screen_ratio1, screen_ratio2, ff, font_outline_size) == NULL ){
             utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file );
             quit();
             exit(-1);
@@ -191,7 +189,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
     }
 #if defined(PSP)
     else
-        info->openFont( font_file, screen_ratio1, screen_ratio2, ff );
+        info->openFont(font_file, screen_ratio1, screen_ratio2, ff, font_outline_size);
 #endif
 
     if ( info->isEndOfLine() ){
@@ -213,8 +211,8 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
-        xy[0] = info->x() * screen_ratio1 / screen_ratio2;
-        xy[1] = info->y() * screen_ratio1 / screen_ratio2;
+        xy[0] = calcFontRatio(info->x(), screen_ratio1, screen_ratio2);
+        xy[1] = calcFontRatio(info->y(), screen_ratio1, screen_ratio2);
 
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
