@@ -99,7 +99,7 @@ target("nsadec")
         "src/language/*.cpp"
     )
 
-target("nscriptdecode")
+target("nsdecode")
     set_kind("binary")
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
