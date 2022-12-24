@@ -322,7 +322,6 @@ void ONScripter::openAudio(int freq)
 ONScripter::ONScripter()
 {
     is_script_read = false;
-    fontRatio = 1.0f;
 
     cdrom_drive_number = 0;
     cdaudio_flag = false;
@@ -439,10 +438,6 @@ void ONScripter::setScaleToWindow() {
     scaleToWindow = true;
 }
 
-void ONScripter::setFontRatio(const float ratio) {
-    fontRatio = ratio;
-}
-
 void ONScripter::setFontCache()
 {
     cacheFont = true;
@@ -461,19 +456,6 @@ void ONScripter::enableWheelDownAdvance()
 void ONScripter::disableRescale()
 {
     disable_rescale_flag = true;
-}
-
-void ONScripter::renderFontOutline()
-{
-    render_font_outline = true;
-}
-
-void ONScripter::setFontOutlineSize(int size) {
-    font_outline_size = size;
-}
-
-void ONScripter::setFontOutlineColor(const char* color) {
-    readColor(&font_outline_color, color);
 }
 
 void ONScripter::enableEdit()
@@ -659,11 +641,10 @@ int ONScripter::init()
     }
 
     auto ff = generateFPath();
-    if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2, ff) == NULL ){
+    if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2, ff, getFontConfig(sentence_font.types)) == NULL ){
         utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file);
         return -1;
     }
-
     return 0;
 }
 
@@ -806,8 +787,9 @@ void ONScripter::resetSub()
 void ONScripter::resetSentenceFont()
 {
     sentence_font.reset();
-    sentence_font.font_size_xy[0] = (float)DEFAULT_FONT_SIZE * fontRatio;
-    sentence_font.font_size_xy[1] = (float)DEFAULT_FONT_SIZE * fontRatio;
+    sentence_font.types = ons_font::SENTENCE_FONT;
+    sentence_font.font_size_xy[0] = calcFontRatio(DEFAULT_FONT_SIZE, sentence_font.types);
+    sentence_font.font_size_xy[1] = calcFontRatio(DEFAULT_FONT_SIZE, sentence_font.types);
     sentence_font.top_xy[0] = 21;
     sentence_font.top_xy[1] = 16;// + sentence_font.font_size;
     sentence_font.num_xy[0] = 23;

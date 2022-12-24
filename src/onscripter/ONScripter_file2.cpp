@@ -31,6 +31,8 @@ int ONScripter::loadSaveFile2( int file_version )
 
     int i, j;
 
+    sentence_font.types = ons_font::SENTENCE_FONT;
+
     readInt(); // 1 ... < 2.96, 2 ... >= 2.96
     if ( readInt() == 1 ) sentence_font.is_bold = true;
     else                  sentence_font.is_bold = false;

@@ -318,17 +318,15 @@ public class MainActivity extends Activity implements
             Game selectedItem = items.getSelectedItem();
             Intent intent = new Intent(this, ONScripter.class);
             Bundle extras = new Bundle();
+            // types(0:普通文字, 1:精灵文字, 2: 菜单文字, 3: 弹窗文字, 4: ruby 文字),font size1,font size2,color,render_outline,outline_size,outline_color
+            // 大部分游戏只有 0, 1 生效，后面的文字都是用精灵文字去做的，还有不少弹框是用图片做的。
             extras.putStringArray(ONScripter.ARGS_KEY, new String[]{
                     "-r",
                     selectedItem.path,
                     "--scale-window",
-                    "--render-font-outline",
-                    "--font-outline-size",
-                    "3",
-                    "--font-outline-color",
-                    "#03a9f4",
-                    "--font-ratio",
-                    "1.5",
+                    "--fontcache",
+                    "--font-config",
+                    "0:15,10,,1,2,#03a9f4",
             });
             intent.putExtras(extras);
             startActivity(intent);

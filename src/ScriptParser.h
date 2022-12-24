@@ -175,6 +175,7 @@ public:
     int addCommand();
     int elseCommand();
     void setRescale(int scale1, int scale2);
+    void setFontConfig(const char* buf);
 
 protected:
     struct UserFuncLUT{
@@ -236,6 +237,11 @@ protected:
            CLICK_EOL     = 4
     };
     enum{ NORMAL_MODE, DEFINE_MODE };
+
+    ons_font::FontConfig* font_configs[5];
+
+    ons_font::FontConfig* GLOBAL_FONT_CONFIG;
+
     int current_mode;
     int debug_level;
 
@@ -292,6 +298,10 @@ protected:
     void setStr( char **dst, const char *src, int num=-1 );
 
     void readToken();
+    
+    const int calcFontRatio(const int v, const ons_font::FONT_TYPE types);
+    const int calcFontUnRatio(const int v, const ons_font::FONT_TYPE types);
+    const ons_font::FontConfig* getFontConfig(const ons_font::FONT_TYPE types);
 
     /* ---------------------------------------- */
     /* Effect related variables */
@@ -355,9 +365,6 @@ protected:
 
     /* ---------------------------------------- */
     /* Text related variables */
-    bool render_font_outline;
-    int font_outline_size;
-    uchar3 font_outline_color;
     char *default_env_font;
     int default_text_speed[3];
     struct Page{

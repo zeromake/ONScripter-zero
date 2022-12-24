@@ -79,9 +79,6 @@ ScriptParser::ScriptParser()
     file_io_buf_ptr = 0;
     file_io_buf_len = 0;
     save_data_len = 0;
-
-    render_font_outline = false;
-    font_outline_size = 1;
     page_list = NULL;
 
     /* ---------------------------------------- */
@@ -112,6 +109,107 @@ ScriptParser::~ScriptParser()
     if (save_data_buf) delete[] save_data_buf;
 
     if (save_dir_envdata) delete[] save_dir_envdata;
+}
+
+
+const ons_font::FontConfig* ScriptParser::getFontConfig(const ons_font::FONT_TYPE types) {
+    if (font_configs[types]) {
+        return font_configs[types];
+    }
+    if (GLOBAL_FONT_CONFIG) {
+        return GLOBAL_FONT_CONFIG;
+    }
+    return ons_font::DEFAULT_FONT_CONFIG();
+}
+
+void ScriptParser::setFontConfig(const char* buf) {
+    ons_font::FONT_TYPE types;
+    bool is_global = false;
+    int offset = 0;
+    if (buf[offset] >= '0' && buf[offset] <= '9') {
+        types = ons_font::FONT_TYPE(buf[offset] - '0');
+    } else if (buf[offset] == 'g') {
+        is_global = true;
+    }
+    offset++;
+    if (buf[offset] != ':') {
+        return;
+    }
+    offset++;
+    ons_font::FontConfig* cfg = nullptr;
+    if (is_global) {
+        if (GLOBAL_FONT_CONFIG == nullptr) {
+            GLOBAL_FONT_CONFIG = new ons_font::FontConfig;
+        }
+        cfg = GLOBAL_FONT_CONFIG;
+
+    } else {
+        if (font_configs[types] == nullptr) {
+            font_configs[types] = new ons_font::FontConfig;
+        }
+        cfg = font_configs[types];
+    }
+    auto default_config = ons_font::DEFAULT_FONT_CONFIG();
+    memcpy(cfg, default_config, sizeof(ons_font::FontConfig));
+    int start = offset;
+    int field = 0;
+    char buff[256];
+    while (1) {
+        if (buf[offset] == ',' || buf[offset] == '\0') {
+            int size = offset - start;
+            if (size > 0) {
+                memcpy(buff, buf + start, size);
+                buff[size] = '\0';
+            } else {
+                buff[0] = '\0';
+            }
+            start = offset + 1;
+            if (buff[0] != '\0') {
+                switch (field)
+                {
+                case 0:
+                    cfg->ratio1 = atoi(buff);
+                    break;
+                case 1:
+                    cfg->ratio2 = atoi(buff);
+                    break;
+                case 2:
+                    readColor(&cfg->color, buff);
+                    break;
+                case 3:
+                    cfg->render_outline = buff[0] != '0' && buff[0] != 'f';
+                    break;
+                case 4:
+                    cfg->outline_size = atoi(buff);
+                    break;
+                case 5:
+                    readColor(&cfg->outline_color, buff);
+                    break;
+                }
+            }
+            field++;
+        }
+        if (buf[offset] == '\0') {
+            break;
+        }
+        offset++;
+    }
+}
+
+const int ScriptParser::calcFontRatio(const int v, const ons_font::FONT_TYPE types) {
+    const ons_font::FontConfig* cfg = getFontConfig(types);
+    if (cfg->ratio1 == cfg->ratio2) {
+        return v;
+    }
+    return v * cfg->ratio1 / cfg->ratio2;
+}
+
+const int ScriptParser::calcFontUnRatio(const int v, const ons_font::FONT_TYPE types) {
+    const ons_font::FontConfig* cfg = getFontConfig(types);
+    if (cfg->ratio1 == cfg->ratio2) {
+        return v;
+    }
+    return v / cfg->ratio1 * cfg->ratio2;
 }
 
 void ScriptParser::reset()
@@ -225,8 +323,9 @@ void ScriptParser::reset()
 
     /* ---------------------------------------- */
     /* Menu related variables */
-    menu_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
-    menu_font.font_size_xy[1] = DEFAULT_FONT_SIZE;
+    menu_font.types = ons_font::MENU_FONT;
+    menu_font.font_size_xy[0] = calcFontRatio(DEFAULT_FONT_SIZE, menu_font.types);
+    menu_font.font_size_xy[1] = calcFontRatio(DEFAULT_FONT_SIZE, menu_font.types);
     menu_font.top_xy[0] = 0;
     menu_font.top_xy[1] = 16;
     menu_font.num_xy[0] = 32;
@@ -239,8 +338,9 @@ void ScriptParser::reset()
 
     /* ---------------------------------------- */
     /* Dialog related variables */
-    dialog_font.font_size_xy[0] = DEFAULT_DIALOG_FONT_SIZE;
-    dialog_font.font_size_xy[1] = DEFAULT_DIALOG_FONT_SIZE;
+    dialog_font.types = ons_font::DAILOG_FONT;
+    dialog_font.font_size_xy[0] = calcFontRatio(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
+    dialog_font.font_size_xy[1] = calcFontRatio(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
     dialog_font.pitch_xy[0] = dialog_font.font_size_xy[0];
     dialog_font.pitch_xy[1] = 2 + dialog_font.font_size_xy[1];
     dialog_font.is_bold = false;

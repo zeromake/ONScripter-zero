@@ -41,8 +41,8 @@ extern Coding2UTF16 *coding2utf16;
         ( *(x) == (char)0x81 && *((x)+1) >= 0x41 && *((x)+1) <= 0x44 )
 
 
-int calcFontRatio(int v, int screen_ratio1, int screen_ratio2) {
-    return (int)((float)v * (((float)screen_ratio1 / (float)screen_ratio2)));
+int calcFontSize(int v, int screen_ratio1, int screen_ratio2) {
+    return v * screen_ratio1 / screen_ratio2;
 }
 
 void ONScripter::shiftHalfPixelX(SDL_Surface *surface)
@@ -76,7 +76,7 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface)
     }
     SDL_UnlockSurface( surface );
 }
-void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char* text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
+void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char* text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect, const ons_font::FontConfig* fontConfig)
 {
     unsigned short unicode;
     if (IS_TWO_BYTE(text[0])){
@@ -100,10 +100,10 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 
     static SDL_Color fcol={0xff, 0xff, 0xff}, bcol={0, 0, 0};
     SDL_Surface *tmp_surface = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[0], unicode, fcol, bcol);
-
-    SDL_Color scolor = {font_outline_color[0], font_outline_color[1], font_outline_color[2]};
+    const ons_font::FontConfig* cfg = getFontConfig(info->types);
+    SDL_Color scolor = {cfg->outline_color[0], cfg->outline_color[1], cfg->outline_color[2]};
     SDL_Surface *tmp_surface_s = tmp_surface;
-    if (info->is_shadow && render_font_outline){
+    if (info->is_shadow && fontConfig->render_outline){
         tmp_surface_s = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[1], unicode, fcol, bcol);
         if (tmp_surface && tmp_surface_s){
             if ((tmp_surface_s->w-tmp_surface->w) & 1) shiftHalfPixelX(tmp_surface_s);
@@ -117,7 +117,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
     dst_rect.x = xy[0];
     dst_rect.y = xy[1];
 
-    dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - calcFontRatio(info->font_size_xy[1], screen_ratio1,screen_ratio2))/2;
+    dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - calcFontSize(info->font_size_xy[1], screen_ratio1,screen_ratio2))/2;
 
     if ( rotate_flag ) dst_rect.x += miny - minx;
 
@@ -128,7 +128,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 
     if (info->is_shadow && tmp_surface_s){
         SDL_Rect dst_rect_s = dst_rect;
-        if (render_font_outline){
+        if (fontConfig->render_outline){
             dst_rect_s.x -= (tmp_surface_s->w - tmp_surface->w)/2;
             dst_rect_s.y -= (tmp_surface_s->h - tmp_surface->h)/2;
         }
@@ -179,9 +179,10 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color
 void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
 {
     //utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
+    auto fontConfig = getFontConfig(info->types);
     auto ff = generateFPath();
     if ( info->ttf_font[0] == NULL ){
-        if ( info->openFont(font_file, screen_ratio1, screen_ratio2, ff, font_outline_size) == NULL ){
+        if ( info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig) == NULL ){
             utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file );
             quit();
             exit(-1);
@@ -189,7 +190,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
     }
 #if defined(PSP)
     else
-        info->openFont(font_file, screen_ratio1, screen_ratio2, ff, font_outline_size);
+        info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig);
 #endif
 
     if ( info->isEndOfLine() ){
@@ -211,12 +212,12 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
-        xy[0] = calcFontRatio(info->x(), screen_ratio1, screen_ratio2);
-        xy[1] = calcFontRatio(info->y(), screen_ratio1, screen_ratio2);
+        xy[0] = calcFontSize(info->x(), screen_ratio1, screen_ratio2);
+        xy[1] = calcFontSize(info->y(), screen_ratio1, screen_ratio2);
 
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
-        drawGlyph( surface, info, color, text2, xy, cache_info, clip, dst_rect );
+        drawGlyph(surface, info, color, text2, xy, cache_info, clip, dst_rect, fontConfig);
 
         if ( surface == accumulation_surface &&
              !flush_flag &&
@@ -225,7 +226,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
         }
         else if ( flush_flag ){
             if (info->is_shadow){
-                if (render_font_outline)
+                if (fontConfig->render_outline)
                     info->addShadeArea(dst_rect, -1, -1, 2, 2);
                 else
                     info->addShadeArea(dst_rect, 0, 0, shade_distance[0], shade_distance[1]);
@@ -253,6 +254,7 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
     int i;
 
     int start_xy[2];
+    auto fontConfig = getFontConfig(info->types);
     start_xy[0] = info->xy[0];
     start_xy[1] = info->xy[1];
 
@@ -347,7 +349,7 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
     scaled_clipped_rect.h = clipped_rect.h * screen_ratio1 / screen_ratio2;
 
     if (info->is_shadow){
-        if (render_font_outline)
+        if (fontConfig->render_outline)
             info->addShadeArea(scaled_clipped_rect, -1, -1, 2, 2);
         else
             info->addShadeArea(scaled_clipped_rect, 0, 0, shade_distance[0], shade_distance[1]);

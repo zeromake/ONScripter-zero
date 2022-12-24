@@ -36,6 +36,12 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
     - [x] 参考面包工房写了一个启动页
     - [x] 先使用 MANAGE_EXTERNAL_STORAGE 权限来读写 ons 目录
 - [x] android 版完成。
+- [x] 绘制画布在 android 上自动缩放到屏幕大小，否则字体渲染会发虚。
+- [x] 支持对各种情况的字体进行单独设置
+    - [x] 描边支持设置描边颜色，和描边宽度。
+    - [x] 文本字体支持缩放比例。
+- [ ] android 需要一个配置页面对游戏进行一个自定义或者全局配置。
+- [ ] 查找动画在 android 有明显卡顿的问题。
 - [ ] 所有平台支持通过 ci 打包分发到 release。
 - [ ] 抽象文件操作(文件读写，文件目录遍历，文件路径自动拼接，文件是否存在判断，目录创建)，以便于移植到各种平台下，考虑使用 `c++17` 的 `std::filesystem` 的通用方法，移动端平台可能需要手动编写。
 - [ ] 支持读取压缩包里的 ons 游戏，无需解压。
@@ -92,7 +98,7 @@ xmake build -y onscripter
 
 上游的 `20220816` 实际上已经支持了 `utf8` 不过在我看来还是有些无语（代码里全是 utf8 判断），我感觉直接在脚本载入阶段全部转为 `utf8` 代码除了读取脚本之外全部只适配 `utf8`会更简单。
 
-顺便一提 GPLv2 的 `ONScripter` 天生不能商用（说是用了必须要以 GPL 开源就可以了，但是有哪个兄弟卖游戏还给大家分发游戏源码的），但是不和引擎打包在一起加密就是等于没有（虽然 ONScripter 的加密本身也和没有差不多了），必须要修改引擎去支持更高级的加密方式，所以 `ONScripter` 也就只能做成执行器去加载游戏了，开源加载器即可，天生就是给移植用的，IOS 那边的 (ONSPlayer)[https://apps.apple.com/cn/app/id1388250129] 闭源也不知道是不是找了 [onscripter原开发者](http://onscripter.osdn.jp) 买了商用授权。
+顺便一提 GPLv2 的 `ONScripter` 天生不能商用（说是用了必须要以 GPL 开源就可以了，但是有哪个兄弟卖游戏还给大家分发游戏源码的），但是不和引擎打包在一起加密就是等于没有（虽然 ONScripter 的加密本身也和没有差不多了），必须要修改引擎去支持更高级的加密方式，所以 `ONScripter` 也就只能做成执行器去加载游戏了，开源加载器即可，天生就是给移植用的，IOS 那边的 [ONSPlayer](https://apps.apple.com/cn/app/id1388250129) 闭源也不知道是不是找了 [onscripter原开发者](http://onscripter.osdn.jp) 买了商用授权。
 
 商用的话比较活跃的就剩 [renpy](https://www.renpy.org/) ，主要是 `MIT` 协议，有些库是 `LGPL`，有各种平台的支持。
 
