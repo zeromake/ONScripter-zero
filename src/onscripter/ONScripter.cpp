@@ -180,6 +180,17 @@ void ONScripter::initSDL()
     }
 
     // use hardware scaling
+    // 强制把画布放大到和窗口一样，但是在低端机上可能会比较卡，专门给手机版用的
+    screen_width  = script_h.screen_width;
+    screen_height = script_h.screen_height;
+    if (!init_screen_ratio && scaleToWindow && screen_height != screen_device_height) {
+        float _ratio1 = (float)screen_height / (float)screen_device_height;
+        screen_width = screen_device_width;
+        screen_height = screen_device_height;
+        setRescale(100, _ratio1 * 100);
+        script_h.screen_ratio1 = 100;
+        script_h.screen_ratio2 = _ratio1 * 100;
+    }
 
     if (script_h.screen_ratio1 > 0 && script_h.screen_ratio2 > 0) {
         screen_ratio1 = script_h.screen_ratio1;
@@ -188,8 +199,6 @@ void ONScripter::initSDL()
         screen_ratio1 = 1;
         screen_ratio2 = 1;
     }
-    screen_width  = script_h.screen_width;
-    screen_height = script_h.screen_height;
     screen_scale_ratio1 = (float)screen_width / screen_device_width;
     screen_scale_ratio2 = (float)screen_height / screen_device_height;
 
@@ -233,6 +242,7 @@ void ONScripter::initSDL()
         utils::printError("Could not create window: %s\n", SDL_GetError());
         exit(-1);
     }
+    utils::printInfo("CreateWindow: %d x %d\n", window_w, window_h);
     Uint32 render_flag = SDL_RENDERER_ACCELERATED;
     if (vsync) render_flag |= SDL_RENDERER_PRESENTVSYNC;
     renderer = SDL_CreateRenderer(window, -1, render_flag);
@@ -424,6 +434,10 @@ void ONScripter::setVsyncOff() {
     vsync = false;
 }
 
+void ONScripter::setScaleToWindow() {
+    scaleToWindow = true;
+}
+
 void ONScripter::setFontCache()
 {
     cacheFont = true;
@@ -447,6 +461,14 @@ void ONScripter::disableRescale()
 void ONScripter::renderFontOutline()
 {
     render_font_outline = true;
+}
+
+void ONScripter::setFontOutlineSize(int size) {
+    font_outline_size = size;
+}
+
+void ONScripter::setFontOutlineColor(const char* color) {
+    readColor(&font_outline_color, color);
 }
 
 void ONScripter::enableEdit()

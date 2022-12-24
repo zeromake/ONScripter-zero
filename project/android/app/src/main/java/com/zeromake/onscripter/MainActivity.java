@@ -321,6 +321,12 @@ public class MainActivity extends Activity implements
             extras.putStringArray(ONScripter.ARGS_KEY, new String[]{
                     "-r",
                     selectedItem.path,
+                    "--scale-window",
+                    "--render-font-outline",
+                    "--font-outline-size",
+                    "3",
+                    "--font-outline-color",
+                    "#03a9f4",
             });
             intent.putExtras(extras);
             startActivity(intent);

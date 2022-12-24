@@ -322,6 +322,16 @@ void parseOption(int argc, char *argv[]) {
             else if ( !strcmp( argv[0]+1, "-render-font-outline" ) ){
                 ons.renderFontOutline();
             }
+            else if ( !strcmp( argv[0]+1, "-font-outline-size" ) ){
+                argc--;
+                argv++;
+                ons.setFontOutlineSize(atoi(argv[0]));
+            }
+            else if ( !strcmp( argv[0]+1, "-font-outline-color" ) ){
+                argc--;
+                argv++;
+                ons.setFontOutlineColor(argv[0]);
+            }
             else if ( !strcmp( argv[0]+1, "-edit" ) ){
                 ons.enableEdit();
             }
@@ -360,6 +370,10 @@ void parseOption(int argc, char *argv[]) {
             }
 			else if (!strcmp(argv[0]+1, "-no-vsync")){
 			    ons.setVsyncOff();
+			}
+			else if (!strcmp(argv[0]+1, "-scale-window")){
+                // 强制缩放渲染到窗口大小，与 rescale 选项同时用时 rescale 生效，scale-window 失效
+			    ons.setScaleToWindow();
 			}
 #if defined(ANDROID)
             else if ( !strcmp(argv[0]+1, "-save-dir") ){

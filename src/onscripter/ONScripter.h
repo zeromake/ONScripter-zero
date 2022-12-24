@@ -88,12 +88,15 @@ public:
     void setFullscreenMode();
     void setWindowMode();
     void setVsyncOff();
+    void setScaleToWindow();
     void setFontCache();
     void setDebugLevel(int debug);
     void enableButtonShortCut();
     void enableWheelDownAdvance();
     void disableRescale();
     void renderFontOutline();
+    void setFontOutlineSize(int size);
+    void setFontOutlineColor(const char* color);
     void enableEdit();
     void setKeyEXE(const char *path);
     const char* getArchivePath() { return archive_path; }
@@ -357,6 +360,7 @@ private:
     bool edit_flag;
     char *key_exe_file;
     bool vsync;
+    bool scaleToWindow;
     bool cacheFont;
     bool screen_dirty_flag;
 
