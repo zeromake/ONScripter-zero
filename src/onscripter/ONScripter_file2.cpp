@@ -436,10 +436,10 @@ int ONScripter::loadSaveFile2( int file_version )
     }
 
     i = readInt();
-    current_label_info = script_h.getLabelByLine( i );
+    current_label_info = script_h.getLabelByLine(i);
     current_line = i - current_label_info.start_line;
     //utils::printInfo("load %d:%d(%d-%d)\n", current_label_info.start_line, current_line, i, current_label_info.start_line);
-    char *buf = script_h.getAddressByLine( i );
+    char *buf = script_h.getAddressByLine(i);
 
     j = readInt();
     for ( i=0 ; i<j ; i++ ){
@@ -669,11 +669,11 @@ void ONScripter::saveSaveFile2( bool output_flag )
     writeInt( 0, output_flag );
     writeChar( 0, output_flag ); // added in version 205
 
-    writeInt(   0, output_flag ); // added in version 206
-    writeInt( script_h.screen_width/4,   output_flag ); // added in version 206, changed in version 208
-    writeInt( script_h.screen_width/2,   output_flag ); // added in version 206, changed in version 208
-    writeInt( script_h.screen_width*3/4, output_flag ); // added in version 206, changed in version 208
-    writeInt( underline_value, output_flag ); // changed in version 207
+    writeInt(0, output_flag ); // added in version 206
+    writeInt(script_h.screen_width/4,   output_flag); // added in version 206, changed in version 208
+    writeInt(script_h.screen_width/2,   output_flag); // added in version 206, changed in version 208
+    writeInt(script_h.screen_width*3/4, output_flag); // added in version 206, changed in version 208
+    writeInt(underline_value, output_flag); // changed in version 207
 
     Page *page = current_page;
     int num_page = 0;
@@ -701,7 +701,7 @@ void ONScripter::saveSaveFile2( bool output_flag )
     }
 
     writeInt( current_label_info.start_line + current_line, output_flag );
-    char *buf = script_h.getAddressByLine( current_label_info.start_line + current_line );
+    char *buf = script_h.getAddressByLine(current_label_info.start_line + current_line);
     //utils::printInfo("save %d:%d\n", current_label_info.start_line, current_line);
 
     i = 0;

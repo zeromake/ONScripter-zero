@@ -1437,6 +1437,9 @@ void ONScripter::runEventLoop()
               case SDL_WINDOWEVENT_RESIZED:
                   calcRenderRect();
                   break;
+              case SDL_WINDOWEVENT_SIZE_CHANGED:
+                  repaintCommand();
+                  break;
               }
               break;
           case SDL_APP_WILLENTERBACKGROUND:
@@ -1448,13 +1451,11 @@ void ONScripter::runEventLoop()
               if (gles_renderer != nullptr) {
                 gles_renderer->resume();
               }
-              SDL_Delay(1);
               repaintCommand();
               break;
           case SDL_QUIT:
             endCommand();
             break;
-
           default:
             break;
         }

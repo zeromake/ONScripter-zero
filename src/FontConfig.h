@@ -5,13 +5,14 @@
 namespace ons_font {
     typedef unsigned char uchar3[3];
     enum FONT_TYPE {
+        GLOBAL_FONT,
         SENTENCE_FONT,
         ANIM_FONT,
         MENU_FONT,
         DAILOG_FONT,
         RUBY_FONT,
     };
-    typedef struct FontConfig
+    struct FontConfig
     {
         int ratio1;
         int ratio2;
@@ -19,7 +20,8 @@ namespace ons_font {
         int outline_size;
         uchar3 outline_color;
         bool render_outline;
-    } FontConfig;
+
+    };
     static ons_font::FontConfig* __DEFAULT_FONT_CONFIG = nullptr;
     static FontConfig* DEFAULT_FONT_CONFIG() {
         if (__DEFAULT_FONT_CONFIG == nullptr) {

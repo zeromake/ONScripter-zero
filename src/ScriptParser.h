@@ -238,9 +238,7 @@ protected:
     };
     enum{ NORMAL_MODE, DEFINE_MODE };
 
-    ons_font::FontConfig* font_configs[5];
-
-    ons_font::FontConfig* GLOBAL_FONT_CONFIG;
+    ons_font::FontConfig* font_configs[6];
 
     int current_mode;
     int debug_level;
@@ -387,8 +385,12 @@ protected:
         }
         char add(char ch){
             if (text_count >= max_text){
+                if (max_text <= 0) {
+                    max_text = text_count;
+                }
                 char *text2 = new char[max_text*2];
-                memcpy(text2, text, max_text);
+                memset(text2, 0, max_text*2);
+                memcpy(text2, text, text_count);
                 delete[] text;
                 text = text2;
                 max_text *= 2;
