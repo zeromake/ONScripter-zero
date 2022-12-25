@@ -116,20 +116,17 @@ const ons_font::FontConfig* ScriptParser::getFontConfig(const ons_font::FONT_TYP
     if (font_configs[types]) {
         return font_configs[types];
     }
-    if (GLOBAL_FONT_CONFIG) {
-        return GLOBAL_FONT_CONFIG;
+    if (font_configs[ons_font::GLOBAL_FONT]) {
+        return font_configs[ons_font::GLOBAL_FONT];
     }
     return ons_font::DEFAULT_FONT_CONFIG();
 }
 
 void ScriptParser::setFontConfig(const char* buf) {
-    ons_font::FONT_TYPE types;
-    bool is_global = false;
+    ons_font::FONT_TYPE types = ons_font::GLOBAL_FONT;
     int offset = 0;
     if (buf[offset] >= '0' && buf[offset] <= '9') {
         types = ons_font::FONT_TYPE(buf[offset] - '0');
-    } else if (buf[offset] == 'g') {
-        is_global = true;
     }
     offset++;
     if (buf[offset] != ':') {
@@ -137,18 +134,10 @@ void ScriptParser::setFontConfig(const char* buf) {
     }
     offset++;
     ons_font::FontConfig* cfg = nullptr;
-    if (is_global) {
-        if (GLOBAL_FONT_CONFIG == nullptr) {
-            GLOBAL_FONT_CONFIG = new ons_font::FontConfig;
-        }
-        cfg = GLOBAL_FONT_CONFIG;
-
-    } else {
-        if (font_configs[types] == nullptr) {
-            font_configs[types] = new ons_font::FontConfig;
-        }
-        cfg = font_configs[types];
+    if (font_configs[types] == nullptr) {
+        font_configs[types] = new ons_font::FontConfig;
     }
+    cfg = font_configs[types];
     auto default_config = ons_font::DEFAULT_FONT_CONFIG();
     memcpy(cfg, default_config, sizeof(ons_font::FontConfig));
     int start = offset;

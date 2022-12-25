@@ -524,12 +524,17 @@ int ScriptHandler::getLineByAddress( char *address )
 
 char *ScriptHandler::getAddressByLine( int line )
 {
-    LabelInfo label = getLabelByLine( line );
+    LabelInfo label = getLabelByLine(line);
 
     int l = line - label.start_line;
     char *addr = label.label_header;
-    while ( l > 0 ){
-        while( *addr != 0x0a ) addr++;
+    while ( l > 0){
+        while(*addr != 0x0a && *addr != '\0') addr++;
+        if (*addr == '\0') {
+            addr = label.label_header;
+            utils::printError("save file is error goto start\n");
+            break;
+        }
         addr++;
         l--;
     }

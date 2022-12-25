@@ -661,12 +661,12 @@ void ONScripter::setwindowCore()
     sentence_font.top_xy[1] = script_h.readInt();
     // 设置文字列数与行数
     sentence_font.num_xy[0] = calcFontUnRatio(script_h.readInt(), sentence_font.types);
-    sentence_font.num_xy[1] = script_h.readInt();
+    sentence_font.num_xy[1] = calcFontUnRatio(script_h.readInt(), sentence_font.types);
     // 设置文字大小
     sentence_font.font_size_xy[0] = calcFontRatio(script_h.readInt(), sentence_font.types);
     sentence_font.font_size_xy[1] = calcFontRatio(script_h.readInt(), sentence_font.types);
 
-    // 字符高宽
+    // 字符宽高
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
     sentence_font.pitch_xy[1] = script_h.readInt() + sentence_font.font_size_xy[1];
 
