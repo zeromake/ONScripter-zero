@@ -106,9 +106,10 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
             if (ch != '"') break;
             cur_offset++;
             do cur_offset++;
-            while( (ch = key_table[fgetc( ai->file_handle )] ) != '"' );
+            while((ch = key_table[fgetc( ai->file_handle )] ) != '"');
             cur_offset += 4;
-            readLong( ai->file_handle );
+            fgetc(ai->file_handle);
+            readLong(ai->file_handle);
             ai->num_of_files++;
         }
         ai->fi_list = new FileInfo[ ai->num_of_files ];
@@ -133,19 +134,19 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
             }
             ai->fi_list[i].name[count] = '\0';
             ai->fi_list[i].original_name[count] = '\0';
-            ai->fi_list[i].compression_type = getRegisteredCompressionType( ai->fi_list[i].name );
             ai->fi_list[i].offset = cur_offset;
-            ai->fi_list[i].length = swapLong( readLong( ai->file_handle ) );
+            ai->fi_list[i].compression_type = readChar(ai->file_handle);
+            ai->fi_list[i].length = swapLong(readLong(ai->file_handle));
             ai->fi_list[i].original_length = ai->fi_list[i].length;
             cur_offset += ai->fi_list[i].length;
         }
     } else {
         // old NSA filename def: filename, ending '\0' byte , compr-type byte,
         // start (4byte), length (4byte))
-        ai->num_of_files = readShort( ai->file_handle );
-        ai->fi_list = new FileInfo[ ai->num_of_files ];
+        ai->num_of_files = readShort(ai->file_handle);
+        ai->fi_list = new FileInfo[ai->num_of_files];
 
-        ai->base_offset = readLong( ai->file_handle );
+        ai->base_offset = readLong(ai->file_handle);
         ai->base_offset += offset;
 
         for ( i=0 ; i<ai->num_of_files ; i++ ){
@@ -222,7 +223,7 @@ int SarReader::writeHeaderSub( ArchiveInfo *ai, FILE *fp, int archive_type, int 
             fputc( ai->fi_list[i].name[j], fp );
 
         if (archive_type >= ARCHIVE_TYPE_NSA)
-            writeChar( fp, ai->fi_list[i].compression_type );
+            writeChar(fp, ai->fi_list[i].compression_type);
 
         if (archive_type == ARCHIVE_TYPE_NS2)
             writeLong( fp, swapLong(ai->fi_list[i].length) );
@@ -308,8 +309,8 @@ size_t SarReader::addFile( ArchiveInfo *ai, FILE *newfp, int no, size_t offset, 
                 getDecompressedFileLength( ai->fi_list[no].compression_type,
                                            newfp, 0 );
         }
-        fseek( ai->file_handle, offset, SEEK_SET );
-        writeLong( ai->file_handle, ai->fi_list[no].original_length );
+        fseek(ai->file_handle, offset, SEEK_SET);
+        writeLong(ai->file_handle, ai->fi_list[no].original_length);
         if (!is_nbz){
             // in case the original is not compressed in NBZ
             ai->fi_list[no].length = encodeNBZ( ai->file_handle, ai->fi_list[no].length, buffer ) + 4;
