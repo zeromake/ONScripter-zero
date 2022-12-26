@@ -1441,7 +1441,7 @@ void ScriptHandler::parseStr( char **buf )
     else if ( **buf == '`' ){
         int c=0;
         str_string_buffer[c++] = *(*buf)++;
-        while ( **buf != '`' && **buf != 0x0a )
+        while (**buf != '`' && **buf != 0x0a)
             str_string_buffer[c++] = *(*buf)++;
         str_string_buffer[c] = '\0';
         if ( **buf == '`' ) (*buf)++;

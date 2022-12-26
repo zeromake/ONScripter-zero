@@ -414,12 +414,6 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
             }
             else{
                 out_text[1] = 0;
-
-                if (i+1 != current_page->text_count &&
-                    current_page->text[i+1] != 0x0a){
-                    out_text[1] = current_page->text[i+1];
-                    i++;
-                }
             }
             drawChar( out_text, &f_info, false, false, surface, &text_info );
         }
@@ -996,55 +990,37 @@ bool ONScripter::processText()
                 return clickWait( out_text );
         }
         else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
-                 script_h.checkClickstr(&script_h.getStringBuffer()[string_buffer_offset+1]) == 1 &&
-                 script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
-            if ( script_h.getStringBuffer()[ string_buffer_offset + 2 ] &&
+                 script_h.checkClickstr(&script_h.getStringBuffer()[string_buffer_offset+1]) == 1){
+            if ( script_h.getStringBuffer()[string_buffer_offset + 2] &&
                  script_h.checkClickstr(&script_h.getStringBuffer()[string_buffer_offset+2]) > 0){
                 clickstr_state = CLICK_NONE;
-            }
-            else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] == '@'){
+            } else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] == '@'){
                 return clickWait( out_text );
-            }
-            else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] == '\\'){
+            } else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] == '\\'){
                 return clickNewPage( out_text );
-            }
-            else{
-                out_text[1] = script_h.getStringBuffer()[ string_buffer_offset + 1 ];
+            } else {
+                out_text[1] = script_h.getStringBuffer()[ string_buffer_offset+ 1];
                 if (sentence_font.getRemainingLine() <= clickstr_line)
                     return clickNewPage( out_text );
                 else
                     return clickWait( out_text );
             }
-        }
-        else{
+        } else{
             clickstr_state = CLICK_NONE;
         }
 
         bool flush_flag = true;
         if ( skip_mode || ctrl_pressed_status )
             flush_flag = false;
-        if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
-             !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)){
-            out_text[1] = script_h.getStringBuffer()[ string_buffer_offset + 1 ];
-            drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
-            num_chars_in_sentence++;
-        }
-        else if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
-            drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
-            num_chars_in_sentence++;
-        }
+        drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
+        num_chars_in_sentence++;
 
         int wait_time = sentence_font.wait_time == -1 ? default_text_speed[text_speed_no] : sentence_font.wait_time;
         if (!skip_mode && !ctrl_pressed_status && wait_time != 0){
             event_mode = WAIT_TIMER_MODE | WAIT_INPUT_MODE;
             waitEvent( wait_time );
         }
-
-        if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
-             !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR))
-            string_buffer_offset++;
         string_buffer_offset++;
-
         return true;
     }
 
