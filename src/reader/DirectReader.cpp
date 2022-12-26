@@ -444,17 +444,17 @@ size_t DirectReader::decodeNBZ( FILE *fp, size_t offset, unsigned char *buf )
     void *unused;
     int err, len, nunused;
 
-    fseek( fp, offset, SEEK_SET );
-    original_length = count = readLong( fp );
+    fseek(fp, offset, SEEK_SET);
+    original_length = count = readLong(fp);
 
     bfp = BZ2_bzReadOpen( &err, fp, 0, 0, NULL, 0 );
     if ( bfp == NULL || err != BZ_OK ) return 0;
 
     while( err == BZ_OK && count > 0 ){
         if ( count >= READ_LENGTH )
-            len = BZ2_bzRead( &err, bfp, buf, READ_LENGTH );
+            len = BZ2_bzRead(&err, bfp, buf, READ_LENGTH);
         else
-            len = BZ2_bzRead( &err, bfp, buf, count );
+            len = BZ2_bzRead(&err, bfp, buf, count);
         count -= len;
         buf += len;
     }

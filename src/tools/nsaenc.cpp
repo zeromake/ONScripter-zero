@@ -69,22 +69,24 @@ int processFile(
         fi->compression_type = BaseReader::NBZ_COMPRESSION;
     }
 
-    // if ( (strstr( fi->name, ".nbz" ) != NULL) ||
-    //      (strstr( fi->name, ".NBZ" ) != NULL) )
-    //     fi->compression_type = BaseReader::NBZ_COMPRESSION;
-    // else if (enhanced_flag &&
-    //          ( (( (strstr( fi->name, ".bmp" ) != NULL) ||
-    //               (strstr( fi->name, ".BMP" ) != NULL) ) &&
-    //             (magic[0] == 'B') && (magic[1] == 'M')) ||
-    //            (( (strstr( fi->name, ".wav" ) != NULL) ||
-    //               (strstr( fi->name, ".WAV" ) != NULL) ) &&
-    //             (magic[0] == 'R') && (magic[1] == 'I') &&
-    //             (magic[2] == 'F') && (magic[3] == 'F')) )){
-    //     // If enhanced, use NBZ compression on (true) BMP & WAV files in NSA archive
-    //     fi->compression_type = BaseReader::NBZ_COMPRESSION;
-    // } else {
-    //     fi->compression_type = BaseReader::NO_COMPRESSION;
-    // }
+    if ( (strstr( fi->name, ".nbz" ) != NULL) ||
+         (strstr( fi->name, ".NBZ" ) != NULL) )
+        fi->compression_type = BaseReader::NBZ_COMPRESSION;
+    else if (enhanced_flag &&
+             ( (( (strstr( fi->name, ".bmp" ) != NULL) ||
+                  (strstr( fi->name, ".BMP" ) != NULL) ) &&
+                (magic[0] == 'B') && (magic[1] == 'M')) ||
+               (( (strstr( fi->name, ".wav" ) != NULL) ||
+                  (strstr( fi->name, ".WAV" ) != NULL) ) &&
+                (magic[0] == 'R') && (magic[1] == 'I') &&
+                (magic[2] == 'F') && (magic[3] == 'F')) ||
+                ((strstr( fi->name, ".ogg" ) != NULL) || (strstr( fi->name, ".ogg" ) != NULL))
+            )){
+        // If enhanced, use NBZ compression on (true) BMP & WAV files in NSA archive
+        fi->compression_type = BaseReader::NBZ_COMPRESSION;
+    } else {
+        fi->compression_type = BaseReader::NO_COMPRESSION;
+    }
 
     if (fi->compression_type > BaseReader::NO_COMPRESSION && fi->length < 10 * 1024) {
         fi->compression_type = BaseReader::NO_COMPRESSION;
@@ -133,7 +135,8 @@ int main(int argc, char *argv[]) {
             int version = atoi(argv[0]);
             if (version == 2) {
                 archive_type = BaseReader::ARCHIVE_TYPE_NS2;
-                init_base_offset = 5;
+                init_base_offset = 5; // nsa_offset + base_offset
+                base_offset = 6;
             }
             nsa_offset = version - 1;
         } else if (!strcmp(argv[0], "-e")){
@@ -216,6 +219,6 @@ int main(int argc, char *argv[]) {
         fclose(fp);
     }
     cSR.writeHeader(sAI->file_handle, archive_type, nsa_offset);
-    if ( buffer ) delete[] buffer;
+    if (buffer) delete[] buffer;
     return 0;
 }
