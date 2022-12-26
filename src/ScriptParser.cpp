@@ -413,6 +413,7 @@ void ScriptParser::readColor( uchar3 *color, const char *buf ){
 void ScriptParser::deleteRMenuLink()
 {
     RMenuLink *link = root_rmenu_link.next;
+    rmenu_calls.clear();
     while(link){
         RMenuLink *tmp = link;
         link = link->next;
@@ -436,8 +437,12 @@ int ScriptParser::getSystemCallNo( const char *buffer )
     else if ( !strcmp( buffer, "automode" ) )    return SYSTEM_AUTOMODE;
     else if ( !strcmp( buffer, "end" ) )         return SYSTEM_END;
     else{
-        utils::printInfo("Unsupported system call %s\n", buffer );
-        return -1;
+        utils::printInfo("rmenu add label call: %s\n", buffer );
+        int no = rmenu_call_no++;
+        char *label = new char[strlen(buffer)+1];
+        strcpy(label, buffer);
+        rmenu_calls[no] = label;
+        return no;
     }
 }
 

@@ -30,6 +30,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <map>
 
 #include "ScriptHandler.h"
 #include "NsaReader.h"
@@ -493,6 +494,9 @@ protected:
         };
     } root_rmenu_link;
     unsigned int rmenu_link_num, rmenu_link_width;
+
+    std::map<int, char*> rmenu_calls;
+    unsigned int rmenu_call_no = 1000;
 
     void deleteRMenuLink();
     int getSystemCallNo( const char *buffer );
