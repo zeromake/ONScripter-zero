@@ -103,12 +103,16 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
         // there's an extra byte at the end of the header, not sure what for
         while(1){
             unsigned char ch = key_table[fgetc( ai->file_handle )];
-            if (ch != '"') break;
+            if (ch != '"') {
+                ch = key_table[fgetc(ai->file_handle)];
+            }
+            if (ch != '"') {
+                break;
+            }
             cur_offset++;
             do cur_offset++;
             while((ch = key_table[fgetc( ai->file_handle )] ) != '"');
             cur_offset += 4;
-            fgetc(ai->file_handle);
             readLong(ai->file_handle);
             ai->num_of_files++;
         }
@@ -120,9 +124,13 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
         for ( i=0 ; i<ai->num_of_files ; i++ ){
             unsigned int count = 0;
             //skip the beginning double-quote
-            unsigned char ch = key_table[fgetc( ai->file_handle )];
+            unsigned char ch = key_table[fgetc(ai->file_handle)];
+            if (ch != '"') {
+                ai->fi_list[i].compression_type = ch;
+                ch = key_table[fgetc(ai->file_handle)];
+            }
             unsigned char origin_ch;
-            while( (ch = key_table[fgetc( ai->file_handle )] ) != '"' ){
+            while((ch = key_table[fgetc( ai->file_handle )] ) != '"'){
                 origin_ch = ch;
                 if ( 'a' <= ch && ch <= 'z' ) ch += 'A' - 'a';
                 else if (REPLACE_DELIMITER == ch) {
@@ -134,8 +142,10 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
             }
             ai->fi_list[i].name[count] = '\0';
             ai->fi_list[i].original_name[count] = '\0';
+            if (ai->fi_list[i].compression_type == NO_COMPRESSION) {
+                ai->fi_list[i].compression_type = getRegisteredCompressionType(ai->fi_list[i].name);
+            }
             ai->fi_list[i].offset = cur_offset;
-            ai->fi_list[i].compression_type = readChar(ai->file_handle);
             ai->fi_list[i].length = swapLong(readLong(ai->file_handle));
             ai->fi_list[i].original_length = ai->fi_list[i].length;
             cur_offset += ai->fi_list[i].length;
@@ -176,8 +186,7 @@ void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int off
 
             if ( archive_type == ARCHIVE_TYPE_NSA ){
                 ai->fi_list[i].original_length = readLong( ai->file_handle );
-            }
-            else{
+            } else {
                 ai->fi_list[i].original_length = ai->fi_list[i].length;
             }
 
