@@ -325,8 +325,8 @@ public class MainActivity extends Activity implements
                     selectedItem.path,
                     "--scale-window",
                     "--fontcache",
-                    "--font-config",
-                    "1:3,2,,1,5,#03a9f4",
+//                    "--font-config",
+//                    "1:3,2,,1,5,#03a9f4",
                     // "--sharpness",
                     // "1.0",
             });

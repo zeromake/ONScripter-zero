@@ -427,8 +427,8 @@ int ScriptParser::rmenuCommand()
         if ( rmenu_link_width < strlen( buf )/2 + 1 )
             rmenu_link_width = strlen( buf )/2 + 1;
 
-        link->next->system_call_no = getSystemCallNo( script_h.readLabel() );
-
+        const char *label = script_h.readLabel();
+        link->next->system_call_no = getSystemCallNo(label);
         link = link->next;
         rmenu_link_num++;
 

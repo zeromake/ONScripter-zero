@@ -353,9 +353,7 @@ int ONScripter::tablegotoCommand()
 int ONScripter::systemcallCommand()
 {
     system_menu_mode = getSystemCallNo( script_h.readLabel() );
-
     executeSystemCall();
-
     return RET_CONTINUE;
 }
 

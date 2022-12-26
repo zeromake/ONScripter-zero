@@ -169,10 +169,16 @@ int ONScripter::executeSystemCall()
             executeSystemEnd();
             break;
           default:
-            leaveSystemCall();
+            if (system_menu_mode >= 1000) {
+                gosubReal(rmenu_calls.at(system_menu_mode), script_h.getNext());
+                leaveSystemCall();
+                return 1;
+            } else {
+                leaveSystemCall();
+            }
+            break;
         }
     }
-
     return 0;
 }
 
