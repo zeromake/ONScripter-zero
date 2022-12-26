@@ -19,6 +19,7 @@ if is_plat("windows") then
     add_cxflags("/utf-8")
     add_cxflags("/UNICODE")
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
+    add_includedirs("include/windows")
 end
 
 add_includedirs("src", "src/onscripter", "src/reader", "include")
@@ -144,6 +145,24 @@ target("nsaenc")
     end
     add_files(
         "src/tools/nsaenc.cpp",
+        "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/reader/DirectReader.cpp",
+        "src/reader/NsaReader.cpp",
+        "src/reader/SarReader.cpp",
+        "src/conv_shared.cpp",
+        "src/resize_image.cpp",
+        "src/language/*.cpp"
+    )
+
+target("arcmake")
+    set_kind("binary")
+    add_packages("bzip2", "jpeg")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    add_files(
+        "src/tools/arcmake.cpp",
         "src/coding2utf16.cpp",
         "src/gbk2utf16.cpp",
         "src/reader/DirectReader.cpp",
