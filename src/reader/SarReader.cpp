@@ -205,8 +205,8 @@ int SarReader::writeHeaderSub( ArchiveInfo *ai, FILE *fp, int archive_type, int 
     if ( archive_type == ARCHIVE_TYPE_NS2 ) {
         writeLong(fp, swapLong(ai->base_offset - nsa_offset));
     } else {
-        writeShort( fp, ai->num_of_files  );
-        writeLong( fp, ai->base_offset-nsa_offset );
+        writeShort(fp, ai->num_of_files );
+        writeLong(fp, ai->base_offset-nsa_offset);
     }
 
     for ( i=0 ; i<ai->num_of_files ; i++ ){
