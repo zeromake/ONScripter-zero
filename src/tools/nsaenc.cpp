@@ -124,7 +124,8 @@ int main(int argc, char *argv[]) {
     unsigned int nsa_offset = 0;
     bool enhanced_flag = false;
     int archive_type = BaseReader::ARCHIVE_TYPE_NSA;
-    int base_offset = 6;
+    int base_offset = 14;
+    int init_base_offset = 6;
     while (argc > 2){
         if (!strcmp(argv[0], "-ns")) {
             argc--;
@@ -132,7 +133,7 @@ int main(int argc, char *argv[]) {
             int version = atoi(argv[0]);
             if (version == 2) {
                 archive_type = BaseReader::ARCHIVE_TYPE_NS2;
-                base_offset = 14;
+                init_base_offset = 5;
             }
             nsa_offset = version - 1;
         } else if (!strcmp(argv[0], "-e")){
@@ -160,7 +161,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
     sAI->num_of_files = 0;
-    sAI->base_offset = 5;
+    sAI->base_offset = init_base_offset;
     unsigned long offset = 0;
     int count = files.size();
     sAI->fi_list = new NsaReader::FileInfo[count];
