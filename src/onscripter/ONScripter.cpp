@@ -95,6 +95,17 @@ void ONScripter::setDebugLevel(int debug) {
 
 void ONScripter::initSDL()
 {
+    char useSimd[16];
+#if defined(USE_SIMD_X86_AVX2)
+    strcpy(useSimd, "AVX2");
+#elif defined(USE_SIMD_X86_SSSE3)
+    strcpy(useSimd, "SSE3");
+#elif defined(USE_SIMD_ARM_NEON)
+    strcpy(useSimd, "NEON");
+#else
+    strcpy(useSimd, "NULL");
+#endif
+    utils::printInfo("use simd: %s\n", useSimd);
     /* ---------------------------------------- */
     /* Initialize SDL */
     //

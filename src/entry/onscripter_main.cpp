@@ -144,7 +144,7 @@ JNIEnv *GetJniEnv() {
             ~DetachJniOnExit() {
                 jniVM->DetachCurrentThread();
             }
-        };
+        } detachJniOnExit;
     } else if (nEnvStat == JNI_EVERSION) {
         return nullptr;
     }

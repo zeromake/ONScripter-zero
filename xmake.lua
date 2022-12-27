@@ -233,10 +233,15 @@ target("onscripter")
     end
 
     if is_arch("x86", "x64", "i386", "x86_64") then
-        add_vectorexts("avx2")
-        add_defines("USE_SIMD=1", "USE_SIMD_X86_AVX2=1")
+        add_defines("USE_SIMD=1")
+        if is_plat("macosx", "iphoneos") then
+            add_cxflags("-march=knl")
+        else
+            add_vectorexts("avx2")
+        end
     elseif is_arch("arm.*") then
-        add_vectorexts("neon")
+        add_defines("USE_SIMD=1")
+        -- add_vectorexts("neon")
     end
     add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
     add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")

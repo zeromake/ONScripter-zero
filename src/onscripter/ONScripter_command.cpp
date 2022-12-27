@@ -4303,9 +4303,11 @@ int ONScripter::sprintfCommand() {
     script_h.readVariable();
     const char* format = script_h.readStr();
     auto out_variable = script_h.current_variable;
-    size_t buff_size = strlen(format) * 50;
-    char *buff = new char[buff_size];
-    memset(buff, 0, buff_size);
+    if (!sprintf_buf) {
+        sprintf_buf = new char[1024]{0};
+    } else {
+        sprintf_buf[0] = '\0';
+    }
 #ifdef _WIN32
     std::vector<ScriptHandler::VariableInfo> args;
     while(script_h.getEndStatus() & ScriptHandler::END_COMMA) {
@@ -4338,18 +4340,21 @@ int ONScripter::sprintfCommand() {
     std::vector<void*> args;
     while(script_h.getEndStatus() & ScriptHandler::END_COMMA) {
         script_h.readVariable();
-        char* value = nullptr;
+        void* value = nullptr;
         if (script_h.current_variable.type == ScriptHandler::VAR_STR) {
             value = script_h.getVariableData(script_h.current_variable.var_no).str;
         } else if (script_h.current_variable.type == ScriptHandler::VAR_INT) {
-            value = (char*)script_h.getVariableData(script_h.current_variable.var_no).num;
+            value = reinterpret_cast<void*>(script_h.getVariableData(script_h.current_variable.var_no).num);
+        } else {
+            utils::printError("sprintf only support string,int\n");
+            return RET_CONTINUE;
         }
         args.push_back(value);
     }
-    ons_sprintf(buff, format, args.size(), args.data());
+    ons_sprintf(sprintf_buf, format, args.size(), args.data());
 #endif
-    setStr(&script_h.getVariableData(out_variable.var_no).str, buff);
-    delete[] buff;
+    setStr(&script_h.getVariableData(out_variable.var_no).str, sprintf_buf);
+    args.clear();
     return RET_CONTINUE;
 }
 
