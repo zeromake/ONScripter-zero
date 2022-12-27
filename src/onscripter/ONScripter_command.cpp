@@ -4335,7 +4335,7 @@ int ONScripter::sprintfCommand() {
         memcpy(al.pa+offset, &value, ptr_size);
         offset += ptr_size;
     }
-    vsprintf(buff, format, al.al);
+    vsprintf(sprintf_buf, format, al.al);
 #else
     std::vector<void*> args;
     while(script_h.getEndStatus() & ScriptHandler::END_COMMA) {
