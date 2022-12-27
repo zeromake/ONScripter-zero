@@ -332,3 +332,10 @@ target("demo/font")
     if is_plat("windows") then
         add_files("src/resource.rc")
     end
+
+target("saveconv")
+    set_kind("binary")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    add_files("src/tools/saveconv.cpp")

@@ -233,11 +233,12 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
             flushDirect( dst_rect, REFRESH_NONE_MODE );
         }
 
+        int charWidth = dst_rect.w * screen_ratio2 / screen_ratio1;
         if (IS_TWO_BYTE(text[0])){
-            info->advanceCharInHankaku(2, dst_rect.w);
+            info->advanceCharInHankaku(2, charWidth);
             break;
         }
-        info->advanceCharInHankaku(1, dst_rect.w);
+        info->advanceCharInHankaku(1, charWidth);
         text2[0] = text[1];
         if (text2[0] == 0) break;
     }

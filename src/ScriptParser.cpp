@@ -199,7 +199,7 @@ const int ScriptParser::calcFontUnRatio(const int v, const ons_font::FONT_TYPE t
     if (cfg->ratio1 == cfg->ratio2) {
         return v;
     }
-    return v / cfg->ratio1 * cfg->ratio2;
+    return v * cfg->ratio2 / cfg->ratio1;
 }
 
 void ScriptParser::reset()
