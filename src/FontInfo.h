@@ -29,10 +29,23 @@
 #include <functional>
 #include "BaseReader.h"
 #include "FontConfig.h"
+#include <map>
 
 typedef unsigned char uchar3[3];
 
+struct Position
+{
+    int xy[2];
+    struct Position* next;
+};
+
+
 class _FontInfo{
+private:
+    int xy[2]; // Current position
+    int old_xy[2]; // Prev position
+    struct Position* stash;
+    int positionOffset;
 public:
     enum { YOKO_MODE = 0,
            TATE_MODE = 1
@@ -46,15 +59,13 @@ public:
     int font_size_xy[2];
     int top_xy[2]; // Top left origin
     int num_xy[2]; // Row and column of the text windows
-    int xy[2]; // Current position
-    int old_xy[2];
     int pitch_xy[2]; // Width and height of a character
     int wait_time;
     bool is_bold;
     bool is_shadow;
     bool is_transparent;
     bool is_newline_accepted;
-    uchar3  window_color;
+    uchar3 window_color;
 
     int line_offset_xy[2]; // ruby offset for each line
     bool rubyon_flag;
@@ -63,6 +74,12 @@ public:
 
     _FontInfo();
     void reset();
+    int getToPrev(int index = 0);
+    int getSavePoint(int index);
+    void saveToPrev(bool use_ruby_offset=true);
+    void savePoint();
+    void rollback(int mode = 3);
+    void copyPosition(_FontInfo *font);
     void *openFont(char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr, const ons_font::FontConfig* fontConfig = nullptr);
     void setTateyokoMode(int tateyoko_mode);
     int getTateyokoMode();
@@ -77,7 +94,7 @@ public:
 
     bool isEndOfLine(int margin=0);
     bool isLineEmpty();
-    void advanceCharInHankaku(int offest);
+    void advanceCharInHankaku(int offest, int width = 0);
     void addLineOffset(int margin);
     void setRubyOnFlag(bool flag);
 

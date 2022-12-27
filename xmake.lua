@@ -320,3 +320,15 @@ target("example2")
 --         add_files("src/resource.rc")
 --     end
 --     add_files("demo.cpp")
+
+
+target("demo/font")
+    set_kind("binary")
+    add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
+    add_files("demo/font.cpp")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    if is_plat("windows") then
+        add_files("src/resource.rc")
+    end

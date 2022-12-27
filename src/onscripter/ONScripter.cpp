@@ -816,8 +816,7 @@ void ONScripter::resetSentenceFont()
     sentence_font_info.scalePosXY( screen_ratio1, screen_ratio2 );
     sentence_font_info.scalePosWH( screen_ratio1, screen_ratio2 );
 
-    sentence_font.old_xy[0] = sentence_font.x(false);
-    sentence_font.old_xy[1] = sentence_font.y(false);
+    sentence_font.saveToPrev(false);
 }
 
 void ONScripter::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag, bool direct_flag )
@@ -1288,9 +1287,7 @@ void ONScripter::newPage()
 
 ButtonLink *ONScripter::getSelectableSentence( char *buffer, _FontInfo *info, bool flush_flag, bool nofile_flag )
 {
-    int current_text_xy[2];
-    current_text_xy[0] = info->xy[0];
-    current_text_xy[1] = info->xy[1];
+    info->savePoint();
 
     ButtonLink *bl = new ButtonLink();
     bl->button_type = ButtonLink::TMP_SPRITE_BUTTON;
@@ -1320,9 +1317,9 @@ ButtonLink *ONScripter::getSelectableSentence( char *buffer, _FontInfo *info, bo
 
     info->newLine();
     if (info->getTateyokoMode() == _FontInfo::YOKO_MODE)
-        info->xy[0] = current_text_xy[0];
+        info->rollback(1);
     else
-        info->xy[1] = current_text_xy[1];
+        info->rollback(2);
 
     dirty_rect.add( bl->image_rect );
 

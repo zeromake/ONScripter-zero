@@ -83,6 +83,28 @@ void _FontInfo::reset()
     is_shadow = true;
     is_transparent = true;
     is_newline_accepted = false;
+    while (stash)
+    {
+        auto cur = stash;
+        stash = cur->next;
+        cur->next = NULL;
+        delete cur;
+    }
+}
+
+
+void _FontInfo::copyPosition(_FontInfo *font) {
+    xy[0] = font->xy[0];
+    xy[1] = font->xy[1];
+}
+
+void _FontInfo::saveToPrev(bool use_ruby_offset) {
+    old_xy[0] = x(use_ruby_offset);
+    old_xy[1] = y(use_ruby_offset);
+}
+
+int _FontInfo::getToPrev(int index) {
+    return old_xy[index];
 }
 
 void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f, const ons_font::FontConfig* fontConfig)
@@ -133,6 +155,8 @@ void *_FontInfo::openFont( char *_font_file, int ratio1, int ratio2, std::functi
         if (fc->next->font[1] == nullptr) {
             utils::printError("Open font failed: %s\n", TTF_GetError());
         }
+        TTF_SetFontHinting(fc->next->font[0], TTF_HINTING_NONE);
+        TTF_SetFontHinting(fc->next->font[1], TTF_HINTING_NONE);
         TTF_SetFontOutline(fc->next->font[1], fontConfig->outline_size);
         
 #endif
@@ -174,6 +198,9 @@ int _FontInfo::x(bool use_ruby_offset)
     int x = xy[0]*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE)
         x += font_size_xy[0] - pitch_xy[0];
+    if (positionOffset != 0) {
+        x += positionOffset;
+    }
     return x;
 }
 
@@ -189,6 +216,7 @@ void _FontInfo::setXY( int x, int y )
 {
     if ( x != -1 ) xy[0] = x*2;
     if ( y != -1 ) xy[1] = y*2;
+    positionOffset = 0;
 }
 
 void _FontInfo::clear()
@@ -211,6 +239,7 @@ void _FontInfo::newLine()
         xy[1] = 0;
     }
     line_offset_xy[0] = line_offset_xy[1] = 0;
+    positionOffset = 0;
 }
 
 void _FontInfo::setLineArea(int num)
@@ -233,14 +262,52 @@ bool _FontInfo::isLineEmpty()
     return false;
 }
 
-void _FontInfo::advanceCharInHankaku(int offset)
+void _FontInfo::advanceCharInHankaku(int offset, int width)
 {
+    if (tateyoko_mode == 0 && width > 0) {
+        int index = xy[tateyoko_mode] + 1;
+        int offsetWidth = width - (offset * pitch_xy[0] / 2);
+        positionOffset += offsetWidth;
+    } else if (tateyoko_mode == 1) {
+        positionOffset = 0;
+    }
     xy[tateyoko_mode] += offset;
 }
 
 void _FontInfo::addLineOffset(int offset)
 {
     line_offset_xy[tateyoko_mode] += offset;
+}
+
+int _FontInfo::getSavePoint(int index) {
+    if (stash) {
+        return stash->xy[index];
+    }
+    return xy[index];
+}
+
+void _FontInfo::savePoint() {
+    auto cur = new struct Position;
+    cur->next = NULL;
+    cur->xy[0] = xy[0];
+    cur->xy[1] = xy[1];
+    cur->next = stash;
+    stash = cur;
+}
+
+void _FontInfo::rollback(int mode) {
+    auto cur = stash;
+    if (cur) {
+        stash = cur->next;
+        cur->next = NULL;
+        if (mode & 1) {
+            xy[0] = cur->xy[0];
+        }
+        if (mode & 2) {
+            xy[1] = cur->xy[1];
+        }
+        delete cur;
+    }
 }
 
 SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
