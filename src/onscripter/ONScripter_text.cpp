@@ -204,8 +204,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
         }
     }
 
-    info->old_xy[0] = info->x(false);
-    info->old_xy[1] = info->y(false);
+    info->saveToPrev(false);
 
     char text2[2] = {text[0], 0};
     if (IS_TWO_BYTE(text[0])) text2[1] = text[1];
@@ -235,10 +234,10 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
         }
 
         if (IS_TWO_BYTE(text[0])){
-            info->advanceCharInHankaku(2);
+            info->advanceCharInHankaku(2, dst_rect.w);
             break;
         }
-        info->advanceCharInHankaku(1);
+        info->advanceCharInHankaku(1, dst_rect.w);
         text2[0] = text[1];
         if (text2[0] == 0) break;
     }
@@ -255,8 +254,10 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
 
     int start_xy[2];
     auto fontConfig = getFontConfig(info->types);
-    start_xy[0] = info->xy[0];
-    start_xy[1] = info->xy[1];
+    info->savePoint();
+    start_xy[0] = info->getSavePoint(0);
+    start_xy[1] = info->getSavePoint(1);
+    info->rollback();
 
     /* ---------------------------------------- */
     /* Draw selected characters */

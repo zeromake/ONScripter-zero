@@ -704,8 +704,7 @@ void ONScripter::setwindowCore()
         sentence_font.window_color[0] = sentence_font.window_color[1] = sentence_font.window_color[2] = 0xff;
     }
 
-    sentence_font.old_xy[0] = sentence_font.x(false);
-    sentence_font.old_xy[1] = sentence_font.y(false);
+    sentence_font.saveToPrev(false);
 }
 
 int ONScripter::setwindow3Command()
@@ -805,9 +804,8 @@ int ONScripter::selectCommand()
     }
     shortcut_mouse_line = -1;
 
-    int xy[2];
-    xy[0] = sentence_font.xy[0];
-    xy[1] = sentence_font.xy[1];
+
+    sentence_font.savePoint();
 
     if ( selectvoice_file_name[SELECTVOICE_OPEN] )
         playSound(selectvoice_file_name[SELECTVOICE_OPEN],
@@ -896,8 +894,7 @@ int ONScripter::selectCommand()
         return RET_CONTINUE;
     }
     automode_flag = false;
-    sentence_font.xy[0] = xy[0];
-    sentence_font.xy[1] = xy[1];
+    sentence_font.rollback();
 
     flush( refreshMode() );
 
@@ -2558,10 +2555,10 @@ int ONScripter::getenterCommand()
 int ONScripter::getcursorpos2Command()
 {
     script_h.readInt();
-    script_h.setInt( &script_h.current_variable, sentence_font.old_xy[0] );
+    script_h.setInt(&script_h.current_variable, sentence_font.getToPrev(0));
 
     script_h.readInt();
-    script_h.setInt( &script_h.current_variable, sentence_font.old_xy[1] );
+    script_h.setInt(&script_h.current_variable, sentence_font.getToPrev(1));
 
     return RET_CONTINUE;
 }

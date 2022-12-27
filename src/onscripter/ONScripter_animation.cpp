@@ -185,21 +185,17 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
             drawString( anim->file_name, anim->color_list[ anim->current_cell ], &f_info, false, NULL, &pos );
         }
         else{
-            int xy_bak[2];
-            xy_bak[0] = f_info.xy[0];
-            xy_bak[1] = f_info.xy[1];
+            f_info.savePoint();
 
             int xy[2] = {0, 0};
             f_info.setXY(f_info.num_xy[0]-1, f_info.num_xy[1]-1);
             pos = f_info.calcUpdatedArea(xy, screen_ratio1, screen_ratio2);
 
-            f_info.xy[0] = xy_bak[0];
-            f_info.xy[1] = xy_bak[1];
+            f_info.rollback();
         }
 
         if (info != NULL){
-            info->xy[0] = f_info.xy[0];
-            info->xy[1] = f_info.xy[1];
+            info->copyPosition(&f_info);
         }
 
         anim->orig_pos.w = pos.w;
