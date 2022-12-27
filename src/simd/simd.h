@@ -19,7 +19,20 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #pragma once
+
+#ifndef __SIMD_H__
 #define __SIMD_H__
+
+#if defined(__AVX2__)
+#define USE_SIMD_X86_AVX2 1
+#elif defined(__SSSE3__)
+#define USE_SIMD_X86_SSSE3 1
+#elif defined(__ARM_NEON)
+#define USE_SIMD_ARM_NEON 1
+#else
+#warning "simd is unsupport!"
+#undef USE_SIMD
+#endif
 
 #ifdef USE_SIMD_X86_AVX2
 #include <immintrin.h>
@@ -96,3 +109,4 @@ namespace simd {
 #endif
 
 #undef inline
+#endif

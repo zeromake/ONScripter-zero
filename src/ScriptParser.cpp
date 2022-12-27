@@ -107,6 +107,7 @@ ScriptParser::~ScriptParser()
 
     if (file_io_buf) delete[] file_io_buf;
     if (save_data_buf) delete[] save_data_buf;
+    if (sprintf_buf) delete[] sprintf_buf;
 
     if (save_dir_envdata) delete[] save_dir_envdata;
 }

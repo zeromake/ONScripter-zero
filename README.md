@@ -16,6 +16,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复并支持某些游戏的换页判断: `。]\`，`。` 和 `\` 都是换页符号，现在会检查换页符号后 5 个字符是否还有换页符号，如果有跳过该换页符号。
 - [x] 修复 android 的 aaudio 音频驱动方式有问题，会出现音乐断续，播放完一个以后会变正常，现在先切换到默认 openslES 后正常驱动。
 - [x] 修复 android 下后台锁屏后黑屏，缺少画布大小变更事件监听后刷新绘制。
+- [x] 修复 osx 上 simd 动画计算加速，xmake 的 `add_vectorexts("avx2")` 选项的 `-mavx2` 编译参数有奇怪的动画加载 bug，改用 `-march=knl` 就没事。
 - [ ] 自动播放会导致音频播放不完整。
 
 ## feture
@@ -41,6 +42,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 支持对各种情况的字体进行单独设置
     - [x] 描边支持设置描边颜色，和描边宽度。
     - [x] 文本字体支持缩放比例。
+- [x] 无需在编译脚本里指定 simd 使用的后端，`simd/simd.h` 会根据编译器预定义头自动选择后端，如果没有可用后端会自动关闭 `simd` 支持。
 - [ ] android 需要一个配置页面对游戏进行一个自定义或者全局配置。
 - [ ] 查找动画在 android 有明显卡顿的问题。
 - [ ] 所有平台支持通过 ci 打包分发到 release。

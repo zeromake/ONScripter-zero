@@ -1060,15 +1060,17 @@ int ScriptHandler::readScript( char *path )
         for (auto f : std::fs::directory_iterator(root_dir)) {
             auto _fp = f.path();
             if (f.is_regular_file() && _fp.extension() == ".txt") {
-                auto str = _fp.filename().string().c_str();
+                auto str = _fp.filename().string();
                 bool skip = false;
-                while (*str != '\0' && *str != '.')
+                size_t offset = 0;
+                while (str.length() > offset && str.at(offset) != '.')
                 {
-                    if (*str > '9' || *str < '0') {
+                    unsigned char ch = str.at(offset);
+                    if (ch > '9' || ch < '0') {
                         skip = true;
                         break;
                     }
-                    str++;
+                    offset++;
                 }
                 if (skip) {
                     continue;
