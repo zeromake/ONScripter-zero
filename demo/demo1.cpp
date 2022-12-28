@@ -1,21 +1,22 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <cstdio>
+#include <infra/filesystem.hpp>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 // macosx https://discourse.libsdl.org/t/high-dpi-mode/34411
 // https://github.com/libsdl-org/SDL/blob/main/docs/README-ios.md#notes----retina--high-dpi-and-window-sizes
 
-SDL_Surface* DrawText(TTF_Font* font, const char* text) {
+SDL_Surface* _DrawText(TTF_Font* font, const char* text) {
   static SDL_Color fcol={0x00, 0x00, 0x00}, bcol={0xff, 0xff, 0xff};
   SDL_Surface *text_surface;
   text_surface = TTF_RenderUTF8_Blended(font, text, fcol);
   return text_surface;
 }
-#ifdef __APPLE__
-#define DEFAUTL_TTF "/System/Library/Fonts/PingFang.ttc"
-#elif defined(__WIN32)
-#define DEFAUTL_TTF "C:\\Windows\\Fonts\\msyh.ttc"
-#endif
+#define DEFAUTL_TTF "JetBrainsMono-Regular.ttf"
 
 
 #undef main
@@ -47,9 +48,15 @@ int main()
         // SDL_RenderSetScale(renderer, widthScale, heightScale);
         textScale = (int)widthScale;
     }
+#elif defined(_WIN32)
+    textScale = GetDpiForSystem() / 96;
 #endif
-    TTF_Font *font = TTF_OpenFont(DEFAUTL_TTF, 16*textScale);
-    SDL_Surface* screen = DrawText(font, u8"\"License\" shall mean the termsn");
+    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / "..\\..\\..\\..\\fonts" / DEFAUTL_TTF);
+    std::string ttfPathStr = ttfPath.string();//"C:\\Windows\\Fonts\\msyh.ttc";//
+    printf("load: %s\n", ttfPathStr.c_str());
+    TTF_Font *font = TTF_OpenFont(ttfPathStr.c_str(), 16*textScale);
+    TTF_SetFontHinting(font, TTF_HINTING_NONE);
+    SDL_Surface* screen = _DrawText(font, u8"中文测试 \"License\" shall");
     auto texture = SDL_CreateTextureFromSurface(renderer, screen);
     int textureW = screen->w;
     int textureH = screen->h;

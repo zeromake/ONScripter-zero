@@ -1,7 +1,15 @@
+#pragma once
+
+#ifndef __REN_FONT_H
+#define __REN_FONT_H
+
 #include <SDL.h>
 #include <freetype/freetype.h>
 #include <freetype/ftoutln.h>
 #include <freetype/ftlcdfil.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 
 #define FONT_FALLBACK_MAX 10
@@ -64,3 +72,5 @@ void ren_init(SDL_Window *win, SDL_Surface* windowSurface);
 float ren_draw_text(RenFont **fonts, const char *text, size_t len, float x, int y, RenColor color);
 RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antialiasing, ERenFontHinting hinting, unsigned char style);
 void ren_draw_rect(RenRect rect, RenColor color);
+
+#endif
