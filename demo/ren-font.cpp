@@ -1,5 +1,15 @@
 #include "ren-font.h"
 
+#ifdef _WIN32
+wchar_t* utfconv_utf8towc(const char* data) {
+    size_t sBufSize = strlen(data);
+    DWORD dBufSize = MultiByteToWideChar(CP_UTF8, 0, data, sBufSize, NULL, 0);
+    wchar_t* dBuf = new wchar_t[dBufSize]{0};
+    MultiByteToWideChar(CP_ACP, 0, data, sBufSize, dBuf, dBufSize);
+    return dBuf;
+}
+#endif
+
 static void* check_alloc(void *ptr) {
   if (!ptr) {
     fprintf(stderr, "Fatal error: memory allocation failed\n");
@@ -54,7 +64,7 @@ RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antial
   if ((font_file_len = GetFileSize(file, NULL)) == INVALID_FILE_SIZE)
     goto failure;
 
-  font_file = check_alloc(malloc(font_file_len * sizeof(unsigned char)));
+  font_file = (unsigned char*)check_alloc(malloc(font_file_len * sizeof(unsigned char)));
   if (!ReadFile(file, font_file, font_file_len, &read, NULL) || read != font_file_len)
     goto failure;
 
@@ -183,7 +193,7 @@ static void font_load_glyphset(RenFont* font, int idx) {
       int glyph_width = slot->bitmap.width / byte_width;
       if (font->antialiasing == FONT_ANTIALIASING_NONE)
         glyph_width *= 8;
-      set->metrics[i] = (GlyphMetric){ (unsigned short)pen_x, (unsigned short)(pen_x + glyph_width), 0, (unsigned short)slot->bitmap.rows, true, (short)slot->bitmap_left, (short)slot->bitmap_top, (slot->advance.x + slot->lsb_delta - slot->rsb_delta) / 64.0f};
+      set->metrics[i] = GlyphMetric{ (unsigned short)pen_x, (unsigned short)(pen_x + glyph_width), 0, (unsigned short)slot->bitmap.rows, true, (short)slot->bitmap_left, (short)slot->bitmap_top, (slot->advance.x + slot->lsb_delta - slot->rsb_delta) / 64.0f};
       pen_x += glyph_width;
       font->max_height = slot->bitmap.rows > font->max_height ? slot->bitmap.rows : font->max_height;
       // In order to fix issues with monospacing; we need the unhinted xadvance; as FreeType doesn't correctly report the hinted advance for spaces on monospace fonts (like RobotoMono). See #843.
@@ -309,7 +319,7 @@ float ren_draw_text(RenFont **fonts, const char *text, size_t len, float x, int 
     int end_x = (metric->x1 - metric->x0) + start_x;
     int glyph_end = metric->x1, glyph_start = metric->x0;
     if (!metric->loaded && codepoint > 0xFF)
-      ren_draw_rect((RenRect){ start_x + 1, y, (int)font->space_advance - 1, ren_font_group_get_height(fonts) }, color);
+      ren_draw_rect(RenRect{ start_x + 1, y, (int)font->space_advance - 1, ren_font_group_get_height(fonts) }, color);
     if (set->surface && color.a > 0 && end_x >= clip.x && start_x < clip_end_x) {
       uint8_t* source_pixels = (uint8_t*)set->surface->pixels;
       for (int line = metric->y0; line < metric->y1; ++line) {
@@ -360,9 +370,9 @@ float ren_draw_text(RenFont **fonts, const char *text, size_t len, float x, int 
     else if(font != last || text == end) {
       float local_pen_x = text == end ? pen_x + adv : pen_x;
       if (underline)
-        ren_draw_rect((RenRect){(int)last_pen_x, (int)(y / surface_scale + last->height - 1), (int)((local_pen_x - last_pen_x) / surface_scale), (int)(last->underline_thickness * surface_scale)}, color);
+        ren_draw_rect(RenRect{(int)last_pen_x, (int)(y / surface_scale + last->height - 1), (int)((local_pen_x - last_pen_x) / surface_scale), (int)(last->underline_thickness * surface_scale)}, color);
       if (strikethrough)
-        ren_draw_rect((RenRect){(int)last_pen_x, (int)(y / surface_scale + last->height / 2), (int)((local_pen_x - last_pen_x) / surface_scale), (int)(last->underline_thickness * surface_scale)}, color);
+        ren_draw_rect(RenRect{(int)last_pen_x, (int)(y / surface_scale + last->height / 2), (int)((local_pen_x - last_pen_x) / surface_scale), (int)(last->underline_thickness * surface_scale)}, color);
       last = font;
       last_pen_x = pen_x;
     }
@@ -385,7 +395,7 @@ float ren_draw_text(RenFont **fonts, const char *text, size_t len, float x, int 
 // }
 void renwin_clip_to_surface(RenWindow *ren) {
   SDL_Surface *surface = renwin_get_surface(ren);
-  ren->clip = (RenRect) {0, 0, surface->w, surface->h};
+  ren->clip = RenRect{0, 0, surface->w, surface->h};
 }
 
 void ren_init(SDL_Window *win, SDL_Surface* windowSurface) {

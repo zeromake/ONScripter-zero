@@ -2,26 +2,29 @@
 #include <SDL_main.h>
 #include <stdio.h>
 #include "ren-font.h"
+#include <vector>
+#include <infra/filesystem.hpp>
 
 #ifdef ANDROID
 #include <android/log.h>
 #endif
+#define DEFAUTL_TTF "JetBrainsMono-Regular.ttf"
+
 #ifdef __APPLE__
 // #define DEFAUTL_TTF "/System/Library/Fonts/PingFang.ttc"
-#define DEFAUTL_TTF "/Users/zero/Downloads/Fira_Sans/JetBrainsMono-Regular.ttf"
 #elif defined(_WIN32)
-#define DEFAUTL_TTF "C:\\Windows\\Fonts\\msyh.ttc"
+#include <windows.h>
 // #define DEFAUTL_TTF "C:\\Users\\admin\\Desktop\\FiraSans-Medium.ttf"
 #endif
 void update_rect(SDL_Texture* texture, SDL_Surface* surface, const RenRect *r) {
     int scale = 1;
     const int x = scale * r->x, y = scale * r->y;
     const int w = scale * r->width, h = scale * r->height;
-    const SDL_Rect sr = {.x = x, .y = y, .w = w, .h = h};
+    const SDL_Rect sr = {x, y, w, h};
     int32_t *pixels = ((int32_t *) surface->pixels) + x + surface->w * y;
     SDL_UpdateTexture(texture, &sr, pixels, surface->w * 4);
 }
-
+#undef main
 int main(int argc, char *argv[])
 {
     int windowWidth = 800;
@@ -29,6 +32,12 @@ int main(int argc, char *argv[])
     int rect_width = 400;
     int rect_height = 300;
     SDL_Init(SDL_INIT_VIDEO);
+    std::vector<std::string> fonts;
+#ifdef __APPLE__
+    fonts.push_back("/System/Library/Fonts/PingFang.ttc");
+#else
+    fonts.push_back("C:\\Windows\\Fonts\\msyh.ttc");
+#endif
 
 #ifdef ANDROID
     SDL_DisplayMode mode;
@@ -71,12 +80,21 @@ int main(int argc, char *argv[])
     // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     // SDL_RenderClear(renderer);
     // auto windowSurface = SDL_CreateRGBSurface(0, 800, 600, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);;
-    auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, 800*2, 600*2, 30, SDL_PIXELFORMAT_BGRA32);
+    auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, windowWidth*textScale,windowHeight*textScale, 30, SDL_PIXELFORMAT_BGRA32);
     ren_init(window, windowSurface);
     SDL_Rect dstRect{ 0, 0, windowWidth, windowHeight };
-    RenRect windowRect{ 0, 0, windowWidth*2, windowHeight*2 };
+    RenRect windowRect{ 0, 0, windowWidth*textScale, windowHeight*textScale };
     Command cmd;
-    cmd.fonts[0] = ren_font_load(DEFAUTL_TTF, 32, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_NONE, 0);
+    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / "..\\..\\..\\..\\fonts" / DEFAUTL_TTF);
+    auto ttfPathStr = ttfPath.string();
+    printf("load: %s\n", ttfPathStr.c_str());
+    cmd.fonts[0] = ren_font_load(ttfPathStr.c_str(), 32, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
+    size_t fontOffset = 1;
+    for (auto it: fonts) {
+        cmd.fonts[fontOffset] = ren_font_load(it.c_str(), 32, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
+        fontOffset++;
+    }
+    
     auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, 800*2, 600*2);
     while (!exit)
     {
@@ -99,7 +117,7 @@ int main(int argc, char *argv[])
         // #242424
         ren_draw_rect(windowRect, RenColor{0x24, 0x24, 0x24, 0xff});
         // #D2DED7
-        ren_draw_text(cmd.fonts, u8"\"License\" shall mean the terms", 31, 130, 50, RenColor{0xdf, 0xdf, 0xdf, 0xff});
+        ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130, 50, RenColor{0xdf, 0xdf, 0xdf, 0xff});
         // SDL_UpdateWindowSurface(window);
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
