@@ -4341,7 +4341,7 @@ int ONScripter::sprintfCommand() {
         if (script_h.current_variable.type == ScriptHandler::VAR_STR) {
             value = script_h.getVariableData(script_h.current_variable.var_no).str;
         } else if (script_h.current_variable.type == ScriptHandler::VAR_INT) {
-            value = reinterpret_cast<void*>(script_h.getVariableData(script_h.current_variable.var_no).num);
+            value = (void*)(intptr_t)(script_h.getVariableData(script_h.current_variable.var_no).num);
         } else {
             utils::printError("sprintf only support string,int\n");
             return RET_CONTINUE;
