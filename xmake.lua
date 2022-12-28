@@ -331,6 +331,33 @@ target("demo/font")
     end
     if is_plat("windows") then
         add_files("src/resource.rc")
+    elseif  is_plat("macosx") then
+        add_frameworks("AudioToolbox", "Cocoa")
+    end
+target("demo/demo")
+    set_kind("binary")
+    add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
+    add_files("demo/demo.cpp")
+    add_files("demo/ren-font.cpp")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    if is_plat("windows") then
+        add_files("src/resource.rc")
+    elseif  is_plat("macosx") then
+        add_frameworks("AudioToolbox", "Cocoa")
+    end
+target("demo/demo1")
+    set_kind("binary")
+    add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
+    add_files("demo/demo1.cpp")
+    if is_plat("mingw") then
+        add_ldflags("-static-libgcc", "-static-libstdc++")
+    end
+    if is_plat("windows") then
+        add_files("src/resource.rc")
+    elseif  is_plat("macosx") then
+        add_frameworks("AudioToolbox", "Cocoa")
     end
 
 target("saveconv")

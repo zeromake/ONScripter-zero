@@ -18,6 +18,13 @@
             "name": "onscripter-debug",
             "program": "${workspaceFolder}/build/macosx/x86_64/debug/onscripter",
             "args": ["--rescale", "2", "--fontcache", "--render-font-outline", "-r", "/Users/zero/Documents/eden/eden"]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "font-debug",
+            "program": "${workspaceFolder}/build/macosx/x86_64/debug/demo/font",
+            "args": []
         }
     ]
 }
