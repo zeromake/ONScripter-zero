@@ -114,8 +114,8 @@ public:
     const char *readStr();
     int  readInt();
     void skipToken();
-    int  parseInt( char **buf );
-    int  parseIntExpression( char **buf );
+    int  parseInt(char **buf, bool ignore_exit = false);
+    int  parseIntExpression(char **buf);
     void readVariable( bool reread_flag=false );
 
     // function for string access
@@ -310,8 +310,8 @@ private:
     void parseStr( char **buf );
     void readNextOp( char **buf, int *op, int *num );
     int  calcArithmetic( int num1, int op, int num2 );
-    int  parseArray( char **buf, ArrayVariable &array );
-    int  *getArrayPtr( int no, ArrayVariable &array, int offset );
+    int  parseArray( char **buf, ArrayVariable &array, bool ignore_exit = false);
+    int  *getArrayPtr( int no, ArrayVariable &array, int offset, bool ignore_exit = false);
 
     /* ---------------------------------------- */
     /* Variable */

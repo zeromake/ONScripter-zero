@@ -674,7 +674,7 @@ void ScriptParser::writeLog( ScriptHandler::LogInfo &info )
 
         sprintf( buf, "%d", info.num_logs );
         for ( i=0 ; i<(int)strlen( buf ) ; i++ ) writeChar( buf[i], output_flag );
-        writeChar( 0x0a, output_flag );
+        writeChar( '\n', output_flag );
 
         ScriptHandler::LogLink *cur = info.root_log.next;
         for ( i=0 ; i<info.num_logs ; i++ ){
@@ -704,7 +704,7 @@ void ScriptParser::readLog( ScriptHandler::LogInfo &info )
         int i, j, ch, count = 0;
         char buf[100];
 
-        while( (ch = readChar()) != 0x0a ){
+        while( (ch = readChar()) != '\n' ){
             count = count * 10 + ch - '0';
         }
 
@@ -783,9 +783,9 @@ void ScriptParser::readToken()
 
         // ugly work around
         unsigned int len = strlen(script_h.getStringBuffer());
-        if (script_h.getStringBuffer()[len-1] == 0x0a){
+        if (script_h.getStringBuffer()[len-1] == '\n'){
             script_h.getStringBuffer()[len-1] = ch;
-            script_h.addStringBuffer(0x0a);
+            script_h.addStringBuffer('\n');
         }
         else{
             script_h.addStringBuffer(ch);

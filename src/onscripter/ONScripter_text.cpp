@@ -278,7 +278,10 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
             continue;
         }
 #endif
-
+        if (*str == '^') {
+            str++;
+            continue;
+        }
 #ifndef FORCE_1BYTE_CHAR
         if (cache_info && !cache_info->is_tight_region){
             if (*str == '('){
@@ -327,13 +330,13 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
             text[1] = *str++;
             drawChar( text, info, false, false, surface, cache_info );
         }
-        else if (*str == 0x0a || (*str == '\\' && info->is_newline_accepted)){
+        else if (*str == '\n' || (*str == '\\' && info->is_newline_accepted)){
             info->newLine();
             str++;
         }
         else if (*str){
             text[0] = *str++;
-            if (*str && *str != 0x0a && pack_hankaku) text[1] = *str++;
+            if (*str && *str != '\n' && pack_hankaku) text[1] = *str++;
             else                                      text[1] = 0;
             drawChar( text, info, false, false, surface, cache_info );
         }
@@ -371,7 +374,7 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
     _FontInfo f_info = sentence_font;
     f_info.clear();
     for ( int i=0 ; i<current_page->text_count ; i++ ){
-        if ( current_page->text[i] == 0x0a ){
+        if ( current_page->text[i] == '\n' ){
             f_info.newLine();
         }
         else{
@@ -691,7 +694,7 @@ int ONScripter::textCommand()
 
     char *current_script = script_h.getCurrent();
     if (pretextgosub_label &&
-        (*(current_script-1) == 0x0a || *(current_script-1) == 0x0d) &&
+        (*(current_script-1) == '\n' || *(current_script-1) == 0x0d) &&
         (!pagetag_flag || page_enter_status == 0) &&
         line_enter_status == 0){
 
@@ -741,7 +744,7 @@ bool ONScripter::checkLineBreak(const char *buf, _FontInfo *fi)
         if (buf2[2] == '_') buf2++;
         int i = 2;
         while (!fi->isEndOfLine(i)){
-            if      ( buf2[i+2] == 0x0a || buf2[i+2] == 0 ) break;
+            if      ( buf2[i+2] == '\n' || buf2[i+2] == 0 ) break;
             else if ( !IS_TWO_BYTE( buf2[i+2] ) ) buf2++;
             else if ( isStartKinsoku( buf2+i+2 ) ) i += 2;
             else break;
@@ -755,7 +758,7 @@ bool ONScripter::checkLineBreak(const char *buf, _FontInfo *fi)
         const char *buf2 = buf;
         int i = 2;
         while (!fi->isEndOfLine(i)){
-            if      ( buf2[i+2] == 0x0a || buf2[i+2] == 0 ) break;
+            if      ( buf2[i+2] == '\n' || buf2[i+2] == 0 ) break;
             else if ( !IS_TWO_BYTE( buf2[i+2] ) ) buf2++;
             else if ( isEndKinsoku( buf2+i ) ) i += 2;
             else break;
@@ -776,7 +779,7 @@ void ONScripter::processEOT()
 
     if (!sentence_font.isLineEmpty() && !new_line_skip_flag){
         // if sentence_font.isLineEmpty() is true, newPage() might be already issued
-        if (!sentence_font.isEndOfLine()) current_page->add( 0x0a );
+        if (!sentence_font.isEndOfLine()) current_page->add( '\n' );
         sentence_font.newLine();
     }
 
@@ -959,7 +962,11 @@ bool ONScripter::processText()
         in_textbtn_flag = true;
         return true;
     }
-    else if ( ch == '>' && in_textbtn_flag &&
+    else if (ch == '^') {
+        string_buffer_offset++;
+        return true;
+    }
+    else if (ch == '>' && in_textbtn_flag &&
               (!english_mode ||
                !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
         current_page->add('>');
@@ -975,9 +982,9 @@ bool ONScripter::processText()
         if (matched_len > 0){
             if (matched_len == 2) out_text[1] = script_h.getStringBuffer()[ string_buffer_offset + 1 ];
             if (sentence_font.getRemainingLine() <= clickstr_line)
-                return clickNewPage( out_text );
+                return clickNewPage(out_text);
             else
-                return clickWait( out_text );
+                return clickWait(out_text);
         }
         else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
                  script_h.checkClickstr(&script_h.getStringBuffer()[string_buffer_offset+1]) == 1){

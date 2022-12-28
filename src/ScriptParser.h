@@ -230,7 +230,7 @@ protected:
            RET_SKIP_LINE = 1,
            RET_CONTINUE  = 2,
            RET_NO_READ   = 4,
-           RET_EOL       = 8 // end of line (0x0a is found)
+           RET_EOL       = 8 // end of line ('\n' is found)
     };
     enum { CLICK_NONE    = 0,
            CLICK_WAIT    = 1,

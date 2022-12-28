@@ -192,6 +192,43 @@ void ScriptHandler::setKeyTable( const unsigned char *key_table )
     }
 }
 
+bool readVariableText(const char *buf, char *out, int &variable_count) {
+    int offset = 0;
+    int outOffset = 0;
+    out[outOffset] = buf[offset];
+    offset++;
+    outOffset++;
+    char ch = ')';
+    if (buf[offset] != '(' && buf[offset] != '{') {
+        return false;
+    }
+    if (buf[offset] == '{') {
+        ch = '}';
+    }
+    out[outOffset] = '(';
+    outOffset++;
+    offset++;
+    bool has = false;
+    while (buf[offset] != ch)
+    {
+        if (buf[offset] == '\0' || buf[offset] == '\n') {
+            return false;
+        }
+        has = true;
+        out[outOffset] = buf[offset];
+        offset++;
+        outOffset++;
+    }
+    if (!has) {
+        return false;
+    }
+    out[outOffset] = ')';
+    outOffset++;
+    variable_count = offset+1;
+    out[outOffset] = '\0';
+    return true;
+}
+
 // basic parser function
 const char *ScriptHandler::readToken()
 {
@@ -210,48 +247,65 @@ const char *ScriptHandler::readToken()
     string_counter = 0;
     char ch = *buf;
     if (ch == ';'){ // comment
-        addStringBuffer( ch );
+        addStringBuffer(ch);
         do{
             ch = *++buf;
             addStringBuffer( ch );
-        } while ( ch != 0x0a && ch != '\0' );
+        } while ( ch != '\n' && ch != '\0' );
     }
     else if (ch & 0x80 ||
              (ch >= '0' && ch <= '9') ||
              ch == '@' || ch == '\\' || ch == '/' ||
              ch == '%' || ch == '?' || ch == '$' ||
              ch == '[' || ch == '(' || ch == '<' ||
+             ch == '^' ||
 #ifndef ENABLE_1BYTE_CHAR
              ch == '`' ||
 #endif
              (!english_mode && ch == '>') ||
              ch == '!' || ch == '#' || ch == ',' || ch == '"'){ // text
         bool ignore_clickstr_flag = false;
-        while(1){
-            if ( IS_TWO_BYTE(ch) ){
-                addStringBuffer( ch );
+        // 前四个有效字符（跳过半角空格，和缩进符号）里有双字节的情况这一行直接标记为，没有变量解析可以使用 $,%,? 符号。
+        bool ignore_variable_flag = false;
+        bool eng_flag = false;
+        char variable_buff[256]{0};
+        while(1) {
+            if (IS_TWO_BYTE(ch)) {
+                addStringBuffer(ch);
                 ch = *++buf;
-                if (ch == 0x0a || ch == '\0') break;
-                addStringBuffer( ch );
+                if (ch == '\n' || ch == '\0') break;
+                addStringBuffer(ch);
                 buf++;
                 if (!wait_script && !ignore_clickstr_flag &&
                     checkCountClickstr(buf-2) > 0)
                     wait_script = buf;
                 ignore_clickstr_flag = false;
-            }
-            else{
+            } else {
                 ignore_clickstr_flag = false;
-                if (ch == '%' || ch == '?'){
-                    addIntVariable(&buf);
-                    SKIP_SPACE(buf);
-                }
-                else if (ch == '$'){
-                    addStrVariable(&buf);
-                    SKIP_SPACE(buf);
-                }
-                else{
-                    if (ch == 0x0a || ch == '\0') break;
-                    addStringBuffer( ch );
+                if (!ignore_variable_flag && (ch == '%' || ch == '?' || ch == '$')) {
+                    // 文本变量替换必须用 {} 或者 () 包裹;
+                    int variable_count = 0;
+                    if (readVariableText(buf, variable_buff, variable_count) && variable_count > 0) {
+                        char* variable_buff_temp = variable_buff;
+                        buf += variable_count;
+                        if (ch == '%' || ch == '?') {
+                            addIntVariable(&variable_buff_temp);
+                            SKIP_SPACE(buf);
+                        } else if (ch == '$') {
+                            addStrVariable(&variable_buff_temp);
+                            SKIP_SPACE(buf);
+                        }
+                    } else {
+                        addStringBuffer(ch);
+                        buf++;
+                    }
+                }  else {
+                    if (ch == '^') {
+                        eng_flag = !eng_flag;
+                        ignore_variable_flag = eng_flag;
+                    }
+                    if (ch == '\n' || ch == '\0') break;
+                    addStringBuffer(ch);
                     buf++;
                     if (ch == '_') ignore_clickstr_flag = true;
                     if (!wait_script && (ch == '@' || ch == '\\')) wait_script = buf;
@@ -265,7 +319,7 @@ const char *ScriptHandler::readToken()
 #ifdef ENABLE_1BYTE_CHAR
     else if (ch == '`'){
         ch = *++buf;
-        while (ch != '`' && ch != 0x0a && ch !='\0'){
+        while (ch != '`' && ch != '\n' && ch !='\0'){
             if ( IS_TWO_BYTE(ch) ){
                 addStringBuffer( ch );
                 ch = *++buf;
@@ -282,7 +336,7 @@ const char *ScriptHandler::readToken()
     else if (english_mode && ch == '>'){
         ch = *++buf;
         while (1){
-            if (ch == 0x0a || ch =='\0') break;
+            if (ch == '\n' || ch =='\0') break;
 
             if (ch != '\t')
                 addStringBuffer( ch );
@@ -308,7 +362,7 @@ const char *ScriptHandler::readToken()
     else if (ch == '*'){ // label
         return readLabel();
     }
-    else if (ch == '~' || ch == 0x0a || ch == ':'){
+    else if (ch == '~' || ch == '\n' || ch == ':'){
         addStringBuffer( ch );
         markAsKidoku( buf++ );
     }
@@ -418,7 +472,7 @@ void ScriptHandler::skipToken()
     bool quat_flag = false;
     bool text_flag = false;
     while(1){
-        if ( *buf == 0x0a || *buf == 0 ||
+        if ( *buf == '\n' || *buf == 0 ||
              (!quat_flag && !text_flag && (*buf == ':' || *buf == ';') ) ) break;
         if ( *buf == '"' ) quat_flag = !quat_flag;
         if ( IS_TWO_BYTE(*buf) ){
@@ -428,7 +482,7 @@ void ScriptHandler::skipToken()
         else
             buf++;
     }
-    if (text_flag && *buf == 0x0a) buf++;
+    if (text_flag && *buf == '\n') buf++;
 
     next_script = buf;
 }
@@ -516,7 +570,7 @@ int ScriptHandler::getLineByAddress( char *address )
     char *addr = label.label_header;
     int line = 0;
     while ( address > addr ){
-        if ( *addr == 0x0a ) line++;
+        if ( *addr == '\n' ) line++;
         addr++;
     }
     return line;
@@ -529,7 +583,7 @@ char *ScriptHandler::getAddressByLine( int line )
     int l = line - label.start_line;
     char *addr = label.label_header;
     while ( l > 0){
-        while(*addr != 0x0a && *addr != '\0') addr++;
+        while(*addr != '\n' && *addr != '\0') addr++;
         if (*addr == '\0') {
             addr = label.label_header;
             utils::printError("save file is error goto start\n");
@@ -588,7 +642,7 @@ bool ScriptHandler::compareString(const char *buf)
 void ScriptHandler::skipLine( int no )
 {
     for ( int i=0 ; i<no ; i++ ){
-        while ( *current_script != 0x0a ) current_script++;
+        while ( *current_script != '\n' ) current_script++;
         current_script++;
     }
     next_script = current_script;
@@ -654,8 +708,7 @@ void ScriptHandler::loadKidokuData()
 void ScriptHandler::addIntVariable(char **buf)
 {
     char num_buf[20];
-    int no = parseInt(buf);
-
+    int no = parseInt(buf, true);
     int len = getStringFromInteger( num_buf, no, -1 );
     for (int i=0 ; i<len ; i++)
         addStringBuffer( num_buf[i] );
@@ -778,7 +831,7 @@ void ScriptHandler::readVariable( bool reread_flag )
     }
     else if ( *buf == '?' ){
         ArrayVariable av;
-        current_variable.var_no = parseArray( &buf, av );
+        current_variable.var_no = parseArray(&buf, av);
         current_variable.type = VAR_ARRAY;
         current_variable.array = av;
     }
@@ -1239,7 +1292,7 @@ void ScriptHandler::readConfiguration()
         buf++;
     }
 
-    while (*buf && *buf != 0x0a){
+    while (*buf && *buf != '\n'){
         SKIP_SPACE(buf);
         if (!strncmp( buf, "mode", 4 )){
             buf += 4;
@@ -1334,7 +1387,7 @@ int ScriptHandler::labelScript()
             label_info[ label_counter ].num_of_lines = 1;
             label_info[ label_counter ].start_line   = current_line;
             buf = getNext();
-            if ( *buf == 0x0a ){
+            if ( *buf == '\n' ){
                 buf++;
                 current_line++;
             }
@@ -1344,7 +1397,7 @@ int ScriptHandler::labelScript()
         else{
             if ( label_counter >= 0 )
                 label_info[ label_counter ].num_of_lines++;
-            while( *buf != 0x0a ) buf++;
+            while( *buf != '\n' ) buf++;
             buf++;
             current_line++;
         }
@@ -1433,7 +1486,7 @@ void ScriptHandler::parseStr( char **buf )
     else if ( **buf == '"' ){
         int c=0;
         (*buf)++;
-        while ( **buf != '"' && **buf != 0x0a )
+        while ( **buf != '"' && **buf != '\n' )
             str_string_buffer[c++] = *(*buf)++;
         str_string_buffer[c] = '\0';
         if ( **buf == '"' ) (*buf)++;
@@ -1443,7 +1496,7 @@ void ScriptHandler::parseStr( char **buf )
     else if ( **buf == '`' ){
         int c=0;
         str_string_buffer[c++] = *(*buf)++;
-        while (**buf != '`' && **buf != 0x0a)
+        while (**buf != '`' && **buf != '\n')
             str_string_buffer[c++] = *(*buf)++;
         str_string_buffer[c] = '\0';
         if ( **buf == '`' ) (*buf)++;
@@ -1522,7 +1575,7 @@ void ScriptHandler::parseStr( char **buf )
     }
 }
 
-int ScriptHandler::parseInt( char **buf )
+int ScriptHandler::parseInt( char **buf, bool ignore_exit)
 {
     int ret = 0;
 
@@ -1542,10 +1595,14 @@ int ScriptHandler::parseInt( char **buf )
         return getVariableData(current_variable.var_no).num;
     } else if ( **buf == '?' ){
         ArrayVariable av;
-        current_variable.var_no = parseArray( buf, av );
+        current_variable.var_no = parseArray( buf, av, ignore_exit);
         current_variable.type = VAR_ARRAY;
         current_variable.array = av;
-        return *getArrayPtr( current_variable.var_no, current_variable.array, 0 );
+        int* ret = getArrayPtr(current_variable.var_no, current_variable.array, 0, ignore_exit);
+        if (!ret) {
+            return  0;
+        }
+        return *ret;
     }
     else{
         char ch, alias_buf[256];
@@ -1717,21 +1774,27 @@ int ScriptHandler::calcArithmetic( int num1, int op, int num2 )
     return ret;
 }
 
-int ScriptHandler::parseArray( char **buf, struct ArrayVariable &array )
+int ScriptHandler::parseArray( char **buf, struct ArrayVariable &array, bool ignore_exit)
 {
     SKIP_SPACE( *buf );
 
     (*buf)++; // skip '?'
-    int no = parseInt( buf );
+    int no = parseInt(buf);
 
-    SKIP_SPACE( *buf );
+    SKIP_SPACE(*buf);
     array.num_dim = 0;
     while ( **buf == '[' ){
         (*buf)++;
         array.dim[array.num_dim] = parseIntExpression(buf);
         array.num_dim++;
         SKIP_SPACE( *buf );
-        if ( **buf != ']' ) errorAndExit( "parseArray: missing ']'." );
+        if (**buf != ']') {
+            if (!ignore_exit) {
+                errorAndExit( "parseArray: missing ']'." );
+            } else {
+                return no;
+            }
+        }
         (*buf)++;
     }
     for ( int i=array.num_dim ; i<20 ; i++ ) array.dim[i] = 0;
@@ -1739,14 +1802,20 @@ int ScriptHandler::parseArray( char **buf, struct ArrayVariable &array )
     return no;
 }
 
-int *ScriptHandler::getArrayPtr( int no, ArrayVariable &array, int offset )
+int *ScriptHandler::getArrayPtr( int no, ArrayVariable &array, int offset, bool ignore_exit)
 {
     ArrayVariable *av = root_array_variable;
     while(av){
         if (av->no == no) break;
         av = av->next;
     }
-    if (av == NULL) errorAndExit( "Array No. is not declared." );
+    if (av == NULL) {
+        if (!ignore_exit) {
+            errorAndExit( "Array No. is not declared." );
+        } else {
+            return NULL;
+        }
+    }
 
     int dim = 0, i;
     for ( i=0 ; i<av->num_dim ; i++ ){

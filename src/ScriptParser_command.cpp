@@ -377,7 +377,7 @@ int ScriptParser::rubyonCommand()
     sentence_font.rubyon_flag = true;
 
     char *buf = script_h.getNext();
-    if ( buf[0] == 0x0a || buf[0] == ':' || buf[0] == ';' ){
+    if ( buf[0] == '\n' || buf[0] == ':' || buf[0] == ';' ){
         ruby_struct.font_size_xy[0] = -1;
         ruby_struct.font_size_xy[1] = -1;
         setStr( &ruby_struct.font_name, NULL );
