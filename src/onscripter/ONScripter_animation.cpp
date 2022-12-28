@@ -324,9 +324,9 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
         else if ( buffer[0] == 'm' ){
             anim->trans_mode = AnimationInfo::TRANS_MASK;
             char *start = ++buffer;
-            while(buffer[0] != ';' && buffer[0] != 0x0a && buffer[0] != '\0') buffer++;
+            while(buffer[0] != ';' && buffer[0] != '\n' && buffer[0] != '\0') buffer++;
             if (buffer[0] == ';')
-                setStr( &anim->mask_file_name, start, buffer-start );
+                setStr(&anim->mask_file_name, start, buffer-start);
         }
         else if ( buffer[0] == '#' ){
             anim->trans_mode = AnimationInfo::TRANS_DIRECT;

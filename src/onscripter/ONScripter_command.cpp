@@ -814,7 +814,7 @@ int ONScripter::selectCommand()
     last_select_link = &root_select_link;
 
     while(1){
-        if ( script_h.getNext()[0] != 0x0a && comma_flag == true ){
+        if ( script_h.getNext()[0] != '\n' && comma_flag == true ){
 
             const char *buf = script_h.readStr();
             comma_flag = (script_h.getEndStatus() & ScriptHandler::END_COMMA);
@@ -838,7 +838,7 @@ int ONScripter::selectCommand()
             comma_flag = (script_h.getEndStatus() & ScriptHandler::END_COMMA);
             //utils::printInfo("2 comma %d %c %x\n", comma_flag, script_h.getCurrent()[0], script_h.getCurrent()[0]);
         }
-        else if (script_h.getNext()[0] == 0x0a){
+        else if (script_h.getNext()[0] == '\n'){
             //utils::printInfo("comma %d\n", comma_flag);
             char *buf = script_h.getNext() + 1; // consume eol
             while ( *buf == ' ' || *buf == '\t' ) buf++;
@@ -854,7 +854,7 @@ int ONScripter::selectCommand()
             }
             script_h.setCurrent(buf);
 
-            if (*buf == 0x0a){
+            if (*buf == '\n'){
                 comma_flag |= comma2_flag;
                 continue;
             }
@@ -1302,7 +1302,7 @@ int ONScripter::nextcselCommand()
     if (last_nest_info != &root_nest_info &&
         last_nest_info->nest_mode == NestInfo::LABEL){
         char *buf = last_nest_info->next_script;
-        while (*buf == ' ' || *buf == '\t' || *buf == 0x0a) buf++;
+        while (*buf == ' ' || *buf == '\t' || *buf == '\n') buf++;
         if (strncmp( buf, "csel", 4) == 0)
             script_h.setInt( &script_h.current_variable, 1 );
         else
@@ -2160,7 +2160,7 @@ int ONScripter::gettextCommand()
     char *buf = new char[ current_page->text_count + 1 ];
     int i, j;
     for ( i=0, j=0 ; i<current_page->text_count ; i++ ){
-        if ( current_page->text[i] != 0x0a )
+        if ( current_page->text[i] != '\n' )
             buf[j++] = current_page->text[i];
     }
     buf[j] = '\0';
@@ -2515,7 +2515,7 @@ int ONScripter::getlogCommand()
                     p2[count++] = *p++;
                     i++;
                 }
-                else if (*p != 0x0a)
+                else if (*p != '\n')
                     p2[count++] = *p++;
                 else
                     p++;
@@ -3645,7 +3645,7 @@ int ONScripter::brCommand()
     enterTextDisplayMode();
 
     sentence_font.newLine();
-    current_page->add( 0x0a );
+    current_page->add( '\n' );
 
     return RET_CONTINUE;
 }

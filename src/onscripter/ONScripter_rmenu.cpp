@@ -58,7 +58,7 @@ extern Coding2UTF16 *coding2utf16;
 #define MESSAGE_CANCEL coding2utf16->MESSAGE_CANCEL
 #endif
 
-#ifdef ANDROID
+#if 0
 #include <stdarg.h>
 static int osprintf(char *str, const char *format, ...)
 {

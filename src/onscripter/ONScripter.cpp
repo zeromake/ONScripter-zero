@@ -1021,12 +1021,12 @@ void ONScripter::executeLabel()
             continue;
         }
         if ( break_flag && !script_h.isName("next") ){
-            if ( script_h.getStringBuffer()[string_buffer_offset] == 0x0a )
+            if ( script_h.getStringBuffer()[string_buffer_offset] == '\n' )
                 current_line++;
 
             if ( script_h.getStringBuffer()[string_buffer_offset] != ':' &&
                  script_h.getStringBuffer()[string_buffer_offset] != ';' &&
-                 script_h.getStringBuffer()[string_buffer_offset] != 0x0a )
+                 script_h.getStringBuffer()[string_buffer_offset] != '\n' )
                 script_h.skipToken();
 
             readToken();
@@ -1112,7 +1112,7 @@ int ONScripter::parseLine( )
         }
     }
 
-    if ( cmd[0] == 0x0a )
+    if ( cmd[0] == '\n' )
         return RET_CONTINUE | RET_EOL;
     else if ( cmd[0] == 'v' && cmd[1] >= '0' && cmd[1] <= '9' )
         return vCommand();

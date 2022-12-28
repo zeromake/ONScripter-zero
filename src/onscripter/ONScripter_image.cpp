@@ -67,7 +67,7 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
 {
     int c=1, w=0, h=0;
     bool decimal_flag = false;
-    while (filename[c] != 0x0a && filename[c] != 0x00){
+    while (filename[c] != '\n' && filename[c] != 0x00){
         if (!decimal_flag && filename[c] >= '0' && filename[c] <= '9')
             w = w*10 + filename[c]-'0';
         if (filename[c] == '.') decimal_flag = true;
@@ -79,7 +79,7 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
     }
 
     decimal_flag = false;
-    while (filename[c] != 0x0a && filename[c] != 0x00){
+    while (filename[c] != '\n' && filename[c] != 0x00){
         if (!decimal_flag && filename[c] >= '0' && filename[c] <= '9')
             h = h*10 + filename[c]-'0';
         if (filename[c] == '.') decimal_flag = true;
