@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
     SDL_Init(SDL_INIT_VIDEO);
     std::vector<std::string> fonts;
 #ifdef __APPLE__
+    windowWidth *= 2;
+    windowHeight *= 2;
     fonts.push_back("/System/Library/Fonts/PingFang.ttc");
 #else
     fonts.push_back("C:\\Windows\\Fonts\\msyh.ttc");
@@ -52,6 +54,10 @@ int main(int argc, char *argv[])
     SDL_bool exit = SDL_FALSE;
     SDL_bool run = SDL_TRUE;
     SDL_Rect mRect = {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight};
+#ifdef __APPLE__
+    mRect.w /= 2;
+    mRect.h /= 2;
+#endif
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
@@ -61,18 +67,8 @@ int main(int argc, char *argv[])
     int windowScale = 1;
     int textScale = 1;
 #ifdef __APPLE__
-    int rw = 0, rh = 0;
-    SDL_GetRendererOutputSize(renderer,&rw, &rh);
-    if(rw != windowWidth) {
-        float widthScale = (float)rw / (float) windowWidth;
-        float heightScale = (float)rh / (float) windowHeight;
-        if(widthScale != heightScale) {
-            fprintf(stderr, "WARNING: width scale != height scale\n");
-        }
-        // SDL_RenderSetScale(renderer, widthScale, heightScale);
-        textScale = (int)widthScale;
-        windowScale = textScale;
-    }
+    textScale = 2;
+    windowScale = 2;
 #elif defined(_WIN32)
     textScale = GetDpiForSystem() / 96;
 #endif
@@ -80,22 +76,24 @@ int main(int argc, char *argv[])
     // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     // SDL_RenderClear(renderer);
     // auto windowSurface = SDL_CreateRGBSurface(0, 800, 600, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);;
-    auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, windowWidth*textScale,windowHeight*textScale, 30, SDL_PIXELFORMAT_BGRA32);
+    auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, windowWidth*windowScale,windowHeight*windowScale, 30, SDL_PIXELFORMAT_BGRA32);
     ren_init(window, windowSurface);
     SDL_Rect dstRect{ 0, 0, windowWidth, windowHeight };
-    RenRect windowRect{ 0, 0, windowWidth*textScale, windowHeight*textScale };
+    RenRect windowRect{ 0, 0, windowWidth*windowScale, windowHeight*windowScale };
     Command cmd;
-    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / "..\\..\\..\\..\\fonts" / DEFAUTL_TTF);
+    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
     auto ttfPathStr = ttfPath.string();
     printf("load: %s\n", ttfPathStr.c_str());
-    cmd.fonts[0] = ren_font_load(ttfPathStr.c_str(), 32, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
+    cmd.fonts[0] = ren_font_load(ttfPathStr.c_str(), 16*textScale, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
     size_t fontOffset = 1;
     for (auto it: fonts) {
-        cmd.fonts[fontOffset] = ren_font_load(it.c_str(), 32, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
+        cmd.fonts[fontOffset] = ren_font_load(it.c_str(), 16*textScale, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
         fontOffset++;
     }
-    
-    auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, 800*2, 600*2);
+
+    auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, windowWidth*windowScale, windowHeight*windowScale);
+    ren_draw_rect(windowRect, RenColor{0x24, 0x24, 0x24, 0xff});
+    ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130 * windowScale, 50 * windowScale, RenColor{0xdf, 0xdf, 0xdf, 0xff});
     while (!exit)
     {
         while (SDL_PollEvent(&event))
@@ -115,9 +113,7 @@ int main(int argc, char *argv[])
         //     }
         // }
         // #242424
-        ren_draw_rect(windowRect, RenColor{0x24, 0x24, 0x24, 0xff});
         // #D2DED7
-        ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130, 50, RenColor{0xdf, 0xdf, 0xdf, 0xff});
         // SDL_UpdateWindowSurface(window);
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
