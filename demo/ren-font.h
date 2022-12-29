@@ -42,10 +42,6 @@ typedef struct RenFont {
   ERenFontHinting hinting;
   unsigned char style;
   unsigned short underline_thickness;
-#ifdef _WIN32
-  unsigned char *file;
-  HANDLE file_handle;
-#endif
   char path[];
 } RenFont;
 

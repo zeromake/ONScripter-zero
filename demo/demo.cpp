@@ -4,6 +4,7 @@
 #include "ren-font.h"
 #include <vector>
 #include <infra/filesystem.hpp>
+#include <chrono>
 
 #ifdef ANDROID
 #include <android/log.h>
@@ -24,9 +25,17 @@ void update_rect(SDL_Texture* texture, SDL_Surface* surface, const RenRect *r) {
     int32_t *pixels = ((int32_t *) surface->pixels) + x + surface->w * y;
     SDL_UpdateTexture(texture, &sr, pixels, surface->w * 4);
 }
+
+long long unix_now() {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()
+    ).count();
+}
+
 #undef main
 int main(int argc, char *argv[])
 {
+    auto rootNow = unix_now();
     int windowWidth = 800;
     int windowHeight = 600;
     int rect_width = 400;
@@ -61,8 +70,7 @@ int main(int argc, char *argv[])
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-    window = SDL_CreateWindow("SDL Tutorial", mRect.x, mRect.y, mRect.w, mRect.h,
-                                SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);
+    window = SDL_CreateWindow("SDL Tutorial", mRect.x, mRect.y, mRect.w, mRect.h, SDL_WINDOW_ALLOW_HIGHDPI|SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     int windowScale = 1;
     int textScale = 1;
@@ -71,6 +79,7 @@ int main(int argc, char *argv[])
     windowScale = 2;
 #elif defined(_WIN32)
     textScale = GetDpiForSystem() / 96;
+    windowScale = textScale;
 #endif
     // SDL_Rect viewport_rect = {0, 0, rect_width*windowScale, rect_height*windowScale};
     // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -78,6 +87,8 @@ int main(int argc, char *argv[])
     // auto windowSurface = SDL_CreateRGBSurface(0, 800, 600, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);;
     auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, windowWidth*windowScale,windowHeight*windowScale, 30, SDL_PIXELFORMAT_BGRA32);
     ren_init(window, windowSurface);
+
+    printf("windowSurface: %ld\n", unix_now() - rootNow);
     SDL_Rect dstRect{ 0, 0, windowWidth, windowHeight };
     RenRect windowRect{ 0, 0, windowWidth*windowScale, windowHeight*windowScale };
     Command cmd;
@@ -85,15 +96,33 @@ int main(int argc, char *argv[])
     auto ttfPathStr = ttfPath.string();
     printf("load: %s\n", ttfPathStr.c_str());
     cmd.fonts[0] = ren_font_load(ttfPathStr.c_str(), 16*textScale, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
+    if (!cmd.fonts[0]) {
+        printf("load font error!");
+        return -1;
+    }
+    printf("root font: %ld\n", unix_now() - rootNow);
     size_t fontOffset = 1;
     for (auto it: fonts) {
         cmd.fonts[fontOffset] = ren_font_load(it.c_str(), 16*textScale, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, 0);
+        if (!cmd.fonts[fontOffset]) {
+            printf("load font error!");
+            return -1;
+        }
         fontOffset++;
     }
+    printf("all font: %ld\n", unix_now() - rootNow);
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
 
     auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, windowWidth*windowScale, windowHeight*windowScale);
-    ren_draw_rect(windowRect, RenColor{0x24, 0x24, 0x24, 0xff});
-    ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130 * windowScale, 50 * windowScale, RenColor{0xdf, 0xdf, 0xdf, 0xff});
+    ren_draw_rect(windowRect, RenColor{0xff, 0xff, 0xff, 0xff});
+    printf("draw rect: %ld\n", unix_now() - rootNow);
+    ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130 * windowScale, 50 * windowScale, RenColor{0x00, 0x00, 0x00, 0xff});
+
+    ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130 * windowScale, 100 * windowScale, RenColor{0x00, 0x00, 0x00, 0xff});
+
+    printf("draw text: %ld\n", unix_now() - rootNow);
     while (!exit)
     {
         while (SDL_PollEvent(&event))
@@ -101,30 +130,15 @@ int main(int argc, char *argv[])
                 case SDL_QUIT:
                     exit = SDL_TRUE;
                     break;
-                case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_f)
-                        run = run == SDL_TRUE ? SDL_FALSE : SDL_TRUE;
-                    break;
             }
-        // if (run) {
-        //     viewport_rect.x += 1;
-        //     if (viewport_rect.x >= windowWidth - rect_width) {
-        //         viewport_rect.x = 0;
-        //     }
-        // }
-        // #242424
-        // #D2DED7
-        // SDL_UpdateWindowSurface(window);
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
         update_rect(texture, windowSurface, &windowRect);
         SDL_RenderCopy(renderer, texture, NULL, &dstRect);
-        // SDL_SetRenderDrawColor(renderer, 0x00, 0x7f, 0x00, 0xff);
-        // SDL_RenderFillRect(renderer, &viewport_rect);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
-    // SDL_DestroyRenderer(renderer);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
