@@ -40,46 +40,8 @@ static int font_set_style(FT_Outline* outline, int x_translation, unsigned char 
 
 RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antialiasing, ERenFontHinting hinting, unsigned char style) {
   FT_Face face = NULL;
-
-#ifdef _WIN32
-
-  HANDLE file = INVALID_HANDLE_VALUE;
-  DWORD read;
-  int font_file_len = 0;
-  unsigned char *font_file = NULL;
-  wchar_t *wpath = NULL;
-
-  if ((wpath = utfconv_utf8towc(path)) == NULL)
-    return NULL;
-
-  if ((file = CreateFileW(wpath,
-                          GENERIC_READ,
-                          FILE_SHARE_READ, // or else we can't copy fonts
-                          NULL,
-                          OPEN_EXISTING,
-                          FILE_ATTRIBUTE_NORMAL,
-                          NULL)) == INVALID_HANDLE_VALUE)
-    goto failure;
-
-  if ((font_file_len = GetFileSize(file, NULL)) == INVALID_FILE_SIZE)
-    goto failure;
-
-  font_file = (unsigned char*)check_alloc(malloc(font_file_len * sizeof(unsigned char)));
-  if (!ReadFile(file, font_file, font_file_len, &read, NULL) || read != font_file_len)
-    goto failure;
-
-  free(wpath);
-  wpath = NULL;
-
-  if (FT_New_Memory_Face(library, font_file, read, 0, &face))
-    goto failure;
-
-#else
-
   if (FT_New_Face(library, path, 0, &face))
     return NULL;
-
-#endif
 
   const int surface_scale = 2;
   int len = 0;
@@ -97,12 +59,6 @@ RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antial
   font->hinting = hinting;
   font->style = style;
 
-#ifdef _WIN32
-  // we need to keep this for freetype
-  font->file = font_file;
-  font->file_handle = file;
-#endif
-
   if(FT_IS_SCALABLE(face))
     font->underline_thickness = (unsigned short)((face->underline_thickness / (float)face->units_per_EM) * font->size);
   if(!font->underline_thickness) font->underline_thickness = ceil((double) font->height / 14.0);
@@ -114,11 +70,6 @@ RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antial
   return font;
 
 failure:
-#ifdef _WIN32
-  free(wpath);
-  free(font_file);
-  if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
-#endif
   if (face != NULL)
     FT_Done_Face(face);
   return NULL;
