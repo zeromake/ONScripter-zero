@@ -141,7 +141,7 @@ int renwin_surface_scale(RenWindow *ren) {
 
 static const char* utf8_to_codepoint(const char *p, unsigned *dst) {
   const unsigned char *up = (unsigned char*)p;
-  unsigned res, n;
+  unsigned int res, n;
   switch (*p & 0xf0) {
     case 0xf0 :  res = *up & 0x07;  n = 3;  break;
     case 0xe0 :  res = *up & 0x0f;  n = 2;  break;

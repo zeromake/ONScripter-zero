@@ -11,7 +11,7 @@
 // https://github.com/libsdl-org/SDL/blob/main/docs/README-ios.md#notes----retina--high-dpi-and-window-sizes
 
 SDL_Surface* _DrawText(TTF_Font* font, const char* text) {
-  static SDL_Color fcol={0x00, 0x00, 0x00}, bcol={0xff, 0xff, 0xff};
+  static SDL_Color fcol={0xdf, 0xdf, 0xdf, 0xff}, bcol={0xff, 0xff, 0xff};
   SDL_Surface *text_surface;
   text_surface = TTF_RenderUTF8_Blended(font, text, fcol);
   return text_surface;
@@ -51,7 +51,7 @@ int main()
 #elif defined(_WIN32)
     textScale = GetDpiForSystem() / 96;
 #endif
-    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / "..\\..\\..\\..\\fonts" / DEFAUTL_TTF);
+    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
     std::string ttfPathStr = ttfPath.string();//"C:\\Windows\\Fonts\\msyh.ttc";//
     printf("load: %s\n", ttfPathStr.c_str());
     TTF_Font *font = TTF_OpenFont(ttfPathStr.c_str(), 16*textScale);
@@ -76,7 +76,7 @@ int main()
                         run = !run;
                     break;
             }
-        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_SetRenderDrawColor(renderer, 0x24, 0x24, 0x24, 0xff);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, NULL, &dstRect);
         SDL_RenderPresent(renderer);
