@@ -294,7 +294,8 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
                 anim->font_pitch[0] = anim->font_size_xy[0];
                 anim->font_pitch[1] = anim->font_size_xy[0]; // dummy
                 if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
-                    anim->font_pitch[0] += script_h.readInt();
+                    int offset = script_h.readInt();
+                    anim->font_pitch[0] += offset;
                     if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
                         script_h.readInt(); // 0 ... normal, 1 ... no anti-aliasing, 2 ... Fukuro
                     }
