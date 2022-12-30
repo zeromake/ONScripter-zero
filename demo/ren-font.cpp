@@ -10,6 +10,10 @@ wchar_t* utfconv_utf8towc(const char* data) {
 }
 #endif
 
+int renwin_surface_scale(RenWindow *ren) {
+  return ren->surface_scale;
+}
+
 static void* check_alloc(void *ptr) {
   if (!ptr) {
     fprintf(stderr, "Fatal error: memory allocation failed\n");
@@ -43,7 +47,7 @@ RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antial
   if (FT_New_Face(library, path, 0, &face))
     return NULL;
 
-  const int surface_scale = 2;
+  const int surface_scale = renwin_surface_scale(&window_renderer);
   int len = 0;
   RenFont* font = NULL;
   if (FT_Set_Pixel_Sizes(face, 0, (int)(size*surface_scale)))
@@ -84,11 +88,6 @@ SDL_Surface *renwin_get_surface(RenWindow *ren) {
   }
   return surface;
 }
-
-int renwin_surface_scale(RenWindow *ren) {
-  return 1;
-}
-
 
 static const char* utf8_to_codepoint(const char *p, unsigned *dst) {
   const unsigned char *up = (unsigned char*)p;
@@ -349,13 +348,14 @@ void renwin_clip_to_surface(RenWindow *ren) {
   ren->clip = RenRect{0, 0, surface->w, surface->h};
 }
 
-void ren_init(SDL_Window *win, SDL_Surface* windowSurface) {
+void ren_init(SDL_Window *win, SDL_Surface* windowSurface, int surface_scale) {
     int error = FT_Init_FreeType( &library );
     if ( error ) {
         fprintf(stderr, "internal font error when starting the application\n");
         return;
     }
     window_renderer.window = win;
+    window_renderer.surface_scale = surface_scale;
     window_renderer.windowSurface = windowSurface;
     renwin_clip_to_surface(&window_renderer);
     draw_rect_surface = SDL_CreateRGBSurface(0, 1, 1, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);

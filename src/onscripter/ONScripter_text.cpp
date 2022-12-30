@@ -164,7 +164,7 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info, SDL_Color 
         }
 
         if (cache_info)
-            cache_info->blendText( tmp_surface, dst_rect.x, dst_rect.y, color, clip, rotate_flag );
+            cache_info->blendText(tmp_surface, dst_rect.x, dst_rect.y, color, clip, rotate_flag);
 
         if (dst_surface)
             alphaBlendText( dst_surface, dst_rect, tmp_surface, color, clip, rotate_flag );
@@ -507,8 +507,8 @@ bool ONScripter::clickWait( char *out_text )
         if ( waitEvent(0) ) return false;
     }
     else{
-        if ( out_text ){
-            drawChar( out_text, &sentence_font, true, true, accumulation_surface, &text_info );
+        if (out_text){
+            drawChar(out_text, &sentence_font, true, true, accumulation_surface, &text_info);
             num_chars_in_sentence++;
         }
 

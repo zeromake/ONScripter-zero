@@ -11,9 +11,9 @@
 // https://github.com/libsdl-org/SDL/blob/main/docs/README-ios.md#notes----retina--high-dpi-and-window-sizes
 
 SDL_Surface* _DrawText(TTF_Font* font, const char* text) {
-  static SDL_Color fcol={0xdf, 0xdf, 0xdf, 0xff}, bcol={0xff, 0xff, 0xff};
+  static SDL_Color fcol={0x00, 0x00, 0x00, 0xff}, bcol={0xff, 0xff, 0xff, 0xff};
   SDL_Surface *text_surface;
-  text_surface = TTF_RenderUTF8_Blended(font, text, fcol);
+  text_surface = TTF_RenderUTF8_LCD(font, text, fcol, bcol);
   return text_surface;
 }
 #define DEFAUTL_TTF "JetBrainsMono-Regular.ttf"
@@ -52,18 +52,18 @@ int main()
     textScale = GetDpiForSystem() / 96;
 #endif
     auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
-    std::string ttfPathStr = ttfPath.string();//"C:\\Windows\\Fonts\\msyh.ttc";//
+    std::string ttfPathStr = ttfPath.string();//"/System/Library/Fonts/Helvetica.ttc";////"C:\\Windows\\Fonts\\msyh.ttc";//
     printf("load: %s\n", ttfPathStr.c_str());
-    TTF_Font *font = TTF_OpenFont(ttfPathStr.c_str(), 16*textScale);
+    TTF_Font *font = TTF_OpenFontIndex(ttfPathStr.c_str(), 16*textScale, 0);
     TTF_SetFontHinting(font, TTF_HINTING_NONE);
-    SDL_Surface* screen = _DrawText(font, u8"中文测试 \"License\" shall");
+    SDL_Surface* screen = _DrawText(font, u8"中文测试 \"License\" shall SDL Tutorial");
     auto texture = SDL_CreateTextureFromSurface(renderer, screen);
     int textureW = screen->w;
     int textureH = screen->h;
     // 获取贴图的宽和高
     SDL_FreeSurface(screen);
 
-    SDL_Rect dstRect{ 130, 50, textureW, textureH };
+    SDL_Rect dstRect{130, 50, textureW, textureH};
     while (!exit)
     {
         while (SDL_PollEvent(&event))
@@ -76,7 +76,7 @@ int main()
                         run = !run;
                     break;
             }
-        SDL_SetRenderDrawColor(renderer, 0x24, 0x24, 0x24, 0xff);
+        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, NULL, &dstRect);
         SDL_RenderPresent(renderer);
