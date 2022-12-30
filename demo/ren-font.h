@@ -58,13 +58,14 @@ struct RenWindow {
   SDL_Window *window;
   RenRect clip;
   SDL_Surface* windowSurface;
+  int surface_scale;
 };
 
 static FT_Library library;
 static RenWindow window_renderer;
 static SDL_Surface *draw_rect_surface;
 
-void ren_init(SDL_Window *win, SDL_Surface* windowSurface);
+void ren_init(SDL_Window *win, SDL_Surface* windowSurface, int surface_scale);
 float ren_draw_text(RenFont **fonts, const char *text, size_t len, float x, int y, RenColor color);
 RenFont* ren_font_load(const char* path, float size, ERenFontAntialiasing antialiasing, ERenFontHinting hinting, unsigned char style);
 void ren_draw_rect(RenRect rect, RenColor color);

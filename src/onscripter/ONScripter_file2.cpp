@@ -446,6 +446,21 @@ int ONScripter::loadSaveFile2( int file_version )
         while( *buf != ':' ) buf++;
         buf++;
     }
+    // 跳过 systemcall rmenu
+    static const char rmenu[] = "systemcall rmenu";
+    int offset = 0;
+    bool has_rmenu = true;
+    while (offset < strlen(rmenu))
+    {
+        if (buf[offset] == '\0' || rmenu[offset] != buf[offset]) {
+            has_rmenu = false;
+            break;
+        }
+        offset++;
+    }
+    if (has_rmenu) {
+        buf += strlen(rmenu);
+    }
     script_h.setCurrent( buf );
 
     display_mode = shelter_display_mode = DISPLAY_MODE_TEXT;

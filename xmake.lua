@@ -360,6 +360,10 @@ target("demo/demo1")
         add_frameworks("AudioToolbox", "Cocoa")
     end
 
+target("demo/print")
+    set_kind("binary")
+    add_files("demo/print.c")
+
 target("saveconv")
     set_kind("binary")
     if is_plat("mingw") then
