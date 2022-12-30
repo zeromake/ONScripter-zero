@@ -45,7 +45,9 @@ private:
     int xy[2]; // Current position
     int old_xy[2]; // Prev position
     struct Position* stash;
-    int positionOffset;
+    int positionWidthMaxOffset;
+    int positionWidthOffset;
+    int positionHeightOffset;
 public:
     enum { YOKO_MODE = 0,
            TATE_MODE = 1
@@ -94,7 +96,7 @@ public:
 
     bool isEndOfLine(int margin=0);
     bool isLineEmpty();
-    void advanceCharInHankaku(int offest, int width = 0);
+    void advanceCharInHankaku(int offest, int width = 0, int heigth = 0);
     void addLineOffset(int margin);
     void setRubyOnFlag(bool flag);
 

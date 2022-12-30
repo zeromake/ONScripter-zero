@@ -447,20 +447,20 @@ int ONScripter::loadSaveFile2( int file_version )
         buf++;
     }
     // 跳过 systemcall rmenu
-    static const char rmenu[] = "systemcall rmenu";
-    int offset = 0;
-    bool has_rmenu = true;
-    while (offset < strlen(rmenu))
-    {
-        if (buf[offset] == '\0' || rmenu[offset] != buf[offset]) {
-            has_rmenu = false;
-            break;
-        }
-        offset++;
-    }
-    if (has_rmenu) {
-        buf += strlen(rmenu);
-    }
+    // static const char rmenu[] = "systemcall rmenu";
+    // int offset = 0;
+    // bool has_rmenu = true;
+    // while (offset < strlen(rmenu))
+    // {
+    //     if (buf[offset] == '\0' || rmenu[offset] != buf[offset]) {
+    //         has_rmenu = false;
+    //         break;
+    //     }
+    //     offset++;
+    // }
+    // if (has_rmenu) {
+    //     buf += strlen(rmenu);
+    // }
     script_h.setCurrent( buf );
 
     display_mode = shelter_display_mode = DISPLAY_MODE_TEXT;
@@ -715,13 +715,37 @@ void ONScripter::saveSaveFile2( bool output_flag )
         page = page->next;
     }
 
-    writeInt( current_label_info.start_line + current_line, output_flag );
     char *buf = script_h.getAddressByLine(current_label_info.start_line + current_line);
+    // 跳过 gosub 触发的 systemcall rmenu
+    static const char rmenu[] = "systemcall rmenu";
+    static const int rmenu_len = strlen(rmenu);
+    int offset = 0;
+    bool has_rmenu = true;
+    while (offset < rmenu_len)
+    {
+        if (buf[offset] == '\0' || rmenu[offset] != buf[offset]) {
+            has_rmenu = false;
+            break;
+        }
+        offset++;
+    }
+    int current_line_offset = 0;
+    if (has_rmenu) {
+        buf += rmenu_len;
+        current_line_offset++;
+    }
+    writeInt(current_label_info.start_line + current_line + current_line_offset, output_flag);
+    
     //utils::printInfo("save %d:%d\n", current_label_info.start_line, current_line);
 
     i = 0;
     if (!script_h.isText()){
-        while( buf != script_h.getCurrent(true) ){
+        char *curr_buf = script_h.getCurrent(true);
+        char *curr_buf_offset = curr_buf;
+        if (has_rmenu) {
+            curr_buf_offset += rmenu_len;
+        }
+        while(buf != curr_buf && buf != curr_buf_offset){
             if ( *buf == ':' ) i++;
             buf++;
         }

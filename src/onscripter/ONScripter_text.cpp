@@ -181,7 +181,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
     //utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
     auto fontConfig = getFontConfig(info->types);
     auto ff = generateFPath();
-    if ( info->ttf_font[0] == NULL ){
+    if (info->ttf_font[0] == NULL) {
         if ( info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig) == NULL ){
             utils::printError("can't open font file(%s): %s\n", strerror(errno), font_file );
             quit();
@@ -193,7 +193,7 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
         info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig);
 #endif
 
-    if ( info->isEndOfLine() ){
+    if (info->isEndOfLine()){
         info->newLine();
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
@@ -218,6 +218,12 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
         SDL_Rect dst_rect;
         drawGlyph(surface, info, color, text2, xy, cache_info, clip, dst_rect, fontConfig);
 
+        if (fontConfig->render_outline && fontConfig->render_outline > 0) {
+            int outline_size = fontConfig->outline_size * screen_ratio1 / screen_ratio2;
+            dst_rect.w += outline_size * 2;
+            dst_rect.h += outline_size * 3;
+            dst_rect.y -= outline_size;
+        }
         if ( surface == accumulation_surface &&
              !flush_flag &&
              (!clip || AnimationInfo::doClipping( &dst_rect, clip ) == 0) ){
@@ -234,11 +240,12 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
         }
 
         int charWidth = dst_rect.w * screen_ratio2 / screen_ratio1;
+        int charHeigth = dst_rect.h * screen_ratio2 / screen_ratio1;
         if (IS_TWO_BYTE(text[0])){
-            info->advanceCharInHankaku(2, charWidth);
+            info->advanceCharInHankaku(2, charWidth, charHeigth);
             break;
         }
-        info->advanceCharInHankaku(1, charWidth);
+        info->advanceCharInHankaku(1, charWidth, charHeigth);
         text2[0] = text[1];
         if (text2[0] == 0) break;
     }

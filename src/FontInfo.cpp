@@ -198,15 +198,15 @@ int _FontInfo::x(bool use_ruby_offset)
     int x = xy[0]*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE)
         x += font_size_xy[0] - pitch_xy[0];
-    if (positionOffset != 0) {
-        x += positionOffset;
+    if (positionWidthOffset != 0) {
+        x += positionWidthOffset;
     }
     return x;
 }
 
 int _FontInfo::y(bool use_ruby_offset)
 {
-    int y = xy[1]*pitch_xy[1]/2 + top_xy[1] + line_offset_xy[1];
+    int y = xy[1]*(pitch_xy[1] + positionHeightOffset)/2 + top_xy[1] + line_offset_xy[1];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == YOKO_MODE)
         y += pitch_xy[1] - font_size_xy[1];
     return y;
@@ -216,7 +216,7 @@ void _FontInfo::setXY( int x, int y )
 {
     if ( x != -1 ) xy[0] = x*2;
     if ( y != -1 ) xy[1] = y*2;
-    positionOffset = 0;
+    positionWidthOffset = 0;
 }
 
 void _FontInfo::clear()
@@ -239,7 +239,7 @@ void _FontInfo::newLine()
         xy[1] = 0;
     }
     line_offset_xy[0] = line_offset_xy[1] = 0;
-    positionOffset = 0;
+    positionWidthOffset = 0;
 }
 
 void _FontInfo::setLineArea(int num)
@@ -262,14 +262,19 @@ bool _FontInfo::isLineEmpty()
     return false;
 }
 
-void _FontInfo::advanceCharInHankaku(int offset, int width)
+void _FontInfo::advanceCharInHankaku(int offset, int width, int height)
 {
     if (tateyoko_mode == 0 && width > 0) {
         int index = xy[tateyoko_mode] + 1;
         int offsetWidth = width - (offset * pitch_xy[0] / 2);
-        positionOffset += offsetWidth;
+        positionWidthOffset += offsetWidth;
+        positionWidthMaxOffset = std::max(offsetWidth, positionWidthMaxOffset);
     } else if (tateyoko_mode == 1) {
-        positionOffset = 0;
+        positionWidthOffset = 0;
+    }
+    if (height > 0) {
+        int tmp = height - pitch_xy[1];
+        positionHeightOffset = std::max(tmp, positionHeightOffset);
     }
     xy[tateyoko_mode] += offset;
 }
@@ -341,7 +346,12 @@ SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
         }
         num_xy[0] = (xy[0]-start_xy[0])/2+1;
     }
-
+    if (positionWidthOffset > 0) {
+        rect.w += positionWidthOffset;
+    }
+    if (positionHeightOffset > 0) {
+        rect.h += positionHeightOffset * num_xy[1];
+    }
     return rect;
 }
 
