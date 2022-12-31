@@ -70,7 +70,7 @@ _FontInfo::_FontInfo()
     nofile_color[1] = 0x55;
     nofile_color[2] = 0x99;
     rubyon_flag = false;
-
+    memset(&positionOffset, 0, sizeof(PositionOffset));
     reset();
 }
 
@@ -195,20 +195,34 @@ int _FontInfo::getRemainingLine()
 
 int _FontInfo::x(bool use_ruby_offset)
 {
-    int x = xy[0]*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
+    int pitch_count = xy[0];
+    int x = pitch_count*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE)
         x += font_size_xy[0] - pitch_xy[0];
-    if (positionWidthOffset != 0) {
-        x += positionWidthOffset;
+    if (tateyoko_mode == YOKO_MODE) {
+        x += positionOffset.all_width;
+    } else if (tateyoko_mode == TATE_MODE) {
+        x += positionOffset.width * pitch_count;
     }
     return x;
 }
 
+void _FontInfo::resetPosition() {
+    positionOffset.all_width = 0;
+    positionOffset.all_height = 0;
+}
+
 int _FontInfo::y(bool use_ruby_offset)
 {
-    int y = xy[1]*(pitch_xy[1] + positionHeightOffset)/2 + top_xy[1] + line_offset_xy[1];
+    int pitch_count = xy[1];
+    int y = pitch_count * pitch_xy[1]/2 + top_xy[1] + line_offset_xy[1];
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == YOKO_MODE)
         y += pitch_xy[1] - font_size_xy[1];
+    if (tateyoko_mode == YOKO_MODE) {
+        y += positionOffset.height * pitch_count;
+    } else if (tateyoko_mode == TATE_MODE) {
+        y += positionOffset.all_width;
+    }
     return y;
 }
 
@@ -216,7 +230,7 @@ void _FontInfo::setXY( int x, int y )
 {
     if ( x != -1 ) xy[0] = x*2;
     if ( y != -1 ) xy[1] = y*2;
-    positionWidthOffset = 0;
+    resetPosition();
 }
 
 void _FontInfo::clear()
@@ -239,7 +253,7 @@ void _FontInfo::newLine()
         xy[1] = 0;
     }
     line_offset_xy[0] = line_offset_xy[1] = 0;
-    positionWidthOffset = 0;
+    resetPosition();
 }
 
 void _FontInfo::setLineArea(int num)
@@ -248,10 +262,36 @@ void _FontInfo::setLineArea(int num)
     num_xy[1-tateyoko_mode] = 1;
 }
 
+int _FontInfo::endStatus(int x, int y) {
+    int result = 0;
+    bool horizontal_over = this->x() + ((pitch_xy[0] + positionOffset.width + positionOffset.width) * 2) >= x;
+    bool vertical_over = this->y() + ((pitch_xy[1] + positionOffset.height + positionOffset.height) * 2) >= y;
+    bool endOfLine = isEndOfLine();
+    if (tateyoko_mode == YOKO_MODE) {
+        // 横向无法放下一个字符，标记为需要换行
+        if (horizontal_over) {
+            result |= 1;
+        }
+        // 横向无法放下一个字符，标记为需要点击切换
+        if (vertical_over && (endOfLine || horizontal_over)) {
+            result |= 2;
+        }
+    } else if (tateyoko_mode == TATE_MODE) {
+        if (vertical_over) {
+            result |= 1;
+        }
+        if (horizontal_over && (endOfLine || vertical_over)) {
+            result |= 2;
+        }
+    }
+    return result;
+}
+
 bool _FontInfo::isEndOfLine(int margin)
 {
-    if (xy[tateyoko_mode] + margin >= num_xy[tateyoko_mode]*2) return true;
-
+    if (xy[tateyoko_mode] + margin >= num_xy[tateyoko_mode]*2) {
+        return true;
+    }
     return false;
 }
 
@@ -264,17 +304,19 @@ bool _FontInfo::isLineEmpty()
 
 void _FontInfo::advanceCharInHankaku(int offset, int width, int height)
 {
-    if (tateyoko_mode == 0 && width > 0) {
-        int index = xy[tateyoko_mode] + 1;
+    if (width > 0) {
         int offsetWidth = width - (offset * pitch_xy[0] / 2);
-        positionWidthOffset += offsetWidth;
-        positionWidthMaxOffset = std::max(offsetWidth, positionWidthMaxOffset);
-    } else if (tateyoko_mode == 1) {
-        positionWidthOffset = 0;
+        positionOffset.width = std::max(offsetWidth, positionOffset.width);
+        if (tateyoko_mode == YOKO_MODE) {
+            positionOffset.all_width += offsetWidth;
+        }
     }
     if (height > 0) {
-        int tmp = height - pitch_xy[1];
-        positionHeightOffset = std::max(tmp, positionHeightOffset);
+        int offsetHeight = height - pitch_xy[1];
+        positionOffset.height = std::max(offsetHeight, positionOffset.height);
+        if (tateyoko_mode == TATE_MODE) {
+            positionOffset.all_height += offsetHeight;
+        }
     }
     xy[tateyoko_mode] += offset;
 }
@@ -318,7 +360,6 @@ void _FontInfo::rollback(int mode) {
 SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
 {
     SDL_Rect rect;
-
     if (tateyoko_mode == YOKO_MODE){
         if (start_xy[1] == xy[1]){
             rect.x = top_xy[0] + pitch_xy[0]*start_xy[0]/2;
@@ -331,8 +372,7 @@ SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
         rect.y = top_xy[1] + start_xy[1]*pitch_xy[1]/2;
         rect.h = font_size_xy[1] + pitch_xy[1]*(xy[1]-start_xy[1])/2;
         if (rubyon_flag) rect.h += pitch_xy[1] - font_size_xy[1];
-    }
-    else{
+    } else {
         rect.x = top_xy[0] + pitch_xy[0]*xy[0]/2;
         rect.w = font_size_xy[0] + pitch_xy[0]*(start_xy[0]-xy[0])/2;
         if (rubyon_flag) rect.w += font_size_xy[0]-pitch_xy[0];
@@ -346,11 +386,12 @@ SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
         }
         num_xy[0] = (xy[0]-start_xy[0])/2+1;
     }
-    if (positionWidthOffset > 0) {
-        rect.w += positionWidthOffset;
-    }
-    if (positionHeightOffset > 0) {
-        rect.h += positionHeightOffset * num_xy[1];
+    if (tateyoko_mode == YOKO_MODE) {
+        rect.w += positionOffset.all_width;
+        rect.h += positionOffset.height * num_xy[1];
+    } else if (tateyoko_mode == TATE_MODE) {
+        rect.w += positionOffset.width * num_xy[1];
+        rect.h += positionOffset.all_height;
     }
     return rect;
 }

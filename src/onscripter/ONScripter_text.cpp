@@ -176,7 +176,7 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info, SDL_Color 
         SDL_FreeSurface(tmp_surface);
 }
 
-void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
+int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
 {
     //utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
     auto fontConfig = getFontConfig(info->types);
@@ -192,8 +192,25 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
     else
         info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig);
 #endif
-
-    if (info->isEndOfLine()){
+    SDL_Rect* text_rect = NULL;
+    if (clip) {
+        text_rect = clip;
+    } else if (surface) {
+        text_rect = &SDL_Rect();
+        text_rect->x = 0;
+        text_rect->y = 0;
+        text_rect->w = surface->w;
+        text_rect->h = surface->h;
+    } else {
+        text_rect = &SDL_Rect();
+        text_rect->x = 0;
+        text_rect->y = 0;
+        text_rect->w = screen_width;
+        text_rect->h = screen_height;
+    }
+    if (info->isEndOfLine() || (text_rect && (info->endStatus(
+        text_rect->x + text_rect->w,
+        text_rect->y + text_rect->h) & 1))){
         info->newLine();
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
@@ -251,9 +268,17 @@ void ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool lo
     }
 
     if ( lookback_flag ){
-        current_page->add( text[0] );
-        if (text[1]) current_page->add( text[1] );
+        current_page->add(text[0]);
+        if (text[1]) current_page->add(text[1]);
     }
+
+    if (text_rect) {
+        int ret = info->endStatus(
+            text_rect->x + text_rect->w,
+            text_rect->y + text_rect->h);
+        return ret;
+    }
+    return 0;
 }
 
 void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool pack_hankaku)
@@ -287,6 +312,7 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
 #endif
         if (*str == '^') {
             str++;
+            skip_whitespace_flag = false;
             continue;
         }
 #ifndef FORCE_1BYTE_CHAR
@@ -368,7 +394,7 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
     }
 
     if ( flush_flag )
-        flush( refresh_shadow_text_mode, &scaled_clipped_rect );
+        flush(refresh_shadow_text_mode, &scaled_clipped_rect);
 
     if ( rect ) *rect = clipped_rect;
 }
@@ -800,9 +826,9 @@ bool ONScripter::processText()
 
     //utils::printInfo("*** textCommand %d (%d,%d)\n", string_buffer_offset, sentence_font.xy[0], sentence_font.xy[1]);
 
-    while( (!(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) &&
-            script_h.getStringBuffer()[ string_buffer_offset ] == ' ') ||
-           script_h.getStringBuffer()[ string_buffer_offset ] == '\t' ) string_buffer_offset ++;
+    // while( (!(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) &&
+    //         script_h.getStringBuffer()[ string_buffer_offset ] == ' ') ||
+    //        script_h.getStringBuffer()[ string_buffer_offset ] == '\t' ) string_buffer_offset ++;
 
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00){
         processEOT();
@@ -811,10 +837,18 @@ bool ONScripter::processText()
 
     line_enter_status = 2;
     if (pagetag_flag) page_enter_status = 1;
+    char ch = script_h.getStringBuffer()[string_buffer_offset];
 
     new_line_skip_flag = false;
+    if (force_new_page_flag) {
+        force_new_page_flag = false;
+        if (ch != '\\' && ch != '@') {
+            if (doClickEnd()) return false;
+            newPage();
+            return true;
+        }
+    }
 
-    char ch = script_h.getStringBuffer()[string_buffer_offset];
     if ( IS_TWO_BYTE(ch) ){ // Shift jis
         /* ---------------------------------------- */
         /* Kinsoku process */
@@ -841,19 +875,20 @@ bool ONScripter::processText()
         }
 
         int wait_time = sentence_font.wait_time == -1 ? default_text_speed[text_speed_no] : sentence_font.wait_time;
+        int drawCharStatus = 0;
         if ( skip_mode || ctrl_pressed_status || wait_time == 0 ){
-            drawChar( out_text, &sentence_font, false, true, accumulation_surface, &text_info );
-        }
-        else{
-            drawChar( out_text, &sentence_font, true, true, accumulation_surface, &text_info );
-
+            drawCharStatus = drawChar(out_text, &sentence_font, false, true, accumulation_surface, &text_info);
+        } else{
+            drawCharStatus = drawChar(out_text, &sentence_font, true, true, accumulation_surface, &text_info);
             event_mode = WAIT_TIMER_MODE | WAIT_INPUT_MODE;
-            waitEvent( wait_time );
+            waitEvent(wait_time);
         }
 
+        if (drawCharStatus & 2) {
+            force_new_page_flag = true;
+        }
         num_chars_in_sentence++;
         string_buffer_offset += 2;
-
         return true;
     }
     else if ( ch == '@' ){ // wait for click
@@ -873,7 +908,9 @@ bool ONScripter::processText()
                     out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
                 bool flush_flag = true;
                 if ( skip_mode || ctrl_pressed_status ) flush_flag = false;
-                drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
+                if (drawChar(out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info) & 2) {
+                    force_new_page_flag = true;
+                }
             }
             string_buffer_offset += matched_len;
         }
@@ -1016,7 +1053,9 @@ bool ONScripter::processText()
         bool flush_flag = true;
         if ( skip_mode || ctrl_pressed_status )
             flush_flag = false;
-        drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
+        if (drawChar(out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info) & 2) {
+            force_new_page_flag = true;
+        }
         num_chars_in_sentence++;
 
         int wait_time = sentence_font.wait_time == -1 ? default_text_speed[text_speed_no] : sentence_font.wait_time;

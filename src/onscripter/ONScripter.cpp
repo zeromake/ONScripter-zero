@@ -1281,8 +1281,7 @@ void ONScripter::newPage()
     }
 
     page_enter_status = 0;
-
-    flush( refreshMode(), &sentence_font_info.pos );
+    flush(refreshMode(), &sentence_font_info.pos);
 }
 
 ButtonLink *ONScripter::getSelectableSentence( char *buffer, _FontInfo *info, bool flush_flag, bool nofile_flag )

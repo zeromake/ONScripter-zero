@@ -39,18 +39,24 @@ struct Position
     struct Position* next;
 };
 
+typedef struct {
+    int width;
+    int all_width;
+    int height;
+    int all_height;
+} PositionOffset;
 
 class _FontInfo{
 private:
     int xy[2]; // Current position
     int old_xy[2]; // Prev position
     struct Position* stash;
-    int positionWidthMaxOffset;
-    int positionWidthOffset;
-    int positionHeightOffset;
+    PositionOffset positionOffset; // maxWidth, allWidth,maxHeight,allHeight
+    void resetPosition();
 public:
-    enum { YOKO_MODE = 0,
-           TATE_MODE = 1
+    enum Direction {
+        YOKO_MODE = 0,
+        TATE_MODE = 1
     };
     static char *cache_font_file;
     static void *font_cache;
@@ -95,6 +101,7 @@ public:
     void setLineArea(int num);
 
     bool isEndOfLine(int margin=0);
+    int endStatus(int x, int y);
     bool isLineEmpty();
     void advanceCharInHankaku(int offest, int width = 0, int heigth = 0);
     void addLineOffset(int margin);

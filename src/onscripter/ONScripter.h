@@ -788,6 +788,7 @@ private:
     bool internal_saveon_flag; // to saveoff at the head of text
 
     bool new_line_skip_flag;
+    bool force_new_page_flag;
     int  text_speed_no;
     bool is_kinsoku;
     AnimationInfo text_info;
@@ -807,7 +808,7 @@ private:
     void shiftHalfPixelX(SDL_Surface *surface);
     void shiftHalfPixelY(SDL_Surface *surface);
     void drawGlyph( SDL_Surface *dst_surface, _FontInfo *info, SDL_Color &color, char *text, int xy[2], AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect, const ons_font::FontConfig* fontConfig);
-    void drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip=NULL );
+    int drawChar( char* text, _FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip=NULL );
     void drawString( const char *str, uchar3 color, _FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect = NULL, AnimationInfo *cache_info=NULL, bool pack_hankaku=true );
     void restoreTextBuffer(SDL_Surface *surface = NULL);
     void enterTextDisplayMode(bool text_flag = true);
