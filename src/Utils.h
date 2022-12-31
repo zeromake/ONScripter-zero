@@ -42,6 +42,7 @@ static BOOL MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize)
 #include <stdio.h>
 #include <stdarg.h>
 #include <utility>
+#include <string>
 
 namespace utils{
 	inline void printInfo(const char *format, ...){

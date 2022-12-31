@@ -173,9 +173,7 @@ const char* ScriptHandler::fpath(const char *path, bool use_save_dir) {
         else
             sprintf(path_string_buffer, "%s%s", archive_path, path);
     }
-    for ( unsigned int i=0 ; i<strlen(path_string_buffer) ; i++ )
-        if ((path_string_buffer[i] == '/' || path_string_buffer[i] == '\\') && path_string_buffer[i] != DELIMITER)
-            path_string_buffer[i] = DELIMITER;
+    strcpy(path_string_buffer, std::fs::absolute(path_string_buffer).string().c_str());
     return path_string_buffer;
 }
 

@@ -25,6 +25,7 @@
 #include "ONScripter.h"
 #include "Utils.h"
 #include <new>
+#include <infra/filesystem.hpp>
 #if defined(LINUX)
 #include <signal.h>
 #endif
@@ -250,14 +251,16 @@ static void smpeg_filter_destroy( struct SMPEG_Filter * filter )
 }
 #endif
 
-int call_system(void* data) {
 #if !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
-    int code = system((const char*)data);
+int call_system(void* data) {
+    char exec[512]{0};
+    sprintf(exec, "explorer \"%s\"", (const char*)data);
+    int code = system(exec);
     delete[] data;
     return code;
-#endif
     return 0;
 }
+#endif
 
 int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
 {
@@ -379,11 +382,8 @@ int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
     texture = SDL_CreateTextureFromSurface(renderer, accumulation_surface);
 #elif !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
     char *filename2 = new char[256];
-    strcpy(filename2, filename);
-    for (unsigned int i=0; i<strlen(filename2); i++)
-        if (filename2[i] == '/' || filename2[i] == '\\')
-            filename2[i] = DELIMITER;
-    SDL_CreateThread(call_system, "play-video", filename2);
+    strcpy(filename2, fpath(filename));
+    SDL_CreateThread(call_system, "play-video", (void*)filename2);
     // system(filename2);
 #elif !defined(IOS)
     utils::printError( "mpegplay command is disabled.\n" );
@@ -406,7 +406,9 @@ int ONScripter::playAVI( const char *filename, bool click_flag )
 #endif
 
 #if !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
-    system(filename);
+    char *filename2 = new char[256];
+    strcpy(filename2, fpath(filename));
+    SDL_CreateThread(call_system, "play-video", (void*)filename2);
 #else
     utils::printError( "avi command is disabled.\n" );
 #endif

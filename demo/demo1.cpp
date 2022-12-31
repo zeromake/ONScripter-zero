@@ -51,7 +51,7 @@ int main()
 #elif defined(_WIN32)
     textScale = GetDpiForSystem() / 96;
 #endif
-    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
+    auto ttfPath = std::fs::absolute(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
     std::string ttfPathStr = ttfPath.string();//"/System/Library/Fonts/Helvetica.ttc";////"C:\\Windows\\Fonts\\msyh.ttc";//
     printf("load: %s\n", ttfPathStr.c_str());
     TTF_Font *font = TTF_OpenFontIndex(ttfPathStr.c_str(), 16*textScale, 0);
