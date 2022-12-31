@@ -25,6 +25,7 @@
 #include "ONScripter.h"
 #include "coding2utf16.h"
 #include "Utils.h"
+#include <memory>
 
 extern Coding2UTF16 *coding2utf16;
 
@@ -192,17 +193,15 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
     else
         info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig);
 #endif
-    SDL_Rect* text_rect = NULL;
+    std::unique_ptr<SDL_Rect> text_rect = std::make_unique<SDL_Rect>();
     if (clip) {
-        text_rect = clip;
+        memcpy(&(*text_rect), clip, sizeof(SDL_Rect));
     } else if (surface) {
-        text_rect = &SDL_Rect();
         text_rect->x = 0;
         text_rect->y = 0;
         text_rect->w = surface->w;
         text_rect->h = surface->h;
     } else {
-        text_rect = &SDL_Rect();
         text_rect->x = 0;
         text_rect->y = 0;
         text_rect->w = screen_width;
