@@ -46,9 +46,9 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
     - [x] 文本字体支持缩放比例。
 - [x] 无需在编译脚本里指定 simd 使用的后端，`simd/simd.h` 会根据编译器预定义头自动选择后端，如果没有可用后端会自动关闭 `simd` 支持。
 - [x] 文本渲染强制换行和切页，防止渲染到窗口外（配合自定义字体切换配置）。
+- [x] 所有平台支持通过 ci 打包分发到 release。
 - [ ] android 需要一个配置页面对游戏进行一个自定义或者全局配置。
 - [ ] 查找动画在 android 有明显卡顿的问题。
-- [ ] 所有平台支持通过 ci 打包分发到 release。
 - [ ] 抽象文件操作(文件读写，文件目录遍历，文件路径自动拼接，文件是否存在判断，目录创建)，以便于移植到各种平台下，考虑使用 `c++17` 的 `std::filesystem` 的通用方法，移动端平台可能需要手动编写。
 - [ ] 支持读取压缩包里的 ons 游戏，无需解压。
 - [ ] 代码里描述指令说明并生成文档, [onscripter-api](https://07th-mod.github.io/ponscripter-fork/api/), [NScrAPI](http://senzogawa.s90.xrea.com/reference/NScrAPI.html)。
@@ -60,7 +60,8 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 > 由于 freetype, harfbuzz 的循环依赖，请使用我的 xmake 分支，已经向 xmake-io 提出 [issuse](https://github.com/xmake-io/xmake/issues/3118) 了，但是维护者没有空处理，我这边只是一个比较简单的实现。
 
 ``` bash
-xmake update -s https://github.com/zeromake/xmake.git#master
+xmake update -s https://github.com/zeromake/xmake.git#feature/dependency_loop
+xrepo add-repo local https://github.com/zeromake/xrepo.git
 ```
 
 **windows**

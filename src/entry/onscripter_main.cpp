@@ -28,6 +28,7 @@
 #include "sjis2utf16.h"
 #include "version.h"
 #include "stdlib.h"
+#include <infra/filesystem.hpp>
 
 ONScripter ons;
 Coding2UTF16 *coding2utf16 = NULL;
@@ -287,7 +288,7 @@ void parseOption(int argc, char *argv[]) {
             else if ( !strcmp( argv[0]+1, "r" ) || !strcmp( argv[0]+1, "-root" ) ){
                 argc--;
                 argv++;
-                ons.setArchivePath(argv[0]);
+                ons.setArchivePath(std::fs::absolute(argv[0]).string().c_str());
             }
             else if ( !strcmp( argv[0]+1, "-fullscreen" ) ){
                 ons.setFullscreenMode();

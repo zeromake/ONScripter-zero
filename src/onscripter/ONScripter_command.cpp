@@ -701,7 +701,7 @@ void ONScripter::setwindowCore()
         setupAnimationInfo( ai );
         ai->orig_pos.x = script_h.readInt();
         ai->orig_pos.y = script_h.readInt();
-        ai->scalePosXY( screen_ratio1, screen_ratio2 );
+        ai->scalePosXY(screen_ratio1, screen_ratio2);
 
         sentence_font.is_transparent = false;
         sentence_font.window_color[0] = sentence_font.window_color[1] = sentence_font.window_color[2] = 0xff;

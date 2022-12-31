@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     SDL_Rect dstRect{ 0, 0, windowWidth, windowHeight };
     RenRect windowRect{ 0, 0, windowWidth*windowScale, windowHeight*windowScale };
     Command cmd;
-    auto ttfPath = std::filesystem::canonical(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
+    auto ttfPath = std::fs::absolute(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
     auto ttfPathStr = ttfPath.string();
     printf("load: %s\n", ttfPathStr.c_str());
     cmd.fonts[0] = ren_font_load(ttfPathStr.c_str(), 16, FONT_ANTIALIASING_SUBPIXEL, FONT_HINTING_SLIGHT, FONT_STYLE_UNDERLINE);
