@@ -383,8 +383,8 @@ int ScriptParser::rubyonCommand()
         setStr( &ruby_struct.font_name, NULL );
     }
     else{
-        ruby_struct.font_size_xy[0] = calcFontRatio(script_h.readInt(), ons_font::RUBY_FONT);
-        ruby_struct.font_size_xy[1] = calcFontRatio(script_h.readInt(), ons_font::RUBY_FONT);
+        ruby_struct.font_size_xy[0] = calcFontSize(script_h.readInt(), ons_font::RUBY_FONT);
+        ruby_struct.font_size_xy[1] = calcFontSize(script_h.readInt(), ons_font::RUBY_FONT);
 
         if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
             setStr( &ruby_struct.font_name, script_h.readStr() );
@@ -684,8 +684,8 @@ int ScriptParser::menusetwindowCommand()
     menu_font.types = ons_font::MENU_FONT;
     menu_font.ttf_font[0]     = NULL;
     menu_font.ttf_font[1]     = NULL;
-    menu_font.font_size_xy[0] = calcFontRatio(script_h.readInt(), menu_font.types);
-    menu_font.font_size_xy[1] = calcFontRatio(script_h.readInt(), menu_font.types);
+    menu_font.font_size_xy[0] = calcFontSize(script_h.readInt(), menu_font.types);
+    menu_font.font_size_xy[1] = calcFontSize(script_h.readInt(), menu_font.types);
     menu_font.pitch_xy[0]     = script_h.readInt() + menu_font.font_size_xy[0];
     menu_font.pitch_xy[1]     = script_h.readInt() + menu_font.font_size_xy[1];
     menu_font.is_bold         = script_h.readInt()?true:false;

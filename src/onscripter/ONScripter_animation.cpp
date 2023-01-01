@@ -289,8 +289,8 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
                 script_h.getNext();
 
                 script_h.pushCurrent( buffer );
-                anim->font_size_xy[0] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
-                anim->font_size_xy[1] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
+                anim->font_size_xy[0] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
+                anim->font_size_xy[1] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
                 anim->font_pitch[0] = anim->font_size_xy[0];
                 anim->font_pitch[1] = anim->font_size_xy[0]; // dummy
                 if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){

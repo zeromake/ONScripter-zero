@@ -42,7 +42,7 @@ extern Coding2UTF16 *coding2utf16;
         ( *(x) == (char)0x81 && *((x)+1) >= 0x41 && *((x)+1) <= 0x44 )
 
 
-int calcFontSize(int v, int screen_ratio1, int screen_ratio2) {
+int calcFontSizeRatio(int v, int screen_ratio1, int screen_ratio2) {
     return v * screen_ratio1 / screen_ratio2;
 }
 
@@ -118,7 +118,7 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info, SDL_Color 
     dst_rect.x = xy[0];
     dst_rect.y = xy[1];
 
-    dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - calcFontSize(info->font_size_xy[1], screen_ratio1,screen_ratio2))/2;
+    dst_rect.y -= (TTF_FontHeight((TTF_Font*)info->ttf_font[0]) - calcFontSizeRatio(info->font_size_xy[1], screen_ratio1,screen_ratio2))/2;
 
     if ( rotate_flag ) dst_rect.x += miny - minx;
 
@@ -194,9 +194,7 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
         info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig);
 #endif
     std::unique_ptr<SDL_Rect> text_rect = std::make_unique<SDL_Rect>();
-    if (clip) {
-        memcpy(&(*text_rect), clip, sizeof(SDL_Rect));
-    } else if (surface) {
+    if (surface) {
         text_rect->x = 0;
         text_rect->y = 0;
         text_rect->w = surface->w;
@@ -207,14 +205,20 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
         text_rect->w = screen_width;
         text_rect->h = screen_height;
     }
+    text_rect->w = text_rect->w * screen_ratio2 / screen_ratio1;
+    text_rect->h = text_rect->h * screen_ratio2 / screen_ratio1;
+    if (fontConfig && fontConfig->offset_x > 0 || fontConfig->offset_y > 0) {
+        text_rect->w -= fontConfig->offset_x;
+        text_rect->h -= fontConfig->offset_y;
+    }
     if (info->isEndOfLine() || (text_rect && (info->endStatus(
         text_rect->x + text_rect->w,
         text_rect->y + text_rect->h) & 1))){
         info->newLine();
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
-                current_page->add(0x81);
-                current_page->add(0x40);
+                current_page->add(' ');
+                current_page->add(' ');
             }
             info->advanceCharInHankaku(2);
         }
@@ -227,8 +231,8 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
-        xy[0] = calcFontSize(info->x(), screen_ratio1, screen_ratio2);
-        xy[1] = calcFontSize(info->y(), screen_ratio1, screen_ratio2);
+        xy[0] = calcFontSizeRatio(info->x(), screen_ratio1, screen_ratio2);
+        xy[1] = calcFontSizeRatio(info->y(), screen_ratio1, screen_ratio2);
 
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
@@ -297,21 +301,21 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
     for ( i=0 ; i<3 ; i++ ) org_color[i] = info->color[i];
     for ( i=0 ; i<3 ; i++ ) info->color[i] = color[i];
 
-    bool skip_whitespace_flag = true;
+    // bool skip_whitespace_flag = true;
     char text[3] = { '\0', '\0', '\0' };
     while( *str ){
-        while (*str == ' ' && skip_whitespace_flag) str++;
+        // while (*str == ' ' && skip_whitespace_flag) str++;
 
 #ifdef ENABLE_1BYTE_CHAR
         if ( *str == '`' ){
             str++;
-            skip_whitespace_flag = false;
+            // skip_whitespace_flag = false;
             continue;
         }
 #endif
         if (*str == '^') {
             str++;
-            skip_whitespace_flag = false;
+            // skip_whitespace_flag = false;
             continue;
         }
 #ifndef FORCE_1BYTE_CHAR
@@ -368,8 +372,7 @@ void ONScripter::drawString( const char *str, uchar3 color, _FontInfo *info, boo
         }
         else if (*str){
             text[0] = *str++;
-            if (*str && *str != '\n' && pack_hankaku) text[1] = *str++;
-            else                                      text[1] = 0;
+            text[1] = 0;
             drawChar( text, info, false, false, surface, cache_info );
         }
     }
@@ -853,7 +856,7 @@ bool ONScripter::processText()
         /* Kinsoku process */
         if ( checkLineBreak( script_h.getStringBuffer() + string_buffer_offset, &sentence_font ) ){
             sentence_font.newLine();
-            for (int i=0 ; i<indent_offset ; i++){
+            for (int i=0 ; i<indent_offset ; i++) {
                 current_page->add(0x81);
                 current_page->add(0x40);
                 sentence_font.advanceCharInHankaku(2);
