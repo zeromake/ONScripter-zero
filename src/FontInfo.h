@@ -101,7 +101,7 @@ public:
     void setLineArea(int num);
 
     bool isEndOfLine(int margin=0);
-    int endStatus(int x, int y);
+    int endStatus(int x, int y, bool useAutoOffset = true);
     bool isLineEmpty();
     void advanceCharInHankaku(int offest, int width = 0, int heigth = 0);
     void addLineOffset(int margin);

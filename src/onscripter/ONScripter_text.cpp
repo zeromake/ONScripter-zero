@@ -207,20 +207,25 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
     }
     text_rect->w = text_rect->w * screen_ratio2 / screen_ratio1;
     text_rect->h = text_rect->h * screen_ratio2 / screen_ratio1;
+    bool useAutoOffset = true;
     if (fontConfig && fontConfig->offset_x > 0 || fontConfig->offset_y > 0) {
         text_rect->w -= fontConfig->offset_x;
         text_rect->h -= fontConfig->offset_y;
+        useAutoOffset = false;
     }
     if (info->isEndOfLine() || (text_rect && (info->endStatus(
         text_rect->x + text_rect->w,
-        text_rect->y + text_rect->h) & 1))){
+        text_rect->y + text_rect->h, useAutoOffset) & 1))){
         info->newLine();
+
+        if (lookback_flag) {
+            current_page->add('\n');
+        }
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
                 current_page->add(' ');
-                current_page->add(' ');
             }
-            info->advanceCharInHankaku(2);
+            info->advanceCharInHankaku(1);
         }
     }
 
@@ -278,7 +283,8 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
     if (text_rect) {
         int ret = info->endStatus(
             text_rect->x + text_rect->w,
-            text_rect->y + text_rect->h);
+            text_rect->y + text_rect->h,
+            useAutoOffset);
         return ret;
     }
     return 0;
@@ -885,12 +891,12 @@ bool ONScripter::processText()
     if ( IS_TWO_BYTE(ch) ){ // Shift jis
         /* ---------------------------------------- */
         /* Kinsoku process */
-        if ( checkLineBreak( script_h.getStringBuffer() + string_buffer_offset, &sentence_font ) ){
+        if (checkLineBreak(script_h.getStringBuffer() + string_buffer_offset, &sentence_font)){
             sentence_font.newLine();
+            current_page->add('\n');
             for (int i=0 ; i<indent_offset ; i++) {
-                current_page->add(0x81);
-                current_page->add(0x40);
-                sentence_font.advanceCharInHankaku(2);
+                current_page->add(' ');
+                sentence_font.advanceCharInHankaku(1);
             }
         }
 
