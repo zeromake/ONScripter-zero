@@ -1192,7 +1192,7 @@ void ONScripter::clearCurrentPage()
         current_page->text = NULL;
     }
     if ( !current_page->text ){
-        current_page->text = new char[num];
+        current_page->text = new char[num]{0};
         current_page->max_text = num;
     }
     current_page->text_count = 0;
@@ -1273,9 +1273,9 @@ void ONScripter::shadowTextDisplay( SDL_Surface *surface, SDL_Rect &clip )
 
 void ONScripter::newPage()
 {
-    if ( current_page->text_count != 0 ){
+    if (current_page->text_count != 0){
         current_page = current_page->next;
-        if ( start_page == current_page )
+        if (start_page == current_page)
             start_page = start_page->next;
         clearCurrentPage();
     }
