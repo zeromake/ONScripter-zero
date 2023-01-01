@@ -788,7 +788,7 @@ private:
     bool internal_saveon_flag; // to saveoff at the head of text
 
     bool new_line_skip_flag;
-    bool force_new_page_flag;
+    int  prev_end_status;
     int  text_speed_no;
     bool is_kinsoku;
     AnimationInfo text_info;

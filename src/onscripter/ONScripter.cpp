@@ -367,6 +367,7 @@ ONScripter::ONScripter()
 #endif
 
     makeFuncLUT();
+    prev_end_status = 0;
 }
 
 ONScripter::~ONScripter()
