@@ -71,6 +71,7 @@ _FontInfo::_FontInfo()
     nofile_color[2] = 0x99;
     rubyon_flag = false;
     memset(&positionOffset, 0, sizeof(PositionOffset));
+    stash = NULL;
     reset();
 }
 
@@ -264,13 +265,16 @@ void _FontInfo::setLineArea(int num)
 
 int _FontInfo::endStatus(int x, int y) {
     int result = 0;
-    bool horizontal_over = this->x() + ((pitch_xy[0] + positionOffset.width + positionOffset.width) * 2) >= x;
-    bool vertical_over = this->y() + ((pitch_xy[1] + positionOffset.height + positionOffset.height) * 2) >= y;
+    bool horizontal_over = this->x() + (pitch_xy[0] + positionOffset.width * 2) >= x;
+    bool vertical_over = this->y() + (pitch_xy[1] + positionOffset.height * 2) >= y;
     bool endOfLine = isEndOfLine();
     if (tateyoko_mode == YOKO_MODE) {
         // 横向无法放下一个字符，标记为需要换行
         if (horizontal_over) {
             result |= 1;
+        }
+        if (vertical_over) {
+            result |= 4;
         }
         // 横向无法放下一个字符，标记为需要点击切换
         if (vertical_over && (endOfLine || horizontal_over)) {
@@ -279,6 +283,9 @@ int _FontInfo::endStatus(int x, int y) {
     } else if (tateyoko_mode == TATE_MODE) {
         if (vertical_over) {
             result |= 1;
+        }
+        if (horizontal_over) {
+            result |= 4;
         }
         if (horizontal_over && (endOfLine || vertical_over)) {
             result |= 2;

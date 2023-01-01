@@ -298,8 +298,7 @@ protected:
 
     void readToken();
     
-    const int calcFontRatio(const int v, const ons_font::FONT_TYPE types);
-    const int calcFontUnRatio(const int v, const ons_font::FONT_TYPE types);
+    const int calcFontSize(const int v, ons_font::FONT_TYPE type);
     const ons_font::FontConfig* getFontConfig(const ons_font::FONT_TYPE types);
 
     /* ---------------------------------------- */
@@ -396,6 +395,8 @@ protected:
                 delete[] text;
                 text = text2;
                 max_text *= 2;
+            } else if (text_count == 0) {
+                memset(text, 0, max_text);
             }
             text[text_count++] = ch;
             return ch;

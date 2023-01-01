@@ -799,8 +799,8 @@ void ONScripter::resetSentenceFont()
 {
     sentence_font.reset();
     sentence_font.types = ons_font::SENTENCE_FONT;
-    sentence_font.font_size_xy[0] = calcFontRatio(DEFAULT_FONT_SIZE, sentence_font.types);
-    sentence_font.font_size_xy[1] = calcFontRatio(DEFAULT_FONT_SIZE, sentence_font.types);
+    sentence_font.font_size_xy[0] = calcFontSize(DEFAULT_FONT_SIZE, sentence_font.types);
+    sentence_font.font_size_xy[1] = calcFontSize(DEFAULT_FONT_SIZE, sentence_font.types);
     sentence_font.top_xy[0] = 21;
     sentence_font.top_xy[1] = 16;// + sentence_font.font_size;
     sentence_font.num_xy[0] = 23;

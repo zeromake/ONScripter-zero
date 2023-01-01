@@ -14,28 +14,31 @@ namespace ons_font {
     };
     struct FontConfig
     {
-        int ratio1;
-        int ratio2;
+        int size;
+        float size_ratio;
         uchar3 color;
+        bool render_outline;
         int outline_size;
         uchar3 outline_color;
-        bool render_outline;
-
+        int offset_x;
+        int offset_y;
     };
     static ons_font::FontConfig* __DEFAULT_FONT_CONFIG = nullptr;
     static FontConfig* DEFAULT_FONT_CONFIG() {
         if (__DEFAULT_FONT_CONFIG == nullptr) {
             __DEFAULT_FONT_CONFIG = new FontConfig;
-            __DEFAULT_FONT_CONFIG->ratio1 = 1;
-            __DEFAULT_FONT_CONFIG->ratio2 = 1;
+            __DEFAULT_FONT_CONFIG->size = 0;
+            __DEFAULT_FONT_CONFIG->size_ratio = 0.0f;
             __DEFAULT_FONT_CONFIG->color[0] =
             __DEFAULT_FONT_CONFIG->color[1] =
             __DEFAULT_FONT_CONFIG->color[2] = 0xff;
+            __DEFAULT_FONT_CONFIG->render_outline = false;
             __DEFAULT_FONT_CONFIG->outline_size = 1,
             __DEFAULT_FONT_CONFIG->outline_color[0] =
             __DEFAULT_FONT_CONFIG->outline_color[1] =
             __DEFAULT_FONT_CONFIG->outline_color[2] = 0;
-            __DEFAULT_FONT_CONFIG->render_outline = false;
+            __DEFAULT_FONT_CONFIG->offset_x = 0;
+            __DEFAULT_FONT_CONFIG->offset_y = 0;
         }
         return __DEFAULT_FONT_CONFIG;
     }

@@ -382,8 +382,8 @@ int ONScripter::strspCommand()
     fi.is_newline_accepted = true;
     fi.num_xy[0] = script_h.readInt();
     fi.num_xy[1] = script_h.readInt();
-    fi.font_size_xy[0] = calcFontRatio(script_h.readInt(), fi.types);
-    fi.font_size_xy[1] = calcFontRatio(script_h.readInt(), fi.types);
+    fi.font_size_xy[0] = calcFontSize(script_h.readInt(), fi.types);
+    fi.font_size_xy[1] = calcFontSize(script_h.readInt(), fi.types);
     fi.pitch_xy[0] = script_h.readInt() + fi.font_size_xy[0];
     fi.pitch_xy[1] = script_h.readInt() + fi.font_size_xy[1];
     fi.is_bold = script_h.readInt()?true:false;
@@ -664,8 +664,8 @@ void ONScripter::setwindowCore()
     sentence_font.num_xy[1] = script_h.readInt();
 
     // 设置文字大小
-    sentence_font.font_size_xy[0] = calcFontRatio(script_h.readInt(), sentence_font.types);
-    sentence_font.font_size_xy[1] = calcFontRatio(script_h.readInt(), sentence_font.types);
+    sentence_font.font_size_xy[0] = calcFontSize(script_h.readInt(), sentence_font.types);
+    sentence_font.font_size_xy[1] = calcFontSize(script_h.readInt(), sentence_font.types);
 
     // 字符宽高
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
@@ -1208,8 +1208,8 @@ int ONScripter::prnumCommand()
     ai->orig_pos.x = script_h.readInt();
     ai->orig_pos.y = script_h.readInt();
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
-    ai->font_size_xy[0] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
-    ai->font_size_xy[1] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
+    ai->font_size_xy[0] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
+    ai->font_size_xy[1] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
     ai->font_pitch[0] = ai->font_size_xy[0];
     ai->font_pitch[1] = ai->font_size_xy[1];
 
@@ -1791,12 +1791,11 @@ int ONScripter::logspCommand()
 
     ai->trans_mode = AnimationInfo::TRANS_STRING;
     if (logsp2_flag){
-        ai->font_size_xy[0] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
-        ai->font_size_xy[1] = calcFontRatio(script_h.readInt(), ons_font::ANIM_FONT);
+        ai->font_size_xy[0] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
+        ai->font_size_xy[1] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
         ai->font_pitch[0] = script_h.readInt() + ai->font_size_xy[0];
         ai->font_pitch[1] = script_h.readInt() + ai->font_size_xy[1];
-    }
-    else{
+    } else {
         ai->font_size_xy[0] = sentence_font.font_size_xy[0];
         ai->font_size_xy[1] = sentence_font.font_size_xy[1];
         ai->font_pitch[0] = sentence_font.pitch_xy[0];

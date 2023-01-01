@@ -158,10 +158,10 @@ void ScriptParser::setFontConfig(const char* buf) {
                 switch (field)
                 {
                 case 0:
-                    cfg->ratio1 = atoi(buff);
+                    cfg->size = atoi(buff);
                     break;
                 case 1:
-                    cfg->ratio2 = atoi(buff);
+                    cfg->size_ratio = atof(buf);
                     break;
                 case 2:
                     readColor(&cfg->color, buff);
@@ -175,6 +175,12 @@ void ScriptParser::setFontConfig(const char* buf) {
                 case 5:
                     readColor(&cfg->outline_color, buff);
                     break;
+                case 6:
+                    cfg->offset_x = atoi(buff);
+                    break;
+                case 7:
+                    cfg->offset_y = atoi(buff);
+                    break;
                 }
             }
             field++;
@@ -186,20 +192,15 @@ void ScriptParser::setFontConfig(const char* buf) {
     }
 }
 
-const int ScriptParser::calcFontRatio(const int v, const ons_font::FONT_TYPE types) {
+const int ScriptParser::calcFontSize(const int v, ons_font::FONT_TYPE types) {
     const ons_font::FontConfig* cfg = getFontConfig(types);
-    if (cfg->ratio1 == cfg->ratio2) {
-        return v;
+    if (cfg->size > 0) {
+        return cfg->size;
     }
-    return v * cfg->ratio1 / cfg->ratio2;
-}
-
-const int ScriptParser::calcFontUnRatio(const int v, const ons_font::FONT_TYPE types) {
-    const ons_font::FontConfig* cfg = getFontConfig(types);
-    if (cfg->ratio1 == cfg->ratio2) {
-        return v;
+    if (cfg->size_ratio > 0.0f) {
+        return (int)((float)v * cfg->size_ratio);
     }
-    return v * cfg->ratio2 / cfg->ratio1;
+    return v;
 }
 
 void ScriptParser::reset()
@@ -314,8 +315,8 @@ void ScriptParser::reset()
     /* ---------------------------------------- */
     /* Menu related variables */
     menu_font.types = ons_font::MENU_FONT;
-    menu_font.font_size_xy[0] = calcFontRatio(DEFAULT_FONT_SIZE, menu_font.types);
-    menu_font.font_size_xy[1] = calcFontRatio(DEFAULT_FONT_SIZE, menu_font.types);
+    menu_font.font_size_xy[0] = calcFontSize(DEFAULT_FONT_SIZE, menu_font.types);
+    menu_font.font_size_xy[1] = calcFontSize(DEFAULT_FONT_SIZE, menu_font.types);
     menu_font.top_xy[0] = 0;
     menu_font.top_xy[1] = 16;
     menu_font.num_xy[0] = 32;
@@ -329,8 +330,8 @@ void ScriptParser::reset()
     /* ---------------------------------------- */
     /* Dialog related variables */
     dialog_font.types = ons_font::DAILOG_FONT;
-    dialog_font.font_size_xy[0] = calcFontRatio(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
-    dialog_font.font_size_xy[1] = calcFontRatio(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
+    dialog_font.font_size_xy[0] = calcFontSize(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
+    dialog_font.font_size_xy[1] = calcFontSize(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
     dialog_font.pitch_xy[0] = dialog_font.font_size_xy[0];
     dialog_font.pitch_xy[1] = 2 + dialog_font.font_size_xy[1];
     dialog_font.is_bold = false;
