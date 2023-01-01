@@ -862,6 +862,10 @@ bool ONScripter::processText()
     //        script_h.getStringBuffer()[ string_buffer_offset ] == '\t' ) string_buffer_offset ++;
 
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00){
+        if (prev_end_status & 4) {
+            prev_end_status = 0;
+            return forceClickNewPage();
+        }
         processEOT();
         return false;
     }
@@ -871,8 +875,8 @@ bool ONScripter::processText()
     char ch = script_h.getStringBuffer()[string_buffer_offset];
 
     new_line_skip_flag = false;
-    if (force_new_page_flag) {
-        force_new_page_flag = false;
+    if (prev_end_status & 2) {
+        prev_end_status = 0;
         if (ch != '\\') {
             return forceClickNewPage();
         }
@@ -912,10 +916,7 @@ bool ONScripter::processText()
             event_mode = WAIT_TIMER_MODE | WAIT_INPUT_MODE;
             waitEvent(wait_time);
         }
-
-        if (drawCharStatus & 2) {
-            force_new_page_flag = true;
-        }
+        prev_end_status = drawCharStatus;
         num_chars_in_sentence++;
         string_buffer_offset += 2;
         return true;
@@ -937,9 +938,13 @@ bool ONScripter::processText()
                     out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
                 bool flush_flag = true;
                 if ( skip_mode || ctrl_pressed_status ) flush_flag = false;
-                if (drawChar(out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info) & 2) {
-                    force_new_page_flag = true;
-                }
+                prev_end_status = drawChar(
+                    out_text,
+                    &sentence_font,
+                    flush_flag,
+                    true,
+                    accumulation_surface,
+                    &text_info);
             }
             string_buffer_offset += matched_len;
         }
@@ -1082,9 +1087,13 @@ bool ONScripter::processText()
         bool flush_flag = true;
         if ( skip_mode || ctrl_pressed_status )
             flush_flag = false;
-        if (drawChar(out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info) & 2) {
-            force_new_page_flag = true;
-        }
+        prev_end_status = drawChar(
+            out_text,
+            &sentence_font,
+            flush_flag,
+            true,
+            accumulation_surface,
+            &text_info);
         num_chars_in_sentence++;
 
         int wait_time = sentence_font.wait_time == -1 ? default_text_speed[text_speed_no] : sentence_font.wait_time;
