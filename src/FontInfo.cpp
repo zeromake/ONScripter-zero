@@ -263,10 +263,16 @@ void _FontInfo::setLineArea(int num)
     num_xy[1-tateyoko_mode] = 1;
 }
 
-int _FontInfo::endStatus(int x, int y) {
+int _FontInfo::endStatus(int x, int y, bool useAutoOffset) {
     int result = 0;
-    bool horizontal_over = this->x() + (pitch_xy[0] + positionOffset.width * 2) >= x;
-    bool vertical_over = this->y() + (pitch_xy[1] + positionOffset.height * 2) >= y;
+    int pitch_width = pitch_xy[0] + positionOffset.width * 2;
+    int pitch_height = pitch_xy[1] + positionOffset.height * 2;
+    if (useAutoOffset) {
+        x -= pitch_width;
+        y -= pitch_height;
+    }
+    bool horizontal_over = this->x() + pitch_width >= x;
+    bool vertical_over = this->y() + pitch_height >= y;
     bool endOfLine = isEndOfLine();
     if (tateyoko_mode == YOKO_MODE) {
         // 横向无法放下一个字符，标记为需要换行
