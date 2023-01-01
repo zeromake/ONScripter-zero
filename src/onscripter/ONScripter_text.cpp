@@ -581,10 +581,49 @@ bool ONScripter::clickWait( char *out_text )
     return true;
 }
 
-bool ONScripter::clickNewPage( char *out_text )
+
+bool ONScripter::forceClickNewPage() {
+    flush(REFRESH_NONE_MODE);
+    skip_mode &= ~SKIP_TO_EOL;
+    if ((skip_mode & SKIP_NORMAL || ctrl_pressed_status) &&
+        !textgosub_label){
+        num_chars_in_sentence = 0;
+        clickstr_state = CLICK_NEWPAGE;
+        event_mode = IDLE_EVENT_MODE;
+        if (waitEvent(0)) return false;
+    } else {
+        if (textgosub_label) {
+            saveon_flag = false;
+            textgosub_clickstr_state = CLICK_NEWPAGE;
+            gosubReal(
+                textgosub_label,
+                script_h.getCurrent(true) + string_buffer_offset,
+                true);
+            event_mode = IDLE_EVENT_MODE;
+            waitEvent(0);
+            return false;
+        }
+        // if this is the end of the line, pretext becomes enabled
+        if (script_h.getStringBuffer()[string_buffer_offset] == 0x0)
+            line_enter_status = 0;
+        clickstr_state = CLICK_NEWPAGE;
+        if (doClickEnd()) return false;
+    }
+    newPage();
+    clickstr_state = CLICK_NONE;
+    return true;
+}
+
+bool ONScripter::clickNewPage(char *out_text)
 {
-    if ( out_text ){
-        drawChar( out_text, &sentence_font, true, true, accumulation_surface, &text_info );
+    if ( out_text){
+        drawChar(
+            out_text,
+            &sentence_font,
+            true,
+            true,
+            accumulation_surface,
+            &text_info);
         num_chars_in_sentence++;
     }
 
@@ -594,27 +633,18 @@ bool ONScripter::clickNewPage( char *out_text )
     if (script_h.checkClickstr(script_h.getStringBuffer() + string_buffer_offset) != 1) string_buffer_offset++;
     string_buffer_offset++;
 
-    if ( (skip_mode & SKIP_NORMAL || ctrl_pressed_status) && !textgosub_label  ){
+    if ((skip_mode & SKIP_NORMAL || ctrl_pressed_status) && !textgosub_label){
         num_chars_in_sentence = 0;
         clickstr_state = CLICK_NEWPAGE;
-
         event_mode = IDLE_EVENT_MODE;
         if (waitEvent(0)) return false;
-    }
-    else{
-        while( (!(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) &&
-                script_h.getStringBuffer()[ string_buffer_offset ] == ' ') ||
-               script_h.getStringBuffer()[ string_buffer_offset ] == '\t' ) string_buffer_offset ++;
-
-        if ( textgosub_label ){
+    } else {
+        if (textgosub_label){
             saveon_flag = false;
-
             textgosub_clickstr_state = CLICK_NEWPAGE;
             gosubReal( textgosub_label, script_h.getWait(), true );
-
             event_mode = IDLE_EVENT_MODE;
             waitEvent(0);
-
             return false;
         }
 
@@ -628,7 +658,6 @@ bool ONScripter::clickNewPage( char *out_text )
 
     newPage();
     clickstr_state = CLICK_NONE;
-
     return true;
 }
 
@@ -844,10 +873,8 @@ bool ONScripter::processText()
     new_line_skip_flag = false;
     if (force_new_page_flag) {
         force_new_page_flag = false;
-        if (ch != '\\' && ch != '@') {
-            if (doClickEnd()) return false;
-            newPage();
-            return true;
+        if (ch != '\\') {
+            return forceClickNewPage();
         }
     }
 

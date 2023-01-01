@@ -814,8 +814,9 @@ private:
     void enterTextDisplayMode(bool text_flag = true);
     void leaveTextDisplayMode(bool force_leave_flag = false);
     bool doClickEnd();
-    bool clickWait( char *out_text );
-    bool clickNewPage( char *out_text );
+    bool clickWait(char *out_text);
+    bool clickNewPage(char *out_text);
+    bool forceClickNewPage();
     void startRuby(const char *buf, _FontInfo &info);
     void endRuby(bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info);
     int  textCommand();
