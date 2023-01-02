@@ -242,6 +242,7 @@ public:
     int screen_height;
     int screen_ratio1;
     int screen_ratio2;
+    int user_ratio;
     int variable_range;
     int global_variable_border;
 

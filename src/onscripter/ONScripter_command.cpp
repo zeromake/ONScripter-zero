@@ -44,6 +44,7 @@ extern "C" void smpegCallback();
 
 #define CONTINUOUS_PLAY
 
+
 int ONScripter::yesnoboxCommand()
 {
     bool yesno_flag = true;
@@ -373,19 +374,19 @@ int ONScripter::strspCommand()
 
     ai->removeTag();
     setStr(&ai->file_name, script_h.readStr());
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
-    ai->scalePosXY( screen_ratio1, screen_ratio2 );
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
+    ai->scalePosXY(screen_ratio1, screen_ratio2);
 
     _FontInfo fi;
     fi.types = ons_font::ANIM_FONT;
     fi.is_newline_accepted = true;
     fi.num_xy[0] = script_h.readInt();
     fi.num_xy[1] = script_h.readInt();
-    fi.font_size_xy[0] = calcFontSize(script_h.readInt(), fi.types);
-    fi.font_size_xy[1] = calcFontSize(script_h.readInt(), fi.types);
-    fi.pitch_xy[0] = script_h.readInt() + fi.font_size_xy[0];
-    fi.pitch_xy[1] = script_h.readInt() + fi.font_size_xy[1];
+    fi.font_size_xy[0] = calcUserRatio(calcFontSize(script_h.readInt(), fi.types));
+    fi.font_size_xy[1] = calcUserRatio(calcFontSize(script_h.readInt(), fi.types));
+    fi.pitch_xy[0] = calcUserRatio(script_h.readInt()) + fi.font_size_xy[0];
+    fi.pitch_xy[1] = calcUserRatio(script_h.readInt()) + fi.font_size_xy[1];
     fi.is_bold = script_h.readInt()?true:false;
     fi.is_shadow = script_h.readInt()?true:false;
 
@@ -656,16 +657,16 @@ void ONScripter::setwindowCore()
     sentence_font.ttf_font[1] = NULL;
 
     // 设置文字渲染起始
-    sentence_font.top_xy[0] = script_h.readInt();
-    sentence_font.top_xy[1] = script_h.readInt();
+    sentence_font.top_xy[0] = calcUserRatio(script_h.readInt());
+    sentence_font.top_xy[1] = calcUserRatio(script_h.readInt());
 
     // 设置文字列数与行数
     sentence_font.num_xy[0] = script_h.readInt();
     sentence_font.num_xy[1] = script_h.readInt();
 
     // 设置文字大小
-    sentence_font.font_size_xy[0] = calcFontSize(script_h.readInt(), sentence_font.types);
-    sentence_font.font_size_xy[1] = calcFontSize(script_h.readInt(), sentence_font.types);
+    sentence_font.font_size_xy[0] = calcUserRatio(calcFontSize(script_h.readInt(), sentence_font.types));
+    sentence_font.font_size_xy[1] = calcUserRatio(calcFontSize(script_h.readInt(), sentence_font.types));
 
     // 字符宽高
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
@@ -688,10 +689,10 @@ void ONScripter::setwindowCore()
         readColor( &sentence_font.window_color, buf );
 
         ai->remove();
-        ai->orig_pos.x = script_h.readInt();
-        ai->orig_pos.y = script_h.readInt();
-        ai->orig_pos.w = script_h.readInt() - ai->orig_pos.x + 1;
-        ai->orig_pos.h = script_h.readInt() - ai->orig_pos.y + 1;
+        ai->orig_pos.x = calcUserRatio(script_h.readInt());
+        ai->orig_pos.y = calcUserRatio(script_h.readInt());
+        ai->orig_pos.w = calcUserRatio(script_h.readInt()) - ai->orig_pos.x + 1;
+        ai->orig_pos.h = calcUserRatio(script_h.readInt()) - ai->orig_pos.y + 1;
         ai->scalePosXY( screen_ratio1, screen_ratio2 );
         ai->scalePosWH( screen_ratio1, screen_ratio2 );
     }
@@ -699,8 +700,8 @@ void ONScripter::setwindowCore()
         ai->setImageName( buf );
         parseTaggedString( ai );
         setupAnimationInfo( ai );
-        ai->orig_pos.x = script_h.readInt();
-        ai->orig_pos.y = script_h.readInt();
+        ai->orig_pos.x = calcUserRatio(script_h.readInt());
+        ai->orig_pos.y = calcUserRatio(script_h.readInt());
         ai->scalePosXY(screen_ratio1, screen_ratio2);
 
         sentence_font.is_transparent = false;
@@ -771,8 +772,8 @@ int ONScripter::setcursorCommand()
     int no = script_h.readInt();
     script_h.readStr();
     const char* buf = script_h.saveStringBuffer();
-    int x = script_h.readInt();
-    int y = script_h.readInt();
+    int x = calcUserRatio(script_h.readInt());
+    int y = calcUserRatio(script_h.readInt());
 
     loadCursor( no, buf, x, y, abs_flag );
 
@@ -1205,11 +1206,11 @@ int ONScripter::prnumCommand()
     ai->color_list = new uchar3[ ai->num_of_cells ];
 
     ai->param = script_h.readInt();
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
-    ai->font_size_xy[0] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
-    ai->font_size_xy[1] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
+    ai->font_size_xy[0] = calcUserRatio(calcFontSize(script_h.readInt(), ons_font::ANIM_FONT));
+    ai->font_size_xy[1] = calcUserRatio(calcFontSize(script_h.readInt(), ons_font::ANIM_FONT));
     ai->font_pitch[0] = ai->font_size_xy[0];
     ai->font_pitch[1] = ai->font_size_xy[1];
 
@@ -1335,12 +1336,12 @@ int ONScripter::mspCommand()
         dirty_rect.add( ai->pos );
     }
 
-    ai->orig_pos.x += script_h.readInt();
-    ai->orig_pos.y += script_h.readInt();
+    ai->orig_pos.x += calcUserRatio(script_h.readInt());
+    ai->orig_pos.y += calcUserRatio(script_h.readInt());
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
     if (msp2_flag){
-        ai->scale_x += script_h.readInt();
-        ai->scale_y += script_h.readInt();
+        ai->scale_x += calcUserRatio(script_h.readInt());
+        ai->scale_y += calcUserRatio(script_h.readInt());
         ai->rot     += script_h.readInt();
         ai->calcAffineMatrix();
         dirty_rect.add( ai->bounding_rect );
@@ -1565,8 +1566,8 @@ int ONScripter::movieCommand()
 
 int ONScripter::movemousecursorCommand()
 {
-    int x = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    int y = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    int x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    int y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
     x = x * screen_device_width / screen_width;
     y = y * screen_device_width / screen_width;
 
@@ -1657,8 +1658,8 @@ int ONScripter::lsp2Command()
     const char *buf = script_h.readStr();
     ai->setImageName( buf );
 
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
     ai->scale_x = script_h.readInt();
     ai->scale_y = script_h.readInt();
@@ -1695,8 +1696,8 @@ int ONScripter::lspCommand()
 
     const char *buf = script_h.readStr();
     ai->setImageName(buf);
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
     ai->scalePosXY(screen_ratio1, screen_ratio2);
 
     if (script_h.getEndStatus() & ScriptHandler::END_COMMA)
@@ -1785,16 +1786,16 @@ int ONScripter::logspCommand()
     ai->remove();
     setStr( &ai->file_name, script_h.readStr() );
 
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
 
     ai->trans_mode = AnimationInfo::TRANS_STRING;
     if (logsp2_flag){
-        ai->font_size_xy[0] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
-        ai->font_size_xy[1] = calcFontSize(script_h.readInt(), ons_font::ANIM_FONT);
-        ai->font_pitch[0] = script_h.readInt() + ai->font_size_xy[0];
-        ai->font_pitch[1] = script_h.readInt() + ai->font_size_xy[1];
+        ai->font_size_xy[0] = calcUserRatio(calcFontSize(script_h.readInt(), ons_font::ANIM_FONT));
+        ai->font_size_xy[1] = calcUserRatio(calcFontSize(script_h.readInt(), ons_font::ANIM_FONT));
+        ai->font_pitch[0] = calcUserRatio(script_h.readInt()) + ai->font_size_xy[0];
+        ai->font_pitch[1] = calcUserRatio(script_h.readInt()) + ai->font_size_xy[1];
     } else {
         ai->font_size_xy[0] = sentence_font.font_size_xy[0];
         ai->font_size_xy[1] = sentence_font.font_size_xy[1];
@@ -2311,9 +2312,9 @@ int ONScripter::getsevolCommand()
 
 int ONScripter::getscreenshotCommand()
 {
-    int w = script_h.readInt();
+    int w = calcUserRatio(script_h.readInt());
     if (disable_rescale_flag) w = w * screen_ratio1 / screen_ratio2;
-    int h = script_h.readInt();
+    int h = calcUserRatio(script_h.readInt());
     if (disable_rescale_flag) h = h * screen_ratio1 / screen_ratio2;
     if ( w == 0 ) w = 1;
     if ( h == 0 ) h = 1;
@@ -2466,6 +2467,7 @@ int ONScripter::getmp3volCommand()
 int ONScripter::getmouseposCommand()
 {
     script_h.readInt();
+    // Todo userUnRatio
     script_h.setInt( &script_h.current_variable, current_button_state.x * screen_ratio2 / screen_ratio1 );
 
     script_h.readInt();
@@ -2969,8 +2971,8 @@ int ONScripter::drawsp2Command()
     int alpha = script_h.readInt();
 
     AnimationInfo *ai = &sprite_info[sprite_no];
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
     ai->scale_x = script_h.readInt();
     ai->scale_y = script_h.readInt();
@@ -2988,8 +2990,8 @@ int ONScripter::drawspCommand()
     int sprite_no = script_h.readInt();
     int cell_no = script_h.readInt();
     int alpha = script_h.readInt();
-    int x = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    int y = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    int x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    int y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
 
     AnimationInfo *ai = &sprite_info[sprite_no];
     int old_cell_no = ai->current_cell;
@@ -3036,8 +3038,8 @@ int ONScripter::drawbgCommand()
 int ONScripter::drawbg2Command()
 {
     AnimationInfo bi = bg_info;
-    bi.orig_pos.x = script_h.readInt();
-    bi.orig_pos.y = script_h.readInt();
+    bi.orig_pos.x = calcUserRatio(script_h.readInt());
+    bi.orig_pos.y = calcUserRatio(script_h.readInt());
     bi.scalePosXY( screen_ratio1, screen_ratio2 );
     bi.scale_x = script_h.readInt();
     bi.scale_y = script_h.readInt();
@@ -3208,8 +3210,8 @@ int ONScripter::cselbtnCommand()
 
     _FontInfo csel_info = sentence_font;
     csel_info.rubyon_flag = false;
-    csel_info.top_xy[0] = script_h.readInt();
-    csel_info.top_xy[1] = script_h.readInt();
+    csel_info.top_xy[0] = calcUserRatio(script_h.readInt());
+    csel_info.top_xy[1] = calcUserRatio(script_h.readInt());
 
     int counter = 0;
     SelectLink *link = root_select_link.next;
@@ -3580,14 +3582,14 @@ int ONScripter::btnCommand()
     ButtonLink *button = new ButtonLink();
 
     button->no           = script_h.readInt();
-    button->image_rect.x = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    button->image_rect.y = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    button->image_rect.w = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    button->image_rect.h = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    button->image_rect.x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    button->image_rect.y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    button->image_rect.w = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    button->image_rect.h = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
     button->select_rect = button->image_rect;
 
-    src_rect.x = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    src_rect.y = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    src_rect.x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    src_rect.y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
     if (btndef_info.image_surface &&
         src_rect.x + button->image_rect.w > btndef_info.image_surface->w){
         button->image_rect.w = btndef_info.image_surface->w - src_rect.x;
@@ -3647,7 +3649,7 @@ int ONScripter::brCommand()
     enterTextDisplayMode();
 
     sentence_font.newLine();
-    current_page->add( '\n' );
+    current_page->add('\n');
 
     return RET_CONTINUE;
 }
@@ -3671,14 +3673,14 @@ int ONScripter::bltCommand()
     Sint16 dx,dy,sx,sy;
     Sint16 dw,dh,sw,sh;
 
-    dx = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    dy = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    dw = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    dh = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    sx = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    sy = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    sw = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    sh = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    dx = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    dy = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    dw = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    dh = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    sx = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    sy = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    sw = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    sh = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
 
     if (btndef_info.image_surface == NULL) return RET_CONTINUE;
     if (dw == 0 || dh == 0 || sw == 0 || sh == 0) return RET_CONTINUE;
@@ -3809,11 +3811,11 @@ int ONScripter::barCommand()
     ai->setCell(0);
 
     ai->param      = script_h.readInt();
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
-    ai->max_width  = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
+    ai->max_width  = calcUserRatio(script_h.readInt());
     ai->orig_pos.w = 0;
-    ai->orig_pos.h = script_h.readInt();
+    ai->orig_pos.h = calcUserRatio(script_h.readInt());
     ai->max_param  = script_h.readInt();
 
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
@@ -3881,8 +3883,8 @@ int ONScripter::amspCommand()
         dirty_rect.add( ai->pos );
     }
 
-    ai->orig_pos.x = script_h.readInt();
-    ai->orig_pos.y = script_h.readInt();
+    ai->orig_pos.x = calcUserRatio(script_h.readInt());
+    ai->orig_pos.y = calcUserRatio(script_h.readInt());
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
     if (amsp2_flag){
         ai->scale_x = script_h.readInt();

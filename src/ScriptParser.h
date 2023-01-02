@@ -282,6 +282,7 @@ protected:
     /* Global definitions */
     bool init_screen_ratio;
     int screen_ratio1, screen_ratio2;
+    int user_ratio1, user_ratio2;
     int screen_width, screen_height;
     int screen_device_width, screen_device_height;
     int device_width, device_height;
@@ -299,6 +300,7 @@ protected:
     void readToken();
     
     const int calcFontSize(const int v, ons_font::FONT_TYPE type);
+    const int calcUserRatio(const int v);
     const ons_font::FontConfig* getFontConfig(const ons_font::FONT_TYPE types);
 
     /* ---------------------------------------- */
