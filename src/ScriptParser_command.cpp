@@ -233,9 +233,9 @@ int ScriptParser::sinCommand()
 
 int ScriptParser::shadedistanceCommand()
 {
-    shade_distance[0] = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    shade_distance[0] = calcUserRatio(script_h.readInt() * screen_ratio1 / screen_ratio2);
     if (shade_distance[0] == 0) shade_distance[0] = 1;
-    shade_distance[1] = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    shade_distance[1] = calcUserRatio(script_h.readInt() * screen_ratio1 / screen_ratio2);
     if (shade_distance[1] == 0) shade_distance[1] = 1;
 
     return RET_CONTINUE;
@@ -684,10 +684,10 @@ int ScriptParser::menusetwindowCommand()
     menu_font.types = ons_font::MENU_FONT;
     menu_font.ttf_font[0]     = NULL;
     menu_font.ttf_font[1]     = NULL;
-    menu_font.font_size_xy[0] = calcFontSize(script_h.readInt(), menu_font.types);
-    menu_font.font_size_xy[1] = calcFontSize(script_h.readInt(), menu_font.types);
-    menu_font.pitch_xy[0]     = script_h.readInt() + menu_font.font_size_xy[0];
-    menu_font.pitch_xy[1]     = script_h.readInt() + menu_font.font_size_xy[1];
+    menu_font.font_size_xy[0] = calcFontSize(calcUserRatio(script_h.readInt()), menu_font.types);
+    menu_font.font_size_xy[1] = calcFontSize(calcUserRatio(script_h.readInt()), menu_font.types);
+    menu_font.pitch_xy[0]     = calcUserRatio(script_h.readInt()) + menu_font.font_size_xy[0];
+    menu_font.pitch_xy[1]     = calcUserRatio(script_h.readInt()) + menu_font.font_size_xy[1];
     menu_font.is_bold         = script_h.readInt()?true:false;
     menu_font.is_shadow       = script_h.readInt()?true:false;
 

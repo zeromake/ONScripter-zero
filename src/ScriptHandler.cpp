@@ -59,6 +59,7 @@ ScriptHandler::ScriptHandler()
     screen_height = 480;
     variable_range = 0;
     global_variable_border = 0;
+    user_ratio = 1;
 }
 
 ScriptHandler::~ScriptHandler()
@@ -1321,8 +1322,7 @@ void ScriptHandler::readConfiguration()
                     break;
                 }
             }
-        }
-        else if (!strncmp( buf, "value", 5 ) ||
+        } else if (!strncmp( buf, "value", 5 ) ||
                  *buf == 'g' || *buf == 'G'){
             if (*buf == 'g' || *buf == 'G') buf++;
             else                            buf += 5;
@@ -1330,15 +1330,13 @@ void ScriptHandler::readConfiguration()
             global_variable_border = 0;
             while (*buf >= '0' && *buf <= '9')
                 global_variable_border = global_variable_border*10 + *buf++ - '0';
-        }
-        else if (*buf == 'v' || *buf == 'V'){
+        } else if (*buf == 'v' || *buf == 'V'){
             buf++;
             SKIP_SPACE(buf);
             variable_range = 0;
             while (*buf >= '0' && *buf <= '9')
                 variable_range = variable_range*10 + *buf++ - '0';
-        }
-        else if (*buf == 's' || *buf == 'S'){
+        } else if (*buf == 's' || *buf == 'S'){
             buf++;
             if (!(*buf >= '0' && *buf <= '9')) break;
             screen_width = 0;
@@ -1352,6 +1350,14 @@ void ScriptHandler::readConfiguration()
             buf++;
             SKIP_SPACE(buf);
             while (*buf >= '0' && *buf <= '9') buf++;
+        } else if (!strncmp(buf, "ratio", 5)) {
+            int _user_ratio = 0;
+            buf += 5;
+            while (*buf >= '0' && *buf <= '9')
+                _user_ratio = _user_ratio*10 + *buf++ - '0';
+            if (_user_ratio > 0) {
+                user_ratio = _user_ratio;
+            }
         } else if (*buf != ',') {
             break;
         }
@@ -1363,6 +1369,10 @@ void ScriptHandler::readConfiguration()
     if (screen_ratio1 > 0 && screen_ratio2 > 0) {
         screen_width = screen_width * screen_ratio1 / screen_ratio2;
         screen_height = screen_height * screen_ratio1 / screen_ratio2;
+    }
+    if (user_ratio > 0) {
+        screen_width *= user_ratio;
+        screen_height *= user_ratio;
     }
 }
 

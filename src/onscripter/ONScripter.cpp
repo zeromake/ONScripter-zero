@@ -514,6 +514,8 @@ int ONScripter::init()
     screenshot_surface = NULL;
     screenshot_w = screen_width;
     screenshot_h = screen_height;
+    user_ratio1 = script_h.user_ratio;
+    user_ratio2 = 1;
 
     texture = SDL_CreateTexture(renderer, texture_format, SDL_TEXTUREACCESS_STATIC, accumulation_surface->w, accumulation_surface->h);
 
@@ -800,8 +802,8 @@ void ONScripter::resetSentenceFont()
 {
     sentence_font.reset();
     sentence_font.types = ons_font::SENTENCE_FONT;
-    sentence_font.font_size_xy[0] = calcFontSize(DEFAULT_FONT_SIZE, sentence_font.types);
-    sentence_font.font_size_xy[1] = calcFontSize(DEFAULT_FONT_SIZE, sentence_font.types);
+    sentence_font.font_size_xy[0] = calcFontSize(calcUserRatio(DEFAULT_FONT_SIZE), sentence_font.types);
+    sentence_font.font_size_xy[1] = calcFontSize(calcUserRatio(DEFAULT_FONT_SIZE), sentence_font.types);
     sentence_font.top_xy[0] = 21;
     sentence_font.top_xy[1] = 16;// + sentence_font.font_size;
     sentence_font.num_xy[0] = 23;
@@ -1374,10 +1376,10 @@ void ONScripter::decodeExbtnControl( const char *ctl_str, SDL_Rect *check_src_re
             SDL_Rect rect = ai->pos;
             if ( *ctl_str != ',' ) continue;
             ctl_str++; // skip ','
-            ai->orig_pos.x = getNumberFromBuffer( &ctl_str );
+            ai->orig_pos.x = calcUserRatio(getNumberFromBuffer( &ctl_str ));
             if ( *ctl_str != ',' ) continue;
             ctl_str++; // skip ','
-            ai->orig_pos.y = getNumberFromBuffer( &ctl_str );
+            ai->orig_pos.y = calcUserRatio(getNumberFromBuffer( &ctl_str ));
             ai->scalePosXY( screen_ratio1, screen_ratio2 );
             dirty_rect.add( rect );
             ai->visible = true;

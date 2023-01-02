@@ -80,6 +80,8 @@ ScriptParser::ScriptParser()
     file_io_buf_len = 0;
     save_data_len = 0;
     page_list = NULL;
+    user_ratio1 = 1;
+    user_ratio2 = 1;
 
     /* ---------------------------------------- */
     /* Sound related variables */
@@ -112,6 +114,14 @@ ScriptParser::~ScriptParser()
     if (save_dir_envdata) delete[] save_dir_envdata;
 }
 
+
+
+const int ScriptParser::calcUserRatio(const int v) {
+    if (user_ratio1 == user_ratio2) {
+        return v;
+    }
+    return v * user_ratio1 / user_ratio2;
+}
 
 const ons_font::FontConfig* ScriptParser::getFontConfig(const ons_font::FONT_TYPE types) {
     if (font_configs[types]) {
@@ -315,8 +325,8 @@ void ScriptParser::reset()
     /* ---------------------------------------- */
     /* Menu related variables */
     menu_font.types = ons_font::MENU_FONT;
-    menu_font.font_size_xy[0] = calcFontSize(DEFAULT_FONT_SIZE, menu_font.types);
-    menu_font.font_size_xy[1] = calcFontSize(DEFAULT_FONT_SIZE, menu_font.types);
+    menu_font.font_size_xy[0] = calcFontSize(calcUserRatio(DEFAULT_FONT_SIZE), menu_font.types);
+    menu_font.font_size_xy[1] = calcFontSize(calcUserRatio(DEFAULT_FONT_SIZE), menu_font.types);
     menu_font.top_xy[0] = 0;
     menu_font.top_xy[1] = 16;
     menu_font.num_xy[0] = 32;
@@ -330,8 +340,8 @@ void ScriptParser::reset()
     /* ---------------------------------------- */
     /* Dialog related variables */
     dialog_font.types = ons_font::DAILOG_FONT;
-    dialog_font.font_size_xy[0] = calcFontSize(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
-    dialog_font.font_size_xy[1] = calcFontSize(DEFAULT_DIALOG_FONT_SIZE, dialog_font.types);
+    dialog_font.font_size_xy[0] = calcFontSize(calcUserRatio(DEFAULT_FONT_SIZE), dialog_font.types);
+    dialog_font.font_size_xy[1] = calcFontSize(calcUserRatio(DEFAULT_FONT_SIZE), dialog_font.types);
     dialog_font.pitch_xy[0] = dialog_font.font_size_xy[0];
     dialog_font.pitch_xy[1] = 2 + dialog_font.font_size_xy[1];
     dialog_font.is_bold = false;
