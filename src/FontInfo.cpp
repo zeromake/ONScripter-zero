@@ -331,6 +331,7 @@ void _FontInfo::advanceCharInHankaku(int offset, int width, int height)
             positionOffset.all_height += offsetHeight;
         }
     }
+    // utils::printInfo("%d %d:%d %d:%d\n", offset, width, positionOffset.width, height, positionOffset.height);
     xy[tateyoko_mode] += offset;
 }
 

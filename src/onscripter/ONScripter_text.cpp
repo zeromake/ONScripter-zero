@@ -217,7 +217,6 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
         text_rect->x + text_rect->w,
         text_rect->y + text_rect->h, useAutoOffset) & 1))){
         info->newLine();
-
         if (lookback_flag) {
             current_page->add('\n');
         }
@@ -243,11 +242,15 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
         SDL_Rect dst_rect;
         drawGlyph(surface, info, color, text2, xy, cache_info, clip, dst_rect, fontConfig);
 
+        SDL_Rect old_dst_rect;
+        memcpy(&old_dst_rect, &dst_rect, sizeof(SDL_Rect));
         if (fontConfig->render_outline && fontConfig->render_outline > 0) {
             int outline_size = fontConfig->outline_size * screen_ratio1 / screen_ratio2;
             dst_rect.w += outline_size * 2;
-            dst_rect.h += outline_size * 3;
+            dst_rect.h += outline_size * 2;
             dst_rect.y -= outline_size;
+            dst_rect.x -= outline_size;
+            old_dst_rect.w += outline_size;
         }
         if ( surface == accumulation_surface &&
              !flush_flag &&
@@ -264,8 +267,8 @@ int ONScripter::drawChar( char* text, _FontInfo *info, bool flush_flag, bool loo
             flushDirect( dst_rect, REFRESH_NONE_MODE );
         }
 
-        int charWidth = dst_rect.w * screen_ratio2 / screen_ratio1;
-        int charHeigth = dst_rect.h * screen_ratio2 / screen_ratio1;
+        int charWidth = old_dst_rect.w * screen_ratio2 / screen_ratio1;
+        int charHeigth = old_dst_rect.h * screen_ratio2 / screen_ratio1;
         if (IS_TWO_BYTE(text[0])){
             info->advanceCharInHankaku(2, charWidth, charHeigth);
             break;

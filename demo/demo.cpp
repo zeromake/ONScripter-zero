@@ -36,15 +36,13 @@ long long unix_now() {
 int main(int argc, char *argv[])
 {
     auto rootNow = unix_now();
-    int windowWidth = 800;
-    int windowHeight = 600;
+    int windowWidth = 800 * 2;
+    int windowHeight = 600 * 2;
     int rect_width = 400;
     int rect_height = 300;
     SDL_Init(SDL_INIT_VIDEO);
     std::vector<std::string> fonts;
 #ifdef __APPLE__
-    windowWidth *= 2;
-    windowHeight *= 2;
     fonts.push_back("/System/Library/Fonts/PingFang.ttc");
 #else
     fonts.push_back("C:\\Windows\\Fonts\\msyh.ttc");
@@ -81,16 +79,20 @@ int main(int argc, char *argv[])
     textScale = GetDpiForSystem() / 96;
     windowScale = textScale;
 #endif
+    int renderer_w;
+    int renderer_h;
+    SDL_GetRendererOutputSize(renderer, &renderer_w, &renderer_h);
     // SDL_Rect viewport_rect = {0, 0, rect_width*windowScale, rect_height*windowScale};
     // SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     // SDL_RenderClear(renderer);
     // auto windowSurface = SDL_CreateRGBSurface(0, 800, 600, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);;
-    auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, windowWidth*windowScale,windowHeight*windowScale, 30, SDL_PIXELFORMAT_BGRA32);
+    renderer_w *= windowScale;
+    renderer_h *= windowScale;
+    auto windowSurface = SDL_CreateRGBSurfaceWithFormat(0, renderer_w, renderer_h, 32, SDL_PIXELFORMAT_BGRA32);
     ren_init(window, windowSurface, windowScale);
 
     printf("windowSurface: %ld\n", unix_now() - rootNow);
-    SDL_Rect dstRect{ 0, 0, windowWidth, windowHeight };
-    RenRect windowRect{ 0, 0, windowWidth*windowScale, windowHeight*windowScale };
+    SDL_Rect dstRect{ 0, 0, renderer_w, renderer_h };
     Command cmd;
     auto ttfPath = std::fs::absolute(std::fs::current_path().parent_path() / ".." / ".." / ".." / ".." / "fonts" / DEFAUTL_TTF);
     auto ttfPathStr = ttfPath.string();
@@ -116,7 +118,7 @@ int main(int argc, char *argv[])
     SDL_RenderPresent(renderer);
 
     auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, windowWidth*windowScale, windowHeight*windowScale);
-    ren_draw_rect(windowRect, RenColor{0xff, 0xff, 0xff, 0xff});
+    ren_draw_rect(*(RenRect*)&dstRect, RenColor{0xff, 0xff, 0xff, 0xff});
     printf("draw rect: %ld\n", unix_now() - rootNow);
     ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall SDL Tutorial", 42, 130, 50, RenColor{0x00, 0x00, 0x00, 0xff});
     // ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130, 100 , RenColor{0x00, 0x00, 0x00, 0xff});
@@ -132,8 +134,8 @@ int main(int argc, char *argv[])
             }
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
-        update_rect(texture, windowSurface, &windowRect);
-        SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+        update_rect(texture, windowSurface, (RenRect*)&dstRect);
+        SDL_RenderCopy(renderer, texture, &dstRect, &dstRect);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
