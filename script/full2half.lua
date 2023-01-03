@@ -31,7 +31,7 @@ function main(...)
                 -- 全角英文
                 has_frist = false
                 out:write(string.char(char - offset))
-            elseif char >= 0xb0 and char <= 0xb9 then
+            elseif char >= 0xb0 and char <= 0xb9 and has_frist then
                 -- 全角数字
                 has_frist = false
                 out:write(string.char(char - offset))

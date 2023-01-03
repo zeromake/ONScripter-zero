@@ -123,6 +123,13 @@ const int ScriptParser::calcUserRatio(const int v) {
     return v * user_ratio1 / user_ratio2;
 }
 
+const int ScriptParser::calcUnUserRatio(const int v) {
+    if (user_ratio1 == user_ratio2) {
+        return v;
+    }
+    return v * user_ratio2 / user_ratio1;
+}
+
 const ons_font::FontConfig* ScriptParser::getFontConfig(const ons_font::FONT_TYPE types) {
     if (font_configs[types]) {
         return font_configs[types];

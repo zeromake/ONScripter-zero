@@ -301,6 +301,7 @@ protected:
     
     const int calcFontSize(const int v, ons_font::FONT_TYPE type);
     const int calcUserRatio(const int v);
+    const int calcUnUserRatio(const int v);
     const ons_font::FontConfig* getFontConfig(const ons_font::FONT_TYPE types);
 
     /* ---------------------------------------- */
