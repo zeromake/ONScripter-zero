@@ -2467,12 +2467,10 @@ int ONScripter::getmp3volCommand()
 int ONScripter::getmouseposCommand()
 {
     script_h.readInt();
-    // Todo userUnRatio
-    script_h.setInt( &script_h.current_variable, current_button_state.x * screen_ratio2 / screen_ratio1 );
+    script_h.setInt(&script_h.current_variable, calcUnUserRatio(current_button_state.x * screen_ratio2 / screen_ratio1));
 
     script_h.readInt();
-    script_h.setInt( &script_h.current_variable, current_button_state.y * screen_ratio2 / screen_ratio1 );
-
+    script_h.setInt(&script_h.current_variable, calcUnUserRatio(current_button_state.y * screen_ratio2 / screen_ratio1));
     return RET_CONTINUE;
 }
 
