@@ -23,7 +23,7 @@
  */
 
 #include "ScriptHandler.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include "coding2utf16.h"
 #include <vector>
 #include <infra/filesystem.hpp>

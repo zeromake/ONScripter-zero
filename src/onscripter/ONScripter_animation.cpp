@@ -23,7 +23,7 @@
  */
 
 #include "ONScripter.h"
-#include "Utils.h"
+#include "private/utils.h"
 #ifdef USE_BUILTIN_LAYER_EFFECTS
 #include "builtin_layer.h"
 #endif
@@ -444,10 +444,10 @@ void ONScripter::stopAnimation( int click )
 {
     int no;
 
-    if ( textgosub_label ) return;
+    if (textgosub_label) return;
 
-    if      ( click == CLICK_WAIT )    no = 0;
-    else if ( click == CLICK_NEWPAGE ) no = 1;
+    if      (click == CLICK_WAIT)    no = 0;
+    else if (click == CLICK_NEWPAGE) no = 1;
     else return;
 
     if (cursor_info[no].image_surface == NULL) return;

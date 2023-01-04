@@ -25,7 +25,7 @@
 #include "ONScripter.h"
 #include <new>
 #include "resize_image.h"
-#include "Utils.h"
+#include "private/utils.h"
 #if defined(USE_OMP_PARALLEL) || defined(USE_PARALLEL)
 #include "Parallel.h"
 #endif
@@ -777,7 +777,7 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
     if ( refresh_mode & REFRESH_CURSOR_MODE && !textgosub_label ){
         if ( clickstr_state == CLICK_WAIT )
             drawTaggedSurface( surface, &cursor_info[0], clip );
-        else if ( clickstr_state == CLICK_NEWPAGE )
+        else if (clickstr_state == CLICK_NEWPAGE)
             drawTaggedSurface( surface, &cursor_info[1], clip );
     }
 

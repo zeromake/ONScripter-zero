@@ -23,7 +23,7 @@
  */
 
 #include "ONScripter.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include <new>
 #include <infra/filesystem.hpp>
 #if defined(LINUX)
@@ -70,7 +70,7 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag, int 
 {
     if ( !audio_open_flag ) return SOUND_NONE;
 
-    // utils::printInfo("playSound: %s %d %d", filename, loop_flag, channel);
+    // utils::printInfo("playSound: %s %d %d\n", filename, loop_flag, channel);
 
     long length = script_h.cBR->getFileLength( filename );
     if (length == 0) return SOUND_NONE;

@@ -25,7 +25,7 @@
 #include "LUAHandler.h"
 #include "ONScripter.h"
 #include "ScriptHandler.h"
-#include "Utils.h"
+#include "private/utils.h"
 
 #define ONS_LUA_HANDLER_PTR "ONS_LUA_HANDLER_PTR"
 #define INIT_SCRIPT "system.lua"

@@ -23,7 +23,7 @@
  */
 
 #include "ONScripter.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include "coding2utf16.h"
 #ifdef USE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
@@ -1276,11 +1276,18 @@ void ONScripter::shadowTextDisplay( SDL_Surface *surface, SDL_Rect &clip )
 
 void ONScripter::newPage()
 {
-    if (current_page->text_count != 0){
+    if (current_page->text_count != 0) {
+        char * current_tag = current_page->tag;
         current_page = current_page->next;
         if (start_page == current_page)
             start_page = start_page->next;
         clearCurrentPage();
+        if (force_click_new_page) {
+            if (current_tag && *current_tag != '\0') {
+                setStr(&current_page->tag, current_tag);
+            }
+            force_click_new_page = false;
+        }
     }
 
     page_enter_status = 0;

@@ -23,7 +23,7 @@
  */
 
 #include "SarReader.h"
-#include "Utils.h"
+#include "private/utils.h"
 #define WRITE_LENGTH 4096
 
 #if defined(PSP)

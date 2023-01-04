@@ -20,8 +20,8 @@
  */
 
 #include "gles_renderer.h"
-#include "../Utils.h"
 #include "shader/post_cas.h"
+#include "private/utils.h"
 
 #ifdef IOS
 #include <OpenGLES/ES2/gl.h>

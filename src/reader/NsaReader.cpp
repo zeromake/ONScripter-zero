@@ -23,7 +23,7 @@
  */
 
 #include "NsaReader.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include <string.h>
 #define NSA_ARCHIVE_NAME "arc"
 #define NSA_ARCHIVE_NAME2 "arc%d"
