@@ -23,7 +23,7 @@
  */
 
 #include "ScriptParser.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include <math.h>
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
 #include <sys/stat.h>

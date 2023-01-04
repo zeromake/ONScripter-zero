@@ -789,6 +789,7 @@ private:
 
     bool new_line_skip_flag;
     int  prev_end_status;
+    bool force_click_new_page;
     int  text_speed_no;
     bool is_kinsoku;
     AnimationInfo text_info;

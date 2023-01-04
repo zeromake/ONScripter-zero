@@ -30,7 +30,7 @@
 #include <direct.h>
 #endif
 #include "version.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include <vector>
 #include <infra/filesystem.hpp>
 
@@ -291,9 +291,9 @@ int ONScripter::textclearCommand()
 
 int ONScripter::texecCommand()
 {
-    if ( textgosub_clickstr_state == CLICK_NEWPAGE )
+    if ( textgosub_clickstr_state == CLICK_NEWPAGE)
         newPage();
-    else if ( textgosub_clickstr_state == (CLICK_WAIT|CLICK_EOL) ){
+    else if (textgosub_clickstr_state == (CLICK_WAIT|CLICK_EOL)){
         processEOT();
         page_enter_status = 0;
     }
@@ -2007,7 +2007,7 @@ int ONScripter::ispageCommand()
 {
     script_h.readInt();
 
-    if ( textgosub_clickstr_state == CLICK_NEWPAGE )
+    if ( textgosub_clickstr_state == CLICK_NEWPAGE)
         script_h.setInt( &script_h.current_variable, 1 );
     else
         script_h.setInt( &script_h.current_variable, 0 );
@@ -2486,13 +2486,22 @@ int ONScripter::getmouseoverCommand()
 
 int ONScripter::getlogCommand()
 {
-    bool getlogtext_flag=false;
+    bool getlogtext_flag = false;
+    bool getlog2_flag = false;
 
-    if ( script_h.isName( "getlogtext" ) )
+    if (script_h.isName("getlogtext"))
         getlogtext_flag = true;
+    
+    if (script_h.isName("getlog2"))
+        getlog2_flag = true;
 
     script_h.readVariable();
     script_h.pushVariable();
+    ScriptHandler::VariableInfo tagVariable;
+    if (getlog2_flag) {
+        script_h.readVariable();
+        tagVariable = script_h.current_variable;
+    }
 
     int page_no = script_h.readInt();
 
@@ -2524,7 +2533,10 @@ int ONScripter::getlogCommand()
             }
         }
 
-        setStr( &script_h.getVariableData(script_h.pushed_variable.var_no).str, buf, count );
+        setStr(&script_h.getVariableData(script_h.pushed_variable.var_no).str, buf, count);
+        if (getlog2_flag) {
+            setStr(&script_h.getVariableData(tagVariable.var_no).str, page->tag);
+        }
 
         if (getlogtext_flag) delete[] buf;
     }
@@ -2866,10 +2878,12 @@ int ONScripter::dwavestopCommand()
     if      (ch < 0) ch = 0;
     else if (ch >= ONS_MIX_CHANNELS) ch = ONS_MIX_CHANNELS-1;
 
-    if (wave_sample[ch]){
-        Mix_Pause( ch );
-        Mix_FreeChunk( wave_sample[ch] );
+    bool pause = false;
+    if (wave_sample[ch]) {
+        Mix_Pause(ch);
+        Mix_FreeChunk(wave_sample[ch]);
         wave_sample[ch] = NULL;
+        prev_chunk_skip[ch] = true;
     }
     return RET_CONTINUE;
 }

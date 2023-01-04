@@ -23,7 +23,7 @@
  */
 
 #include "ONScripter.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include "coding2utf16.h"
 
 #define DIALOG_W 241

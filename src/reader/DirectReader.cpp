@@ -23,7 +23,7 @@
  */
 
 #include "DirectReader.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include "coding2utf16.h"
 #include <bzlib.h>
 #if !defined(WIN32) && !defined(_WIN32) && !defined(MACOS9) && !defined(PSP) && !defined(__OS2__)

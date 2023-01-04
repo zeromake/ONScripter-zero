@@ -23,7 +23,7 @@
  */
 
 #include "ScriptParser.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include <infra/filesystem.hpp>
 #ifdef USE_BUILTIN_LAYER_EFFECTS
 #include "builtin_layer.h"

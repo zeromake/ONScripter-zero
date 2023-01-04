@@ -23,7 +23,7 @@
  */
 
 #include "ONScripter.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include "gbk2utf16.h"
 #include "sjis2utf16.h"
 #include "version.h"

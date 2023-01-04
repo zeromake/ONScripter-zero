@@ -24,7 +24,7 @@
 
 #include "ONScripter.h"
 #include "coding2utf16.h"
-#include "Utils.h"
+#include "private/utils.h"
 #include <memory>
 
 extern Coding2UTF16 *coding2utf16;
@@ -594,6 +594,7 @@ bool ONScripter::clickWait( char *out_text )
 bool ONScripter::forceClickNewPage() {
     flush(REFRESH_NONE_MODE);
     skip_mode &= ~SKIP_TO_EOL;
+    force_click_new_page = true;
     if ((skip_mode & SKIP_NORMAL || ctrl_pressed_status) &&
         !textgosub_label){
         num_chars_in_sentence = 0;

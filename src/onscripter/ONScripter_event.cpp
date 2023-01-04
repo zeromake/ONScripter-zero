@@ -23,7 +23,7 @@
  */
 
 #include "ONScripter.h"
-#include "Utils.h"
+#include "private/utils.h"
 #if defined(LINUX)
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -1384,7 +1384,7 @@ void ONScripter::runEventLoop()
 
           case ONS_CHUNK_EVENT:
             flushEventSub( event );
-            //utils::printInfo("ONS_CHUNK_EVENT %d: %x %d %x\n", event.user.code, wave_sample[0], automode_flag, event_mode);
+            // utils::printInfo("ONS_CHUNK_EVENT %d: %x %d %x\n", event.user.code, wave_sample[0], automode_flag, event_mode);
             if ( event.user.code != 0 ||
                  !(event_mode & WAIT_VOICE_MODE) ) break;
 
@@ -1410,7 +1410,7 @@ void ONScripter::runEventLoop()
 
             if (event_mode & (WAIT_INPUT_MODE | WAIT_BUTTON_MODE) &&
                 ( clickstr_state == CLICK_WAIT ||
-                  clickstr_state == CLICK_NEWPAGE ) ){
+                  clickstr_state == CLICK_NEWPAGE) ){
                 playClickVoice();
                 stopAnimation( clickstr_state );
             }
