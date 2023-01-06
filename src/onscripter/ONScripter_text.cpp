@@ -637,7 +637,7 @@ bool ONScripter::clickNewPage(char *out_text)
         num_chars_in_sentence++;
     }
 
-    flush( REFRESH_NONE_MODE );
+    flush(REFRESH_NONE_MODE);
     skip_mode &= ~SKIP_TO_EOL;
 
     if (script_h.checkClickstr(script_h.getStringBuffer() + string_buffer_offset) != 1) string_buffer_offset++;
@@ -931,13 +931,13 @@ bool ONScripter::processText()
         string_buffer_offset += 2;
         return true;
     }
-    else if ( ch == '@' ){ // wait for click
-        return clickWait( NULL );
+    else if ( ch == '@' ) { // wait for click
+        return clickWait(NULL);
     }
-    else if ( ch == '\\' ){ // new page
-        return clickNewPage( NULL );
+    else if ( ch == '\\' ) { // new page
+        return clickNewPage(NULL);
     }
-    else if ( ch == '_' ){ // Ignore an immediate click wait
+    else if ( ch == '_' ) { // Ignore an immediate click wait
         string_buffer_offset++;
 
         int matched_len = script_h.checkClickstr(script_h.getStringBuffer() + string_buffer_offset, true);

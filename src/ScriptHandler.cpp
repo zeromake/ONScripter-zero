@@ -1124,10 +1124,16 @@ int ScriptHandler::readScript( char *path )
     }
 
     std::vector<std::string> unencrypt;
-    std::fs::path root_dir(archive_path);
+    std::fs::path root_dir;
+    if (archive_path && *archive_path) {
+        root_dir = archive_path;
+    } else {
+        root_dir = ".";
+    }
     if (encrypt_mode == 0){
         fclose(fp);
         estimated_buffer_length = 1;
+
         for (auto f : std::fs::directory_iterator(root_dir)) {
             auto _fp = f.path();
             if (f.is_regular_file() && _fp.extension() == ".txt") {
@@ -1608,7 +1614,7 @@ int ScriptHandler::parseInt( char **buf, bool ignore_exit)
 
     SKIP_SPACE( *buf );
 
-    if ( **buf == '%' ){
+    if (**buf == '%'){
         (*buf)++;
         int no;
         if (**buf == '(') {
@@ -1620,7 +1626,9 @@ int ScriptHandler::parseInt( char **buf, bool ignore_exit)
         current_variable.var_no = no;
         current_variable.type = VAR_INT;
         return getVariableData(current_variable.var_no).num;
-    } else if ( **buf == '?' ){
+    } else if ( **buf == '(') {
+        return parseIntExpression(buf);
+    } else if (**buf == '?'){
         ArrayVariable av;
         current_variable.var_no = parseArray( buf, av, ignore_exit);
         current_variable.type = VAR_ARRAY;
@@ -1630,8 +1638,7 @@ int ScriptHandler::parseInt( char **buf, bool ignore_exit)
             return  0;
         }
         return *ret;
-    }
-    else{
+    } else {
         char ch, alias_buf[256];
         int alias_buf_len = 0, alias_no = 0;
         bool direct_num_flag = false;

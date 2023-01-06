@@ -254,6 +254,7 @@ target("onscripter")
     )
     add_files(
         "src/*.cpp",
+        "src/SDL2_rotozoom.c",
         "src/renderer/*.cpp",
         "src/reader/*.cpp",
         "src/onscripter/*.cpp",

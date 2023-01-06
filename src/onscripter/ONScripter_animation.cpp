@@ -24,6 +24,7 @@
 
 #include "ONScripter.h"
 #include "private/utils.h"
+#include <SDL2_rotozoom.h>
 #ifdef USE_BUILTIN_LAYER_EFFECTS
 #include "builtin_layer.h"
 #endif
@@ -224,7 +225,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
 
         SDL_Surface *surface_m = NULL;
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
-            surface_m = loadImage( anim->mask_file_name );
+            surface_m = loadImage(anim->mask_file_name);
 
         surface = anim->setupImageAlpha(surface, surface_m, has_alpha);
 
@@ -234,14 +235,22 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
         {
             SDL_Surface *src_s = surface;
 
-            int w, h;
-            if ( (w = src_s->w * screen_ratio1 / screen_ratio2) == 0 ) w = 1;
-            if ( (h = src_s->h * screen_ratio1 / screen_ratio2) == 0 ) h = 1;
-            SDL_PixelFormat *fmt = image_surface->format;
-            surface = SDL_CreateRGBSurface( SDL_SWSURFACE, w, h,
-                                            fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask );
-
-            resizeSurface(src_s, surface);
+            // int w, h;
+            // if ( (w = src_s->w * screen_ratio1 / screen_ratio2) == 0 ) w = 1;
+            // if ( (h = src_s->h * screen_ratio1 / screen_ratio2) == 0 ) h = 1;
+            // SDL_PixelFormat *fmt = image_surface->format;
+            // surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+            //     w,
+            //     h,
+            //     fmt->BitsPerPixel,
+            //     fmt->Rmask,
+            //     fmt->Gmask,
+            //     fmt->Bmask,
+            //     fmt->Amask);
+            // SDL_Rect dest_rect{0, 0, w, h};
+            // SDL_UpperBlit(src_s, NULL, surface, &dest_rect);
+            // resizeSurface(src_s, surface);
+            surface = ::rotozoomSurface(src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2), 1);
             SDL_FreeSurface(src_s);
         }
 

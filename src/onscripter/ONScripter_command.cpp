@@ -3162,35 +3162,39 @@ int ONScripter::cspCommand()
         }
     else if (nos.size() > 0) {
         auto it = nos.begin();
-        if (step_flag && nos.size() >= 2) {
-            it += 2;
-            for (int no = nos.at(0); no <= nos.at(1); no++) {
-                if (no >= 0 && no < MAX_SPRITE_NUM){
-                    if ( si[no].visible ){
-                        if (csp2_flag)
-                            dirty_rect.add( si[no].bounding_rect );
-                        else
-                            dirty_rect.add( si[no].pos );
+        std::function<void(int no)> sp_remove = [
+            &num,
+            &csp2_flag,
+            &si,
+            this
+        ](int no){
+            if (no >= 0 && no < num) {
+                if (si[no].visible){
+                        if (csp2_flag) {
+                            dirty_rect.add(si[no].bounding_rect);
+                        } else {
+                            dirty_rect.add(si[no].pos);
+                        }
                     }
                     if (!csp2_flag) root_button_link.removeSprite(no);
                     si[no].remove();
+            }
+            return;
+        };
+        if (step_flag && nos.size() >= 2) {
+            it += 2;
+            for (int no = nos.at(0); no <= nos.at(1); no++) {
+                if (no >= num) {
+                    break;
                 }
+                sp_remove(no);
             }
         }
-
-        for (; it != nos.end(); it++ ) {
+        for (;it != nos.end(); it++ ) {
             int no = *it;
-            if (no >= 0 && no < MAX_SPRITE_NUM){
-                if ( si[no].visible ){
-                    if (csp2_flag)
-                        dirty_rect.add( si[no].bounding_rect );
-                    else
-                        dirty_rect.add( si[no].pos );
-                }
-                if (!csp2_flag) root_button_link.removeSprite(no);
-                si[no].remove();
-            }
+            sp_remove(no);
         }
+        sp_remove = nullptr;
     }
     return RET_CONTINUE;
 }
@@ -3662,7 +3666,6 @@ int ONScripter::brCommand()
 
     sentence_font.newLine();
     current_page->add('\n');
-
     return RET_CONTINUE;
 }
 

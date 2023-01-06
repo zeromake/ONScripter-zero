@@ -195,12 +195,11 @@ void ONScripter::initSDL()
     screen_width  = script_h.screen_width;
     screen_height = script_h.screen_height;
     if (!init_screen_ratio && scaleToWindow && screen_height != screen_device_height) {
-        float _ratio1 = (float)screen_height / (float)screen_device_height;
-        screen_width = screen_device_width;
+        setRescale(screen_device_height, screen_height);
+        script_h.screen_ratio1 = screen_device_height;
+        script_h.screen_ratio2 = screen_height;
         screen_height = screen_device_height;
-        setRescale(100, _ratio1 * 100);
-        script_h.screen_ratio1 = 100;
-        script_h.screen_ratio2 = _ratio1 * 100;
+        screen_width = screen_width * script_h.screen_ratio1 / script_h.screen_ratio2;
     }
 
     if (script_h.screen_ratio1 > 0 && script_h.screen_ratio2 > 0) {
@@ -210,8 +209,8 @@ void ONScripter::initSDL()
         screen_ratio1 = 1;
         screen_ratio2 = 1;
     }
-    screen_scale_ratio1 = (float)screen_width / screen_device_width;
-    screen_scale_ratio2 = (float)screen_height / screen_device_height;
+    screen_scale_ratio1 = (float)screen_width / (float)screen_device_width;
+    screen_scale_ratio2 = (float)screen_height / (float)screen_device_height;
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -406,7 +405,11 @@ void ONScripter::setArchivePath(const char *path)
 {
     if (archive_path) delete[] archive_path;
     archive_path = new char[ RELATIVEPATHLENGTH + strlen(path) + 2 ];
-    sprintf( archive_path, RELATIVEPATH "%s%c", path, DELIMITER );
+    if (archive_path[strlen(path) - 1] != DELIMITER) {
+        sprintf(archive_path, RELATIVEPATH "%s%c", path, DELIMITER);
+    } else {
+        sprintf(archive_path, RELATIVEPATH "%s", path);
+    }
 }
 
 void ONScripter::setSaveDir(const char *path)
@@ -824,10 +827,10 @@ void ONScripter::resetSentenceFont()
 
 void ONScripter::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag, bool direct_flag )
 {
-    if ( direct_flag ){
+    if (direct_flag) {
         flushDirect( *rect, refresh_mode );
     }
-    else{
+    else {
         if ( rect ) dirty_rect.add( *rect );
 
         if (dirty_rect.bounding_box.w * dirty_rect.bounding_box.h > 0)
@@ -839,7 +842,7 @@ void ONScripter::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag,
 
 void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
 {
-    //utils::printInfo("flush %d: %d %d %d %d\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );
+    // utils::printInfo("flush %d: %d %d %d %d\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );
 
     SDL_Rect dst_rect = rect;
     --dst_rect.x; --dst_rect.y; dst_rect.w += 2; dst_rect.h += 2;
