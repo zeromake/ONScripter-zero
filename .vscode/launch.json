@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(Windows) 启动",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/windows/x64/debug/onscripter.exe",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "args": ["-r", "C:\\Users\\admin\\Desktop\\Rewrite Harvest festa"],
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
             "type": "lldb",
             "request": "launch",
             "name": "osx-debug",

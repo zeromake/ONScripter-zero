@@ -39,7 +39,7 @@ int NL_dofile(lua_State *state)
     lua_getglobal( state, ONS_LUA_HANDLER_PTR );
     LUAHandler *lh = (LUAHandler*)lua_topointer( state, -1 );
 
-    const char *str = luaL_checkstring( state, 1 );
+    const char *str = luaL_checkstring(state, 1);
 
     unsigned long length = lh->sh->cBR->getFileLength(str);
     if (length == 0){
@@ -956,9 +956,23 @@ int NSSp2Visible(lua_State *state)
     return 0;
 }
 
+static int NSCurrentDir(lua_State *state) {
+    lua_getglobal(state, ONS_LUA_HANDLER_PTR);
+    LUAHandler *lh = (LUAHandler*)lua_topointer(state, -1);
+
+    const char* archivePath = "./";
+    if (lh->ons->getArchivePath()) {
+        archivePath = lh->ons->getArchivePath();
+    }
+    static const char* _archivePath = archivePath;
+    lua_pushstring(state, _archivePath);
+    return 1;
+}
+
 #define LUA_FUNC_LUT(s) {#s, s}
 #define LUA_FUNC_LUT_DUMMY(s) {#s, lua_dummy}
 static const struct luaL_Reg lua_lut[] = {
+    LUA_FUNC_LUT(NSCurrentDir),
     LUA_FUNC_LUT(NL_dofile),
     LUA_FUNC_LUT(NSCheckComma),
     LUA_FUNC_LUT(NSDCall),
@@ -1161,7 +1175,7 @@ void LUAHandler::loadInitScript()
 
     if (luaL_loadbuffer(state, (const char*)buffer2, p2 - buffer2, INIT_SCRIPT) ||
         lua_pcall(state, 0, 0, 0)){
-        printf("cannot parse %s %s\n", INIT_SCRIPT, lua_tostring(state,-1));
+        utils::printError("cannot parse %s %s\n", INIT_SCRIPT, lua_tostring(state,-1));
     }
 
     delete[] buffer;

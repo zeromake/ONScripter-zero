@@ -33,6 +33,12 @@
 ONScripter ons;
 Coding2UTF16 *coding2utf16 = NULL;
 
+#ifdef _WIN32
+#include <direct.h>
+
+#define chdir _chdir
+#endif
+
 #if defined(IOS)
 #import <Foundation/NSArray.h>
 #import <UIKit/UIKit.h>
@@ -288,7 +294,9 @@ void parseOption(int argc, char *argv[]) {
             else if ( !strcmp( argv[0]+1, "r" ) || !strcmp( argv[0]+1, "-root" ) ){
                 argc--;
                 argv++;
-                ons.setArchivePath(std::fs::absolute(argv[0]).string().c_str());
+                const char* root = std::fs::absolute(argv[0]).string().c_str();
+                chdir(root);
+                ons.setArchivePath(root);
             }
             else if ( !strcmp( argv[0]+1, "-fullscreen" ) ){
                 ons.setFullscreenMode();

@@ -109,6 +109,7 @@ static ONScripter::FuncLUT func_lut[] = {
     {"savename",		&ONScripter::savenameCommand},
     {"savegame2",		&ONScripter::savegameCommand},
     {"savegame",		&ONScripter::savegameCommand},
+    {"save",		    &ONScripter::savegameCommand},
     {"savefileexist",	&ONScripter::savefileexistCommand},
     {"savedir",         &ONScripter::savedirCommand},
     {"sar",				&ONScripter::nsaCommand},
