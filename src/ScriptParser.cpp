@@ -178,7 +178,7 @@ void ScriptParser::setFontConfig(const char* buf) {
                     cfg->size = atoi(buff);
                     break;
                 case 1:
-                    cfg->size_ratio = atof(buf);
+                    cfg->size_ratio = atof(buff);
                     break;
                 case 2:
                     readColor(&cfg->color, buff);

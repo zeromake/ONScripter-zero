@@ -326,7 +326,7 @@ public class MainActivity extends Activity implements
                     "--scale-window",
                     "--fontcache",
 //                    "--font-config",
-//                    "1:,,,1,2,,50,50",
+//                    "1:,1.2",
                     // "--sharpness",
                     // "1.0",
             });
