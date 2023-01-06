@@ -191,6 +191,25 @@ void ScriptHandler::setKeyTable( const unsigned char *key_table )
     }
 }
 
+bool readVariableTextCompatible(const char *buf, char *out, int &variable_count) {
+    int offset = 0;
+    int outOffset = 0;
+    out[outOffset] = buf[offset];
+    offset++;
+    outOffset++;
+    if (buf[offset] < '0' && buf[offset] > '9') {
+        return false;
+    }
+    while (buf[offset] >= '0' && buf[offset] <= '9') {
+        out[outOffset] = buf[offset];
+        offset++;
+        outOffset++;
+    }
+    variable_count = offset;
+    out[outOffset] = '\0';
+    return true;
+}
+
 bool readVariableText(const char *buf, char *out, int &variable_count) {
     int offset = 0;
     int outOffset = 0;
@@ -199,7 +218,7 @@ bool readVariableText(const char *buf, char *out, int &variable_count) {
     outOffset++;
     char ch = ')';
     if (buf[offset] != '(' && buf[offset] != '{') {
-        return false;
+        return readVariableTextCompatible(buf, out, variable_count);
     }
     if (buf[offset] == '{') {
         ch = '}';

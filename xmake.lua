@@ -34,7 +34,8 @@ local deps = {
     "sdl2_ttf",
     "sdl2_mixer",
     "brotli",
-    "ghc_filesystem"
+    "ghc_filesystem",
+    "luajit"
 }
 local sdlConfigs = {}
 
@@ -207,7 +208,8 @@ target("onscripter")
         "sdl2_ttf",
         "sdl2_mixer",
         "brotli",
-        "ghc_filesystem"
+        "ghc_filesystem",
+        "luajit"
     )
     if is_plat("windows") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
@@ -241,11 +243,24 @@ target("onscripter")
         end
     elseif is_arch("arm.*") then
         add_defines("USE_SIMD=1")
-        -- add_vectorexts("neon")
+        add_vectorexts("neon")
     end
-    add_defines("USE_BUILTIN_LAYER_EFFECTS=1", "USE_BUILTIN_EFFECTS=1", "USE_PARALLEL=1", "FMT_HEADER_ONLY=1")
-    add_files("src/*.cpp", "src/renderer/*.cpp", "src/reader/*.cpp", "src/onscripter/*.cpp", "src/builtin_dll/*.cpp", "src/language/*.cpp")
-    remove_files("src/AVIWrapper.cpp", "src/LUAHandler.cpp")
+    add_defines(
+        "USE_LUA=1",
+        "USE_BUILTIN_LAYER_EFFECTS=1",
+        "USE_BUILTIN_EFFECTS=1",
+        "USE_PARALLEL=1",
+        "FMT_HEADER_ONLY=1"
+    )
+    add_files(
+        "src/*.cpp",
+        "src/renderer/*.cpp",
+        "src/reader/*.cpp",
+        "src/onscripter/*.cpp",
+        "src/builtin_dll/*.cpp",
+        "src/language/*.cpp"
+    )
+    remove_files("src/AVIWrapper.cpp")
     after_build(function (target)
         if target:is_plat("android") then
             local outDir = "project/android/app/libs/"..target:arch().."/"
