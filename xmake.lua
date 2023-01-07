@@ -338,17 +338,17 @@ target("example2")
 --     add_files("demo.cpp")
 
 
-target("demo/font")
+target("demo/cache")
     set_kind("binary")
-    add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
-    add_files("demo/font.cpp")
+    add_files(
+        "demo/cache.cpp",
+        "src/murmurhash.c"
+    )
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
     end
     if is_plat("windows") then
         add_files("src/resource.rc")
-    elseif  is_plat("macosx") then
-        add_frameworks("AudioToolbox", "Cocoa")
     end
 target("demo/demo")
     set_kind("binary")

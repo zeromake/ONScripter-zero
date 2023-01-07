@@ -221,13 +221,18 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
     else{
         bool has_alpha;
         int location;
-        SDL_Surface *surface = loadImage( anim->file_name, &has_alpha, &location, &anim->default_alpha );
+        SDL_Surface* _surface1 = nullptr;
+        SDL_Surface* _surface2 = nullptr;
+        _surface1 = loadImage(
+            anim->file_name,
+            &has_alpha,
+            &location,
+            &anim->default_alpha);
 
-        SDL_Surface *surface_m = NULL;
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
-            surface_m = loadImage(anim->mask_file_name);
+            _surface2 = loadImage(anim->mask_file_name);
 
-        surface = anim->setupImageAlpha(surface, surface_m, has_alpha);
+        SDL_Surface* surface = anim->setupImageAlpha(_surface1, _surface2, has_alpha);
 
         if (surface &&
             screen_ratio2 != screen_ratio1 &&
@@ -250,13 +255,12 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
             // SDL_Rect dest_rect{0, 0, w, h};
             // SDL_UpperBlit(src_s, NULL, surface, &dest_rect);
             // resizeSurface(src_s, surface);
-            surface = ::rotozoomSurface(src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2), 1);
+            surface = ::rotozoomSurface(src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2), SMOOTHING_ON);
             SDL_FreeSurface(src_s);
         }
 
-        anim->setImage( surface, texture_format );
-
-        if ( surface_m ) SDL_FreeSurface(surface_m);
+        anim->setImage(surface, texture_format);
+        if (_surface2) SDL_FreeSurface(_surface2);
     }
 }
 

@@ -33,6 +33,19 @@
 #include "simd/simd.h"
 #endif
 
+
+std::shared_ptr<onscache::SurfaceBaseNode> ONScripter::loadImageCache(char *filename, bool *has_alpha, int *location, unsigned char *alpha) {
+    auto node = surfaceCache.Get(filename);
+    if (node == nullptr) {
+        SDL_Surface* surface = loadImage(filename, has_alpha, location, alpha);
+        if (surface) {
+            return surfaceCache.Put(filename, surface);
+        }
+        return nullptr;
+    }
+    return node;
+}
+
 SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha, int *location, unsigned char *alpha)
 {
     if (!filename) return NULL;

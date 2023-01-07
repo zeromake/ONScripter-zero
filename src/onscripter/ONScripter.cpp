@@ -329,7 +329,7 @@ void ONScripter::openAudio(int freq)
     }
 }
 
-ONScripter::ONScripter()
+ONScripter::ONScripter(): surfaceCache(onscache::SurfaceCache(256))
 {
     is_script_read = false;
 
@@ -406,9 +406,9 @@ void ONScripter::setArchivePath(const char *path)
     if (archive_path) delete[] archive_path;
     archive_path = new char[ RELATIVEPATHLENGTH + strlen(path) + 2 ];
     if (archive_path[strlen(path) - 1] != DELIMITER) {
-        sprintf(archive_path, RELATIVEPATH "%s%c", path, DELIMITER);
+        sprintf(archive_path, "%s%s%c", RELATIVEPATH, path, DELIMITER);
     } else {
-        sprintf(archive_path, RELATIVEPATH "%s", path);
+        sprintf(archive_path, "%s%s", RELATIVEPATH, path);
     }
 }
 

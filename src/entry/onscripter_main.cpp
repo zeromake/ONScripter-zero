@@ -27,7 +27,7 @@
 #include "gbk2utf16.h"
 #include "sjis2utf16.h"
 #include "version.h"
-#include "stdlib.h"
+#include <stdlib.h>
 #include <infra/filesystem.hpp>
 
 ONScripter ons;
@@ -37,6 +37,8 @@ Coding2UTF16 *coding2utf16 = NULL;
 #include <direct.h>
 
 #define chdir _chdir
+#else
+#include <unistd.h>
 #endif
 
 #if defined(IOS)
@@ -294,9 +296,12 @@ void parseOption(int argc, char *argv[]) {
             else if ( !strcmp( argv[0]+1, "r" ) || !strcmp( argv[0]+1, "-root" ) ){
                 argc--;
                 argv++;
-                const char* root = std::fs::absolute(argv[0]).string().c_str();
-                chdir(root);
-                ons.setArchivePath(root);
+                auto root = std::fs::absolute(argv[0]).string();
+                char *_root = new char[root.size() + 1]{0};
+                memcpy(_root, root.data(), root.size());
+                chdir(_root);
+                ons.setArchivePath(_root);
+                delete[] _root;
             }
             else if ( !strcmp( argv[0]+1, "-fullscreen" ) ){
                 ons.setFullscreenMode();
