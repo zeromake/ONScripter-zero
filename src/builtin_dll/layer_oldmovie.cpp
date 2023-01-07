@@ -365,8 +365,8 @@ void OldMovieLayer::refresh(SDL_Surface *surface, SDL_Rect &clip)
   // If an offset is present, we average the given surface with an offset version
 
   if ((rx != 0) || (ry != 0)) {
-    SDL_BlitSurface(surface, &clip, sprite->image_surface, &clip);
-    BlurOnSurface(sprite->image_surface, surface, clip, rx, ry, width);
+    SDL_BlitSurface(surface, &clip, sprite->image_surface->v, &clip);
+    BlurOnSurface(sprite->image_surface->v, surface, clip, rx, ry, width);
   }
 
   // Add noise and glow.

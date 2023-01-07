@@ -27,6 +27,7 @@
 
 #include <SDL.h>
 #include <string.h>
+#include "ons_cache.h"
 
 typedef unsigned char uchar3[3];
 
@@ -81,7 +82,7 @@ public:
     char *image_name;
     char *surface_name; // used to avoid reloading images
     char *mask_surface_name; // used to avoid reloading images
-    SDL_Surface *image_surface;
+    std::shared_ptr<onscache::SurfaceBaseNode> image_surface;
     unsigned char *alpha_buf;
     Uint32 texture_format;
     SDL_mutex *mutex;
@@ -147,8 +148,11 @@ public:
     void allocImage( int w, int h, Uint32 texture_format );
     void copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_Rect *dst_rect = NULL );
     void fill( Uint8 r, Uint8 g, Uint8 b, Uint8 a );
-    SDL_Surface *setupImageAlpha( SDL_Surface *surface, SDL_Surface *surface_m, bool has_alpha );
-    void setImage( SDL_Surface *surface, Uint32 texture_format );
+    std::shared_ptr<onscache::SurfaceBaseNode> setupImageAlpha(
+        std::shared_ptr<onscache::SurfaceBaseNode> surface,
+        std::shared_ptr<onscache::SurfaceBaseNode> surface_m,
+        bool has_alpha);
+    void setImage(std::shared_ptr<onscache::SurfaceBaseNode> surface, Uint32 texture_format);
     unsigned char getAlpha(int x, int y);
 
 #ifdef USE_SMPEG

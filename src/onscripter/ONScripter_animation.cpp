@@ -221,24 +221,24 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
     else{
         bool has_alpha;
         int location;
-        SDL_Surface* _surface1 = nullptr;
-        SDL_Surface* _surface2 = nullptr;
-        _surface1 = loadImage(
+        std::shared_ptr<onscache::SurfaceBaseNode> surface1 = nullptr;
+        std::shared_ptr<onscache::SurfaceBaseNode> surface2 = nullptr;
+        surface1 = loadImageCache(
             anim->file_name,
             &has_alpha,
             &location,
             &anim->default_alpha);
 
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
-            _surface2 = loadImage(anim->mask_file_name);
+            surface2 = loadImageCache(anim->mask_file_name);
 
-        SDL_Surface* surface = anim->setupImageAlpha(_surface1, _surface2, has_alpha);
+        std::shared_ptr<onscache::SurfaceBaseNode> surface = anim->setupImageAlpha(surface1, surface2, has_alpha);
 
         if (surface &&
             screen_ratio2 != screen_ratio1 &&
             (!disable_rescale_flag || location == BaseReader::ARCHIVE_TYPE_NONE))
         {
-            SDL_Surface *src_s = surface;
+            std::shared_ptr<onscache::SurfaceBaseNode> src_s = surface;
 
             // int w, h;
             // if ( (w = src_s->w * screen_ratio1 / screen_ratio2) == 0 ) w = 1;
@@ -255,12 +255,17 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, _FontInfo *info )
             // SDL_Rect dest_rect{0, 0, w, h};
             // SDL_UpperBlit(src_s, NULL, surface, &dest_rect);
             // resizeSurface(src_s, surface);
-            surface = ::rotozoomSurface(src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2), SMOOTHING_ON);
-            SDL_FreeSurface(src_s);
+            SDL_Surface* surface3 = ::rotozoomSurface(
+                src_s->v,
+                0,
+                ((double)screen_ratio1 / (double)screen_ratio2),
+                SMOOTHING_ON);
+            surface = onscache::CreateSurfaceUnCacheNode(surface3);
+            src_s->release();
         }
 
         anim->setImage(surface, texture_format);
-        if (_surface2) SDL_FreeSurface(_surface2);
+        if (surface2) surface2->release();
     }
 }
 

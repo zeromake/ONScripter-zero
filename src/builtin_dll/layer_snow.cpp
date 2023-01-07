@@ -29,6 +29,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <SDL_image.h>
+#include "ons_cache.h"
 
 extern ONScripter ons;
 
@@ -219,7 +220,7 @@ char *FuruLayer::message(const char *message, int &ret_int)
             anim->loop_mode = 3; // not animatable
             anim->trans_mode = AnimationInfo::TRANS_TOPLEFT;
             setStr(&anim->file_name, &buf[i][0]);
-            anim->setImage(anim->setupImageAlpha(img, NULL, has_alpha), ons.getTextureFormat());
+            anim->setImage(anim->setupImageAlpha(onscache::CreateSurfaceUnCacheNode(img), NULL, has_alpha), ons.getTextureFormat());
             elements[i].setSprite(anim);
             if (anim->pos.w > max_sp_w)
               max_sp_w = anim->pos.w;
@@ -253,7 +254,7 @@ char *FuruLayer::message(const char *message, int &ret_int)
           }
           SDL_UnlockSurface(img);
           setStr(&anim->file_name, &buf[i][0]);
-          anim->setImage(anim->setupImageAlpha(img, NULL, has_alpha), ons.getTextureFormat());
+          anim->setImage(anim->setupImageAlpha(onscache::CreateSurfaceUnCacheNode(img), NULL, has_alpha), ons.getTextureFormat());
           elements[i].setSprite(anim);
           if (anim->pos.w > max_sp_w)
             max_sp_w = anim->pos.w;

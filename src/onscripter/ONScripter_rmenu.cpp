@@ -108,7 +108,7 @@ void ONScripter::leaveSystemCall( bool restore_flag )
     if ( restore_flag ){
 
         current_page = cached_page;
-        SDL_BlitSurface( backup_surface, NULL, text_info.image_surface, NULL );
+        SDL_BlitSurface( backup_surface, NULL, text_info.image_surface->v, NULL );
         root_button_link.next = shelter_button_link;
         root_select_link.next = shelter_select_link;
 
@@ -132,7 +132,7 @@ void ONScripter::leaveSystemCall( bool restore_flag )
 
 int ONScripter::executeSystemCall()
 {
-    SDL_BlitSurface( text_info.image_surface, NULL, backup_surface, NULL );
+    SDL_BlitSurface( text_info.image_surface->v, NULL, backup_surface, NULL );
 
     enterSystemCall();
 
@@ -739,7 +739,7 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
 
     dialog_info.deleteSurface();
     dialog_info.num_of_cells = 1;
-    dialog_info.setImage(s2, texture_format);
+    dialog_info.setImage(onscache::CreateSurfaceUnCacheNode(s2), texture_format);
 
     dialog_info.pos.x = (screen_width  - dialog_info.pos.w)/2;
     dialog_info.pos.y = (screen_height - dialog_info.pos.h)/2;
@@ -806,7 +806,7 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
         btn->button_type = ButtonLink::TMP_SPRITE_BUTTON;
         btn->anim[0] = new AnimationInfo();
         btn->anim[0]->num_of_cells = 2;
-        btn->anim[0]->setImage(bs2, texture_format);
+        btn->anim[0]->setImage(onscache::CreateSurfaceUnCacheNode(bs2), texture_format);
         btn->show_flag = 1;
 
         btn->anim[0]->pos.x = dialog_info.pos.x + (DIALOG_W-3-(DIALOG_BUTTON_W+8)*(2-i))*screen_ratio1/screen_ratio2;

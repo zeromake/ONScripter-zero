@@ -34,6 +34,7 @@
 #include "simd/simd.h"
 #endif
 #include "builtin_layer.h"
+#include <memory>
 
 
 #define RMASK 0x00ff0000
@@ -120,8 +121,8 @@ AnimationInfo& AnimationInfo::operator =(const AnimationInfo &anim)
         }
 
         if (image_surface){
-            image_surface = allocSurface( anim.image_surface->w, anim.image_surface->h, texture_format );
-            memcpy(image_surface->pixels, anim.image_surface->pixels, anim.image_surface->pitch*anim.image_surface->h);
+            image_surface = onscache::CreateSurfaceUnCacheNode(allocSurface( anim.image_surface->v->w, anim.image_surface->v->h, texture_format ));
+            memcpy(image_surface->v->pixels, anim.image_surface->v->pixels, anim.image_surface->v->pitch*anim.image_surface->v->h);
         }
     }
 
@@ -175,7 +176,7 @@ void AnimationInfo::deleteSurface(bool delete_surface_name)
         mask_surface_name = NULL;
     }
     SDL_mutexP(mutex);
-    if (image_surface) SDL_FreeSurface(image_surface);
+    if (image_surface) image_surface->release();
     image_surface = NULL;
     SDL_mutexV(mutex);
     if (alpha_buf) delete[] alpha_buf;
@@ -495,10 +496,10 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
 
     SDL_mutexP(mutex);
     SDL_LockSurface( dst_surface );
-    SDL_LockSurface( image_surface );
+    SDL_LockSurface( image_surface->v );
 
     alpha &= 0xff;
-    int pitch = image_surface->pitch / sizeof(ONSBuf);
+    int pitch = image_surface->v->pitch / sizeof(ONSBuf);
 
     struct Blender {
         ONSBuf *const stsrc_buffer, *const stdst_buffer;
@@ -580,7 +581,7 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
                 }
 #endif
         }
-    } blender = {(ONSBuf *)image_surface->pixels + pitch * src_rect.y + image_surface->w * current_cell / num_of_cells + src_rect.x,
+    } blender = {(ONSBuf *)image_surface->v->pixels + pitch * src_rect.y + image_surface->v->w * current_cell / num_of_cells + src_rect.x,
         (ONSBuf *)dst_surface->pixels + dst_surface->w * dst_rect.y + dst_rect.x,
         alpha, dst_rect.w, dst_rect.h, pitch, dst_surface->w, blending_mode};
 #if defined(USE_PARALLEL) || defined(USE_OMP_PARALLEL)
@@ -589,7 +590,7 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
     for (int i = 0; i < dst_rect.h; i++) blender(i);
 #endif
 
-    SDL_UnlockSurface( image_surface );
+    SDL_UnlockSurface( image_surface->v );
     SDL_UnlockSurface( dst_surface );
     SDL_mutexV(mutex);
 }
@@ -620,10 +621,10 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
 
     SDL_mutexP(mutex);
     SDL_LockSurface( dst_surface );
-    SDL_LockSurface( image_surface );
+    SDL_LockSurface( image_surface->v );
 
     alpha &= 0xff;
-    int pitch = image_surface->pitch / sizeof(ONSBuf);
+    int pitch = image_surface->v->pitch / sizeof(ONSBuf);
     int cx2 = affine_pos.x*2 + affine_pos.w; // center x multiplied by 2
     int cy2 = affine_pos.y*2 + affine_pos.h; // center y multiplied by 2
 
@@ -777,7 +778,22 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
             blendLine(line_buffer, line_pos, &dst_buffer_s);
             delete[] line_buffer;
         }
-    } blender = {corner_xy, min_xy, max_xy, inv_mat, (ONSBuf*)image_surface->pixels, pos.w*current_cell, blending_mode, dst_surface, alpha, pitch, dst_x, dst_y, cx2, cy2, src_rect};
+    } blender = {
+        corner_xy,
+        min_xy,
+        max_xy,
+        inv_mat,
+        (ONSBuf*)image_surface->v->pixels,
+        pos.w*current_cell,
+        blending_mode,
+        dst_surface,
+        alpha,
+        pitch,
+        dst_x,
+        dst_y,
+        cx2,
+        cy2,
+        src_rect};
 #if defined(USE_PARALLEL) || defined(USE_OMP_PARALLEL)
     parallel::For(min_xy[1], max_xy[1] + 1, 1, blender, (max_xy[1] - min_xy[1] + 1) * (max_xy[0] + 1 - min_xy[0]) * 4);
 #else
@@ -785,7 +801,7 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
 #endif
 
     // unlock surface
-    SDL_UnlockSurface( image_surface );
+    SDL_UnlockSurface( image_surface->v );
     SDL_UnlockSurface( dst_surface );
     SDL_mutexV(mutex);
 }
@@ -854,8 +870,8 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
     /* 2nd clipping */
     SDL_Rect clip_rect;
     clip_rect.x = clip_rect.y = 0;
-    clip_rect.w = image_surface->w;
-    clip_rect.h = image_surface->h;
+    clip_rect.w = image_surface->v->w;
+    clip_rect.h = image_surface->v->h;
     if ( doClipping( &dst_rect, &clip_rect, &clipped_rect ) ) return;
 
     src_rect.x += clipped_rect.x;
@@ -865,17 +881,17 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
 
     SDL_mutexP(mutex);
     SDL_LockSurface( surface );
-    SDL_LockSurface( image_surface );
+    SDL_LockSurface( image_surface->v );
 
-    SDL_PixelFormat *fmt = image_surface->format;
+    SDL_PixelFormat *fmt = image_surface->v->format;
 
-    int pitch = image_surface->pitch / sizeof(ONSBuf);
+    int pitch = image_surface->v->pitch / sizeof(ONSBuf);
     Uint32 src_color1 = (((color.r >> fmt->Rloss) << fmt->Rshift) |
                          ((color.b >> fmt->Bloss) << fmt->Bshift));
     Uint32 src_color2 =  ((color.g >> fmt->Gloss) << fmt->Gshift);
     Uint32 src_color  = src_color1 | src_color2 | fmt->Amask;
 
-    ONSBuf *dst_buffer = (ONSBuf *)image_surface->pixels + pitch * dst_rect.y + image_surface->w*current_cell/num_of_cells + dst_rect.x;
+    ONSBuf *dst_buffer = (ONSBuf *)image_surface->v->pixels + pitch * dst_rect.y + image_surface->v->w*current_cell/num_of_cells + dst_rect.x;
 
     if (!rotate_flag){
         unsigned char *src_buffer = (unsigned char*)surface->pixels +
@@ -903,7 +919,7 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
         }
     }
 
-    SDL_UnlockSurface( image_surface );
+    SDL_UnlockSurface( image_surface->v );
     SDL_UnlockSurface( surface );
 	SDL_mutexV(mutex);
 }
@@ -980,13 +996,13 @@ SDL_Surface *AnimationInfo::alloc32bitSurface( int w, int h, Uint32 texture_form
 void AnimationInfo::allocImage( int w, int h, Uint32 texture_format )
 {
     if (!image_surface ||
-        image_surface->w != w ||
-        image_surface->h != h){
+        image_surface->v->w != w ||
+        image_surface->v->h != h){
         deleteSurface(false);
 
         this->texture_format = texture_format;
         SDL_mutexP(mutex);
-        image_surface = allocSurface( w, h, texture_format );
+        image_surface = onscache::CreateSurfaceUnCacheNode(allocSurface( w, h, texture_format ));
         SDL_mutexV(mutex);
     }
 
@@ -1021,22 +1037,22 @@ void AnimationInfo::copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_R
     if (_src_rect.y+_src_rect.h >= surface->h)
         _src_rect.h = surface->h - _src_rect.y;
 
-    if (_dst_rect.x+_src_rect.w > image_surface->w)
-        _src_rect.w = image_surface->w - _dst_rect.x;
-    if (_dst_rect.y+_src_rect.h > image_surface->h)
-        _src_rect.h = image_surface->h - _dst_rect.y;
+    if (_dst_rect.x+_src_rect.w > image_surface->v->w)
+        _src_rect.w = image_surface->v->w - _dst_rect.x;
+    if (_dst_rect.y+_src_rect.h > image_surface->v->h)
+        _src_rect.h = image_surface->v->h - _dst_rect.y;
 
     SDL_mutexP(mutex);
     SDL_LockSurface( surface );
-    SDL_LockSurface( image_surface );
+    SDL_LockSurface( image_surface->v );
 
     int i;
     for (i=0 ; i<_src_rect.h ; i++)
-        memcpy( (ONSBuf*)((unsigned char*)image_surface->pixels + image_surface->pitch * (_dst_rect.y+i)) + _dst_rect.x,
+        memcpy( (ONSBuf*)((unsigned char*)image_surface->v->pixels + image_surface->v->pitch * (_dst_rect.y+i)) + _dst_rect.x,
                 (ONSBuf*)((unsigned char*)surface->pixels + surface->pitch * (_src_rect.y+i)) + _src_rect.x,
                 _src_rect.w*sizeof(ONSBuf) );
 
-    SDL_UnlockSurface( image_surface );
+    SDL_UnlockSurface( image_surface->v );
     SDL_UnlockSurface( surface );
     SDL_mutexV(mutex);
 }
@@ -1046,35 +1062,35 @@ void AnimationInfo::fill( Uint8 r, Uint8 g, Uint8 b, Uint8 a )
     if (!image_surface) return;
 
     SDL_mutexP(mutex);
-    SDL_LockSurface( image_surface );
+    SDL_LockSurface( image_surface->v );
 
-    SDL_PixelFormat *fmt = image_surface->format;
+    SDL_PixelFormat *fmt = image_surface->v->format;
     Uint32 rgb = (((r >> fmt->Rloss) << fmt->Rshift) |
                   ((g >> fmt->Gloss) << fmt->Gshift) |
                   ((b >> fmt->Bloss) << fmt->Bshift) |
                   ((a >> fmt->Aloss) << fmt->Ashift));
 
-    int pitch = image_surface->pitch / sizeof(ONSBuf);
-    for (int i=0 ; i<image_surface->h ; i++){
-        ONSBuf *dst_buffer = (ONSBuf *)image_surface->pixels + pitch*i;
-        for (int j=0 ; j<image_surface->w ; j++){
+    int pitch = image_surface->v->pitch / sizeof(ONSBuf);
+    for (int i=0 ; i<image_surface->v->h ; i++){
+        ONSBuf *dst_buffer = (ONSBuf *)image_surface->v->pixels + pitch*i;
+        for (int j=0 ; j<image_surface->v->w ; j++){
             *dst_buffer++ = rgb;
         }
     }
-    SDL_UnlockSurface( image_surface );
+    SDL_UnlockSurface( image_surface->v );
     SDL_mutexV(mutex);
 }
 
-SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *surface_m, bool has_alpha )
+std::shared_ptr<onscache::SurfaceBaseNode> AnimationInfo::setupImageAlpha(std::shared_ptr<onscache::SurfaceBaseNode> surface, std::shared_ptr<onscache::SurfaceBaseNode> surface_m, bool has_alpha)
 {
     if (surface == NULL) return NULL;
 
-    SDL_LockSurface( surface );
-    Uint32 *buffer = (Uint32 *)surface->pixels;
-    SDL_PixelFormat *fmt = surface->format;
+    SDL_LockSurface( surface->v );
+    Uint32 *buffer = (Uint32 *)surface->v->pixels;
+    SDL_PixelFormat *fmt = surface->v->format;
 
-    int w = surface->w;
-    int h = surface->h;
+    int w = surface->v->w;
+    int h = surface->v->h;
     int w2 = w / num_of_cells;
     orig_pos.w = w;
     orig_pos.h = h;
@@ -1090,7 +1106,7 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
         ref_color = *buffer;
     }
     else if ( trans_mode == TRANS_TOPRIGHT ){
-        ref_color = *(buffer + surface->w - 1);
+        ref_color = *(buffer + surface->v->w - 1);
     }
     else if ( trans_mode == TRANS_DIRECT ) {
         ref_color =
@@ -1105,7 +1121,7 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
         const int w22 = w2/2;
         const int w3 = w22 * num_of_cells;
         orig_pos.w = w3;
-        SDL_PixelFormat *fmt = surface->format;
+        SDL_PixelFormat *fmt = surface->v->format;
         SDL_Surface *surface2 = SDL_CreateRGBSurface( SDL_SWSURFACE, w3, h,
                                                       fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask );
         SDL_LockSurface( surface2 );
@@ -1125,24 +1141,24 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
                 }
                 buffer += (w2 - w22);
             }
-            buffer  +=  surface->w  - w2 *num_of_cells;
+            buffer  +=  surface->v->w  - w2 *num_of_cells;
             buffer2 +=  surface2->w - w22*num_of_cells;
             alphap  += (surface2->w - w22*num_of_cells)*4;
         }
 
-        SDL_UnlockSurface( surface );
-        SDL_FreeSurface( surface );
-        surface = surface2;
+        SDL_UnlockSurface(surface->v);
+        surface->release();
+        surface = onscache::CreateSurfaceUnCacheNode(surface2);
     }
     else if ( trans_mode == TRANS_MASK ){
         if (surface_m){
-            SDL_LockSurface( surface_m );
-            const int mw  = surface_m->w;
-            const int mwh = surface_m->w * surface_m->h;
+            SDL_LockSurface( surface_m->v );
+            const int mw  = surface_m->v->w;
+            const int mwh = surface_m->v->w * surface_m->v->h;
 
             int i2 = 0;
             for (i=h ; i!=0 ; i--){
-                Uint32 *buffer_m = (Uint32 *)surface_m->pixels + i2;
+                Uint32 *buffer_m = (Uint32 *)surface_m->v->pixels + i2;
                 for (c=num_of_cells ; c!=0 ; c--){
                     int j2 = 0;
                     for (j=w2 ; j!=0 ; j--, buffer++, alphap+=4){
@@ -1154,7 +1170,7 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
                 if (i2 >= mwh) i2 = 0;
                 else           i2 += mw;
             }
-            SDL_UnlockSurface( surface_m );
+            SDL_UnlockSurface( surface_m->v );
         }
     }
     else if ( trans_mode == TRANS_TOPLEFT ||
@@ -1182,18 +1198,18 @@ SDL_Surface *AnimationInfo::setupImageAlpha( SDL_Surface *surface, SDL_Surface *
         }
     }
 
-    SDL_UnlockSurface( surface );
+    SDL_UnlockSurface( surface->v );
 
     return surface;
 }
 
-void AnimationInfo::setImage( SDL_Surface *surface, Uint32 texture_format )
+void AnimationInfo::setImage(std::shared_ptr<onscache::SurfaceBaseNode> surface, Uint32 texture_format )
 {
     if (surface == NULL) return;
 
     this->texture_format = texture_format;
     image_surface = surface; // deleteSurface() should be called beforehand
-    allocImage(surface->w, surface->h, texture_format);
+    allocImage(surface->v->w, surface->v->h, texture_format);
 }
 
 unsigned char AnimationInfo::getAlpha(int x, int y)
@@ -1202,20 +1218,20 @@ unsigned char AnimationInfo::getAlpha(int x, int y)
 
     x -= pos.x;
     y -= pos.y;
-    int offset_x = (image_surface->w/num_of_cells)*current_cell;
+    int offset_x = (image_surface->v->w/num_of_cells)*current_cell;
 
     unsigned char alpha = 0;
-    int pitch = image_surface->pitch / 4;
+    int pitch = image_surface->v->pitch / 4;
     SDL_mutexP(mutex);
-    SDL_LockSurface( image_surface );
-    ONSBuf *buf = (ONSBuf *)image_surface->pixels + pitch*y + offset_x + x;
+    SDL_LockSurface( image_surface->v );
+    ONSBuf *buf = (ONSBuf *)image_surface->v->pixels + pitch*y + offset_x + x;
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
     alpha = *((unsigned char *)buf + 3);
 #else
     alpha = *((unsigned char *)buf);
 #endif
-    SDL_UnlockSurface( image_surface );
+    SDL_UnlockSurface( image_surface->v );
     SDL_mutexV(mutex);
 
     return alpha;

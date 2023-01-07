@@ -318,7 +318,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         break;
 
       case 15: // Fade with mask
-        alphaBlend( effect->anim.image_surface, ALPHA_BLEND_FADE_MASK, 256 * effect_counter / effect_duration, &dirty_rect.bounding_box );
+        alphaBlend( effect->anim.image_surface->v, ALPHA_BLEND_FADE_MASK, 256 * effect_counter / effect_duration, &dirty_rect.bounding_box );
         break;
 
       case 16: // Mosaic out
@@ -330,7 +330,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
         break;
 
       case 18: // Cross fade with mask
-        alphaBlend( effect->anim.image_surface, ALPHA_BLEND_CROSSFADE_MASK, 256 * effect_counter * 2 / effect_duration, &dirty_rect.bounding_box );
+        alphaBlend( effect->anim.image_surface->v, ALPHA_BLEND_CROSSFADE_MASK, 256 * effect_counter * 2 / effect_duration, &dirty_rect.bounding_box );
         break;
 
       case (MAX_EFFECT_NUM + 0): // quakey

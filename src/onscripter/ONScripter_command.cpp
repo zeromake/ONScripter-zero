@@ -444,7 +444,7 @@ int ONScripter::sp_rgb_gradationCommand()
     AnimationInfo *ai;
     if (no == -1) ai = &sentence_font_info;
     else          ai = &sprite_info[no];
-    SDL_Surface *surface = ai->image_surface;
+    SDL_Surface *surface = ai->image_surface->v;
     if (surface == NULL) return RET_CONTINUE;
 
     SDL_PixelFormat *fmt = surface->format;
@@ -1910,7 +1910,7 @@ int ONScripter::ldCommand()
         if ( ai->image_surface ){
             ai->visible = true;
             ai->orig_pos.x = screen_width * (no+1) * screen_ratio2 / (4 * screen_ratio1) - ai->orig_pos.w / 2;
-            ai->orig_pos.y = underline_value - ai->image_surface->h * screen_ratio2 / screen_ratio1;
+            ai->orig_pos.y = underline_value - ai->image_surface->v->h * screen_ratio2 / screen_ratio1;
             ai->scalePosXY( screen_ratio1, screen_ratio2 );
             dirty_rect.add( ai->pos );
         }
@@ -2708,7 +2708,7 @@ int ONScripter::flushoutCommand()
 
     setStr(&bg_info.file_name, "white");
     createBackground();
-    SDL_BlitSurface(bg_info.image_surface, NULL, effect_dst_surface, NULL);
+    SDL_BlitSurface(bg_info.image_surface->v, NULL, effect_dst_surface, NULL);
     SDL_BlitSurface(accumulation_surface, NULL, effect_tmp_surface, NULL);
     while (doEffect(&tmp_effect));
 
@@ -3578,7 +3578,7 @@ int ONScripter::btndefCommand()
             btndef_info.trans_mode = AnimationInfo::TRANS_COPY;
             setupAnimationInfo( &btndef_info );
 
-            SDL_SetSurfaceBlendMode(btndef_info.image_surface, SDL_BLENDMODE_NONE);
+            SDL_SetSurfaceBlendMode(btndef_info.image_surface->v, SDL_BLENDMODE_NONE);
         }
     }
 
@@ -3607,12 +3607,12 @@ int ONScripter::btnCommand()
     src_rect.x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
     src_rect.y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
     if (btndef_info.image_surface &&
-        src_rect.x + button->image_rect.w > btndef_info.image_surface->w){
-        button->image_rect.w = btndef_info.image_surface->w - src_rect.x;
+        src_rect.x + button->image_rect.w > btndef_info.image_surface->v->w){
+        button->image_rect.w = btndef_info.image_surface->v->w - src_rect.x;
     }
     if (btndef_info.image_surface &&
-        src_rect.y + button->image_rect.h > btndef_info.image_surface->h){
-        button->image_rect.h = btndef_info.image_surface->h - src_rect.y;
+        src_rect.y + button->image_rect.h > btndef_info.image_surface->v->h){
+        button->image_rect.h = btndef_info.image_surface->v->h - src_rect.y;
     }
     src_rect.w = button->image_rect.w;
     src_rect.h = button->image_rect.h;
@@ -3624,7 +3624,7 @@ int ONScripter::btnCommand()
     ai->pos.y = button->image_rect.y;
     ai->allocImage( button->image_rect.w, button->image_rect.h, texture_format );
     ai->fill( 0, 0, 0, 0 );
-    ai->copySurface( btndef_info.image_surface, &src_rect );
+    ai->copySurface( btndef_info.image_surface->v, &src_rect );
 
     root_button_link.insert( button );
 
@@ -3701,8 +3701,8 @@ int ONScripter::bltCommand()
     if (dw == 0 || dh == 0 || sw == 0 || sh == 0) return RET_CONTINUE;
 
     if (sx >= 0 && sy >= 0 && sw > 0 && sh > 0) {
-        if (sx + sw > btndef_info.image_surface->w) sw = btndef_info.image_surface->w - sx;
-        if (sy + sh > btndef_info.image_surface->h) sh = btndef_info.image_surface->h - sy;
+        if (sx + sw > btndef_info.image_surface->v->w) sw = btndef_info.image_surface->v->w - sx;
+        if (sy + sh > btndef_info.image_surface->v->h) sh = btndef_info.image_surface->v->h - sy;
         if (dx + dw > screen_width) dw = screen_width - dx;
         else if (dx + dw < 0) dx = -dx;
         if (dy + dh > screen_height) dh = screen_height - dy;
@@ -3711,21 +3711,21 @@ int ONScripter::bltCommand()
         SDL_Rect dst_rect = {dx,dy,dw,dh};
 
         if (blt_texture == NULL) {
-          if (btndef_info.image_surface->w > max_texture_width || btndef_info.image_surface->h > max_texture_height) {
-            blt_texture = createMaximumTexture(renderer, blt_texture_src_rect, src_rect, btndef_info.image_surface,
+          if (btndef_info.image_surface->v->w > max_texture_width || btndef_info.image_surface->v->h > max_texture_height) {
+            blt_texture = createMaximumTexture(renderer, blt_texture_src_rect, src_rect, btndef_info.image_surface->v,
               texture_format, max_texture_width, max_texture_height);
           } else {
             blt_texture_src_rect.x = 0;
             blt_texture_src_rect.y = 0;
-            blt_texture_src_rect.w = btndef_info.image_surface->w;
-            blt_texture_src_rect.h = btndef_info.image_surface->h;
-            blt_texture = SDL_CreateTextureFromSurface(renderer, btndef_info.image_surface);
+            blt_texture_src_rect.w = btndef_info.image_surface->v->w;
+            blt_texture_src_rect.h = btndef_info.image_surface->v->h;
+            blt_texture = SDL_CreateTextureFromSurface(renderer, btndef_info.image_surface->v);
           }
         } else {
           if (sx < blt_texture_src_rect.x || sy < blt_texture_src_rect.y
             || sx + sw > blt_texture_src_rect.x + blt_texture_src_rect.w || sy + sh > blt_texture_src_rect.y + blt_texture_src_rect.h) {
             SDL_DestroyTexture(blt_texture);
-            blt_texture = createMaximumTexture(renderer, blt_texture_src_rect, src_rect, btndef_info.image_surface,
+            blt_texture = createMaximumTexture(renderer, blt_texture_src_rect, src_rect, btndef_info.image_surface->v,
               texture_format, max_texture_width, max_texture_height);
           }
         }

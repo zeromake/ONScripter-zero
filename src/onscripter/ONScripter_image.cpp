@@ -35,15 +35,36 @@
 
 
 std::shared_ptr<onscache::SurfaceBaseNode> ONScripter::loadImageCache(char *filename, bool *has_alpha, int *location, unsigned char *alpha) {
-    auto node = surfaceCache.Get(filename);
+    std::string cache_key = filename;
+    if (alpha) {
+        cache_key += ";";
+        cache_key += *alpha;
+    }
+    auto node = surfaceCache.Get(cache_key);
     if (node == nullptr) {
         SDL_Surface* surface = loadImage(filename, has_alpha, location, alpha);
-        if (surface) {
-            return surfaceCache.Put(filename, surface);
+        node = std::make_shared<onscache::SurfaceNodeWrap>();
+        node->node = std::make_shared<onscache::SurfaceNode>();
+        node->node->v = surface;
+        if (location) {
+            node->location = *location;
         }
-        return nullptr;
+        if (has_alpha) {
+            node->has_alpha = *has_alpha;
+        }
+        surfaceCache.Put(cache_key, node);
+    } else {
+        if (node->has_alpha.has_value() && has_alpha) {
+            *has_alpha = node->has_alpha.value();
+        }
+        if (node->location.has_value() && location) {
+            *location = node->location.value();
+        }
     }
-    return node;
+    if (node->node->v) {
+        return node->node;
+    }
+    return nullptr;
 }
 
 SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha, int *location, unsigned char *alpha)
@@ -707,7 +728,7 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
     if (clip_src) if ( AnimationInfo::doClipping( &clip, clip_src ) ) return;
 
     int i, top;
-    SDL_BlitSurface( bg_info.image_surface, &clip, surface, &clip );
+    SDL_BlitSurface( bg_info.image_surface->v, &clip, surface, &clip );
 
     if ( !all_sprite_hide_flag ){
         if ( z_order < 10 && refresh_mode & REFRESH_SAYA_MODE )
@@ -852,25 +873,25 @@ void ONScripter::createBackground()
         if (anim.image_surface){
             SDL_Rect src_rect;
             src_rect.x = src_rect.y = 0;
-            src_rect.w = anim.image_surface->w;
-            src_rect.h = anim.image_surface->h;
+            src_rect.w = anim.image_surface->v->w;
+            src_rect.h = anim.image_surface->v->h;
             SDL_Rect dst_rect = {0, 0};
-            if (screen_width >= anim.image_surface->w){
-                dst_rect.x = (screen_width - anim.image_surface->w) / 2;
+            if (screen_width >= anim.image_surface->v->w){
+                dst_rect.x = (screen_width - anim.image_surface->v->w) / 2;
             }
             else{
-                src_rect.x = (anim.image_surface->w - screen_width) / 2;
+                src_rect.x = (anim.image_surface->v->w - screen_width) / 2;
                 src_rect.w = screen_width;
             }
 
-            if (screen_height >= anim.image_surface->h){
-                dst_rect.y = (screen_height - anim.image_surface->h) / 2;
+            if (screen_height >= anim.image_surface->v->h){
+                dst_rect.y = (screen_height - anim.image_surface->v->h) / 2;
             }
             else{
-                src_rect.y = (anim.image_surface->h - screen_height) / 2;
+                src_rect.y = (anim.image_surface->v->h - screen_height) / 2;
                 src_rect.h = screen_height;
             }
-            bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect);
+            bg_info.copySurface(anim.image_surface->v, &src_rect, &dst_rect);
         }
         return;
     }

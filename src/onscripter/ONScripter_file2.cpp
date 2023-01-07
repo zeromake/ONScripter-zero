@@ -332,7 +332,7 @@ int ONScripter::loadSaveFile2( int file_version )
         parseTaggedString( &btndef_info );
         setupAnimationInfo( &btndef_info );
 
-        SDL_SetSurfaceBlendMode(btndef_info.image_surface, SDL_BLENDMODE_NONE);
+        SDL_SetSurfaceBlendMode(btndef_info.image_surface->v, SDL_BLENDMODE_NONE);
     }
 
     if ( file_version >= 202 )
