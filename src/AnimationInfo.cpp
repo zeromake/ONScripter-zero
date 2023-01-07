@@ -175,7 +175,7 @@ void AnimationInfo::deleteSurface(bool delete_surface_name)
         mask_surface_name = NULL;
     }
     SDL_mutexP(mutex);
-    if ( image_surface ) SDL_FreeSurface( image_surface );
+    if (image_surface) SDL_FreeSurface(image_surface);
     image_surface = NULL;
     SDL_mutexV(mutex);
     if (alpha_buf) delete[] alpha_buf;

@@ -33,6 +33,7 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 #include "renderer/gles_renderer.h"
+#include "ons_cache.h"
 
 #if defined(USE_SMPEG)
 #include <smpeg.h>
@@ -361,6 +362,7 @@ private:
     bool cacheFont;
     bool screen_dirty_flag;
 
+    onscache::SurfaceCache surfaceCache;
     // variables relevant to button
     ButtonState current_button_state, last_mouse_state;
 
@@ -637,6 +639,7 @@ private:
     unsigned char *resize_buffer;
     size_t resize_buffer_size;
 
+    std::shared_ptr<onscache::SurfaceBaseNode> loadImageCache(char *filename, bool *has_alpha=NULL, int *location=NULL, unsigned char *alpha=NULL);
     SDL_Surface *loadImage(char *filename, bool *has_alpha=NULL, int *location=NULL, unsigned char *alpha=NULL);
     SDL_Surface *createRectangleSurface(char *filename, bool *has_alpha, unsigned char *alpha=NULL);
     SDL_Surface *createSurfaceFromFile(char *filename,bool *has_alpha, int *location);
