@@ -329,7 +329,7 @@ void ONScripter::openAudio(int freq)
     }
 }
 
-ONScripter::ONScripter(): surfaceCache(onscache::SurfaceCache(256))
+ONScripter::ONScripter(): surfaceCache(onscache::SurfaceCache(64))
 {
     is_script_read = false;
 

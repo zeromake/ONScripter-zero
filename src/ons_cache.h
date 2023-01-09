@@ -2,10 +2,10 @@
 #define __ONS_CACHE_H__
 #include <string>
 #include <memory>
-#include <SDL.h>
 #include <map>
 #include <list>
 #include <utility>
+#include <SDL.h>
 
 namespace onscache {
     template<class Key, class Value>
@@ -121,7 +121,7 @@ namespace onscache {
         public:
             SDL_Surface* v;
         public:
-            virtual void release();
+            virtual void release() {};
             SurfaceBaseNode() {}
     };
     struct SurfaceNodeWrap {
@@ -131,44 +131,32 @@ namespace onscache {
     };
     class SurfaceUnCacheNode: public SurfaceBaseNode {
         public:
-            void release() {
-                SDL_FreeSurface(v);
-                v = nullptr;
-            };
-            SurfaceUnCacheNode() {}
-            ~SurfaceUnCacheNode() {
-                if (v) {
-                    SDL_FreeSurface(v);
-                    v = nullptr;
+            void release();
+            SurfaceUnCacheNode();
+            ~SurfaceUnCacheNode();
+    };
+    class SurfaceNode: public SurfaceBaseNode {
+        public:
+            void release();
+            SurfaceNode();
+            ~SurfaceNode();
+    };
+    class SurfaceCache {
+        public:
+            lru_cache<std::string, std::shared_ptr<SurfaceNodeWrap>> store;
+            SurfaceCache(size_t size): store(lru_cache<std::string, std::shared_ptr<SurfaceNodeWrap>>(size)) {}
+            ~SurfaceCache() {}
+            void Put(const std::string &k, std::shared_ptr<SurfaceNodeWrap> s) {
+                store.insert(k, s);
+            }
+            std::shared_ptr<SurfaceNodeWrap> Get(const std::string &k) {
+                auto node = store.get(k);
+                if (node.has_value()) {
+                    return node.value();
                 }
+                return nullptr;
             }
     };
-    typedef struct SurfaceNode: public SurfaceBaseNode {
-        void release() {}
-        SurfaceNode() {}
-        ~SurfaceNode() {
-            if (v) {
-                SDL_FreeSurface(v);
-                v = nullptr;
-            }
-        }
-    } SurfaceNode;
-    typedef struct SurfaceCache {
-        lru_cache<std::string, std::shared_ptr<SurfaceNodeWrap>> store;
-        SurfaceCache(size_t size): store(lru_cache<std::string, std::shared_ptr<SurfaceNodeWrap>>(size)) {}
-        ~SurfaceCache() {}
-        void Put(const std::string &k, std::shared_ptr<SurfaceNodeWrap> s) {
-            store.insert(k, s);
-        }
-        std::shared_ptr<SurfaceNodeWrap> Get(const std::string &k) {
-            auto node = store.get(k);
-            if (node.has_value()) {
-                return node.value();
-            }
-            return nullptr;
-        }
-    } SurfaceCache;
-
     static std::shared_ptr<SurfaceBaseNode> CreateSurfaceUnCacheNode(SDL_Surface* s) {
         auto p = std::make_shared<SurfaceUnCacheNode>();
         p->v = s;
