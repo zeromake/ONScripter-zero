@@ -50,13 +50,19 @@ for _, dep_name in ipairs(deps) do
 end
 
 add_requires("sdl2", {system=false, configs=sdlConfigs})
-add_requires("freetype", {system=false,configs={
-    zlib=true,
-    bzip2=true,
-    brotli=true,
-    png=true,
-    harfbuzz=true
-}, lazy_options={system=false,configs={harfbuzz=false}}})
+add_requires("freetype",
+    {
+        system=false,
+        configs={
+            zlib=true,
+            bzip2=true,
+            brotli=true,
+            png=true,
+            harfbuzz=true
+        }
+    }
+)
+-- , lazy_options={system=false,configs={harfbuzz=false}}}
 add_requires("sdl2_image", {system=false,configs={
     png=true,
     jpeg=true,

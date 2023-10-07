@@ -6,6 +6,7 @@
 #include <map>
 #include <list>
 #include <utility>
+#include <optional>
 
 namespace onscache {
     template<class Key, class Value>
