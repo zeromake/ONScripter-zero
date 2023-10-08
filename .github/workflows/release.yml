@@ -82,12 +82,12 @@ jobs:
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
         run: |
-          go build script/cert.go
           cd project/android
           echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
-          ../../cert $CERT_TEXT
+          echo "$CERT_TEXT" > cert.txt
+          cat cert.txt | base64 -d > cert.tar.xz
           tar -xf cert.tar.xz
-          rm cert.tar.xz
+          rm cert.tar.xz cert.txt
           ls -lh keystore.properties release.keystore
           cd ../../
       - name: build-arm64-so
