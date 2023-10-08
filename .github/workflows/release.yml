@@ -74,7 +74,10 @@ jobs:
           fetch-depth: 1
       - name: install-xmake
         run: |
-          sudo apt-get install -y xmake
+          ./script/xmake-install.sh xmake-amd64.deb
+          sudo apt-get install -y ./xmake-amd64.deb
+          rm ./xmake-amd64.deb
+          xmake --version
       - name: cert
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
