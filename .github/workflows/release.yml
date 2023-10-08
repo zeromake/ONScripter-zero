@@ -101,7 +101,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y gcc:i386 g++:i386
+          sudo apt-get install gcc-multilib:i386 g++-multilib:i386
       - name: build-arm-so
         env:
           VERSION: ${{ github.ref_name }}
