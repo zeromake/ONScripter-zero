@@ -80,12 +80,6 @@ jobs:
           rm cert.tar.xz cert.txt
           ls -lh keystore.properties release.keystore
           cd ../../
-      - name: build-arm-so
-        env:
-          VERSION: ${{ github.ref_name }}
-        run: |
-          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
-          xmake build -y onscripter
       - name: build-arm64-so
         env:
           VERSION: ${{ github.ref_name }}
