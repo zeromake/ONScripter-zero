@@ -79,7 +79,7 @@ jobs:
           rm ./xmake-amd64.deb
           xmake --version
           sudo apt-get update
-          sudo apt-get install libc6-dev-i386
+          sudo apt-get install libc6-dev:i386 libc++-11-dev:i386
       - name: cert
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
