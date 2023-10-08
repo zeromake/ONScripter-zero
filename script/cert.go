@@ -1,0 +1,29 @@
+package main
+
+import (
+	"encoding/base64"
+	"log"
+	"os"
+)
+
+func main() {
+	var cert = os.Args[1]
+	var out = os.Args[2]
+	bb, err := base64.StdEncoding.DecodeString(cert)
+	if err != nil {
+		log.Fatal(err)
+	}
+	f, err := os.OpenFile(out, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = f.Write(bb)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = f.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("done")
+}
