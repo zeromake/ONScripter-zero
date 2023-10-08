@@ -79,11 +79,13 @@ jobs:
           rm ./xmake-amd64.deb
           xmake --version
       - name: cert
+        env:
+          CERT_TEXT: ${{ secrets.CERT_TEXT }}
         run: |
           go build script/cert.go
           cd project/android
           echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
-          ../../cert "${{ secrets.GITHUB_TOKEN }}" cert.tar.xz
+          ../../cert $CERT_TEXT cert.tar.xz
           tar -xf cert.tar.xz
           rm cert.tar.xz
           ls -lh keystore.properties release.keystore
