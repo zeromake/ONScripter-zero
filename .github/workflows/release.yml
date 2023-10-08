@@ -98,8 +98,8 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
-          xmake build -y onscripter
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c -vD
+          xmake build -y onscripter -vD
       - name: build-arm64-so
         env:
           VERSION: ${{ github.ref_name }}
