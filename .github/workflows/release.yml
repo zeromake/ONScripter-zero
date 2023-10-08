@@ -85,8 +85,8 @@ jobs:
           cd project/android
           echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
           echo $CERT_TEXT > cert.txt
-          wc -l cert.txt
-          cat cert.txt | head -n 1 | base64 -d > cert.tar.xz
+          cat cert.txt
+          cat cert.txt | base64 -d > cert.tar.xz
           tar -xf cert.tar.xz
           rm cert.tar.xz cert.txt
           ls -lh keystore.properties release.keystore
