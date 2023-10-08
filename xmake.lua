@@ -56,9 +56,8 @@ add_requires("freetype",
         configs={
             zlib=true,
             bzip2=true,
-            brotli=true,
-            png=true,
-            harfbuzz=true
+            brotli=true
+            -- png=true
         }
     }
 )
@@ -69,8 +68,7 @@ add_requires("sdl2_image", {system=false,configs={
     -- jpeg=true,
     webp=true
 }})
-add_requires("harfbuzz", {system=false,configs={freetype=true}})
-add_requires("sdl2_ttf", {system=false,configs={harfbuzz=true}})
+add_requires("sdl2_ttf", {system=false})
 
 target("nsaconv")
     set_kind("binary")
