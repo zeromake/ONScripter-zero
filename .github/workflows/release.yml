@@ -76,17 +76,17 @@ jobs:
         run: |
           apt install -y xmake
       - name: cert
-          env:
-            CERT_TEXT: ${{ secrets.CERT_TEXT }}
-          run: |
-            cd project/android
-            echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
-            echo $CERT_TEXT > cert.txt
-            cat cert.txt | base64 -d > cert.tar.xz
-            tar -xf cert.tar.xz
-            rm cert.tar.xz cert.txt
-            ls -lh keystore.properties release.keystore
-            cd ../../
+        env:
+          CERT_TEXT: ${{ secrets.CERT_TEXT }}
+        run: |
+          cd project/android
+          echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
+          echo $CERT_TEXT > cert.txt
+          cat cert.txt | base64 -d > cert.tar.xz
+          tar -xf cert.tar.xz
+          rm cert.tar.xz cert.txt
+          ls -lh keystore.properties release.keystore
+          cd ../../
         - name: build-arm64-so
           env:
             VERSION: ${{ github.ref_name }}
