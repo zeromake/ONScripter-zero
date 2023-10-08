@@ -13,6 +13,19 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties!!.load(FileInputStream(keystorePropertiesFile))
 }
 
+val localPropertiesFile = rootProject.file("local.properties")
+var localVersionName: String? = null
+if (localPropertiesFile.exists()) {
+    var localProperties: Properties = Properties()
+    localProperties!!.load(FileInputStream(localPropertiesFile))
+    localProperties?.let {
+        var versionName: String? = it["versionName"] as String?
+        versionName?.let {
+            localVersionName = it
+        }
+    }
+}
+
 android {
     namespace = "com.zeromake.onscripter"
     compileSdk = 33
@@ -22,6 +35,10 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0.0"
+        localVersionName?.let {
+            versionCode = (it.replace(",", "", false)).toIntOrNull() ?: 1
+            versionName = it
+        }
     }
     signingConfigs {
         keystoreProperties?.let {
