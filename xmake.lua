@@ -269,15 +269,18 @@ target("onscripter")
     after_build(function (target)
         if target:is_plat("android") then
             local outDir = "project/android/app/libs/"..target:arch().."/"
-            for _, pkg in pairs(target:pkgs()) do
-                if pkg:has_shared() then
-                    for _, libraryfile in ipairs(pkg:libraryfiles()) do
-                        if libraryfile:endswith(".so") then
-                            print("cp "..libraryfile.." "..outDir)
-                            os.cp(libraryfile, outDir)
-                        end
+            local packages = io.readfile(".xmake/"..os.host().."/"..os.arch().."/cache/package"):deserialize()
+            local shareds = {}
+            for _, pkg in pairs(packages) do
+                for _, libfile in ipairs(pkg["libfiles"]) do
+                    if libfile:endswith(".so") then
+                        shareds[libfile] = 1
                     end
                 end
+            end
+            for libfile, _ in pairs(shareds) do
+                print("cp "..libfile.." "..outDir)
+                os.cp(libfile, outDir)
             end
             os.cp(target:targetfile(), outDir)
             return
