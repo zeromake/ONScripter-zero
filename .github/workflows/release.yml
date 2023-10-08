@@ -78,6 +78,7 @@ jobs:
           sudo apt-get install -y ./xmake-amd64.deb
           rm ./xmake-amd64.deb
           xmake --version
+          sudo apt-get install libc6-dev
       - name: cert
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
