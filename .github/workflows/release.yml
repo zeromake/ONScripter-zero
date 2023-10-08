@@ -80,7 +80,7 @@ jobs:
           xmake --version
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install libc6-dev:i386 libc++-11-dev:i386 libstdc++-10-dev:i386 libgcc-10-dev:i386
+          sudo apt-get install libc6-dev:i386 libc++-11-dev:i386 libstdc++-11-dev:i386 libgcc-11-dev:i386
       - name: cert
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
@@ -98,8 +98,8 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c -vD
-          xmake build -y onscripter -vD
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
+          xmake build -y onscripter
       - name: build-arm64-so
         env:
           VERSION: ${{ github.ref_name }}
