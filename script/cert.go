@@ -9,6 +9,7 @@ import (
 func main() {
 	var cert = os.Args[1]
 	var out = os.Args[2]
+	log.Println("cert: ", cert[0:4])
 	bb, err := base64.StdEncoding.DecodeString(cert)
 	if err != nil {
 		log.Fatal(err)
