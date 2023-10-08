@@ -29,8 +29,8 @@ jobs:
         shell: powershell
         run: |
           $env:path+=";$Home\scoop\shims"
-          xmake f -c -y -vD
-          xmake build -y -vD onscripter
+          xmake f -c -y
+          xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-windows-${{ github.run_id }}
@@ -51,15 +51,15 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -c -y -vD
-          xmake build -y -vD onscripter
+          xmake f -c -y
+          xmake build -y onscripter
       - name: build-arm64
         env:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
-          xmake f -a arm64 -c -y -vD
-          xmake build -y -vD onscripter
+          xmake f -a arm64 -c -y
+          xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-osx-${{ github.run_id }}
@@ -90,12 +90,19 @@ jobs:
           rm cert.tar.xz cert.txt
           ls -lh keystore.properties release.keystore
           cd ../../
+          mkdir -p dist
+      - name: build-arm-so
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
+          xmake build -y onscripter
       - name: build-arm64-so
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c -vD
-          xmake build -y -vD onscripter
+          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c
+          xmake build -y onscripter
       - name: build-apk
         run: |
           export JAVA_HOME=$JAVA_HOME_11_X64
