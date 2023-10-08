@@ -3,10 +3,12 @@ add_rules("mode.debug", "mode.release")
 add_includedirs("src")
 set_languages("c++17")
 
-local VERSION = os.getenv("VERSION") or "0.8.0"
+local VERSION = os.getenv("VERSION") or "0.9.2"
 if VERSION:startswith("v") then
     VERSION = VERSION:sub(2)
 end
+
+add_repositories("zeromake https://github.com/zeromake/xrepo.git")
 
 add_defines(
     "ONS_JH_VERSION=\""..VERSION.."\"",
@@ -27,11 +29,9 @@ add_includedirs("src", "src/onscripter", "src/reader", "include")
 local deps = {
     "zlib",
     "bzip2",
-    -- "jpeg",
-    -- "png",
+    "jpeg",
+    "png",
     "webp",
-    -- "sdl2",
-    "sdl2_ttf",
     "sdl2_mixer",
     "brotli",
     "ghc_filesystem",
@@ -49,26 +49,25 @@ for _, dep_name in ipairs(deps) do
     add_requires(dep_name, dep_opt)
 end
 
-add_requires("sdl2", {system=false, configs=sdlConfigs})
-add_requires("freetype",
-    {
-        system=false,
-        configs={
-            zlib=true,
-            bzip2=true,
-            brotli=true
-            -- png=true
-        }
+add_requireconfs("sdl2", {system=false, configs=sdlConfigs})
+add_requireconfs("**.sdl2", {system=false, configs=sdlConfigs})
+add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
+add_requires("freetype", {
+    system=false,
+    configs={
+        harfbuzz=true,
+        zlib=true,
+        bzip2=true,
+        brotli=true,
+        png=true
     }
-)
--- , lazy_options={system=false,configs={harfbuzz=false}}}
-
+})
+add_requires("sdl2_ttf", {system=false,configs={harfbuzz=true}})
 add_requires("sdl2_image", {system=false,configs={
-    -- png=true,
-    -- jpeg=true,
+    png=true,
+    jpeg=true,
     webp=true
 }})
-add_requires("sdl2_ttf", {system=false})
 
 target("nsaconv")
     set_kind("binary")
