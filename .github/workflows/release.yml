@@ -85,7 +85,7 @@ jobs:
           go build script/cert.go
           cd project/android
           echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
-          ../../cert $CERT_TEXT cert.tar.xz
+          ../../cert $CERT_TEXT
           tar -xf cert.tar.xz
           rm cert.tar.xz
           ls -lh keystore.properties release.keystore
