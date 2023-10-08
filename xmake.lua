@@ -27,8 +27,8 @@ add_includedirs("src", "src/onscripter", "src/reader", "include")
 local deps = {
     "zlib",
     "bzip2",
-    "jpeg",
-    "png",
+    -- "jpeg",
+    -- "png",
     "webp",
     -- "sdl2",
     "sdl2_ttf",
@@ -63,9 +63,10 @@ add_requires("freetype",
     }
 )
 -- , lazy_options={system=false,configs={harfbuzz=false}}}
+
 add_requires("sdl2_image", {system=false,configs={
-    png=true,
-    jpeg=true,
+    -- png=true,
+    -- jpeg=true,
     webp=true
 }})
 add_requires("harfbuzz", {system=false,configs={freetype=true}})
@@ -259,7 +260,7 @@ target("onscripter")
         "FMT_HEADER_ONLY=1"
     )
     add_files(
-        "src/*.cpp",
+        "src/*.cpp|conv_shared.cpp",
         "src/SDL2_rotozoom.c",
         "src/renderer/*.cpp",
         "src/reader/*.cpp",
