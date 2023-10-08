@@ -65,7 +65,7 @@ add_requires("freetype", {
 add_requires("sdl2_ttf", {system=false,configs={harfbuzz=true}})
 add_requires("sdl2_image", {system=false,configs={
     png=true,
-    jpeg=true,
+    jpeg=(not is_plat("android")),
     webp=true
 }})
 
