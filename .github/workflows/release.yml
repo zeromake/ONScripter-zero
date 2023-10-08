@@ -80,9 +80,10 @@ jobs:
           xmake --version
       - name: cert
         run: |
+          go build script/cert.go
           cd project/android
           echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
-          ../../script/cert.sh "${{ secrets.GITHUB_TOKEN }}" cert.tar.xz
+          ../../cert "${{ secrets.GITHUB_TOKEN }}" cert.tar.xz
           tar -xf cert.tar.xz
           rm cert.tar.xz
           ls -lh keystore.properties release.keystore
