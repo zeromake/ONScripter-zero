@@ -273,8 +273,12 @@ target("onscripter")
             local outDir = "project/android/app/libs/"..target:arch().."/"
             for _, pkg in pairs(target:pkgs()) do
                 if pkg:has_shared() then
-                    os.cp(pkg:libraryfiles(), outDir)
-                    print("cp "..pkg:libraryfiles().." "..outDir)
+                    for _, libraryfile in ipairs(pkg:libraryfiles()) do
+                        if libraryfile:endswith(".so") then
+                            print("cp "..libraryfile.." "..outDir)
+                            os.cp(libraryfile, outDir)
+                        end
+                    end
                 end
             end
             os.cp(target:targetfile(), outDir)
@@ -344,18 +348,18 @@ target("example2")
 --     add_files("demo.cpp")
 
 
-target("demo/cache")
-    set_kind("binary")
-    add_files(
-        "demo/cache.cpp",
-        "src/murmurhash.c"
-    )
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    if is_plat("windows") then
-        add_files("src/resource.rc")
-    end
+-- target("demo/cache")
+--     set_kind("binary")
+--     add_files(
+--         "demo/cache.cpp",
+--         "src/murmurhash.c"
+--     )
+--     if is_plat("mingw") then
+--         add_ldflags("-static-libgcc", "-static-libstdc++")
+--     end
+--     if is_plat("windows") then
+--         add_files("src/resource.rc")
+--     end
 target("demo/demo")
     set_kind("binary")
     add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
