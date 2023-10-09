@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int decodeNT3(void *sh, char **buf, unsigned int size, FILE *fp)
-{
+int decodeNT3(void *sh, char **buf, unsigned int size, FILE *fp) {
     int key;
     int tmp;
     int flag;
@@ -11,32 +10,29 @@ int decodeNT3(void *sh, char **buf, unsigned int size, FILE *fp)
     char *cur;
     int data_size;
 
-    if(size < 0x920) return -1;
+    if (size < 0x920) return -1;
     fseek(fp, 0x91C, 0);
-    fread(&key, 4, 1, fp); // 1346323918
+    fread(&key, 4, 1, fp);  // 1346323918
     printf("key: %d\n", key);
-    data_size = fread(*buf, 1, size-0x920, fp);
+    data_size = fread(*buf, 1, size - 0x920, fp);
     cur = *buf;
-    if(data_size)
-    {
-        int i=1;
-        do{
-            key ^=  *cur;
-            tmp = key + (*cur)*(data_size+1-i) + 0x5D588B65;
+    if (data_size) {
+        int i = 1;
+        do {
+            key ^= *cur;
+            tmp = key + (*cur) * (data_size + 1 - i) + 0x5D588B65;
             key = tmp;
-            *cur^=tmp;
+            *cur ^= tmp;
             i++;
             cur++;
-        }
-        while (data_size>=i);
+        } while (data_size >= i);
     }
     *cur = 10;
     cur++;
     return 0;
 }
 
-int extractNT3(char *inpath, char *outpath)
-{
+int extractNT3(char *inpath, char *outpath) {
     FILE *fp = fopen(inpath, "rb");
     fseek(fp, 0, SEEK_END);
     int size = ftell(fp);
@@ -53,15 +49,17 @@ int extractNT3(char *inpath, char *outpath)
     return ret;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     printf("extract onscript.nt3 (by devseed), extract_nt3 input [output]\n");
     char *outpath;
-    if(argc<=2)
+    if (argc <= 2)
         outpath = "result.txt";
-    else outpath = argv[2];
+    else
+        outpath = argv[2];
     int ret = extractNT3(argv[1], outpath);
-    if(ret==0) printf("%s extracted successfully!\n", outpath);
-    else printf("%s extract faiiled!\n", outpath);
+    if (ret == 0)
+        printf("%s extracted successfully!\n", outpath);
+    else
+        printf("%s extract faiiled!\n", outpath);
     return 0;
 }
