@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 void va_func(char* fmt, ...) {
     va_list al;
@@ -8,7 +8,6 @@ void va_func(char* fmt, ...) {
     va_end(al);
     printf(fmt, s);
 }
-
 
 // typedef struct {
 //     void *__stack;
