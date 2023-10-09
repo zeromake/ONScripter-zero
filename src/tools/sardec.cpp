@@ -22,27 +22,25 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <sys/types.h>
+
 #include "SarReader.h"
 #include "coding2utf16.h"
 #ifdef _WIN32
 #include <direct.h>
-inline int mkdir(const char *pathname, int unused){
-  return _mkdir(pathname);
-}
+inline int mkdir(const char *pathname, int unused) { return _mkdir(pathname); }
 #endif
 
 Coding2UTF16 *coding2utf16;
 
 extern int errno;
 
-int main( int argc, char **argv )
-{
+int main(int argc, char **argv) {
     SarReader cSR;
     unsigned long length, buffer_length = 0;
     unsigned char *buffer = NULL;
@@ -51,57 +49,56 @@ int main( int argc, char **argv )
     FILE *fp;
     struct stat file_stat;
 
-    if ( argc != 2 ){
-        fprintf( stderr, "Usage: sardec arc_file\n");
+    if (argc != 2) {
+        fprintf(stderr, "Usage: sardec arc_file\n");
         exit(-1);
     }
-    if (cSR.open( argv[1] ) != 0){
-        fprintf( stderr, "can't open file %s\n", argv[1] );
+    if (cSR.open(argv[1]) != 0) {
+        fprintf(stderr, "can't open file %s\n", argv[1]);
         exit(-1);
     }
     count = cSR.getNumFiles();
 
     SarReader::FileInfo sFI;
 
-    for ( i=0 ; i<count ; i++ ){
-        sFI = cSR.getFileByIndex( i );
+    for (i = 0; i < count; i++) {
+        sFI = cSR.getFileByIndex(i);
 
-        length = cSR.getFileLength( sFI.name );
+        length = cSR.getFileLength(sFI.name);
 
-        if ( length > buffer_length ){
-            if ( buffer ) delete[] buffer;
+        if (length > buffer_length) {
+            if (buffer) delete[] buffer;
             buffer = new unsigned char[length];
             buffer_length = length;
         }
-        if ( cSR.getFile( sFI.name, buffer ) != length ){
-            fprintf( stderr, "file %s can't be retrieved\n", sFI.name );
+        if (cSR.getFile(sFI.name, buffer) != length) {
+            fprintf(stderr, "file %s can't be retrieved\n", sFI.name);
             continue;
         }
 
-        strcpy( file_name, sFI.name );
-        for ( j=0 ; j<strlen(file_name) ; j++ ){
-            if ( file_name[j] == '\\' ){
+        strcpy(file_name, sFI.name);
+        for (j = 0; j < strlen(file_name); j++) {
+            if (file_name[j] == '\\') {
                 file_name[j] = '/';
-                strncpy( dir_name, file_name, j );
+                strncpy(dir_name, file_name, j);
                 dir_name[j] = '\0';
 
                 /* If the directory does'nt exist, create it */
-                if ( stat ( dir_name, &file_stat ) == -1 && errno == ENOENT )
-                    mkdir( dir_name, 00755 );
+                if (stat(dir_name, &file_stat) == -1 && errno == ENOENT)
+                    mkdir(dir_name, 00755);
             }
         }
 
-        printf("opening %s\n", file_name );
-        if ( (fp = fopen( file_name, "wb" ) )){
-            fwrite( buffer, 1, length, fp );
+        printf("opening %s\n", file_name);
+        if ((fp = fopen(file_name, "wb"))) {
+            fwrite(buffer, 1, length, fp);
             fclose(fp);
-        }
-        else{
+        } else {
             printf(" ... falied\n");
         }
     }
 
-    if ( buffer ) delete[] buffer;
+    if (buffer) delete[] buffer;
 
     exit(0);
 }

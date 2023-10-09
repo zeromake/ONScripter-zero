@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <infra/filesystem.hpp>
 #include <string>
 
@@ -11,7 +12,7 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         auto in = std::fopen(arg.c_str(), "rb");
-        std::string argout= arg+".s";
+        std::string argout = arg + ".s";
         auto out = std::fopen(argout.c_str(), "wb");
         std::fseek(in, 0, SEEK_END);
         size_t count = std::ftell(in);

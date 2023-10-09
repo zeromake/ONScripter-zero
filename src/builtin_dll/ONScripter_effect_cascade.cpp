@@ -26,23 +26,22 @@
 #ifdef USE_BUILTIN_EFFECTS
 #include "ONScripter.h"
 
-void ONScripter::effectCascade( char *params, int duration )
-{
+void ONScripter::effectCascade(char *params, int duration) {
     enum {
-        //some constants for cascade
-        CASCADE_DIR   = 1,
-        CASCADE_LR    = 2,
-        CASCADE_UP    = 0,
-        CASCADE_DOWN  = 1,
-        CASCADE_LEFT  = 2,
+        // some constants for cascade
+        CASCADE_DIR = 1,
+        CASCADE_LR = 2,
+        CASCADE_UP = 0,
+        CASCADE_DOWN = 1,
+        CASCADE_LEFT = 2,
         CASCADE_RIGHT = 3,
         CASCADE_CROSS = 4,
-        CASCADE_IN    = 8
+        CASCADE_IN = 8
     };
 
     SDL_Surface *src_surface, *dst_surface;
-    SDL_Rect src_rect={0, 0, screen_width, screen_height};
-    SDL_Rect dst_rect={0, 0, screen_width, screen_height};
+    SDL_Rect src_rect = {0, 0, screen_width, screen_height};
+    SDL_Rect dst_rect = {0, 0, screen_width, screen_height};
     int mode, width, start, end;
 
     if (params[0] == 'u')
@@ -68,14 +67,12 @@ void ONScripter::effectCascade( char *params, int duration )
     else
         dst_surface = accumulation_surface;
 
-    if (effect_counter == 0)
-        effect_tmp = 0;
+    if (effect_counter == 0) effect_tmp = 0;
 
     if (mode & CASCADE_LR) {
         // moves left-right
         width = screen_width * effect_counter / duration;
-        if (!(mode & CASCADE_IN))
-            width = screen_width - width;
+        if (!(mode & CASCADE_IN)) width = screen_width - width;
 
         src_rect.y = dst_rect.y = 0;
         src_rect.h = dst_rect.h = screen_height;
@@ -94,10 +91,12 @@ void ONScripter::effectCascade( char *params, int duration )
                 dst_rect.x = start;
             }
             src_rect.x = 0;
-            SDL_BlitSurface(effect_src_surface, &dst_rect, accumulation_surface, &src_rect);
-            for (int i=start; i<end; i++) {
+            SDL_BlitSurface(effect_src_surface, &dst_rect, accumulation_surface,
+                            &src_rect);
+            for (int i = start; i < end; i++) {
                 dst_rect.x = i;
-                SDL_BlitSurface(accumulation_surface, &src_rect, effect_src_surface, &dst_rect);
+                SDL_BlitSurface(accumulation_surface, &src_rect,
+                                effect_src_surface, &dst_rect);
             }
         }
         if (mode & CASCADE_DIR) {
@@ -111,7 +110,7 @@ void ONScripter::effectCascade( char *params, int duration )
             end = screen_width - width;
             src_rect.x = end;
         }
-        for (int i=start; i<end; i++) {
+        for (int i = start; i < end; i++) {
             dst_rect.x = i;
             SDL_BlitSurface(src_surface, &src_rect, dst_surface, &dst_rect);
         }
@@ -128,8 +127,7 @@ void ONScripter::effectCascade( char *params, int duration )
     } else {
         // moves up-down
         width = screen_height * effect_counter / duration;
-        if (!(mode & CASCADE_IN))
-            width = screen_height - width;
+        if (!(mode & CASCADE_IN)) width = screen_height - width;
 
         src_rect.x = dst_rect.x = 0;
         src_rect.h = dst_rect.h = 1;
@@ -148,10 +146,12 @@ void ONScripter::effectCascade( char *params, int duration )
                 dst_rect.y = start;
             }
             src_rect.y = 0;
-            SDL_BlitSurface(effect_src_surface, &dst_rect, accumulation_surface, &src_rect);
-            for (int i=start; i<end; i++) {
+            SDL_BlitSurface(effect_src_surface, &dst_rect, accumulation_surface,
+                            &src_rect);
+            for (int i = start; i < end; i++) {
                 dst_rect.y = i;
-                SDL_BlitSurface(accumulation_surface, &src_rect, effect_src_surface, &dst_rect);
+                SDL_BlitSurface(accumulation_surface, &src_rect,
+                                effect_src_surface, &dst_rect);
             }
         }
         if (mode & CASCADE_DIR) {
@@ -165,7 +165,7 @@ void ONScripter::effectCascade( char *params, int duration )
             end = screen_height - width;
             src_rect.y = end;
         }
-        for (int i=start; i<end; i++) {
+        for (int i = start; i < end; i++) {
             dst_rect.y = i;
             SDL_BlitSurface(src_surface, &src_rect, dst_surface, &dst_rect);
         }
@@ -183,7 +183,8 @@ void ONScripter::effectCascade( char *params, int duration )
     if (mode & CASCADE_CROSS) {
         // do crossfade
         width = 256 * effect_counter / duration;
-        alphaBlend( NULL, ALPHA_BLEND_CONST, width, &dirty_rect.bounding_box, NULL, dst_surface );
+        alphaBlend(NULL, ALPHA_BLEND_CONST, width, &dirty_rect.bounding_box,
+                   NULL, dst_surface);
     }
 }
 #endif
