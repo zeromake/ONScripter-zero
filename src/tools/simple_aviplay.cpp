@@ -21,29 +21,29 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <SDL.h>
+#include <SDL_mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
-#include <SDL_mixer.h>
 
 #include "AVIWrapper.h"
 
-#define DEFAULT_AUDIOBUF  4096
+#define DEFAULT_AUDIOBUF 4096
 #define ONS_MIX_CHANNELS 50
 
-int main( int argc, char **argv )
-{
-    if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) < 0 ){
-        fprintf( stderr, "Couldn't initialize SDL: %s\n", SDL_GetError() );
+int main(int argc, char **argv) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO) < 0) {
+        fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
         exit(-1);
     }
 
     AVIWrapper avi;
-    if ( avi.init( argv[1], true ) ) exit(-1);
-    SDL_Surface *screen_surface = SDL_SetVideoMode( avi.getWidth(), avi.getHeight(), 32, SDL_SWSURFACE );
-    if ( avi.initAV( screen_surface, true ) ) exit(-1);
-    avi.play( true );
+    if (avi.init(argv[1], true)) exit(-1);
+    SDL_Surface *screen_surface =
+        SDL_SetVideoMode(avi.getWidth(), avi.getHeight(), 32, SDL_SWSURFACE);
+    if (avi.initAV(screen_surface, true)) exit(-1);
+    avi.play(true);
 
     exit(0);
 }

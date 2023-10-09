@@ -1,23 +1,23 @@
 /* -*- C++ -*-
-*
-*  coding2utf16.cpp
-*
-*  Copyright (C) 2014 jh10001 <jh10001@live.cn>
-*
-*  This program is free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  This program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program; if not, write to the Free Software
-*  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ *
+ *  coding2utf16.cpp
+ *
+ *  Copyright (C) 2014 jh10001 <jh10001@live.cn>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include "coding2utf16.h"
 
@@ -69,16 +69,16 @@ int Coding2UTF16::convUTF16ToUTF8(unsigned char dst[4], uint16_t src) const {
 }
 
 unsigned short Coding2UTF16::convUTF8ToUTF16(const char **src) {
-    unsigned short utf16=0;
+    unsigned short utf16 = 0;
 
     if (**src & 0x80) {
         if (**src & 0x20) {
-            utf16 |= ((unsigned short)((*(*src)++)&0x0f)) << 12;
-            utf16 |= ((unsigned short)((*(*src)++)&0x3f)) << 6;
-            utf16 |= ((unsigned short)((*(*src)++)&0x3f));
+            utf16 |= ((unsigned short)((*(*src)++) & 0x0f)) << 12;
+            utf16 |= ((unsigned short)((*(*src)++) & 0x3f)) << 6;
+            utf16 |= ((unsigned short)((*(*src)++) & 0x3f));
         } else {
-            utf16 |= ((unsigned short)((*(*src)++)&0x1f)) << 6;
-            utf16 |=  (unsigned short)((*(*src)++)&0x3f);
+            utf16 |= ((unsigned short)((*(*src)++) & 0x1f)) << 6;
+            utf16 |= (unsigned short)((*(*src)++) & 0x3f);
         }
     } else {
         utf16 |= (unsigned short)(*(*src)++);

@@ -22,24 +22,25 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <sys/types.h>
+
+#include <string>
+
 #include "NsaReader.h"
 #include "coding2utf16.h"
 #include "gbk2utf16.h"
 #ifdef _WIN32
-#include <io.h>
 #include <direct.h>
-#include <string>
+#include <io.h>
+
 #include <algorithm>
-inline int mkdir(const char *pathname, int unused){
-	return _mkdir(pathname);
-}
+#include <string>
+inline int mkdir(const char *pathname, int unused) { return _mkdir(pathname); }
 #else
 #include <unistd.h>
 #endif
@@ -47,8 +48,7 @@ inline int mkdir(const char *pathname, int unused){
 extern int errno;
 Coding2UTF16 *coding2utf16 = new GBK2UTF16();
 
-int main( int argc, char **argv )
-{
+int main(int argc, char **argv) {
     NsaReader cNR;
     unsigned int nsa_offset = 0;
     unsigned long length;
@@ -61,11 +61,11 @@ int main( int argc, char **argv )
     char *out;
     bool useLower = false;
     bool vLog = false;
-    if ( argc >= 2 ){
-        while ( argc > 2 ){
+    if (argc >= 2) {
+        while (argc > 2) {
             if (!strcmp(argv[1], "-ns2")) {
                 archive_type = BaseReader::ARCHIVE_TYPE_NS2;
-            } else if ( !strcmp( argv[1], "-offset") ){
+            } else if (!strcmp(argv[1], "-offset")) {
                 nsa_offset = atoi(argv[2]);
                 argc--;
                 argv++;
@@ -85,8 +85,10 @@ int main( int argc, char **argv )
     if (archive_type == BaseReader::ARCHIVE_TYPE_NS2 && nsa_offset == 0) {
         nsa_offset = 1;
     }
-    if ( argc != 2 ){
-        fprintf( stderr, "Usage: nsadec [-offset ##] [-ns2] [-out dir] [-lower] arc_file\n");
+    if (argc != 2) {
+        fprintf(
+            stderr,
+            "Usage: nsadec [-offset ##] [-ns2] [-out dir] [-lower] arc_file\n");
         exit(-1);
     }
     if (out) {
@@ -97,17 +99,18 @@ int main( int argc, char **argv )
     cNR.openForConvert(argv[1], archive_type, nsa_offset);
     count = cNR.getNumFiles();
 
-    BaseReader::ArchiveInfo* sAI;
+    BaseReader::ArchiveInfo *sAI;
     BaseReader::FileInfo sFI;
 
-    for ( i=0 ; i<count ; i++ ){
+    for (i = 0; i < count; i++) {
         sAI = cNR.getArchiveInfoByIndex(i);
         sFI = sAI->fi_list[i];
         length = cNR.getFileLengthSubByIndex(sAI, i);
         buffer = new unsigned char[length];
         unsigned int len;
-        if ((len = cNR.getFileSubByIndex(sAI, i, buffer)) != length){
-            fprintf( stderr, "file %s is not fully retrieved %d %lu\n", sFI.original_name, len, length  );
+        if ((len = cNR.getFileSubByIndex(sAI, i, buffer)) != length) {
+            fprintf(stderr, "file %s is not fully retrieved %d %lu\n",
+                    sFI.original_name, len, length);
             length = sFI.length;
             continue;
         }
@@ -121,28 +124,28 @@ int main( int argc, char **argv )
             std::transform(s.begin(), s.end(), s.begin(), std::tolower);
             strcpy(file_name, s.c_str());
         }
-        for ( j=0 ; j<strlen(file_name) ; j++ ){
-            if (file_name[j] == '\\' || file_name[j] == '/'){
+        for (j = 0; j < strlen(file_name); j++) {
+            if (file_name[j] == '\\' || file_name[j] == '/') {
                 file_name[j] = DELIMITER;
                 strncpy(dir_name, file_name, j);
                 dir_name[j] = '\0';
                 /* If the directory does'nt exist, create it */
                 if (stat(dir_name, &file_stat) == -1 && errno == ENOENT)
-                    mkdir( dir_name, 00755 );
+                    mkdir(dir_name, 00755);
             }
         }
 
         if (vLog) {
-            printf("\033[Kouting %s\t\t%.2fkb\t\t%d/%d\r", file_name, float(length) / 1024.0f, i, count);
+            printf("\033[Kouting %s\t\t%.2fkb\t\t%d/%d\r", file_name,
+                   float(length) / 1024.0f, i, count);
         } else {
             printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
         }
-        if ( (fp = fopen( file_name, "wb" ) )){
-            fwrite( buffer, 1, length, fp );
+        if ((fp = fopen(file_name, "wb"))) {
+            fwrite(buffer, 1, length, fp);
             fclose(fp);
-        }
-        else{
-            printf("opening %s ... falied\n", file_name );
+        } else {
+            printf("opening %s ... falied\n", file_name);
         }
 
         delete[] buffer;
