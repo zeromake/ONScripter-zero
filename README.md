@@ -53,7 +53,13 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [ ] 支持读取压缩包里的 ons 游戏，无需解压。
 - [ ] 代码里描述指令说明并生成文档, [onscripter-api](https://07th-mod.github.io/ponscripter-fork/api/), [NScrAPI](http://senzogawa.s90.xrea.com/reference/NScrAPI.html)。
 - [ ] 比较合并上游的 [onscripter](http://onscripter.osdn.jp/onscripter.html.en#package-source) 的 `20220816` 版本。
-
+- [ ] surface 支持 gpu 着色器缩放(静态内置)
+    - [ ] [Magpie's Effect](https://github.com/Blinue/Magpie/tree/main/src/Effects)
+    - [ ] [FSR-GLES-Demo](https://github.com/elecro/FSR-GLES-Demo)
+    - [ ] [第三方着色器介绍](https://hooke007.github.io/mpv-lazy/%5B01%5D_%E7%AC%AC%E4%B8%89%E6%96%B9%E7%9D%80%E8%89%B2%E5%99%A8%E4%BB%8B%E7%BB%8D.html)
+    - [ ] opengl 支持
+    - [ ] dx11,dx12 支持
+    - [ ] metal 支持
 ## 编译指南
 
 **预先工作**
