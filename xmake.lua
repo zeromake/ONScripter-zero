@@ -69,6 +69,8 @@ add_requires("sdl2_image", {system=false,configs={
     webp=true
 }})
 
+set_rundir("$(projectdir)")
+
 target("nsaconv")
     set_kind("binary")
     add_packages("bzip2", "jpeg")

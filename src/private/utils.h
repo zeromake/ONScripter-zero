@@ -79,11 +79,11 @@ namespace utils{
 		va_end(ap);
 	}
 
-	template<class T> T min(T a, T b){
+	template<typename T> T (min)(T a, T b) {
         return a < b ? a : b;
     }
 
-	template<class T> T clamp(T x, T min, T max){
+	template<typename T> T (clamp)(T x, T min, T max) {
         return x < min ? min : (x > max ? max : x);
     }
 }

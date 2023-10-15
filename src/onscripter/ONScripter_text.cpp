@@ -265,7 +265,7 @@ int ONScripter::drawChar(char *text, _FontInfo *info, bool flush_flag,
 
         SDL_Rect old_dst_rect;
         memcpy(&old_dst_rect, &dst_rect, sizeof(SDL_Rect));
-        if (fontConfig->render_outline && fontConfig->render_outline > 0) {
+        if (fontConfig->render_outline) {
             int outline_size =
                 fontConfig->outline_size * screen_ratio1 / screen_ratio2;
             dst_rect.w += outline_size * 2;
