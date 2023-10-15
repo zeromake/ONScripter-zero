@@ -197,10 +197,16 @@ bool readVariableTextCompatible(const char *buf, char *out,
     out[outOffset] = buf[offset];
     offset++;
     outOffset++;
-    if (buf[offset] < '0' && buf[offset] > '9') {
+#define VERIABLE_TEXT_COMPATIBLE_CHAR(ch) (\
+        (ch >= '0' && ch <= '9')\
+        || (ch >= 'A' && ch <= 'Z')\
+        || (ch >= 'a' && ch <= 'z')\
+        || (ch == '_')\
+    )
+    if (!VERIABLE_TEXT_COMPATIBLE_CHAR(buf[offset])) {
         return false;
     }
-    while (buf[offset] >= '0' && buf[offset] <= '9') {
+    while (VERIABLE_TEXT_COMPATIBLE_CHAR(buf[offset])) {
         out[outOffset] = buf[offset];
         offset++;
         outOffset++;
@@ -297,7 +303,7 @@ readTokenTop:
                 ignore_clickstr_flag = false;
                 if (!ignore_variable_flag &&
                     (ch == '%' || ch == '?' || ch == '$')) {
-                    // 文本变量替换必须用 {} 或者 () 包裹;
+                    // 文本变量替换建议用 {} 或者 () 包裹;
                     int variable_count = 0;
                     if (readVariableText(buf, variable_buff, variable_count) &&
                         variable_count > 0) {
