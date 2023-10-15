@@ -299,11 +299,7 @@ void parseOption(int argc, char *argv[]) {
                 argc--;
                 argv++;
                 auto root = std::fs::absolute(argv[0]).string();
-                char *_root = new char[root.size() + 1]{0};
-                memcpy(_root, root.data(), root.size());
-                chdir(_root);
-                ons.setArchivePath(_root);
-                delete[] _root;
+                ons.setArchivePath(root.data());
             } else if (!strcmp(argv[0] + 1, "-fullscreen")) {
                 ons.setFullscreenMode();
             } else if (!strcmp(argv[0] + 1, "-window")) {
@@ -369,7 +365,13 @@ void parseOption(int argc, char *argv[]) {
                 utils::printInfo(" unknown option %s\n", argv[0]);
             }
         } else {
-            optionHelp();
+            auto rootPath = std::fs::absolute(argv[0]);
+            if (std::fs::is_directory(rootPath)) {
+                auto root = rootPath.string();
+                ons.setArchivePath(root.data());
+            } else {
+                optionHelp();
+            }
         }
         argc--;
         argv++;

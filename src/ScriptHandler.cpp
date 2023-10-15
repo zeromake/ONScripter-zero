@@ -1155,10 +1155,7 @@ int ScriptHandler::readScriptSub(FILE *fp, char **buf, int encrypt_mode) {
         offset++;
         if (encrypt_mode == 1)
             ch ^= 0x84;
-        else if (encrypt_mode == 15) {
-            ch ^= 0x85 & 0x97;
-            ch -= 1;
-        } else if (encrypt_mode == 16) {
+        else if (encrypt_mode == 15 || encrypt_mode == 16) {
             ch ^= 0x85 & 0x97;
             ch -= 1;
         } else if (encrypt_mode == 17) {

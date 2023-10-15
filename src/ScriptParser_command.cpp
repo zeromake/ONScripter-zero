@@ -424,6 +424,11 @@ int ScriptParser::rmenuCommand() {
     return RET_CONTINUE;
 }
 
+int ScriptParser::deletemenuCommand() {
+    deleteRMenuLink();
+    return RET_CONTINUE;
+}
+
 int ScriptParser::returnCommand() {
     if (!last_nest_info->previous ||
         last_nest_info->nest_mode != NestInfo::LABEL)

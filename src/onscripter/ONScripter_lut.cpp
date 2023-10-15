@@ -121,6 +121,7 @@ static ONScripter::FuncLUT func_lut[] = {
     {"rnd", &ONScripter::rndCommand},
     {"rmode", &ONScripter::rmodeCommand},
     {"rmenu", &ONScripter::rmenuCommand},
+    {"deletemenu", &ONScripter::deletemenuCommand},
     {"return", &ONScripter::returnCommand},
     {"resettimer", &ONScripter::resettimerCommand},
     {"reset", &ONScripter::resetCommand},

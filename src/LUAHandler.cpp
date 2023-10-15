@@ -1096,10 +1096,9 @@ void LUAHandler::init(ONScripter *ons, ScriptHandler *sh, int screen_ratio1,
 void LUAHandler::loadInitScript() {
     unsigned long length = sh->cBR->getFileLength(INIT_SCRIPT);
     if (length == 0) {
-        utils::printInfo("cannot open %s\n", INIT_SCRIPT);
         return;
     }
-
+    utils::printInfo("lua script init to: %s\n", INIT_SCRIPT);
     unsigned char *buffer = new unsigned char[length + 1];
     int location;
     sh->cBR->getFile(INIT_SCRIPT, buffer, &location);
