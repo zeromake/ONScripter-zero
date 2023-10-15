@@ -109,6 +109,7 @@ public:
     int rubyoffCommand();
     int roffCommand();
     int rmenuCommand();
+    int deletemenuCommand();
     int returnCommand();
     int pretextgosubCommand();
     int pagetagCommand();

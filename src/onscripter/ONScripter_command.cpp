@@ -2649,8 +2649,11 @@ int ONScripter::exec_dllCommand() {
 
     FILE *fp;
     if ((fp = fopen(dll_file, "r")) == NULL) {
-        utils::printError("Cannot open file [%s] while reading %s\n", dll_file,
-                          dll_name);
+        utils::printError(
+            "Cannot open file [%s] while reading %s\n",
+            dll_file,
+            dll_name
+        );
         return RET_CONTINUE;
     }
 

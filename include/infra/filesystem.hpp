@@ -35,12 +35,12 @@
 #endif
 
 #if defined(INFRA_USE_STD_FS)
-# include <filesystem>
+#include <filesystem>
 namespace std {
   namespace fs = std::filesystem;
 }
 #else
-# include <ghc/filesystem.hpp>
+#include <ghc/filesystem.hpp>
 namespace std {
   namespace fs = ghc::filesystem;
 }
