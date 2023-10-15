@@ -881,9 +881,9 @@ bool ONScripter::processText() {
     //        string_buffer_offset ++;
 
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00) {
-        if (prev_end_status & 4) {
+        if (prev_end_status != 0) {
             prev_end_status = 0;
-            return forceClickNewPage();
+            // return forceClickNewPage();
         }
         processEOT();
         return false;
