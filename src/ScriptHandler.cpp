@@ -1167,6 +1167,7 @@ int ScriptHandler::readScriptSub(FILE *fp, char **buf, int encrypt_mode) {
             } else if (offset < 0x920) {
                 int index = offset - 0x91C;
                 key_buf[index] = ch;
+                continue;
             } else {
                 if (0x920 == offset) {
                     memcpy(&key, key_buf, 4);
