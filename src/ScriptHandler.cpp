@@ -1245,9 +1245,10 @@ void ScriptHandler::readConfiguration() {
             buf += 4;
             screen_width = 0;
             screen_height = 0;
-
+            SKIP_SPACE(buf);
             while (*buf >= '0' && *buf <= '9')
                 screen_width = screen_width * 10 + *buf++ - '0';
+            SKIP_SPACE(buf);
             if (*buf == 'x' || *buf == '*') {
                 buf += 1;
                 while (*buf >= '0' && *buf <= '9')
