@@ -1251,6 +1251,7 @@ void ScriptHandler::readConfiguration() {
             SKIP_SPACE(buf);
             if (*buf == 'x' || *buf == '*') {
                 buf += 1;
+                SKIP_SPACE(buf);
                 while (*buf >= '0' && *buf <= '9')
                     screen_height = screen_height * 10 + *buf++ - '0';
             }
@@ -1303,6 +1304,7 @@ void ScriptHandler::readConfiguration() {
         } else if (!strncmp(buf, "ratio", 5)) {
             int _user_ratio = 0;
             buf += 5;
+            SKIP_SPACE(buf);
             while (*buf >= '0' && *buf <= '9')
                 _user_ratio = _user_ratio * 10 + *buf++ - '0';
             if (_user_ratio > 0) {
