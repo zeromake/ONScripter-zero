@@ -1106,6 +1106,12 @@ int ScriptParser::getparamCommand() {
                     NULL);
             }
         }
+    } else {
+        // 清空剩余未读取的变量，防止渲染到文本上，但不做变量初始化，需要剩余变量初始化为 0 请使用 getparam2
+        while (end_status2 & ScriptHandler::END_COMMA) {
+            script_h.readVariable();
+            end_status2 = script_h.getEndStatus();
+        }
     }
 
     return RET_CONTINUE;

@@ -575,7 +575,7 @@ bool ONScripter::clickWait(char *out_text) {
             string_buffer_offset++;
 
         if (textgosub_label) {
-            saveon_flag = false;
+            setSaveFlag(false);
 
             textgosub_clickstr_state = CLICK_WAIT;
             if (script_h.getStringBuffer()[string_buffer_offset] == 0x0)
@@ -615,7 +615,7 @@ bool ONScripter::forceClickNewPage() {
         if (waitEvent(0)) return false;
     } else {
         if (textgosub_label) {
-            saveon_flag = false;
+            setSaveFlag(false);
             textgosub_clickstr_state = CLICK_NEWPAGE;
             gosubReal(textgosub_label,
                       script_h.getCurrent(true) + string_buffer_offset, true);
@@ -656,7 +656,7 @@ bool ONScripter::clickNewPage(char *out_text) {
         if (waitEvent(0)) return false;
     } else {
         if (textgosub_label) {
-            saveon_flag = false;
+            setSaveFlag(false);
             textgosub_clickstr_state = CLICK_NEWPAGE;
             gosubReal(textgosub_label, script_h.getWait(), true);
             event_mode = IDLE_EVENT_MODE;
@@ -783,7 +783,7 @@ int ONScripter::textCommand() {
             current_page->tag = NULL;
         }
 
-        saveon_flag = false;
+        setSaveFlag(false);
         pretext_buf = script_h.getCurrent();
         gosubReal(pretextgosub_label, script_h.getCurrent());
         line_enter_status = 1;

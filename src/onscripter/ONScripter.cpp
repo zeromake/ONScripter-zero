@@ -728,7 +728,7 @@ void ONScripter::resetSub() {
     trap_mode = TRAP_NONE;
     setStr(&trap_dist, NULL);
 
-    saveon_flag = true;
+    setSaveFlag(true);
     internal_saveon_flag = true;
 
     is_kinsoku = true;
@@ -1509,3 +1509,10 @@ int ONScripter::getNumberFromBuffer(const char **buf) {
 
     return ret;
 }
+
+#ifndef NDEBUG
+void ONScripter::setSaveFlag(bool save_on) {
+    // debug 模式下比较好找是哪里调用的
+    this->saveon_flag = save_on;
+}
+#endif

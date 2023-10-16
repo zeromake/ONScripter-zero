@@ -367,7 +367,7 @@ bool ONScripter::executeSystemLoad() {
             if (loadSaveFile(file_no)) return false;
 
             leaveSystemCall(false);
-            saveon_flag = true;
+            setSaveFlag(true);
             internal_saveon_flag = true;
             text_on_flag = false;
             indent_offset = 0;

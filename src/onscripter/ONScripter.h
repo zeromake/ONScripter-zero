@@ -755,6 +755,13 @@ private:
     void stopBGM( bool continue_flag );
     void stopAllDWAVE();
     void playClickVoice();
+#ifdef NDEBUG
+    inline void setSaveFlag(bool save_on) {
+        this->saveon_flag = save_on;
+    }
+#else
+    void setSaveFlag(bool save_on);
+#endif
 
     // ----------------------------------------
     // variables and methods relevant to text

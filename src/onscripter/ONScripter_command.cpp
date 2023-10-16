@@ -274,7 +274,7 @@ int ONScripter::texecCommand() {
         page_enter_status = 0;
     }
 
-    saveon_flag = true;
+    setSaveFlag(true);
 
     return RET_CONTINUE;
 }
@@ -775,7 +775,7 @@ int ONScripter::selectCommand() {
     bool comma_flag = true;
     if (select_mode == SELECT_CSEL_MODE) {
         if (saveon_flag && internal_saveon_flag) storeSaveFile();
-        saveon_flag = false;
+        setSaveFlag(false);
     }
     shortcut_mouse_line = -1;
 
@@ -971,7 +971,7 @@ int ONScripter::savepointCommand() {
 }
 
 int ONScripter::saveonCommand() {
-    if (!autosaveoff_flag) saveon_flag = true;
+    if (!autosaveoff_flag) setSaveFlag(true);
 
     return RET_CONTINUE;
 }
@@ -980,7 +980,7 @@ int ONScripter::saveoffCommand() {
     if (!autosaveoff_flag) {
         if (saveon_flag && internal_saveon_flag) storeSaveFile();
 
-        saveon_flag = false;
+        setSaveFlag(false);
     }
 
     return RET_CONTINUE;
@@ -1769,7 +1769,7 @@ int ONScripter::loadgameCommand() {
         dirty_rect.fill(screen_width, screen_height);
         flush(refreshMode());
 
-        saveon_flag = true;
+        setSaveFlag(true);
         internal_saveon_flag = true;
         skip_mode &= ~SKIP_NORMAL;
         automode_flag = false;
