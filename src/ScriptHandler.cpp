@@ -1248,6 +1248,13 @@ void ScriptHandler::readConfiguration() {
             buf += 4;
             screen_width = 0;
             screen_height = 0;
+            float height_ratio1 = 3.0f;
+            float height_ratio2 = 4.0f;
+            if (*buf == 'w') {
+                buf++;
+                float height_ratio1 = 9.0f;
+                float height_ratio2 = 16.0f;
+            }
             SKIP_SPACE(buf);
             while (*buf >= '0' && *buf <= '9')
                 screen_width = screen_width * 10 + *buf++ - '0';
@@ -1270,8 +1277,21 @@ void ScriptHandler::readConfiguration() {
                         screen_height = 240;
                         break;
                     default:
-                        screen_height = (float)screen_width * 3.0f / 4.0f;
+                        screen_height = (float)screen_width * height_ratio1 / height_ratio2;
                         break;
+                }
+            }
+            if (*buf == '@') {
+                buf++;
+                int _screen_ratio = 0;
+                while (*buf >= '0' && *buf <= '9')
+                    _screen_ratio = _screen_ratio * 10 + *buf++ - '0';
+                if (_screen_ratio > 0 && !init_screen_ratio) {
+                    screen_ratio1 = _screen_ratio;
+                    screen_ratio2 = 1.0f;
+                }
+                if (*buf == 'x' || *buf == 'X') {
+                    buf++;
                 }
             }
         } else if (!strncmp(buf, "value", 5) || *buf == 'g' || *buf == 'G') {
