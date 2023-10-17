@@ -383,6 +383,7 @@ int ScriptParser::openScript() {
     if (init_screen_ratio) {
         script_h.screen_ratio1 = screen_ratio1;
         script_h.screen_ratio2 = screen_ratio2;
+        script_h.init_screen_ratio = init_screen_ratio;
     }
     script_h.cBR =
         new NsaReader(0, archive_path, BaseReader::ARCHIVE_TYPE_NS2, key_table);
