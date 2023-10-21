@@ -773,6 +773,18 @@ int ScriptHandler::getIntVariable(VariableInfo *var_info) {
     return 0;
 }
 
+void ScriptHandler::skipAnyVariable() {
+    end_status = END_NONE;
+    current_script = next_script;
+    char *buf = current_script;
+    SKIP_SPACE(buf);
+    while (*buf != ',' && *buf != '\n' && *buf != '\r')
+    {
+        buf++;
+    }
+    next_script = checkComma(buf);
+}
+
 void ScriptHandler::readVariable(bool reread_flag) {
     end_status = END_NONE;
     current_variable.type = VAR_NONE;

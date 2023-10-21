@@ -117,6 +117,7 @@ public:
     int  parseInt(char **buf, bool ignore_exit = false);
     int  parseIntExpression(char **buf);
     void readVariable( bool reread_flag=false );
+    void skipAnyVariable();
 
     // function for string access
     inline char *getStringBuffer(){ return string_buffer; };
