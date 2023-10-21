@@ -8,7 +8,7 @@ if VERSION:startswith("v") then
     VERSION = VERSION:sub(2)
 end
 
-add_repositories("xrepo git@github.com:zeromake/xrepo.git")
+add_repositories("xrepo https://github.com/zeromake/xrepo.git")
 
 add_defines(
     "ONS_JH_VERSION=\""..VERSION.."\"",
