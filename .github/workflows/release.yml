@@ -29,6 +29,7 @@ jobs:
         shell: powershell
         run: |
           $env:path+=";$Home\scoop\shims"
+          Remove-Item -Recurse -Force .xmake
           xmake f -c -y
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
