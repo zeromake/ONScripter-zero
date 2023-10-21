@@ -1114,6 +1114,17 @@ int ScriptParser::getparamCommand() {
         }
     }
 
+    // 强制跳过没有用到的参数设置，防止这些参数被渲染为文字
+    if (last_nest_info->next_script[0] == ',') {
+        last_nest_info->next_script++;
+        do {
+            script_h.pushCurrent(last_nest_info->next_script);
+            script_h.skipAnyVariable();
+            end_status = script_h.getEndStatus();
+            last_nest_info->next_script = script_h.getNext();
+            script_h.popCurrent();
+        } while (end_status & ScriptHandler::END_COMMA);
+    }
     return RET_CONTINUE;
 }
 
