@@ -447,6 +447,8 @@ int ScriptParser::returnCommand() {
             *buf != '\n'
             && *buf != '\r'
             && *buf != '\0'
+            && *buf != ':'
+            && *buf != ';'
         ) buf++;
         if (buf != last_nest_info->next_script) {
             last_nest_info->next_script = buf;

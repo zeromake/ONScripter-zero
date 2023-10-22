@@ -783,6 +783,8 @@ void ScriptHandler::skipAnyVariable() {
         && *buf != '\n'
         && *buf != '\r'
         && *buf != '\0'
+        && *buf != ':'
+        && *buf != ';'
     ) buf++;
     next_script = checkComma(buf);
 }
