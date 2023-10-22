@@ -29,8 +29,8 @@ jobs:
         shell: powershell
         run: |
           $env:path+=";$Home\scoop\shims"
-          xmake f -c -y
-          tree /f .xmake\windows\x64\repositories
+          xmake f -c -y -vD
+          tree /f .xmake\windows\x64\repositories\xrepo
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
