@@ -73,7 +73,12 @@ public:
     void reset();
     int  openScript();
     void setCurrentLabel( const char *label );
-    void gosubReal( const char *label, char *next_script, bool textgosub_flag=false );
+    void gosubReal(
+        const char *label,
+        char *next_script,
+        bool textgosub_flag=false,
+        bool skip_params=false
+    );
     int getStringBufferOffset(){return string_buffer_offset;};
 
     FILE *fopen(const char *path, const char *mode, bool use_save_dir=false);
@@ -207,11 +212,13 @@ protected:
         char *next_script; // used in gosub and for
         int  var_no, to, step; // used in for
         bool textgosub_flag; // used in textgosub and pretextgosub
+        bool skip_params;
 
         NestInfo(){
             previous = next = NULL;
             nest_mode = LABEL;
             textgosub_flag = false;
+            skip_params = false;
         };
     } last_tilde;
 
