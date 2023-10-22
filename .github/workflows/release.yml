@@ -59,7 +59,7 @@ jobs:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
-          xmake f -a arm64 -c -y
+          xmake f -a arm64 -c -y -vD
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
@@ -82,9 +82,11 @@ jobs:
       - name: cert
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
+          VERSION: ${{ github.ref_name }}
         run: |
           cd project/android
-          echo "org.gradle.java.home=$JAVA_HOME_11_X64" >> gradle.properties
+          echo "org.gradle.java.home=${JAVA_HOME_11_X64}" >> gradle.properties
+          echo "versionName=${VERSION}" >> local.properties
           echo "$CERT_TEXT" > cert.txt
           cat cert.txt | base64 -d > cert.tar.xz
           tar -xf cert.tar.xz
@@ -107,7 +109,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c -vD
           xmake build -y onscripter
       - name: build-apk
         run: |
