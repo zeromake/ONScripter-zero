@@ -30,6 +30,7 @@ jobs:
         run: |
           $env:path+=";$Home\scoop\shims"
           xmake f -c -y
+          tree /f .xmake\windows\x64\repositories
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
