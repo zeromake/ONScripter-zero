@@ -1086,6 +1086,10 @@ int ScriptParser::getparamCommand() {
 
         script_h.pushVariable();
 
+        if (script_h.pushed_variable.type == ScriptHandler::VAR_NONE) {
+            break;
+        }
+
         script_h.pushCurrent(last_nest_info->next_script);
 
         if (script_h.pushed_variable.type & ScriptHandler::VAR_PTR) {
@@ -1136,17 +1140,20 @@ int ScriptParser::getparamCommand() {
         }
     }
 
-    // 强制跳过没有用到的参数设置，防止这些参数被渲染为文字，切换到 return 去做，防止多次调用 getparam 无效
-    // if (last_nest_info->next_script[0] == ',') {
-    //     last_nest_info->next_script++;
-    //     do {
-    //         script_h.pushCurrent(last_nest_info->next_script);
-    //         script_h.skipAnyVariable();
-    //         end_status = script_h.getEndStatus();
-    //         last_nest_info->next_script = script_h.getNext();
-    //         script_h.popCurrent();
-    //     } while (end_status & ScriptHandler::END_COMMA);
-    // }
+    // 仅对类型不正确的参数进行跳过，例如一个 string 变量但是无法读取，其它多余的参数会在 return 自动跳过
+    char *buf = last_nest_info->next_script;
+    if (*buf != ',') {
+        while (
+            *buf != '\0'
+            && *buf != '\n'
+            && *buf != '\r'
+            && *buf != ':'
+            && *buf != ';'
+        ) buf++;
+        if (buf != last_nest_info->next_script) {
+            last_nest_info->next_script = buf;
+        }
+    }
     return RET_CONTINUE;
 }
 
