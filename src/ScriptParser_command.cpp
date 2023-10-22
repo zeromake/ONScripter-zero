@@ -443,17 +443,19 @@ int ScriptParser::returnCommand() {
         // 跳过方法调用，但是没有使用 getparam，导致参数渲染为文本的情况
         // 跳过方法调用，使用了 getparam 但是参数多于变量
         char *buf = last_nest_info->next_script;
-        while (
-            *buf != '\n'
-            && *buf != '\r'
-            && *buf != '\0'
-            && *buf != ':'
-            && *buf != ';'
-        ) buf++;
-        if (buf != last_nest_info->next_script) {
-            last_nest_info->next_script = buf;
-            current_label_info = script_h.getLabelByAddress(last_nest_info->next_script);
-            current_line = script_h.getLineByAddress(last_nest_info->next_script);
+        if (last_nest_info->skip_params && (*buf == ' ' || *buf == ',')) {
+            while (
+                *buf != '\n'
+                && *buf != '\r'
+                && *buf != '\0'
+                && *buf != ':'
+                && *buf != ';'
+            ) buf++;
+            if (buf != last_nest_info->next_script) {
+                last_nest_info->next_script = buf;
+                current_label_info = script_h.getLabelByAddress(last_nest_info->next_script);
+                current_line = script_h.getLineByAddress(last_nest_info->next_script);
+            }
         }
         script_h.setCurrent(last_nest_info->next_script);
     } else
@@ -1037,14 +1039,19 @@ int ScriptParser::gotoCommand() {
     return RET_CONTINUE;
 }
 
-void ScriptParser::gosubReal(const char *label, char *next_script,
-                             bool textgosub_flag) {
+void ScriptParser::gosubReal(
+    const char *label,
+    char *next_script,
+    bool textgosub_flag,
+    bool skip_params
+) {
     last_nest_info->next = new NestInfo();
     last_nest_info->next->previous = last_nest_info;
 
     last_nest_info = last_nest_info->next;
     last_nest_info->next_script = next_script;
     last_nest_info->textgosub_flag = textgosub_flag;
+    last_nest_info->skip_params = skip_params;
 
     setCurrentLabel(label);
 }

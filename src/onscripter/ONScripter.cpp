@@ -1080,7 +1080,8 @@ int ONScripter::parseLine() {
                             errorAndExit(lua_handler.error_str);
 #endif
                     } else {
-                        gosubReal(cmd, script_h.getNext());
+                        // 仅在调用方法时尝试跳过参数
+                        gosubReal(cmd, script_h.getNext(), false, true);
                     }
                     return RET_CONTINUE;
                 }
