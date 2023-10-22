@@ -439,9 +439,21 @@ int ScriptParser::returnCommand() {
     current_line = script_h.getLineByAddress(last_nest_info->next_script);
 
     const char *label = script_h.readStr();
-    if (label[0] != '*')
+    if (label[0] != '*') {
+        // 跳过方法调用，但是没有使用 getparam，导致参数渲染为文本的情况
+        char *buf = last_nest_info->next_script;
+        while (
+            *buf != '\n'
+            && *buf != '\r'
+            && *buf != '\0'
+        ) buf++;
+        if (buf != last_nest_info->next_script) {
+            last_nest_info->next_script = buf;
+            current_label_info = script_h.getLabelByAddress(last_nest_info->next_script);
+            current_line = script_h.getLineByAddress(last_nest_info->next_script);
+        }
         script_h.setCurrent(last_nest_info->next_script);
-    else
+    } else
         setCurrentLabel(label + 1);
 
     bool textgosub_flag = last_nest_info->textgosub_flag;
