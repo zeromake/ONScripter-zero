@@ -52,7 +52,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -c -y
+          xmake f -c -y -vD
           xmake build -y onscripter
       - name: build-arm64
         env:
@@ -96,7 +96,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c
+          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c -vD
           xmake build -y onscripter
       - name: cc-32
         run: |
