@@ -104,14 +104,18 @@ void _FontInfo::saveToPrev(bool use_ruby_offset) {
 
 int _FontInfo::getToPrev(int index) { return old_xy[index]; }
 
-void *_FontInfo::openFont(char *_font_file, int ratio1, int ratio2,
-                          std::function<const char *(const char *, bool)> f,
-                          const ons_font::FontConfig *fontConfig) {
-    const char *font_file;
+void *_FontInfo::openFont(
+    char *_font_file,
+    int ratio1,
+    int ratio2,
+    generate_path_function f,
+    const ons_font::FontConfig *fontConfig
+) {
+    char font_file[4096] = {0};
     if (f != nullptr) {
-        font_file = f(_font_file, false);
+        f(_font_file, font_file, false);
     } else {
-        font_file = _font_file;
+        strcpy(font_file, _font_file);
     }
     int font_size;
     if (font_size_xy[0] < font_size_xy[1])

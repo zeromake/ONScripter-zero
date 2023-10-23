@@ -10,6 +10,12 @@ end
 
 add_repositories("xrepo https://github.com/zeromake/xrepo.git")
 
+option("simd")
+    set_default(true)
+    set_showmenu(true)
+    set_description('开启 simd 优化')
+option_end()
+
 add_defines(
     "ONS_JH_VERSION=\""..VERSION.."\"",
     "ONS_VERSION=\"20181218\"",
@@ -231,17 +237,13 @@ target("onscripter")
     else
         add_files("src/entry/onscripter_main.cpp")
     end
-
-    if is_arch("x86", "x64", "i386", "x86_64") then
+    if get_config('simd') then
         add_defines("USE_SIMD=1")
-        if is_plat("macosx", "iphoneos") then
-            add_cxflags("-march=knl")
+        if is_plat("macosx") then
+            add_cxflags("-march=knm")
         else
-            add_vectorexts("avx2")
+            add_vectorexts('all')
         end
-    elseif is_arch("arm.*") then
-        add_defines("USE_SIMD=1")
-        add_vectorexts("neon")
     end
     add_defines(
         "USE_LUA=1",

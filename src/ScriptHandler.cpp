@@ -33,7 +33,6 @@
 extern Coding2UTF16 *coding2utf16;
 
 #define TMP_SCRIPT_BUF_LEN 4096
-#define STRING_BUFFER_LENGTH 4096
 
 #define SKIP_SPACE(p) \
     while (*(p) == ' ' || *(p) == '\t') (p)++
@@ -74,7 +73,6 @@ ScriptHandler::~ScriptHandler() {
     delete[] str_string_buffer;
     delete[] saved_string_buffer;
     if (variable_data) delete[] variable_data;
-    if (path_string_buffer) delete[] path_string_buffer;
 }
 
 void ScriptHandler::reset() {
@@ -149,34 +147,22 @@ void ScriptHandler::setSaveDir(const char *path) {
 
 FILE *ScriptHandler::fopen(const char *path, const char *mode,
                            bool use_save_dir) {
-    auto filename = fpath(path, use_save_dir);
+    char filename[STRING_BUFFER_LENGTH] = {0};
+    fpath(path, filename, use_save_dir);
     auto fp = ::fopen(filename, mode);
     return fp;
 }
 
-const char *ScriptHandler::fpath(const char *path, bool use_save_dir) {
-    size_t pathCount = strlen(path) + 1;
-    if (save_dir && strlen(save_dir) > strlen(archive_path)) {
-        pathCount += strlen(save_dir);
-    } else {
-        pathCount += strlen(archive_path);
+int ScriptHandler::fpath(const char *path, char *result, bool use_save_dir) {
+    const char* prefix_dir = (use_save_dir && save_dir) ? save_dir : archive_path;
+    const int prefix_dir_size = strlen(prefix_dir);
+    if (std::fs::path(path).is_absolute() || path[0] == '.') {
+        strcpy(result, path);
+    } else if (strncmp(path, prefix_dir, prefix_dir_size) != 0) {
+        sprintf(result, "%s%s", prefix_dir, path);
     }
-    if (!path_string_buffer) {
-        path_string_buffer = new char[STRING_BUFFER_LENGTH];
-    }
-    memset(path_string_buffer, 0, STRING_BUFFER_LENGTH);
-    if (path[0] == '/' || path[0] == '.' ||
-        (strlen(path) > 1 && path[1] == ':')) {
-        strcpy(path_string_buffer, path);
-    } else {
-        if (use_save_dir && save_dir)
-            sprintf(path_string_buffer, "%s%s", save_dir, path);
-        else
-            sprintf(path_string_buffer, "%s%s", archive_path, path);
-    }
-    strcpy(path_string_buffer,
-           std::fs::absolute(path_string_buffer).string().c_str());
-    return path_string_buffer;
+    strcpy(result, std::fs::absolute(result).string().c_str());
+    return 0;
 }
 
 void ScriptHandler::setKeyTable(const unsigned char *key_table) {

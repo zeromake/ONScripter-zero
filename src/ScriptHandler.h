@@ -34,6 +34,8 @@
 #define IS_TWO_BYTE(x) \
         ( ((unsigned char)(x) > (unsigned char)0x80) && ((unsigned char)(x) !=(unsigned char) 0xff) )
 
+#define STRING_BUFFER_LENGTH 4096
+
 typedef unsigned char uchar3[3];
 
 class ScriptHandler
@@ -105,7 +107,7 @@ public:
     void reset();
     void setSaveDir(const char *path);
     FILE *fopen(const char *path, const char *mode, bool use_save_dir=false);
-    const char *fpath(const char *path, bool use_save_dir=false);
+    int fpath(const char *path, char *result, bool use_save_dir=false);
     void setKeyTable( const unsigned char *key_table );
 
     // basic parser function
@@ -341,7 +343,6 @@ private:
     int  string_counter;
     char *saved_string_buffer; // updated only by saveStringBuffer
     char *str_string_buffer; // updated only by readStr
-    char *path_string_buffer;
 
     LabelInfo *label_info;
     int num_of_labels;

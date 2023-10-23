@@ -19,6 +19,13 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复 osx 上 simd 动画计算加速，xmake 的 `add_vectorexts("avx2")` 选项的 `-mavx2` 编译参数有奇怪的动画加载 bug，改用 `-march=knl` 就没事。
 - [x] 修复各种奇怪的文字截断，主要是字体并非是正方形也不是等宽和等高的，但是 FontInfo 是完全以字体大小来计算偏移和精灵文字的绘制范围。
 - [x] 修复文字带有描边会被截断，描边字体并未被算做绘制区域强制加上描边长度到绘制区域。
+- [x] 修复 xmake 的 android 打包问题，新版 xmake 的依赖 api 有部分变化。
+- [x] 修复 nt3 脚本解密不完全的问题。
+- [x] 修复结束的文本不需要做强制点击换页。
+- [x] 修复文本渲染里的变量替换无法支持别名的情况（初音岛1）。
+- [x] 修复文本渲染有些游戏会做每行文本最后添加一个 / 符号，需要跳过该符号且跳过 processEOT 里的自动换行（3day）。
+- [x] 修复方法调用的参数没有消费被渲染为文本。
+- [x] 修复 getparam 的多余声明参数没有消费被渲染为文本。
 - [ ] 自动播放会导致音频播放不完整。
 
 ## feture
@@ -47,6 +54,11 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 无需在编译脚本里指定 simd 使用的后端，`simd/simd.h` 会根据编译器预定义头自动选择后端，如果没有可用后端会自动关闭 `simd` 支持。
 - [x] 文本渲染强制换行和切页，防止渲染到窗口外（配合自定义字体切换配置）。
 - [x] 所有平台支持通过 ci 打包分发到 release。
+- [x] 不再对文本里的单字节符号英文做特殊处理，支持中英混合，支持变量插入。
+- [x] 强制对超过文本框的内容，做强制点击换页（有 bug 如果是和选项一起出现会导致点击换页事件抢掉选项事件注册）。
+- [ ] 文字渲染范围改为一个矩形坐标，不再使用横向纵向多少个字符的方式(设置依旧生效但是会转化为一个矩形坐标)。
+- [ ] 脚本全部切换到 utf-8 的处理，仅在读取时做 gbk,shift_jis 到 utf-8 转换。
+- [ ] 支持为字体设置多个 fallback 字体，并默认内置系统字体 fallback。
 - [ ] android 需要一个配置页面对游戏进行一个自定义或者全局配置。
 - [ ] 查找动画在 android 有明显卡顿的问题。
 - [ ] 抽象文件操作(文件读写，文件目录遍历，文件路径自动拼接，文件是否存在判断，目录创建)，以便于移植到各种平台下，考虑使用 `c++17` 的 `std::filesystem` 的通用方法，移动端平台可能需要手动编写。
@@ -63,12 +75,9 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 ## 编译指南
 
 **预先工作**
-> 由于 freetype, harfbuzz 的循环依赖，请使用我的 xmake 分支，已经向 xmake-io 提出 [issuse](https://github.com/xmake-io/xmake/issues/3118) 了，但是维护者没有空处理，我这边只是一个比较简单的实现。
+~~> 由于 freetype, harfbuzz 的循环依赖，请使用我的 xmake 分支，已经向 xmake-io 提出 [issuse](https://github.com/xmake-io/xmake/issues/3118) 了，但是维护者没有空处理，我这边只是一个比较简单的实现。~~
 
-``` bash
-xmake update -s https://github.com/zeromake/xmake.git#feature/dependency_loop
-xrepo add-repo local https://github.com/zeromake/xrepo.git
-```
+已经不需要手动处理最新版的 xmake v2.8.3 已经正常支持。
 
 **windows**
 > 需要安装 Visual Studio
@@ -79,7 +88,9 @@ xmake build -y onscripter
 ```
 
 **windows by mingw**
+
 > 安装 [llvm-mingw](https://github.com/mstorsjo/llvm-mingw/releases) 或者其它 `mingw` 的版本。
+
 ``` powershell
 $MINGW="D:\mingw64"
 xmake f -p mingw --mingw=$MINGW -y -c
@@ -87,6 +98,7 @@ xmake build -y onscripter
 ```
 
 **osx**
+
 > 需要安装 xcode
 
 ``` bash
@@ -95,13 +107,17 @@ xmake build -y onscripter
 ```
 
 **android**
-> 需要 android sdk + ndk
+
+> 需要 android sdk + ndk + jdk
+> 顺便一提 luajit 需要编译机能编译 32 位的，所以 osx 编译不了 arm 的。
 
 ``` bash
-ANDROID_SDK=~/Library/Android/sdk
 NDK_SDK=~/Library/Android/sdk/ndk/25.0.8775105
-xmake f -p android --ndk=${NDK_SDK} --android_sdk=${ANDROID_SDK} -y -c
+xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${NDK_SDK} -y -c
 xmake build -y onscripter
+cd project/android
+./gradlew assembleDebug
+adb install ./app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## 吐槽
@@ -126,3 +142,9 @@ xmake build -y onscripter
 | krkrz | https://krkrz.github.io | ✓ | windows | ✕ | 没有统一的官网文档，大量的 kag 映射没用地方查 | 很强的一个引擎可惜没落了 |
 | renpy | https://www.renpy.org | ✓ | windows,linux,MacOSx | Android,IOS | 有统一的渐进式的官方文档 | 未来之星 krkr 有力替代者 |
 | ONScripter | https://onscripter.osdn.jp | ✕ | windows,linux,MacOSx | Android,IOS | 由于并没有特别的语法和插件，一个指令列表就足够了 | 超轻量级引擎(全静态 upx 后 2-3 mb)，免费游戏的选择 |
+
+## 参考资料
+
+- [shift_jis码表](https://uic.io/zh/charset/show/shift_jis/)
+- [gb2312码表](https://uic.io/zh/charset/show/gb2312/)
+- [gb18030码表](https://uic.io/zh/charset/show/gb18030/)

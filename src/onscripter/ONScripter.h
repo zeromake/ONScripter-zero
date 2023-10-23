@@ -61,6 +61,8 @@
 #define DEFAULT_WM_TITLE "ONScripter"
 #define DEFAULT_WM_ICON  "ONScripter"
 
+typedef std::function<int (const char *, char*, bool)> generate_path_function;
+
 class ONScripter : public ScriptParser
 {
 public:
@@ -458,7 +460,7 @@ private:
     void quit();
     void disableGetButtonFlag();
     int  getNumberFromBuffer( const char **buf );
-    std::function<const char*(const char*, bool)> generateFPath();
+    generate_path_function generateFPath();
 
     // ----------------------------------------
     // variables and methods relevant to animation
