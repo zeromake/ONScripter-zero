@@ -956,7 +956,6 @@ int ONScripter::savescreenshotCommand() {
     if (dir.length() > 0 && !std::fs::exists(std::fs::status(dir))) {
         std::fs::create_directory(dir);
     }
-
     SDL_RWops *rwops = SDL_RWFromFile(capital_name, "wb");
     if (rwops == nullptr || SDL_SaveBMP_RW(surface, rwops, 1) != 0)
         utils::printError("Save screenshot failed: %s\n", SDL_GetError());
