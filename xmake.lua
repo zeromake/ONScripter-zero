@@ -215,7 +215,7 @@ target("onscripter")
         "ghc_filesystem",
         "luajit"
     )
-    if is_plat("windows") then
+    if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
     end
     if is_plat("macosx") then
@@ -239,10 +239,16 @@ target("onscripter")
     end
     if get_config('simd') then
         add_defines("USE_SIMD=1")
-        if is_plat("macosx") then
-            add_cxflags("-march=knm")
+        if is_arch("x86", "x64", "i386", "x86_64") then
+            if is_plat("macosx") then
+                add_cxflags("-march=knl")
+            else
+                add_vectorexts("avx2")
+            end
+        elseif is_arch("arm.*") then
+            add_vectorexts("neon")
         else
-            add_vectorexts('all')
+            add_vectorexts("all")
         end
     end
     add_defines(

@@ -261,7 +261,7 @@ static void smpeg_filter_destroy(struct SMPEG_Filter *filter) {}
 
 #if !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
 int call_system(void *data) {
-    char exec[512]{0};
+    char exec[4096] = {0};
     sprintf(exec, "explorer \"%s\"", (const char *)data);
     int code = system(exec);
     delete[] data;
@@ -398,8 +398,8 @@ int ONScripter::playMPEG(const char *filename, bool click_flag,
     SDL_DestroyMutex(oi.mutex);
     texture = SDL_CreateTextureFromSurface(renderer, accumulation_surface);
 #elif !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
-    char *filename2 = new char[256];
-    strcpy(filename2, fpath(filename));
+    char *filename2 = new char[4096];
+    fpath(filename, filename2);
     SDL_CreateThread(call_system, "play-video", (void *)filename2);
     // system(filename2);
 #elif !defined(IOS)
@@ -422,8 +422,8 @@ int ONScripter::playAVI(const char *filename, bool click_flag) {
 #endif
 
 #if !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
-    char *filename2 = new char[256];
-    strcpy(filename2, fpath(filename));
+    char *filename2 = new char[4096];
+    fpath(filename, filename2);
     SDL_CreateThread(call_system, "play-video", (void *)filename2);
 #else
     utils::printError("avi command is disabled.\n");
