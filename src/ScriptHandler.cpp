@@ -159,7 +159,14 @@ int ScriptHandler::fpath(const char *path, char *result, bool use_save_dir) {
     if (std::fs::path(path).is_absolute() || path[0] == '.') {
         strcpy(result, path);
     } else if (strncmp(path, prefix_dir, prefix_dir_size) != 0) {
-        sprintf(result, "%s%s", prefix_dir, path);
+        strcpy(result, (std::fs::path(prefix_dir) / path).string().c_str());
+    }
+    char *buf = result;
+    while (*buf != '\0')
+    {
+        if ((*buf == '/' || *buf == '\\') && *buf != std::fs::path::preferred_separator)
+            *buf = std::fs::path::preferred_separator;
+        buf++;
     }
     strcpy(result, std::fs::absolute(result).string().c_str());
     return 0;
