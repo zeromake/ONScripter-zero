@@ -640,9 +640,14 @@ int ONScripter::init() {
     return 0;
 }
 
-std::function<const char *(const char *, bool)> ONScripter::generateFPath() {
-    std::function<const char *(const char *, bool)> ff = std::bind(
-        &ONScripter::fpath, this, std::placeholders::_1, std::placeholders::_2);
+generate_path_function ONScripter::generateFPath() {
+    auto ff = std::bind(
+        &ONScripter::fpath,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3
+    );
     return ff;
 }
 

@@ -177,9 +177,13 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         }
 
         if (f_info.ttf_font[0] == NULL) {
-            auto ff = generateFPath();
-            f_info.openFont(font_file, screen_ratio1, screen_ratio2, ff,
-                            getFontConfig(f_info.types));
+            f_info.openFont(
+                font_file,
+                screen_ratio1,
+                screen_ratio2,
+                generateFPath(),
+                getFontConfig(f_info.types)
+            );
         }
 
         SDL_Rect pos;

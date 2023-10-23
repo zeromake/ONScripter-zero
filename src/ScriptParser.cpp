@@ -512,8 +512,8 @@ int ScriptParser::saveFileIOBuf(const char *filename, int offset,
     std::fs::path pp(filename);
     auto parent_path = pp.parent_path().string();
     if (parent_path.length() > 0) {
-        const char *dir = parent_path.c_str();
-        dir = fpath(dir, use_save_dir);
+        char dir[STRING_BUFFER_LENGTH] = {0};
+        fpath(parent_path.c_str(), dir, use_save_dir);
         if (!std::fs::exists(std::fs::status(dir))) {
             std::fs::create_directory(dir);
         }
@@ -840,8 +840,8 @@ FILE *ScriptParser::fopen(const char *path, const char *mode,
     return script_h.fopen(path, mode, use_save_dir);
 }
 
-const char *ScriptParser::fpath(const char *path, bool use_save_dir) {
-    return script_h.fpath(path, use_save_dir);
+int ScriptParser::fpath(const char *path, char *result, bool use_save_dir) {
+    return script_h.fpath(path, result, use_save_dir);
 }
 
 void ScriptParser::createKeyTable(const char *key_exe) {

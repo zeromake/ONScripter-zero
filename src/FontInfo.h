@@ -31,6 +31,9 @@
 #include "FontConfig.h"
 #include <map>
 
+
+typedef std::function<int (const char *, char*, bool)> generate_path_function;
+
 typedef unsigned char uchar3[3];
 
 struct Position
@@ -88,7 +91,13 @@ public:
     void savePoint();
     void rollback(int mode = 3);
     void copyPosition(_FontInfo *font);
-    void *openFont(char *font_file, int ratio1, int ratio2, std::function<const char*(const char*, bool)>f = nullptr, const ons_font::FontConfig* fontConfig = nullptr);
+    void *openFont(
+        char *font_file,
+        int ratio1,
+        int ratio2,
+        generate_path_function f = nullptr,
+        const ons_font::FontConfig* fontConfig = nullptr
+    );
     void setTateyokoMode(int tateyoko_mode);
     int getTateyokoMode();
     int getRemainingLine();
