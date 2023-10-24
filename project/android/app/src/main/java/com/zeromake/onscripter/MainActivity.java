@@ -126,7 +126,7 @@ public class MainActivity extends Activity implements
     }
     @Override
     public void onGranted(List<String> permissions, boolean all) {
-        Toast.makeText(MainActivity.this, "权限申请成功", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(MainActivity.this, "权限申请成功", Toast.LENGTH_SHORT).show();
         Settings.LoadGlobals(this, true);
     }
 
@@ -161,9 +161,7 @@ public class MainActivity extends Activity implements
 
     private void chooseDir() {
         CharSequence[] strArr = new CharSequence[Globals.CurrentDirectoryValidPathArray.length + 1];
-        for (int i = 0; i < Globals.CurrentDirectoryValidPathArray.length; i++) {
-            strArr[i] = Globals.CurrentDirectoryValidPathArray[i];
-        }
+        System.arraycopy(Globals.CurrentDirectoryValidPathArray, 0, strArr, 0, Globals.CurrentDirectoryValidPathArray.length);
         strArr[strArr.length - 1] = getString(R.string.Other) + "...";
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setInverseBackgroundForced(true);

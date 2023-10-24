@@ -36,6 +36,7 @@ public class GameAdapter extends ArrayAdapter<Game> implements ListAdapter {
             holder = (ViewHolder) view.getTag();
         }
         Game item = getItem(position);
+        assert item != null;
         holder.caption.setText(item.title);
         if (position == selectedPos) {
             holder.startPanel.setVisibility(View.VISIBLE);

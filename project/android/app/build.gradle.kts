@@ -61,7 +61,7 @@ android {
             isDebuggable = false
         }
         debug {
-            signingConfig = signingConfigs.findByName("config")
+            signingConfig = signingConfigs.getByName("debug")
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
