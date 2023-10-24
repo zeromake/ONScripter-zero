@@ -1,8 +1,12 @@
 package com.zeromake.onscripter;
 
+import org.libsdl.app.FileProvider;
 import org.libsdl.app.SDLActivity;
 
+import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -58,25 +62,25 @@ public class ONScripter extends SDLActivity {
 
     public void playVideo(char[] name) {
         Log.d("ONScripter", "playVideo: " + rootPath + "/" + String.copyValueOf(name));
-//        Intent intent = new Intent();
-//        intent.setAction(Intent.ACTION_VIEW);
-//        Uri uri = null;
-//        String file = rootPath + "/" + String.copyValueOf(name);
-//        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N){
-//            uri = FileProvider.getUriForFile(this,"com.zeromake.onscripter", new File(file));
-//        } else {
-//            Uri.parse("file://" + file);
-//        }
-//        intent.setDataAndType(uri, "video/*");
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//        startActivity(intent);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = null;
+        String file = rootPath + "/" + String.copyValueOf(name);
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N){
+            uri = FileProvider.getUriForFile(this,"com.zeromake.onscripter", new File(file));
+        } else {
+            Uri.parse("file://" + file);
+        }
+        intent.setDataAndType(uri, "video/*");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
     }
 
-//    public void onNativeCrashed() {
-//        new RuntimeException("crashed here (native trace should follow after the Java trace)").printStackTrace();
-//        Application.getInstance().startActivity(new Intent(Application.getInstance(), CrashHandler.class));
-//    }
+    public void onNativeCrashed() {
+        new RuntimeException("crashed here (native trace should follow after the Java trace)").printStackTrace();
+        Application.getInstance().startActivity(new Intent(Application.getInstance(), CrashHandler.class));
+    }
 
 
     public native int nativeInitJavaCallbacks();
