@@ -113,7 +113,7 @@ jobs:
           xmake build -y onscripter
       - name: build-apk
         run: |
-          export JAVA_HOME=$JAVA_HOME_11_X64
+          export JAVA_HOME=$JAVA_HOME_17_X64
           cd project/android
           ./gradlew assembleRelease
           cp ./app/build/outputs/apk/release/app-release.apk ../../dist/onscripter-release.apk
