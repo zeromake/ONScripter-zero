@@ -7,28 +7,39 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA316CFD2951972500A927C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA316CFC2951972500A927C7 /* AppDelegate.m */; };
-		DA316D002951972500A927C7 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA316CFF2951972500A927C7 /* SceneDelegate.m */; };
 		DA316D032951972500A927C7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA316D022951972500A927C7 /* ViewController.m */; };
-		DA316D062951972500A927C7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA316D042951972500A927C7 /* Main.storyboard */; };
-		DA316D082951972700A927C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA316D072951972700A927C7 /* Assets.xcassets */; };
-		DA316D0B2951972700A927C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA316D092951972700A927C7 /* LaunchScreen.storyboard */; };
-		DA316D0E2951972700A927C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA316D0D2951972700A927C7 /* main.m */; };
+		DA316D0E2951972700A927C7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA316D0D2951972700A927C7 /* main.mm */; };
+		DAE79C7A2AEB9573000CEBA9 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C792AEB9573000CEBA9 /* AVFAudio.framework */; };
+		DAE79C7C2AEB957F000CEBA9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C7B2AEB957F000CEBA9 /* AudioToolbox.framework */; };
+		DAE79C7E2AEB9586000CEBA9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C7D2AEB9586000CEBA9 /* UIKit.framework */; };
+		DAE79C802AEB958F000CEBA9 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C7F2AEB958F000CEBA9 /* Metal.framework */; };
+		DAE79C822AEB9598000CEBA9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C812AEB9598000CEBA9 /* CoreGraphics.framework */; };
+		DAE79C842AEB95A0000CEBA9 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C832AEB95A0000CEBA9 /* QuartzCore.framework */; };
+		DAE79C862AEB95A6000CEBA9 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C852AEB95A6000CEBA9 /* OpenGLES.framework */; };
+		DAE79C882AEB95AD000CEBA9 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C872AEB95AD000CEBA9 /* CoreHaptics.framework */; };
+		DAE79C8A2AEB95B4000CEBA9 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C892AEB95B3000CEBA9 /* GameController.framework */; };
+		DAE79C8C2AEB95BA000CEBA9 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C8B2AEB95BA000CEBA9 /* CoreMotion.framework */; };
+		DAE79C8F2AEBA0B5000CEBA9 /* Main.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = DAE79C8E2AEB9CF1000CEBA9 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DA316CF82951972500A927C7 /* onscripter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = onscripter.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA316CFB2951972500A927C7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		DA316CFC2951972500A927C7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		DA316CFE2951972500A927C7 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
-		DA316CFF2951972500A927C7 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		DA316D012951972500A927C7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		DA316D022951972500A927C7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		DA316D052951972500A927C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DA316D072951972700A927C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DA316D0A2951972700A927C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DA316D0C2951972700A927C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA316D0D2951972700A927C7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		DA316D0D2951972700A927C7 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		DAE79C792AEB9573000CEBA9 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
+		DAE79C7B2AEB957F000CEBA9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		DAE79C7D2AEB9586000CEBA9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		DAE79C7F2AEB958F000CEBA9 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		DAE79C812AEB9598000CEBA9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		DAE79C832AEB95A0000CEBA9 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		DAE79C852AEB95A6000CEBA9 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		DAE79C872AEB95AD000CEBA9 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
+		DAE79C892AEB95B3000CEBA9 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
+		DAE79C8B2AEB95BA000CEBA9 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		DAE79C8E2AEB9CF1000CEBA9 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +47,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAE79C862AEB95A6000CEBA9 /* OpenGLES.framework in Frameworks */,
+				DAE79C7A2AEB9573000CEBA9 /* AVFAudio.framework in Frameworks */,
+				DAE79C7E2AEB9586000CEBA9 /* UIKit.framework in Frameworks */,
+				DAE79C8C2AEB95BA000CEBA9 /* CoreMotion.framework in Frameworks */,
+				DAE79C842AEB95A0000CEBA9 /* QuartzCore.framework in Frameworks */,
+				DAE79C802AEB958F000CEBA9 /* Metal.framework in Frameworks */,
+				DAE79C822AEB9598000CEBA9 /* CoreGraphics.framework in Frameworks */,
+				DAE79C882AEB95AD000CEBA9 /* CoreHaptics.framework in Frameworks */,
+				DAE79C7C2AEB957F000CEBA9 /* AudioToolbox.framework in Frameworks */,
+				DAE79C8A2AEB95B4000CEBA9 /* GameController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,6 +68,7 @@
 			children = (
 				DA316CFA2951972500A927C7 /* onscripter */,
 				DA316CF92951972500A927C7 /* Products */,
+				DAE79C782AEB9573000CEBA9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,19 +83,31 @@
 		DA316CFA2951972500A927C7 /* onscripter */ = {
 			isa = PBXGroup;
 			children = (
-				DA316CFB2951972500A927C7 /* AppDelegate.h */,
-				DA316CFC2951972500A927C7 /* AppDelegate.m */,
-				DA316CFE2951972500A927C7 /* SceneDelegate.h */,
-				DA316CFF2951972500A927C7 /* SceneDelegate.m */,
 				DA316D012951972500A927C7 /* ViewController.h */,
 				DA316D022951972500A927C7 /* ViewController.m */,
-				DA316D042951972500A927C7 /* Main.storyboard */,
 				DA316D072951972700A927C7 /* Assets.xcassets */,
-				DA316D092951972700A927C7 /* LaunchScreen.storyboard */,
 				DA316D0C2951972700A927C7 /* Info.plist */,
-				DA316D0D2951972700A927C7 /* main.m */,
+				DA316D0D2951972700A927C7 /* main.mm */,
+				DAE79C8E2AEB9CF1000CEBA9 /* Main.storyboard */,
 			);
 			path = onscripter;
+			sourceTree = "<group>";
+		};
+		DAE79C782AEB9573000CEBA9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DAE79C8B2AEB95BA000CEBA9 /* CoreMotion.framework */,
+				DAE79C892AEB95B3000CEBA9 /* GameController.framework */,
+				DAE79C872AEB95AD000CEBA9 /* CoreHaptics.framework */,
+				DAE79C852AEB95A6000CEBA9 /* OpenGLES.framework */,
+				DAE79C832AEB95A0000CEBA9 /* QuartzCore.framework */,
+				DAE79C812AEB9598000CEBA9 /* CoreGraphics.framework */,
+				DAE79C7F2AEB958F000CEBA9 /* Metal.framework */,
+				DAE79C7D2AEB9586000CEBA9 /* UIKit.framework */,
+				DAE79C7B2AEB957F000CEBA9 /* AudioToolbox.framework */,
+				DAE79C792AEB9573000CEBA9 /* AVFAudio.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -85,7 +119,6 @@
 			buildPhases = (
 				DA316CF42951972500A927C7 /* Sources */,
 				DA316CF52951972500A927C7 /* Frameworks */,
-				DA316CF62951972500A927C7 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -128,51 +161,18 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		DA316CF62951972500A927C7 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA316D0B2951972700A927C7 /* LaunchScreen.storyboard in Resources */,
-				DA316D082951972700A927C7 /* Assets.xcassets in Resources */,
-				DA316D062951972500A927C7 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		DA316CF42951972500A927C7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAE79C8F2AEBA0B5000CEBA9 /* Main.storyboard in Sources */,
 				DA316D032951972500A927C7 /* ViewController.m in Sources */,
-				DA316CFD2951972500A927C7 /* AppDelegate.m in Sources */,
-				DA316D0E2951972700A927C7 /* main.m in Sources */,
-				DA316D002951972500A927C7 /* SceneDelegate.m in Sources */,
+				DA316D0E2951972700A927C7 /* main.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		DA316D042951972500A927C7 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA316D052951972500A927C7 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		DA316D092951972700A927C7 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA316D0A2951972700A927C7 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		DA316D0F2951972700A927C7 /* Debug */ = {
@@ -294,17 +294,24 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/include;
 				INFOPLIST_FILE = onscripter/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/lib;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-lsdl2",
+					"-lsdl2_main",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeromake.onscripter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -321,17 +328,24 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/include;
 				INFOPLIST_FILE = onscripter/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/lib;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-lsdl2",
+					"-lsdl2_main",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zeromake.onscripter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
