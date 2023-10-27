@@ -289,6 +289,7 @@ protected:
     /* ---------------------------------------- */
     /* Global definitions */
     bool init_screen_ratio;
+    bool init_force_ratio;
     int screen_ratio1, screen_ratio2;
     int user_ratio1, user_ratio2;
     int screen_width, screen_height;

@@ -242,12 +242,15 @@ void ONScripter::initSDL() {
     int window_w = screen_device_width;
     int window_h = screen_device_height;
     // macosx 需要强制缩小 render 的范围
-    if (force_render_ratio1 > 0 && force_render_ratio2 > 0 &&
-        force_render_ratio1 != force_render_ratio2) {
-        float force_render_ratio =
-            (float)force_render_ratio1 / (float)force_render_ratio2;
-        window_w = int((float)window_w * force_render_ratio);
-        window_h = int((float)window_h * force_render_ratio);
+    if (
+        force_render_ratio1 > 0
+        && force_render_ratio2 > 0
+        && force_render_ratio1 != force_render_ratio2
+        && !init_force_ratio
+    ) {
+        window_w = int((float)window_w * force_render_ratio1 / force_render_ratio2);
+        window_h = int((float)window_h * force_render_ratio1 / force_render_ratio2);
+        init_force_ratio = true;
     }
 
     window = SDL_CreateWindow(NULL, window_x, window_y, window_w, window_h,
@@ -276,8 +279,8 @@ void ONScripter::initSDL() {
 
     underline_value = script_h.screen_height;
 
-    utils::printInfo("Display: %s %d x %d (%d bpp)\n", info.name, screen_width,
-                     screen_height, screen_bpp);
+    utils::printInfo("Display: %s %d x %d @%.2f (%d bpp)\n", info.name, screen_width,
+                     screen_height, ((float)screen_ratio1 / screen_ratio2), screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
 
     screen_rect.x = screen_rect.y = 0;
