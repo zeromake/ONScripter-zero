@@ -69,11 +69,23 @@ add_requires("freetype", {
     }
 })
 add_requires("sdl2_ttf", {system=false,configs={harfbuzz=true}})
-add_requires("sdl2_image", {system=false,configs={
-    png=true,
-    jpeg=(not is_plat("android")),
+local sdl2_image_config = {
     webp=true
-}})
+}
+if is_plat("windows", "mingw") then
+    sdl2_image_config["backend"] = "wic"
+elseif is_plat("macosx", "iphoneos") then
+    sdl2_image_config["backend"] = "imageio"
+elseif is_plat("android") then
+    -- 安卓 jpeg 库有 bug 无法显示，改用 stb 替代
+    sdl2_image_config["backend"] = "stb"
+else
+    -- 没有 backend，需要外部库
+    sdl2_image_config["backend"] = "common"
+    sdl2_image_config["png"] = true
+    sdl2_image_config["jpeg"] = true
+end
+add_requires("sdl2_image", {system=false, configs=sdl2_image_config})
 
 set_rundir("$(projectdir)")
 
@@ -218,24 +230,23 @@ target("onscripter")
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
     end
+    add_defines("ONSCRIPTER_EXTEND_INIT=1")
+    add_files("src/entry/onscripter_main.cpp")
     if is_plat("macosx") then
-        add_files("src/entry/onscripter_main.mm")
+        add_files("src/entry/*.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
         add_frameworks("AudioToolbox", "Cocoa")
     elseif is_plat("iphoneos") then
-        add_files("src/entry/onscripter_main.mm")
+        add_files("src/entry/*.mm")
         add_defines("IOS", "INFRA_FORCE_GHC_FS", "GLES_SILENCE_DEPRECATION")
     elseif is_plat("windows") then
-        add_files("src/resource.rc", "src/entry/onscripter_main.cpp")
+        add_files("src/resource.rc")
     elseif is_plat("android") then
         add_packages("ndk-cpufeatures")
-        add_files("src/entry/onscripter_main.cpp")
         add_defines("SDL_JAVA_PACKAGE_PATH=com_zeromake_onscripter", "ANDROID")
         add_cxflags("-fPIC", {force = true})
         add_ldflags("-fPIC", {force = true})
         add_cxflags("-funwind-tables", {force = true})
-    else
-        add_files("src/entry/onscripter_main.cpp")
     end
     if get_config('simd') then
         add_defines("USE_SIMD=1")
