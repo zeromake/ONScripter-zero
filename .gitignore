@@ -15,3 +15,5 @@ build
 !.vscode/launch.json
 dist
 .xrepo
+project.xcworkspace
+xcuserdata
