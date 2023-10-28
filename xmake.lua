@@ -28,6 +28,8 @@ if is_plat("windows") then
     add_cxflags("/UNICODE")
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
     add_includedirs("include/windows")
+elseif is_plat("mingw") then
+    add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
 end
 
 add_includedirs("src", "src/onscripter", "src/reader", "include")
@@ -239,8 +241,9 @@ target("onscripter")
     elseif is_plat("iphoneos") then
         add_files("src/entry/*.mm")
         add_defines("IOS", "INFRA_FORCE_GHC_FS", "GLES_SILENCE_DEPRECATION")
-    elseif is_plat("windows") then
+    elseif is_plat("windows", "mingw") then
         add_files("src/resource.rc")
+        add_syslinks("windowscodecs")
     elseif is_plat("android") then
         add_packages("ndk-cpufeatures")
         add_defines("SDL_JAVA_PACKAGE_PATH=com_zeromake_onscripter", "ANDROID")
