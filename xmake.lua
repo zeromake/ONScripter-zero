@@ -16,6 +16,12 @@ option("simd")
     set_description('开启 simd 优化')
 option_end()
 
+option("omp")
+    set_default(false)
+    set_showmenu(true)
+    set_description('使用 opennmp 进行并行')
+option_end()
+
 add_defines(
     "ONS_JH_VERSION=\""..VERSION.."\"",
     "ONS_VERSION=\"20181218\"",
@@ -26,9 +32,18 @@ if is_plat("windows") then
     add_defines("XMD_H=1")
     add_cxflags("/utf-8")
     add_cxflags("/UNICODE")
+
+    if get_config("omp") then
+        add_cxflags("/openmp")
+        add_ldflags("/openmp")
+    end
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
     add_includedirs("include/windows")
 elseif is_plat("mingw") then
+    if get_config("omp") then
+        add_cxflags("-fopenmp")
+        add_ldflags("-fopenmp")
+    end
     add_defines("UNICODE", "_UNICODE", "WINVER=0x0606")
 end
 
@@ -272,6 +287,9 @@ target("onscripter")
         "USE_PARALLEL=1",
         "FMT_HEADER_ONLY=1"
     )
+    if get_config("omp") then
+        add_defines("USE_OMP_PARALLEL=1")
+    end
     add_files(
         "src/*.cpp|conv_shared.cpp",
         "src/SDL2_rotozoom.c",

@@ -19,9 +19,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#if defined(USE_PARALLEL)
+#ifdef USE_OMP_PARALLEL
+#elif defined(USE_PARALLEL)
 #include "Parallel.h"
-
 using namespace parallel;
 
 ThreadPool parallel::threadPool;
