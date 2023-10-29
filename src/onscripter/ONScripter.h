@@ -60,6 +60,8 @@
 
 #define DEFAULT_WM_TITLE "ONScripter"
 #define DEFAULT_WM_ICON  "ONScripter"
+#define BUTTON_STATE_SNPRINTF(buf, ...) snprintf(buf, 16, __VA_ARGS__)
+#define WM_WDIT_STRING_SIZE 256
 
 typedef std::function<int (const char *, char*, bool)> generate_path_function;
 
@@ -344,7 +346,7 @@ private:
     bool is_script_read;
     char *wm_title_string;
     char *wm_icon_string;
-    char wm_edit_string[256];
+    char wm_edit_string[WM_WDIT_STRING_SIZE];
     bool fullscreen_mode;
     bool window_mode;
 

@@ -170,16 +170,17 @@ void ONScripter::playCDAudio() {
         }
 #endif
     } else {
-        char filename[256];
-        sprintf(filename, "cd\\track%2.2d.mp3", current_cd_track);
+        const int __size = 256;
+        char filename[__size];
+        snprintf(filename, __size, "cd\\track%2.2d.mp3", current_cd_track);
         int ret = playSound(filename, SOUND_MUSIC, cd_play_loop_flag);
         if (ret == SOUND_MUSIC) return;
 
-        sprintf(filename, "cd\\track%2.2d.ogg", current_cd_track);
+        snprintf(filename, __size, "cd\\track%2.2d.ogg", current_cd_track);
         ret = playSound(filename, SOUND_MUSIC, cd_play_loop_flag);
         if (ret == SOUND_MUSIC) return;
 
-        sprintf(filename, "cd\\track%2.2d.wav", current_cd_track);
+        snprintf(filename, __size, "cd\\track%2.2d.wav", current_cd_track);
         ret = playSound(filename, SOUND_MUSIC | SOUND_CHUNK, cd_play_loop_flag,
                         MIX_BGM_CHANNEL);
     }
@@ -215,9 +216,10 @@ int ONScripter::playWave(Mix_Chunk *chunk, int format, bool loop_flag,
 int ONScripter::playMIDI(bool loop_flag, int fadetime) {
     Mix_SetMusicCMD(midi_cmd);
 
-    char midi_filename[256];
-    sprintf(midi_filename, "%s%s", save_dir ? save_dir : archive_path,
-            TMP_MUSIC_FILE);
+    int __size = 256;
+    char midi_filename[__size];
+    snprintf(midi_filename, __size, "%s%s", save_dir ? save_dir : archive_path,
+             TMP_MUSIC_FILE);
     if ((midi_info = Mix_LoadMUS(midi_filename)) == NULL) return -1;
 
     int midi_looping = loop_flag ? -1 : 0;
@@ -261,8 +263,9 @@ static void smpeg_filter_destroy(struct SMPEG_Filter *filter) {}
 
 #if !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
 int call_system(void *data) {
-    char exec[4096] = {0};
-    sprintf(exec, "explorer \"%s\"", (const char *)data);
+    const int __size = 4096;
+    char exec[__size] = {0};
+    snprintf(exec, __size, "explorer \"%s\"", (const char *)data);
     int code = system(exec);
     delete[] data;
     return code;
@@ -284,9 +287,9 @@ int ONScripter::playMPEG(const char *filename, bool click_flag,
 #endif
 
 #ifdef IOS
-    char *absolute_filename =
-        new char[strlen(archive_path) + strlen(filename) + 1];
-    sprintf(absolute_filename, "%s%s", archive_path, filename);
+    const int __size = strlen(archive_path) + strlen(filename) + 1;
+    char *absolute_filename = new char[__size];
+    snprintf(absolute_filename, __size, "%s%s", archive_path, filename);
     playVideoIOS(absolute_filename, click_flag, loop_flag);
     delete[] absolute_filename;
 #endif

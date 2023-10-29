@@ -154,7 +154,8 @@ FILE *ScriptHandler::fopen(const char *path, const char *mode,
 }
 
 int ScriptHandler::fpath(const char *path, char *result, bool use_save_dir) {
-    const char* prefix_dir = (use_save_dir && save_dir) ? save_dir : archive_path;
+    const char *prefix_dir =
+        (use_save_dir && save_dir) ? save_dir : archive_path;
     const int prefix_dir_size = strlen(prefix_dir);
     if (std::fs::path(path).is_absolute() || path[0] == '.') {
         strcpy(result, path);
@@ -162,9 +163,9 @@ int ScriptHandler::fpath(const char *path, char *result, bool use_save_dir) {
         strcpy(result, (std::fs::path(prefix_dir) / path).string().c_str());
     }
     char *buf = result;
-    while (*buf != '\0')
-    {
-        if ((*buf == '/' || *buf == '\\') && *buf != std::fs::path::preferred_separator)
+    while (*buf != '\0') {
+        if ((*buf == '/' || *buf == '\\') &&
+            *buf != std::fs::path::preferred_separator)
             *buf = std::fs::path::preferred_separator;
         buf++;
     }
@@ -190,12 +191,9 @@ bool readVariableTextCompatible(const char *buf, char *out,
     out[outOffset] = buf[offset];
     offset++;
     outOffset++;
-#define VERIABLE_TEXT_COMPATIBLE_CHAR(ch) (\
-        (ch >= '0' && ch <= '9')\
-        || (ch >= 'A' && ch <= 'Z')\
-        || (ch >= 'a' && ch <= 'z')\
-        || (ch == '_')\
-    )
+#define VERIABLE_TEXT_COMPATIBLE_CHAR(ch)                    \
+    ((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || \
+     (ch >= 'a' && ch <= 'z') || (ch == '_'))
     if (!VERIABLE_TEXT_COMPATIBLE_CHAR(buf[offset])) {
         return false;
     }
@@ -670,9 +668,10 @@ void ScriptHandler::loadKidokuData() {
 }
 
 void ScriptHandler::addIntVariable(char **buf) {
-    char num_buf[20];
+    const int buffer_size = 20;
+    char num_buf[buffer_size];
     int no = parseInt(buf, true);
-    int len = getStringFromInteger(num_buf, no, -1);
+    int len = getStringFromInteger(num_buf, buffer_size, no, -1);
     for (int i = 0; i < len; i++) addStringBuffer(num_buf[i]);
 }
 
@@ -771,14 +770,9 @@ void ScriptHandler::skipAnyVariable() {
     current_script = next_script;
     char *buf = current_script;
     SKIP_SPACE(buf);
-    while (
-        *buf != ','
-        && *buf != '\n'
-        && *buf != '\r'
-        && *buf != '\0'
-        && *buf != ':'
-        && *buf != ';'
-    ) buf++;
+    while (*buf != ',' && *buf != '\n' && *buf != '\r' && *buf != '\0' &&
+           *buf != ':' && *buf != ';')
+        buf++;
     next_script = checkComma(buf);
 }
 
@@ -840,7 +834,8 @@ void ScriptHandler::setNumVariable(int no, int val) {
     vd.num = val;
 }
 
-int ScriptHandler::getStringFromInteger(char *buffer, int no, int num_column,
+int ScriptHandler::getStringFromInteger(char *buffer, const int buffer_size,
+                                        int no, int num_column,
                                         bool is_zero_inserted) {
     int i, num_space = 0, num_minus = 0;
     if (no < 0) {
@@ -863,12 +858,13 @@ int ScriptHandler::getStringFromInteger(char *buffer, int no, int num_column,
 
 #if defined(ENABLE_1BYTE_CHAR) && defined(FORCE_1BYTE_CHAR)
     if (num_minus == 1) no = -no;
-    char format[6];
+    const int __size = 6;
+    char format[__size];
     if (is_zero_inserted)
-        sprintf(format, "%%0%dd", num_column);
+        snprintf(format, __size, "%%0%dd", num_column);
     else
-        sprintf(format, "%%%dd", num_column);
-    sprintf(buffer, format, no);
+        snprintf(format, __size, "%%%dd", num_column);
+    snprintf(buffer, buffer_size, format, no);
 
     return num_column;
 #else
@@ -1286,7 +1282,8 @@ void ScriptHandler::readConfiguration() {
                         screen_height = 240;
                         break;
                     default:
-                        screen_height = (float)screen_width * height_ratio1 / height_ratio2;
+                        screen_height =
+                            (float)screen_width * height_ratio1 / height_ratio2;
                         break;
                 }
             }
@@ -1409,9 +1406,9 @@ int ScriptHandler::findLabel(const char *label) {
     for (i = 0; i < num_of_labels; i++) {
         if (!strcmp(label_info[i].name, capital_label)) return i;
     }
-
-    char *p = new char[strlen(label) + 32];
-    sprintf(p, "Label \"%s\" is not found.", label);
+    int size = strlen(label) + 32;
+    char *p = new char[size];
+    snprintf(p, size, "Label \"%s\" is not found.", label);
     errorAndExit(p);
 
     return -1;  // dummy

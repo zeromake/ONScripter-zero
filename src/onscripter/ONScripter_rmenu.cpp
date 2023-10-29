@@ -315,7 +315,8 @@ bool ONScripter::executeSystemLoad() {
     flush(refreshMode());
 
     bool nofile_flag;
-    char *buffer = new char[strlen(save_item_name) + 31 + 1];
+    int __size = strlen(save_item_name) + 31 + 1;
+    char *buffer = new char[__size];
 
     SaveFileInfo save_file_info;
     for (unsigned int i = 1; i <= num_save_file; i++) {
@@ -324,14 +325,14 @@ bool ONScripter::executeSystemLoad() {
             (menu_font.num_xy[0] - (strlen(save_item_name) / 2 + 15)) / 2);
 
         if (save_file_info.valid) {
-            sprintf(buffer, MESSAGE_SAVE_EXIST, save_item_name,
-                    save_file_info.sjis_no, save_file_info.sjis_month,
-                    save_file_info.sjis_day, save_file_info.sjis_hour,
-                    save_file_info.sjis_minute);
+            snprintf(buffer, __size, MESSAGE_SAVE_EXIST, save_item_name,
+                     save_file_info.sjis_no, save_file_info.sjis_month,
+                     save_file_info.sjis_day, save_file_info.sjis_hour,
+                     save_file_info.sjis_minute);
             nofile_flag = false;
         } else {
-            sprintf(buffer, MESSAGE_SAVE_EMPTY, save_item_name,
-                    save_file_info.sjis_no);
+            snprintf(buffer, __size, MESSAGE_SAVE_EMPTY, save_item_name,
+                     save_file_info.sjis_no);
             nofile_flag = true;
         }
         ButtonLink *button =
@@ -423,7 +424,8 @@ void ONScripter::executeSystemSave() {
     flush(refreshMode());
 
     bool nofile_flag;
-    char *buffer = new char[strlen(save_item_name) + 31 + 1];
+    int __size = strlen(save_item_name) + 31 + 1;
+    char *buffer = new char[__size];
 
     for (unsigned int i = 1; i <= num_save_file; i++) {
         SaveFileInfo save_file_info;
@@ -432,14 +434,14 @@ void ONScripter::executeSystemSave() {
             (menu_font.num_xy[0] - (strlen(save_item_name) / 2 + 15)) / 2);
 
         if (save_file_info.valid) {
-            sprintf(buffer, MESSAGE_SAVE_EXIST, save_item_name,
-                    save_file_info.sjis_no, save_file_info.sjis_month,
-                    save_file_info.sjis_day, save_file_info.sjis_hour,
-                    save_file_info.sjis_minute);
+            snprintf(buffer, __size, MESSAGE_SAVE_EXIST, save_item_name,
+                     save_file_info.sjis_no, save_file_info.sjis_month,
+                     save_file_info.sjis_day, save_file_info.sjis_hour,
+                     save_file_info.sjis_minute);
             nofile_flag = false;
         } else {
-            sprintf(buffer, MESSAGE_SAVE_EMPTY, save_item_name,
-                    save_file_info.sjis_no);
+            snprintf(buffer, __size, MESSAGE_SAVE_EMPTY, save_item_name,
+                     save_file_info.sjis_no);
             nofile_flag = true;
         }
         ButtonLink *button =
@@ -478,16 +480,17 @@ bool ONScripter::executeSystemYesNo(int caller, int file_no) {
     dirty_rect.fill(screen_width, screen_height);
 
     char name[64] = {'\0'};
+    int __size = 64;
     if (caller == SYSTEM_SAVE) {
         SaveFileInfo save_file_info;
         searchSaveFile(save_file_info, file_no);
-        sprintf(name, MESSAGE_SAVE_CONFIRM, save_item_name,
-                save_file_info.sjis_no);
+        snprintf(name, __size, MESSAGE_SAVE_CONFIRM, save_item_name,
+                 save_file_info.sjis_no);
     } else if (caller == SYSTEM_LOAD) {
         SaveFileInfo save_file_info;
         searchSaveFile(save_file_info, file_no);
-        sprintf(name, MESSAGE_LOAD_CONFIRM, save_item_name,
-                save_file_info.sjis_no);
+        snprintf(name, __size, MESSAGE_LOAD_CONFIRM, save_item_name,
+                 save_file_info.sjis_no);
     } else if (caller == SYSTEM_RESET)
         strcpy(name, MESSAGE_RESET_CONFIRM);
     else if (caller == SYSTEM_END)

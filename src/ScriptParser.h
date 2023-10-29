@@ -53,6 +53,7 @@ extern Coding2UTF16 *coding2utf16;
 
 #define DEFAULT_FONT_SIZE 26
 #define DEFAULT_DIALOG_FONT_SIZE 18
+#define SJIS_INFO_SIZE 5
 
 #define DEFAULT_LOOKBACK_NAME0 "uoncur.bmp"
 #define DEFAULT_LOOKBACK_NAME1 "uoffcur.bmp"
@@ -363,11 +364,11 @@ protected:
     struct SaveFileInfo{
         bool valid;
         int  year, month, day, hour, minute;
-        char sjis_no[5];
-        char sjis_month[5];
-        char sjis_day[5];
-        char sjis_hour[5];
-        char sjis_minute[5];
+        char sjis_no[SJIS_INFO_SIZE];
+        char sjis_month[SJIS_INFO_SIZE];
+        char sjis_day[SJIS_INFO_SIZE];
+        char sjis_hour[SJIS_INFO_SIZE];
+        char sjis_minute[SJIS_INFO_SIZE];
     };
     unsigned int num_save_file;
     char *save_menu_name;

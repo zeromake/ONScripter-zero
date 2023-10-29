@@ -115,7 +115,7 @@ FILE *DirectReader::fopen(const char *path, const char *mode) {
         if (file_sub_path) delete[] file_sub_path;
         file_sub_path = new char[file_path_len];
     }
-    sprintf(file_full_path, "%s%s", archive_path, path);
+    snprintf(file_full_path, file_path_len, "%s%s", archive_path, path);
 
     FILE *fp = ::fopen(file_full_path, mode);
     if (fp) return fp;

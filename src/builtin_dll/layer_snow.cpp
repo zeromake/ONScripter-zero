@@ -180,7 +180,8 @@ void FuruLayer::validate_params() {
 
 char *FuruLayer::message(const char *message, int &ret_int) {
     int num_cells[3], tmp[5];
-    char buf[3][128];
+    const int __buf_item_size = 128;
+    char buf[3][__buf_item_size];
 
     char *ret_str = NULL;
     ret_int = 0;
@@ -301,8 +302,9 @@ char *FuruLayer::message(const char *message, int &ret_int) {
         // Get Parameters
     } else if (!strcmp(message, "g")) {
         ret_int = paused ? 1 : 0;
-        sprintf(&buf[0][0], "s|%d,%d,%d,%d,%d", interval, fall_velocity, wind,
-                amplitude, (freq * 360 / FURU_AMP_TABLE_SIZE));
+        snprintf(&buf[0][0], __buf_item_size, "s|%d,%d,%d,%d,%d", interval,
+                 fall_velocity, wind, amplitude,
+                 (freq * 360 / FURU_AMP_TABLE_SIZE));
         setStr(&ret_str, &buf[0][0]);
         // Halt adding new elements
     } else if (!strcmp(message, "h")) {

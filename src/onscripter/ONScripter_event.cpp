@@ -478,7 +478,7 @@ bool ONScripter::mousePressEvent(SDL_MouseButtonEvent *event) {
         ((rmode_flag && event_mode & WAIT_TEXT_MODE) ||
          (event_mode & (WAIT_BUTTON_MODE | WAIT_RCLICK_MODE)))) {
         current_button_state.button = -1;
-        sprintf(current_button_state.str, "RCLICK");
+        BUTTON_STATE_SNPRINTF(current_button_state.str, "RCLICK");
         if (event_mode & WAIT_TEXT_MODE) {
             if (root_rmenu_link.next)
                 system_menu_mode = SYSTEM_MENU;
@@ -490,9 +490,10 @@ bool ONScripter::mousePressEvent(SDL_MouseButtonEvent *event) {
         current_button_state.button = current_over_button;
         if (current_over_button == -1) {
             if (!bexec_flag) current_button_state.button = 0;
-            sprintf(current_button_state.str, "LCLICK");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "LCLICK");
         } else {
-            sprintf(current_button_state.str, "S%d", current_over_button);
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "S%d",
+                                  current_over_button);
             if (bexec_flag && current_button_link) {
                 ButtonLink *cbl = current_button_link;
                 if (current_button_link->exbtn_ctl[2]) {
@@ -513,7 +514,7 @@ bool ONScripter::mousePressEvent(SDL_MouseButtonEvent *event) {
             current_button_state.down_flag = true;
     } else if (getmclick_flag && event->button == SDL_BUTTON_MIDDLE) {
         current_button_state.button = -70;
-        sprintf(current_button_state.str, "MCLICK");
+        BUTTON_STATE_SNPRINTF(current_button_state.str, "MCLICK");
     } else
         return false;
 
@@ -545,7 +546,7 @@ bool ONScripter::mouseWheelEvent(SDL_MouseWheelEvent *event) {
                          (usewheel_flag && event_mode & WAIT_BUTTON_MODE) ||
                          system_menu_mode == SYSTEM_LOOKBACK)) {
         current_button_state.button = -2;
-        sprintf(current_button_state.str, "WHEELUP");
+        BUTTON_STATE_SNPRINTF(current_button_state.str, "WHEELUP");
         if (event_mode & WAIT_TEXT_MODE) system_menu_mode = SYSTEM_LOOKBACK;
     } else if (event->y < 0 &&
                (bexec_flag ||
@@ -557,7 +558,7 @@ bool ONScripter::mouseWheelEvent(SDL_MouseWheelEvent *event) {
             current_button_state.button = 0;
         else
             current_button_state.button = -3;
-        sprintf(current_button_state.str, "WHEELDOWN");
+        BUTTON_STATE_SNPRINTF(current_button_state.str, "WHEELDOWN");
     } else
         return false;
 
@@ -575,7 +576,8 @@ bool ONScripter::mouseWheelEvent(SDL_MouseWheelEvent *event) {
 void ONScripter::variableEditMode(SDL_KeyboardEvent *event) {
     int i;
     const char *var_name;
-    char var_index[12];
+    const int __var_index_size = 12;
+    char var_index[__var_index_size];
 
     switch (event->keysym.sym) {
         case SDLK_m:
@@ -738,16 +740,19 @@ void ONScripter::variableEditMode(SDL_KeyboardEvent *event) {
     }
 
     if (variable_edit_mode == EDIT_SELECT_MODE) {
-        sprintf(wm_edit_string, "%s%s", EDIT_MODE_PREFIX, EDIT_SELECT_STRING);
+        snprintf(wm_edit_string, WM_WDIT_STRING_SIZE, "%s%s", EDIT_MODE_PREFIX,
+                 EDIT_SELECT_STRING);
     } else if (variable_edit_mode == EDIT_VARIABLE_INDEX_MODE) {
-        sprintf(wm_edit_string, "%s%s%d", EDIT_MODE_PREFIX,
-                "Variable Index?  %", variable_edit_sign * variable_edit_num);
+        snprintf(wm_edit_string, WM_WDIT_STRING_SIZE, "%s%s%d",
+                 EDIT_MODE_PREFIX, "Variable Index?  %",
+                 variable_edit_sign * variable_edit_num);
     } else if (variable_edit_mode >= EDIT_VARIABLE_NUM_MODE) {
         int p = 0;
 
         switch (variable_edit_mode) {
             case EDIT_VARIABLE_NUM_MODE:
-                sprintf(var_index, "%%%d", variable_edit_index);
+                snprintf(var_index, __var_index_size, "%%%d",
+                         variable_edit_index);
                 var_name = var_index;
                 p = script_h.getVariableData(variable_edit_index).num;
                 break;
@@ -770,9 +775,9 @@ void ONScripter::variableEditMode(SDL_KeyboardEvent *event) {
             default:
                 var_name = "";
         }
-        sprintf(wm_edit_string, "%sCurrent %s=%d  New value? %s%d",
-                EDIT_MODE_PREFIX, var_name, p,
-                (variable_edit_sign == 1) ? "" : "-", variable_edit_num);
+        snprintf(wm_edit_string, WM_WDIT_STRING_SIZE,
+                 "%sCurrent %s=%d  New value? %s%d", EDIT_MODE_PREFIX, var_name,
+                 p, (variable_edit_sign == 1) ? "" : "-", variable_edit_num);
     }
 
     setCaption(wm_edit_string, wm_icon_string);
@@ -830,11 +835,11 @@ bool ONScripter::keyDownEvent(SDL_KeyboardEvent *event) {
     switch (event->keysym.sym) {
         case SDLK_RCTRL:
             ctrl_pressed_status |= 0x01;
-            sprintf(current_button_state.str, "CTRL");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "CTRL");
             goto ctrl_pressed;
         case SDLK_LCTRL:
             ctrl_pressed_status |= 0x02;
-            sprintf(current_button_state.str, "CTRL");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "CTRL");
             goto ctrl_pressed;
         case SDLK_RSHIFT:
             shift_pressed_status |= 0x01;
@@ -916,8 +921,8 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
             variable_edit_mode = EDIT_SELECT_MODE;
             variable_edit_sign = 1;
             variable_edit_num = 0;
-            sprintf(wm_edit_string, "%s%s", EDIT_MODE_PREFIX,
-                    EDIT_SELECT_STRING);
+            snprintf(wm_edit_string, WM_WDIT_STRING_SIZE, "%s%s",
+                     EDIT_MODE_PREFIX, EDIT_SELECT_STRING);
             setCaption(wm_edit_string, wm_icon_string);
         }
     }
@@ -950,9 +955,10 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
             current_button_state.button = current_over_button;
             if (current_over_button == -1) {
                 if (!bexec_flag) current_button_state.button = 0;
-                sprintf(current_button_state.str, "RETURN");
+                BUTTON_STATE_SNPRINTF(current_button_state.str, "RETURN");
             } else {
-                sprintf(current_button_state.str, "S%d", current_over_button);
+                BUTTON_STATE_SNPRINTF(current_button_state.str, "S%d",
+                                      current_over_button);
                 if (bexec_flag && current_button_link) {
                     ButtonLink *cbl = current_button_link;
                     if (current_button_link->exbtn_ctl[2]) {
@@ -973,7 +979,7 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
         } else {
             current_button_state.button = -1;
             if (!bexec_flag) current_button_state.button = 0;
-            sprintf(current_button_state.str, "SPACE");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "SPACE");
         }
         playClickVoice();
         stopAnimation(clickstr_state);
@@ -987,7 +993,7 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
         (autoclick_time == 0 || (event_mode & WAIT_BUTTON_MODE))) {
         if (!useescspc_flag && event->keysym.sym == SDLK_ESCAPE) {
             current_button_state.button = -1;
-            sprintf(current_button_state.str, "RCLICK");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "RCLICK");
             if (rmode_flag && event_mode & WAIT_TEXT_MODE) {
                 if (root_rmenu_link.next)
                     system_menu_mode = SYSTEM_MENU;
@@ -1006,7 +1012,7 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
                      event_mode & WAIT_BUTTON_MODE) ||
                     system_menu_mode == SYSTEM_LOOKBACK)) {
             current_button_state.button = -2;
-            sprintf(current_button_state.str, "WHEELUP");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "WHEELUP");
             if (event_mode & WAIT_TEXT_MODE) system_menu_mode = SYSTEM_LOOKBACK;
         } else if (((!getcursor_flag && event->keysym.sym == SDLK_RIGHT) ||
                     event->keysym.sym == SDLK_l) &&
@@ -1018,7 +1024,7 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
                 current_button_state.button = 0;
             else
                 current_button_state.button = -3;
-            sprintf(current_button_state.str, "WHEELDOWN");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "WHEELDOWN");
         } else if (((!getcursor_flag && event->keysym.sym == SDLK_UP) ||
                     event->keysym.sym == SDLK_k ||
                     event->keysym.sym == SDLK_p) &&
@@ -1033,10 +1039,10 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
             return false;
         } else if (getpageup_flag && event->keysym.sym == SDLK_PAGEUP) {
             current_button_state.button = -12;
-            sprintf(current_button_state.str, "PAGEUP");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "PAGEUP");
         } else if (getpagedown_flag && event->keysym.sym == SDLK_PAGEDOWN) {
             current_button_state.button = -13;
-            sprintf(current_button_state.str, "PAGEDOWN");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "PAGEDOWN");
         } else if ((getenter_flag && event->keysym.sym == SDLK_RETURN) ||
                    (getenter_flag && event->keysym.sym == SDLK_KP_ENTER)) {
             current_button_state.button = -19;
@@ -1044,16 +1050,16 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
             current_button_state.button = -20;
         } else if (getcursor_flag && event->keysym.sym == SDLK_UP) {
             current_button_state.button = -40;
-            sprintf(current_button_state.str, "UP");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "UP");
         } else if (getcursor_flag && event->keysym.sym == SDLK_RIGHT) {
             current_button_state.button = -41;
-            sprintf(current_button_state.str, "RIGHT");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "RIGHT");
         } else if (getcursor_flag && event->keysym.sym == SDLK_DOWN) {
             current_button_state.button = -42;
-            sprintf(current_button_state.str, "DOWN");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "DOWN");
         } else if (getcursor_flag && event->keysym.sym == SDLK_LEFT) {
             current_button_state.button = -43;
-            sprintf(current_button_state.str, "LEFT");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "LEFT");
         } else if (getinsert_flag && event->keysym.sym == SDLK_INSERT) {
             current_button_state.button = -50;
         } else if (getzxc_flag && event->keysym.sym == SDLK_z) {
@@ -1065,21 +1071,22 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
         } else if (getfunction_flag && event->keysym.sym >= SDLK_F1 &&
                    event->keysym.sym <= SDLK_F12) {
             current_button_state.button = -21 - (event->keysym.sym - SDLK_F1);
-            sprintf(current_button_state.str, "F%d",
-                    event->keysym.sym - SDLK_F1 + 1);
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "F%d",
+                                  event->keysym.sym - SDLK_F1 + 1);
         } else if (bexec_flag && event->keysym.sym >= SDLK_0 &&
                    event->keysym.sym <= SDLK_9) {
             current_button_state.button = -1;  // dummy
-            sprintf(current_button_state.str, "%d", event->keysym.sym - SDLK_0);
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "%d",
+                                  event->keysym.sym - SDLK_0);
         } else if (bexec_flag && event->keysym.sym >= SDLK_a &&
                    event->keysym.sym <= SDLK_z) {
             current_button_state.button = -1;  // dummy
-            sprintf(current_button_state.str, "%c",
-                    'A' + event->keysym.sym - SDLK_a);
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "%c",
+                                  'A' + event->keysym.sym - SDLK_a);
         } else if (bexec_flag && (event->keysym.sym == SDLK_RSHIFT ||
                                   event->keysym.sym == SDLK_LSHIFT)) {
             current_button_state.button = -1;  // dummy
-            sprintf(current_button_state.str, "SHIFT");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "SHIFT");
         }
 
         if (current_button_state.button != 0) {
@@ -1428,10 +1435,10 @@ void ONScripter::runEventLoop() {
                     current_button_state.button = 0;
                 else if (usewheel_flag) {
                     current_button_state.button = -5;
-                    sprintf(current_button_state.str, "TIMEOUT");
+                    BUTTON_STATE_SNPRINTF(current_button_state.str, "TIMEOUT");
                 } else {
                     current_button_state.button = -2;
-                    sprintf(current_button_state.str, "TIMEOUT");
+                    BUTTON_STATE_SNPRINTF(current_button_state.str, "TIMEOUT");
                 }
 
                 if (event_mode & (WAIT_INPUT_MODE | WAIT_BUTTON_MODE) &&

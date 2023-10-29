@@ -64,11 +64,13 @@ std::time_t to_time_t(TP tp) {
 }
 
 void ONScripter::searchSaveFile(SaveFileInfo &save_file_info, int no) {
-    char file_name[256];
+    const int __size = 256;
+    char file_name[__size];
 
-    script_h.getStringFromInteger(save_file_info.sjis_no, no,
+    script_h.getStringFromInteger(save_file_info.sjis_no, SJIS_INFO_SIZE, no,
                                   (num_save_file >= 10) ? 2 : 1);
-    sprintf(file_name, "%ssave%d.dat", save_dir ? save_dir : archive_path, no);
+    snprintf(file_name, __size, "%ssave%d.dat",
+             save_dir ? save_dir : archive_path, no);
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
     struct stat buf;
     struct tm *tm;
@@ -178,19 +180,20 @@ void ONScripter::searchSaveFile(SaveFileInfo &save_file_info, int no) {
     save_file_info.minute = ptm->tm_min;
 #endif
     save_file_info.valid = true;
-    script_h.getStringFromInteger(save_file_info.sjis_month,
+    script_h.getStringFromInteger(save_file_info.sjis_month, SJIS_INFO_SIZE,
                                   save_file_info.month, 2);
-    script_h.getStringFromInteger(save_file_info.sjis_day, save_file_info.day,
-                                  2);
-    script_h.getStringFromInteger(save_file_info.sjis_hour, save_file_info.hour,
-                                  2);
-    script_h.getStringFromInteger(save_file_info.sjis_minute,
+    script_h.getStringFromInteger(save_file_info.sjis_day, SJIS_INFO_SIZE,
+                                  save_file_info.day, 2);
+    script_h.getStringFromInteger(save_file_info.sjis_hour, SJIS_INFO_SIZE,
+                                  save_file_info.hour, 2);
+    script_h.getStringFromInteger(save_file_info.sjis_minute, SJIS_INFO_SIZE,
                                   save_file_info.minute, 2, true);
 }
 
 char *ONScripter::readSaveStrFromFile(int no) {
-    char filename[32];
-    sprintf(filename, "save%d.dat", no);
+    const int __filename_size = 32;
+    char filename[__filename_size];
+    snprintf(filename, __filename_size, "save%d.dat", no);
     size_t len = loadFileIOBuf(filename);
     if (len == 0) {
         // utils::printError("readSaveStrFromFile: can't open save file %s\n",
@@ -217,8 +220,9 @@ char *ONScripter::readSaveStrFromFile(int no) {
 }
 
 int ONScripter::loadSaveFile(int no) {
-    char filename[32];
-    sprintf(filename, "save%d.dat", no);
+    const int __filename_size = 32;
+    char filename[__filename_size];
+    snprintf(filename, __filename_size, "save%d.dat", no);
     if (loadFileIOBuf(filename) == 0) {
         utils::printError("can't open save file %s\n", filename);
         return -1;
@@ -276,9 +280,10 @@ void ONScripter::storeSaveFile() {
 
 int ONScripter::writeSaveFile(int no, const char *savestr) {
     saveAll();
+    const int __filename_size = 32;
 
-    char filename[32];
-    sprintf(filename, "save%d.dat", no);
+    char filename[__filename_size];
+    snprintf(filename, __filename_size, "save%d.dat", no);
 
     memcpy(file_io_buf, save_data_buf, save_data_len);
     file_io_buf_ptr = save_data_len;
@@ -288,7 +293,7 @@ int ONScripter::writeSaveFile(int no, const char *savestr) {
     }
 
     // size_t magic_len = strlen(SAVEFILE_MAGIC_NUMBER)+2;
-    // sprintf(filename, RELATIVEPATH "sav%csave%d.dat", DELIMITER, no);
+    // snprintf(filename, 32, RELATIVEPATH "sav%csave%d.dat", DELIMITER, no);
     // if (saveFileIOBuf(filename, magic_len, savestr))
     //     utils::printError("can't open save file %s for writing (not an
     //     error)\n", filename );

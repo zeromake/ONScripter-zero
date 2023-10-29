@@ -65,9 +65,9 @@ int ScriptParser::versionstrCommand() {
     const char *save_buf = script_h.saveStringBuffer();
 
     const char *buf = script_h.readStr();
-    version_str =
-        new char[strlen(save_buf) + strlen(buf) + strlen("\n") * 2 + 1];
-    sprintf(version_str, "%s\n%s\n", save_buf, buf);
+    const int __size = strlen(save_buf) + strlen(buf) + strlen("\n") * 2 + 1;
+    version_str = new char[__size];
+    snprintf(version_str, __size, "%s\n%s\n", save_buf, buf);
 
     return RET_CONTINUE;
 }
@@ -341,8 +341,9 @@ int ScriptParser::savedirCommand() {
 
     if (!save_dir) {
         // a workaround not to overwrite save_dir given in command line options
-        save_dir = new char[strlen(archive_path) + strlen(path) + 2];
-        sprintf(save_dir, "%s%s%c", archive_path, path, DELIMITER);
+        int __size = strlen(archive_path) + strlen(path) + 2;
+        save_dir = new char[__size];
+        snprintf(save_dir, __size, "%s%s%c", archive_path, path, DELIMITER);
 
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
         struct stat buf;
@@ -444,17 +445,15 @@ int ScriptParser::returnCommand() {
         // 跳过方法调用，使用了 getparam 但是参数多于变量
         char *buf = last_nest_info->next_script;
         if (last_nest_info->skip_params && (*buf == ' ' || *buf == ',')) {
-            while (
-                *buf != '\n'
-                && *buf != '\r'
-                && *buf != '\0'
-                && *buf != ':'
-                && *buf != ';'
-            ) buf++;
+            while (*buf != '\n' && *buf != '\r' && *buf != '\0' &&
+                   *buf != ':' && *buf != ';')
+                buf++;
             if (buf != last_nest_info->next_script) {
                 last_nest_info->next_script = buf;
-                current_label_info = script_h.getLabelByAddress(last_nest_info->next_script);
-                current_line = script_h.getLineByAddress(last_nest_info->next_script);
+                current_label_info =
+                    script_h.getLabelByAddress(last_nest_info->next_script);
+                current_line =
+                    script_h.getLineByAddress(last_nest_info->next_script);
             }
         }
         script_h.setCurrent(last_nest_info->next_script);
@@ -515,8 +514,9 @@ int ScriptParser::nsadirCommand() {
     const char *buf = script_h.readStr();
 
     if (nsa_path) delete[] nsa_path;
-    nsa_path = new char[strlen(buf) + 2];
-    sprintf(nsa_path, RELATIVEPATH "%s%c", buf, DELIMITER);
+    int __size = strlen(buf) + 2;
+    nsa_path = new char[__size];
+    snprintf(nsa_path, __size, RELATIVEPATH "%s%c", buf, DELIMITER);
 
     return RET_CONTINUE;
 }
@@ -855,11 +855,12 @@ int ScriptParser::itoaCommand() {
 
     int val = script_h.readInt();
 
-    char val_str[20];
+    const int __size = 20;
+    char val_str[__size];
     if (itoa2_flag)
-        script_h.getStringFromInteger(val_str, val, -1);
+        script_h.getStringFromInteger(val_str, __size, val, -1);
     else
-        sprintf(val_str, "%d", val);
+        snprintf(val_str, __size, "%d", val);
     setStr(&script_h.getVariableData(no).str, val_str);
 
     return RET_CONTINUE;
@@ -1039,12 +1040,8 @@ int ScriptParser::gotoCommand() {
     return RET_CONTINUE;
 }
 
-void ScriptParser::gosubReal(
-    const char *label,
-    char *next_script,
-    bool textgosub_flag,
-    bool skip_params
-) {
+void ScriptParser::gosubReal(const char *label, char *next_script,
+                             bool textgosub_flag, bool skip_params) {
     last_nest_info->next = new NestInfo();
     last_nest_info->next->previous = last_nest_info;
 
@@ -1133,23 +1130,21 @@ int ScriptParser::getparamCommand() {
             }
         }
     } else {
-        // 清空剩余未读取的变量，防止渲染到文本上，但不做变量初始化，需要剩余变量初始化为 0 请使用 getparam2
+        // 清空剩余未读取的变量，防止渲染到文本上，但不做变量初始化，需要剩余变量初始化为
+        // 0 请使用 getparam2
         while (end_status2 & ScriptHandler::END_COMMA) {
             script_h.readVariable();
             end_status2 = script_h.getEndStatus();
         }
     }
 
-    // 仅对类型不正确的参数进行跳过，例如一个 string 变量但是无法读取，其它多余的参数会在 return 自动跳过
+    // 仅对类型不正确的参数进行跳过，例如一个 string
+    // 变量但是无法读取，其它多余的参数会在 return 自动跳过
     char *buf = last_nest_info->next_script;
     if (*buf != ',') {
-        while (
-            *buf != '\0'
-            && *buf != '\n'
-            && *buf != '\r'
-            && *buf != ':'
-            && *buf != ';'
-        ) buf++;
+        while (*buf != '\0' && *buf != '\n' && *buf != '\r' && *buf != ':' &&
+               *buf != ';')
+            buf++;
         if (buf != last_nest_info->next_script) {
             last_nest_info->next_script = buf;
         }

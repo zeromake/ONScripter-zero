@@ -68,12 +68,14 @@ unsigned long getfilesize(std::FILE *file_ptr) {
     return posEnd;
 }
 
-bool startsWith(const std::string& str, const std::string prefix) {
+bool startsWith(const std::string &str, const std::string prefix) {
     return (str.rfind(prefix, 0) == 0);
 }
 
-bool endsWith(const std::string& str, const std::string suffix) {
-    if (suffix.length() > str.length()) { return false; }
+bool endsWith(const std::string &str, const std::string suffix) {
+    if (suffix.length() > str.length()) {
+        return false;
+    }
     return (str.rfind(suffix) == (str.length() - suffix.length()));
 }
 
@@ -135,7 +137,8 @@ int main(int argc, char *argv[]) {
                 strerror(errno));
         return 1;
     }
-    printf("nsdecode\n  extract: %s\n  output: %s\n  mode: %d\n", input.data(), outFile.data(), mode);
+    printf("nsdecode\n  extract: %s\n  output: %s\n  mode: %d\n", input.data(),
+           outFile.data(), mode);
     size_t data_size = getfilesize(pFile) - 0x920;
     unsigned char key_buf[4];
     int32_t key = 0;

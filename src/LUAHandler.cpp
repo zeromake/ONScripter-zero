@@ -30,8 +30,10 @@
 
 #define ONS_LUA_HANDLER_PTR "ONS_LUA_HANDLER_PTR"
 #define INIT_SCRIPT "system.lua"
+#define CMD_BUF_SIZE 256
+#define CMD_BUF_SNPRINTF(buf, ...) snprintf(buf, CMD_BUF_SIZE, __VA_ARGS__)
 
-static char cmd_buf[256];
+static char cmd_buf[CMD_BUF_SIZE];
 static char *conv_buf = NULL;
 static size_t conv_buf_len = 0;
 
@@ -214,7 +216,7 @@ int NSDoEvents(lua_State *state) {
     lua_getglobal(state, ONS_LUA_HANDLER_PTR);
     LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
 
-    sprintf(cmd_buf, "_wait 0");
+    CMD_BUF_SNPRINTF(cmd_buf, "_wait 0");
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -228,7 +230,7 @@ int NSEnd(lua_State *state) {
     lua_getglobal(state, ONS_LUA_HANDLER_PTR);
     LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
 
-    sprintf(cmd_buf, "_end");
+    CMD_BUF_SNPRINTF(cmd_buf, "_end");
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -419,7 +421,7 @@ int NSOggClose(lua_State *state) {
 
     int no = luaL_checkinteger(state, 1);
 
-    sprintf(cmd_buf, "_dwavestop %d", no);
+    CMD_BUF_SNPRINTF(cmd_buf, "_dwavestop %d", no);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -439,9 +441,9 @@ int NSOggFade(lua_State *state) {
     int flag = lua_toboolean(state, 5);
 
     if (flag)
-        sprintf(cmd_buf, "_dwavestop %d", no);
+        CMD_BUF_SNPRINTF(cmd_buf, "_dwavestop %d", no);
     else
-        sprintf(cmd_buf, "_chvol %d %d", no, (endvol + 10000) / 100);
+        CMD_BUF_SNPRINTF(cmd_buf, "_chvol %d %d", no, (endvol + 10000) / 100);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -456,7 +458,7 @@ int NSOggLoad(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
 
-    sprintf(cmd_buf, "_dwaveload %d \"%s\"", no, str);
+    CMD_BUF_SNPRINTF(cmd_buf, "_dwaveload %d \"%s\"", no, str);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -472,9 +474,9 @@ int NSOggPlay(lua_State *state) {
     int val = lua_toboolean(state, 2);
 
     if (val)
-        sprintf(cmd_buf, "_dwaveplayloop %d", no);
+        CMD_BUF_SNPRINTF(cmd_buf, "_dwaveplayloop %d", no);
     else
-        sprintf(cmd_buf, "_dwaveplay %d", no);
+        CMD_BUF_SNPRINTF(cmd_buf, "_dwaveplay %d", no);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -489,7 +491,7 @@ int NSOggVolume(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     int val = luaL_checkinteger(state, 2);
 
-    sprintf(cmd_buf, "_chvol %d %d", no, (val + 10000) / 100);
+    CMD_BUF_SNPRINTF(cmd_buf, "_chvol %d %d", no, (val + 10000) / 100);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -674,7 +676,7 @@ int NSSleep(lua_State *state) {
 
     int val = luaL_checkinteger(state, 1);
 
-    sprintf(cmd_buf, "_wait %d", val);
+    CMD_BUF_SNPRINTF(cmd_buf, "_wait %d", val);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -688,7 +690,7 @@ int NSSp2Clear(lua_State *state) {
 
     int no = luaL_checkinteger(state, 1);
 
-    sprintf(cmd_buf, "_csp2 %d", no);
+    CMD_BUF_SNPRINTF(cmd_buf, "_csp2 %d", no);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -737,8 +739,8 @@ int NSSp2Load(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
 
-    sprintf(cmd_buf, "_lsp2 %d, \"%s\", %d, 0, 100, 100, 0", no, str,
-            lh->ons->getWidth() * 2);
+    CMD_BUF_SNPRINTF(cmd_buf, "_lsp2 %d, \"%s\", %d, 0, 100, 100, 0", no, str,
+                     lh->ons->getWidth() * 2);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -760,8 +762,8 @@ int NSSp2Move(lua_State *state) {
     int opt = luaL_checkinteger(state, 8);
 
     lh->ons->getSprite2Info(no)->blending_mode = opt;
-    sprintf(cmd_buf, "_amsp2 %d, %d, %d, %d, %d, %d, %d", no, x, y, sx, sy, r,
-            alpha);
+    CMD_BUF_SNPRINTF(cmd_buf, "_amsp2 %d, %d, %d, %d, %d, %d, %d", no, x, y, sx,
+                     sy, r, alpha);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -776,7 +778,7 @@ int NSSpCell(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     int cell = luaL_checkinteger(state, 2);
 
-    sprintf(cmd_buf, "_cell %d, %d", no, cell);
+    CMD_BUF_SNPRINTF(cmd_buf, "_cell %d, %d", no, cell);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -790,7 +792,7 @@ int NSSpClear(lua_State *state) {
 
     int no = luaL_checkinteger(state, 1);
 
-    sprintf(cmd_buf, "_csp %d", no);
+    CMD_BUF_SNPRINTF(cmd_buf, "_csp %d", no);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -835,8 +837,8 @@ int NSSpLoad(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
 
-    sprintf(cmd_buf, "_lsp %d, \"%s\", %d, 0", no, str,
-            lh->ons->getWidth() + 1);
+    CMD_BUF_SNPRINTF(cmd_buf, "_lsp %d, \"%s\", %d, 0", no, str,
+                     lh->ons->getWidth() + 1);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -853,7 +855,7 @@ int NSSpMove(lua_State *state) {
     int y = luaL_checkinteger(state, 3);
     int alpha = luaL_checkinteger(state, 4);
 
-    sprintf(cmd_buf, "_amsp %d, %d, %d, %d", no, x, y, alpha);
+    CMD_BUF_SNPRINTF(cmd_buf, "_amsp %d, %d, %d, %d", no, x, y, alpha);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -868,7 +870,7 @@ int NSSpVisible(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     int v = lua_toboolean(state, 2);
 
-    sprintf(cmd_buf, "_vsp %d, %d", no, v);
+    CMD_BUF_SNPRINTF(cmd_buf, "_vsp %d, %d", no, v);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -887,7 +889,7 @@ int NSUpdate(lua_State *state) {
     lua_getglobal(state, ONS_LUA_HANDLER_PTR);
     LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
 
-    sprintf(cmd_buf, "_print 1");
+    CMD_BUF_SNPRINTF(cmd_buf, "_print 1");
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -904,7 +906,7 @@ int NSSp2Visible(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     int v = lua_toboolean(state, 2);
 
-    sprintf(cmd_buf, "vsp2 %d, %d", no, v);
+    CMD_BUF_SNPRINTF(cmd_buf, "vsp2 %d, %d", no, v);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -1140,12 +1142,13 @@ void LUAHandler::addCallback(const char *label) {
 }
 
 int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
-    char cmd2[64];
+    const int __cmd_size = 64;
+    char cmd2[__cmd_size];
 
     if (is_callback)
-        sprintf(cmd2, "NSCALL_%s", cmd);
+        snprintf(cmd2, __cmd_size, "NSCALL_%s", cmd);
     else
-        sprintf(cmd2, "NSCOM_%s", cmd);
+        snprintf(cmd2, __cmd_size, "NSCOM_%s", cmd);
 
     lua_getglobal(state, cmd2);
 
@@ -1172,7 +1175,7 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
 
     if (strcmp(cmd2, "NSCALL_animation") == 0) {
         if (lua_isboolean(state, -1) && lua_toboolean(state, -1)) {
-            sprintf(cmd2, "NSUpdate");
+            snprintf(cmd2, __cmd_size, "NSUpdate");
             lua_getglobal(state, cmd2);
             if (lua_pcall(state, 0, 0, 0) != 0) {
                 strcpy(error_str, lua_tostring(state, -1));

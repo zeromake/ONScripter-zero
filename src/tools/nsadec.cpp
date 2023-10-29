@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
             continue;
         }
         if (out[0] != '\0') {
-            sprintf(file_name, "%s/%s", out, sFI.original_name);
+            snprintf(file_name, 256, "%s/%s", out, sFI.original_name);
         } else {
             strcpy(file_name, sFI.original_name);
         }
