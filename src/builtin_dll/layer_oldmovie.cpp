@@ -27,6 +27,7 @@
 
 #include "ONScripter.h"
 #include "builtin_layer.h"
+#include "private/utils.h"
 
 #define MAX_NOISE 8
 #define MAX_GLOW 25
@@ -268,7 +269,7 @@ char* OldMovieLayer::message(const char* message, int& ret_int) {
     ret_int = 0;
     if (!sprite_info) return NULL;
 
-    printf("OldMovieLayer: got message '%s'\n", message);
+    utils::printInfo("OldMovieLayer: got message '%s'\n", message);
     if (sscanf(message, "s|%d,%d,%d,%d,%d,%d", &blur_level, &noise_level,
                &glow_level, &scratch_level, &dust_level, &sprite_no)) {
         if (blur_level < 0)

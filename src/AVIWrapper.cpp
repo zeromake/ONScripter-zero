@@ -90,12 +90,12 @@ int AVIWrapper::initAV(SDL_Surface *surface, bool audio_open_flag) {
 
     v_stream->StartStreaming();
     if (v_stream->GetVideoDecoder() == NULL) {
-        if (debug_flag) fprintf(stderr, "GetVideoDecoder() return 0.\n");
+        if (debug_flag) utils::printError("GetVideoDecoder() return 0.\n");
         return -1;
     }
     avm::IVideoDecoder::CAPS cap =
         v_stream->GetVideoDecoder()->GetCapabilities();
-    if (debug_flag) printf("cap %x\n", cap);
+    if (debug_flag) utils::printInfo("cap %x\n", cap);
 
     if (cap & avm::IVideoDecoder::CAP_YV12) {
         v_stream->GetVideoDecoder()->SetDestFmt(0, fccYV12);
@@ -113,7 +113,7 @@ int AVIWrapper::initAV(SDL_Surface *surface, bool audio_open_flag) {
     if (!audio_open_flag) return 0;
     a_stream = i_avi->GetStream(0, AviStream::Audio);
     if (a_stream == NULL) {
-        if (debug_flag) fprintf(stderr, "Audio Stream is NULL\n");
+        if (debug_flag) utils::printError("Audio Stream is NULL\n");
         return 0;
     }
 
@@ -121,7 +121,7 @@ int AVIWrapper::initAV(SDL_Surface *surface, bool audio_open_flag) {
     WAVEFORMATEX wave_fmt;
     a_stream->GetAudioDecoder()->GetOutputFormat(&wave_fmt);
     if (debug_flag)
-        printf(" format %d ch %d sample %d bit %d avg Bps %d\n",
+        utils::printInfo(" format %d ch %d sample %d bit %d avg Bps %d\n",
                wave_fmt.wFormatTag, wave_fmt.nChannels, wave_fmt.nSamplesPerSec,
                wave_fmt.wBitsPerSample, wave_fmt.nAvgBytesPerSec);
 

@@ -236,14 +236,14 @@ int ONScripter::loadSaveFile(int no) {
 
     if (i != (int)strlen(SAVEFILE_MAGIC_NUMBER)) {
         file_io_buf_ptr = 0;
-        printf("Save file version is unknown\n");
+        utils::printInfo("Save file version is unknown\n");
         return loadSaveFile2(SAVEFILE_VERSION_MAJOR * 100 +
                              SAVEFILE_VERSION_MINOR);
     }
 
     int file_version = readChar() * 100;
     file_version += readChar();
-    printf("Save file version is %d.%d\n", file_version / 100,
+    utils::printInfo("Save file version is %d.%d\n", file_version / 100,
            file_version % 100);
     if (file_version > SAVEFILE_VERSION_MAJOR * 100 + SAVEFILE_VERSION_MINOR) {
         utils::printError(
