@@ -56,41 +56,47 @@ Coding2UTF16 *coding2utf16 = NULL;
 #endif
 
 void optionHelp() {
-    printf("Usage: onscripter [option ...]\n");
-    printf("      --cdaudio\t\tuse CD audio if available\n");
-    printf("      --cdnumber no\tchoose the CD-ROM drive number\n");
-    printf("  -f, --font file\tset a TTF font file\n");
-    printf("      --registry file\tset a registry file\n");
-    printf("      --dll file\tset a dll file\n");
-    printf("  -r, --root path\tset the root path to the archives\n");
-    printf("      --fullscreen\tstart in fullscreen mode\n");
-    printf("      --window\t\tstart in windowed mode\n");
-    printf(
+    utils::printInfo("Usage: onscripter [option ...]\n");
+    utils::printInfo("      --cdaudio\t\tuse CD audio if available\n");
+    utils::printInfo("      --cdnumber no\tchoose the CD-ROM drive number\n");
+    utils::printInfo("  -f, --font file\tset a TTF font file\n");
+    utils::printInfo("      --registry file\tset a registry file\n");
+    utils::printInfo("      --dll file\tset a dll file\n");
+    utils::printInfo("  -r, --root path\tset the root path to the archives\n");
+    utils::printInfo("      --fullscreen\tstart in fullscreen mode\n");
+    utils::printInfo("      --window\t\tstart in windowed mode\n");
+    utils::printInfo(
         "      --force-button-shortcut\tignore useescspc and getenter "
         "command\n");
-    printf(
+    utils::printInfo(
         "      --enable-wheeldown-advance\tadvance the text on mouse wheel "
         "down\n");
-    printf("      --rescale \tdo rescale the images in the archives\n");
-    printf(
+    utils::printInfo("      --rescale \tdo rescale the images in the archives\n");
+    utils::printInfo(
         "      --disable-rescale\tdo not rescale the images in the archives\n");
-    printf(
+    utils::printInfo(
         "      --render-font-outline\trender the outline of a text instead of "
         "casting a shadow\n");
-    printf(
+    utils::printInfo(
         "      --edit\t\tenable online modification of the volume and "
         "variables when 'z' is pressed\n");
-    printf(
+    utils::printInfo(
         "      --key-exe file\tset a file (*.EXE) that includes a key table\n");
-    printf("      --enc:sjis|gbk\tuse sjis|gbk coding script\n");
-    printf("      --debug:1\t\tprint debug info\n");
-    printf("      --fontcache\tcache default font\n");
-    printf("  -h, --help\t\tshow this help and exit\n");
-    printf("  -v, --version\t\tshow the version information and exit\n");
+    utils::printInfo("      --enc:sjis|gbk\tuse sjis|gbk coding script\n");
+    utils::printInfo("      --debug:1\t\tprint debug info\n");
+    utils::printInfo("      --fontcache\tcache default font\n");
+    utils::printInfo("  -h, --help\t\tshow this help and exit\n");
+    utils::printInfo("  -v, --version\t\tshow the version information and exit\n");
     exit(0);
 }
 
 void optionVersion() {
+    utils::printInfo("Copyright:\n");
+    utils::printInfo("  (C) 2001-2018 Ogapee.\n");
+    utils::printInfo("  (C) 2014-2018 jh10001<jh10001@live.cn>.\n");
+    utils::printInfo("  (C) 2022-2023 zeromake<a390720046@gmail.com>.\n\n");
+    utils::printInfo("Origin Written by Ogapee <ogapee@aqua.dti2.ne.jp>\n\n");
+    utils::printInfo("This is free software; see the source for copying conditions.\n");
     int count = SDL_GetNumRenderDrivers();
     std::string renderDrivers = "";
     SDL_RendererInfo info;
@@ -99,7 +105,8 @@ void optionVersion() {
         renderDrivers += info.name;
         renderDrivers += " ";
     }
-    printf("\nSupport Render: %s\n", renderDrivers.c_str());
+    utils::printInfo("\nSuppert:\n");
+    utils::printInfo("  Render => %s\n", renderDrivers.c_str());
     count = SDL_GetNumAudioDrivers();
     std::string audioDrivers = "";
     for (int i = 0; i < count; i++) {
@@ -107,12 +114,7 @@ void optionVersion() {
         audioDrivers += audioDriverName;
         audioDrivers += " ";
     }
-    printf("Support Audio: %s\n\n", audioDrivers.c_str());
-    printf("Written by Ogapee <ogapee@aqua.dti2.ne.jp>\n\n");
-    printf(
-        "Copyright (c) 2001-2018 Ogapee.\t(C) 2014-2018 "
-        "jh10001<jh10001@live.cn>\n");
-    printf("This is free software; see the source for copying conditions.\n");
+    utils::printInfo("  Audio  => %s\n\n", audioDrivers.c_str());
 
     exit(0);
 }
@@ -404,8 +406,11 @@ int SDL_main(int argc, char *argv[]) {
 #undef main
 int main(int argc, char *argv[]) {
 #endif
-    utils::printInfo("ONScripter-Jh version %s (%s, %d.%02d)\n", ONS_JH_VERSION,
-                     ONS_VERSION, NSC_VERSION / 100, NSC_VERSION % 100);
+    utils::printInfo("Version:\n");
+    utils::printInfo("  ONScripter-zero\t%s\n", ONS_ZERO_VERSION);
+    utils::printInfo("  ONScripter-Jh\t\t%s\n", ONS_JH_VERSION);
+    utils::printInfo("  ONScripter\t\t%s\n", ONS_VERSION);
+    utils::printInfo("  NScriper\t\t%.2f\n", (float)NSC_VERSION / 100);
 
 #if defined(PSP)
     ons.disableRescale();

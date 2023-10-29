@@ -23,7 +23,8 @@ option("omp")
 option_end()
 
 add_defines(
-    "ONS_JH_VERSION=\""..VERSION.."\"",
+    "ONS_ZERO_VERSION=\""..VERSION.."\"",
+    "ONS_JH_VERSION=\"0.8.0\"",
     "ONS_VERSION=\"20181218\"",
     "NSC_VERSION=296"
 )
