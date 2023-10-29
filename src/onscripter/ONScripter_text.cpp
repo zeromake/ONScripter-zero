@@ -1034,8 +1034,9 @@ bool ONScripter::processText() {
 
         string_buffer_offset++;
         return true;
-    } else if (ch == '/' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) {
-        if (ruby_struct.stage == RubyStruct::BODY){
+    } else if (ch == '/' &&
+               !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) {
+        if (ruby_struct.stage == RubyStruct::BODY) {
             current_page->add('/');
             sentence_font.addLineOffset(ruby_struct.margin);
             string_buffer_offset =
@@ -1049,11 +1050,11 @@ bool ONScripter::processText() {
                 string_buffer_offset++;
             }
         } else {
-             // skip new line
+            // skip new line
             new_line_skip_flag = true;
             string_buffer_offset++;
             if (script_h.getStringBuffer()[string_buffer_offset] != 0x00)
-                errorAndExit( "'new line' must follow '/'." );
+                errorAndExit("'new line' must follow '/'.");
         }
         return true;
     } else if (ch == ')' && ruby_struct.stage == RubyStruct::BODY &&

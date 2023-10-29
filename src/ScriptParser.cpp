@@ -128,7 +128,8 @@ const int ScriptParser::calcUnUserRatio(const int v) {
     return v * user_ratio2 / user_ratio1;
 }
 
-const ons_font::FontConfig *ScriptParser::getFontConfig(const ons_font::FONT_TYPE types) {
+const ons_font::FontConfig *ScriptParser::getFontConfig(
+    const ons_font::FONT_TYPE types) {
     // return new ons_font::FontConfig();
     if (font_configs[types] != nullptr) {
         return font_configs[types];
@@ -265,9 +266,9 @@ void ScriptParser::reset(bool isDestroy) {
     trans_mode = AnimationInfo::TRANS_TOPLEFT;
 
     if (version_str) delete[] version_str;
-    version_str = new char[strlen(VERSION_STR1) + strlen("\n") +
-                           strlen(VERSION_STR2) + strlen("\n") + +1];
-    sprintf(version_str, "%s\n%s\n", VERSION_STR1, VERSION_STR2);
+    int __size = strlen(VERSION_STR1) + strlen(VERSION_STR2) + 3;
+    version_str = new char[__size];
+    snprintf(version_str, __size, "%s\n%s\n", VERSION_STR1, VERSION_STR2);
     z_order = 499;
 
     textgosub_label = NULL;
@@ -298,7 +299,6 @@ void ScriptParser::reset(bool isDestroy) {
         ruby_font.reset();
         dialog_font.reset();
     }
-    
 
     current_font = &sentence_font;
     shade_distance[0] = 1;
@@ -693,7 +693,7 @@ void ScriptParser::writeLog(ScriptHandler::LogInfo &info) {
         int i, j;
         char buf[10];
 
-        sprintf(buf, "%d", info.num_logs);
+        snprintf(buf, 10, "%d", info.num_logs);
         for (i = 0; i < (int)strlen(buf); i++) writeChar(buf[i], output_flag);
         writeChar('\n', output_flag);
 

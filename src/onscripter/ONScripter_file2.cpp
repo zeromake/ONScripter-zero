@@ -317,9 +317,9 @@ int ONScripter::loadSaveFile2(int file_version) {
             ai->font_pitch[1] = ai->font_size_xy[1];
             for (j = 0; j < 3; j++) ai->color_list[0][2 - j] = readChar();
             readChar();  // 0x00
-
-            char num_buf[7];
-            script_h.getStringFromInteger(num_buf, ai->param, 3);
+            const int __size = 7;
+            char num_buf[__size];
+            script_h.getStringFromInteger(num_buf, __size, ai->param, 3);
             setStr(&ai->file_name, num_buf);
 
             setupAnimationInfo(ai);

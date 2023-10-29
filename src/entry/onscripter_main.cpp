@@ -43,7 +43,6 @@ Coding2UTF16 *coding2utf16 = NULL;
 #include <unistd.h>
 #endif
 
-
 #ifdef ANDROID
 #include <unistd.h>
 #endif
@@ -435,7 +434,7 @@ ons.enableButtonShortCut();
     if (ons.getArchivePath()) {
         size_t len = strlen(ons.getArchivePath()) + strlen(argfilename) + 1;
         char *full_path = new char[len];
-        sprintf(full_path, "%s%s", ons.getArchivePath(), argfilename);
+        snprintf(full_path, len, "%s%s", ons.getArchivePath(), argfilename);
         fp = fopen(full_path, "r");
         delete[] full_path;
     } else

@@ -242,14 +242,12 @@ void ONScripter::initSDL() {
     int window_w = screen_device_width;
     int window_h = screen_device_height;
     // macosx 需要强制缩小 render 的范围
-    if (
-        force_render_ratio1 > 0
-        && force_render_ratio2 > 0
-        && force_render_ratio1 != force_render_ratio2
-        && !init_force_ratio
-    ) {
-        window_w = int((float)window_w * force_render_ratio1 / force_render_ratio2);
-        window_h = int((float)window_h * force_render_ratio1 / force_render_ratio2);
+    if (force_render_ratio1 > 0 && force_render_ratio2 > 0 &&
+        force_render_ratio1 != force_render_ratio2 && !init_force_ratio) {
+        window_w =
+            int((float)window_w * force_render_ratio1 / force_render_ratio2);
+        window_h =
+            int((float)window_h * force_render_ratio1 / force_render_ratio2);
         init_force_ratio = true;
     }
 
@@ -279,8 +277,9 @@ void ONScripter::initSDL() {
 
     underline_value = script_h.screen_height;
 
-    utils::printInfo("Display: %s %d x %d @%.2f (%d bpp)\n", info.name, screen_width,
-                     screen_height, ((float)screen_ratio1 / screen_ratio2), screen_bpp);
+    utils::printInfo("Display: %s %d x %d @%.2f (%d bpp)\n", info.name,
+                     screen_width, screen_height,
+                     ((float)screen_ratio1 / screen_ratio2), screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
 
     screen_rect.x = screen_rect.y = 0;
@@ -407,18 +406,20 @@ void ONScripter::setDLLFile(const char *filename) {
 
 void ONScripter::setArchivePath(const char *path) {
     if (archive_path) delete[] archive_path;
-    archive_path = new char[RELATIVEPATHLENGTH + strlen(path) + 2];
+    const int __size = RELATIVEPATHLENGTH + strlen(path) + 2;
+    archive_path = new char[__size];
     if (archive_path[strlen(path) - 1] != DELIMITER) {
-        sprintf(archive_path, "%s%s%c", RELATIVEPATH, path, DELIMITER);
+        snprintf(archive_path, __size, "%s%s%c", RELATIVEPATH, path, DELIMITER);
     } else {
-        sprintf(archive_path, "%s%s", RELATIVEPATH, path);
+        snprintf(archive_path, __size, "%s%s", RELATIVEPATH, path);
     }
 }
 
 void ONScripter::setSaveDir(const char *path) {
     if (save_dir) delete[] save_dir;
-    save_dir = new char[RELATIVEPATHLENGTH + strlen(path) + 2];
-    sprintf(save_dir, RELATIVEPATH "%s%c", path, DELIMITER);
+    const int __size = RELATIVEPATHLENGTH + strlen(path) + 2;
+    save_dir = new char[__size];
+    snprintf(save_dir, __size, RELATIVEPATH "%s%c", path, DELIMITER);
     script_h.setSaveDir(save_dir);
 }
 
@@ -510,12 +511,15 @@ int ONScripter::init() {
 
     // ----------------------------------------
     // Initialize font
+    int __size = 0;
     if (default_font) {
-        font_file = new char[strlen(default_font) + 1];
-        sprintf(font_file, "%s", default_font);
+        __size = strlen(default_font) + 1;
+        font_file = new char[__size];
+        snprintf(font_file, __size, "%s", default_font);
     } else {
-        font_file = new char[strlen(FONT_FILE) + 1];
-        sprintf(font_file, "%s", FONT_FILE);
+        __size = strlen(FONT_FILE) + 1;
+        font_file = new char[__size];
+        snprintf(font_file, __size, "%s", FONT_FILE);
 #ifdef USE_FONTCONFIG
         FILE *fp = NULL;
         if ((fp = ::fopen(font_file, "rb")) == NULL) {
@@ -644,13 +648,8 @@ int ONScripter::init() {
 }
 
 generate_path_function ONScripter::generateFPath() {
-    auto ff = std::bind(
-        &ONScripter::fpath,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3
-    );
+    auto ff = std::bind(&ONScripter::fpath, this, std::placeholders::_1,
+                        std::placeholders::_2, std::placeholders::_3);
     return ff;
 }
 
@@ -1427,10 +1426,11 @@ void ONScripter::loadEnvData() {
         if (!save_dir && save_dir_envdata) {
             // a workaround not to overwrite save_dir given in command line
             // options
-            save_dir =
-                new char[strlen(archive_path) + strlen(save_dir_envdata) + 2];
-            sprintf(save_dir, "%s%s%c", archive_path, save_dir_envdata,
-                    DELIMITER);
+            const int __size =
+                strlen(archive_path) + strlen(save_dir_envdata) + 2;
+            save_dir = new char[__size];
+            snprintf(save_dir, __size, "%s%s%c", archive_path, save_dir_envdata,
+                     DELIMITER);
             script_h.setSaveDir(save_dir);
         }
         automode_time = readInt();

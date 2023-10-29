@@ -174,7 +174,7 @@ public:
     void pushVariable();
     int  getIntVariable( VariableInfo *var_info=NULL );
 
-    int  getStringFromInteger( char *buffer, int no, int num_column, bool is_zero_inserted=false );
+    int  getStringFromInteger( char *buffer, const int buffer_size, int no, int num_column, bool is_zero_inserted=false );
 
     int  openScript( char *path );
 

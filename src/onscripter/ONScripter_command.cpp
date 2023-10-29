@@ -156,10 +156,11 @@ int ONScripter::voicevolCommand() {
 }
 
 int ONScripter::vCommand() {
-    char buf[256];
+    const int __size = 256;
+    char buf[__size];
 
-    sprintf(buf, RELATIVEPATH "wav%c%s.wav", DELIMITER,
-            script_h.getStringBuffer() + 1);
+    snprintf(buf, __size, RELATIVEPATH "wav%c%s.wav", DELIMITER,
+             script_h.getStringBuffer() + 1);
     playSound(buf, SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
     return RET_CONTINUE;
 }
@@ -1172,8 +1173,9 @@ int ONScripter::prnumCommand() {
     const char *buf = script_h.readStr();
     readColor(&ai->color_list[0], buf);
 
-    char num_buf[7];
-    script_h.getStringFromInteger(num_buf, ai->param, 3);
+    const int __size = 7;
+    char num_buf[__size];
+    script_h.getStringFromInteger(num_buf, __size, ai->param, 3);
     setStr(&ai->file_name, num_buf);
 
     setupAnimationInfo(ai);
@@ -2634,8 +2636,9 @@ int ONScripter::exec_dllCommand() {
     if (strcmp(dll_name, "fileutil.dll") == 0) {
         if (strncmp(buf + c, "/mkdir", 6) == 0) {
             c += 7;
-            char *dir = new char[strlen(archive_path) + strlen(buf + c) + 1];
-            sprintf(dir, "%s%s", archive_path, buf + c);
+            int __size = strlen(archive_path) + strlen(buf + c) + 1;
+            char *dir = new char[__size];
+            snprintf(dir, __size, "%s%s", archive_path, buf + c);
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
             mkdir(dir, 0755);
 #elif defined(WIN32)
@@ -2648,11 +2651,8 @@ int ONScripter::exec_dllCommand() {
 
     FILE *fp;
     if ((fp = fopen(dll_file, "r")) == NULL) {
-        utils::printError(
-            "Cannot open file [%s] while reading %s\n",
-            dll_file,
-            dll_name
-        );
+        utils::printError("Cannot open file [%s] while reading %s\n", dll_file,
+                          dll_name);
         return RET_CONTINUE;
     }
 
@@ -2817,10 +2817,11 @@ int ONScripter::dwaveCommand() {
 }
 
 int ONScripter::dvCommand() {
-    char buf[256];
+    const int __size = 256;
+    char buf[__size];
 
-    sprintf(buf, RELATIVEPATH "voice%c%s.wav", DELIMITER,
-            script_h.getStringBuffer() + 2);
+    snprintf(buf, __size, RELATIVEPATH "voice%c%s.wav", DELIMITER,
+             script_h.getStringBuffer() + 2);
     playSound(buf, SOUND_CHUNK, false, 0);
 
     return RET_CONTINUE;
@@ -3319,9 +3320,9 @@ int ONScripter::btnwaitCommand() {
         if (skip_mode & SKIP_NORMAL ||
             (skip_mode & SKIP_TO_EOP &&
              (textgosub_clickstr_state & 0x03) == CLICK_WAIT))
-            sprintf(current_button_state.str, "SKIP");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "SKIP");
         else
-            sprintf(current_button_state.str, "CTRL");
+            BUTTON_STATE_SNPRINTF(current_button_state.str, "CTRL");
     } else {
         shortcut_mouse_line = 0;
         skip_mode &= ~SKIP_NORMAL;
@@ -3953,10 +3954,10 @@ void ONScripter::NSDLoadCommand(int texnum, const char *str) {
             if (str[c] == ',') n++;
             c++;
         }
-
-        char buf[32];
-        sprintf(buf, ">%d,%d,#%02x%02x%02x", val[0], val[1], val[2], val[3],
-                val[4]);
+        const int __buf_size = 32;
+        char buf[__buf_size];
+        snprintf(buf, __buf_size, ">%d,%d,#%02x%02x%02x", val[0], val[1],
+                 val[2], val[3], val[4]);
         ai->setImageName(buf);
         ai->default_alpha = val[5];
     }
@@ -4018,11 +4019,12 @@ void ONScripter::NSDSetSpriteCommand(int spnum, int texnum, const char *tag) {
     *ais = *ait;
     ais->visible = true;
 
-    char buf[256];
+    const int __size = 256;
+    char buf[__size];
     if (tag)
-        sprintf(buf, "%s%s", tag, ait->file_name);
+        snprintf(buf, __size, "%s%s", tag, ait->file_name);
     else
-        sprintf(buf, ":a;%s", ait->file_name);
+        snprintf(buf, __size, ":a;%s", ait->file_name);
     ais->setImageName(buf);
     parseTaggedString(ais);
 
@@ -4072,181 +4074,190 @@ int ONScripter::checkspCommand() {
     return RET_CONTINUE;
 }
 
-void ons_sprintf(char *buff, const char *format, int argc, void *args[]) {
+void ons_sprintf(char *buff, const int size, const char *format, int argc,
+                 void *args[]) {
     switch (argc) {
         case 0:
-            strcpy(buff, format);
+            snprintf(buff, size, "%s", format);
             break;
         case 1:
-            sprintf(buff, format, args[0]);
+            snprintf(buff, size, format, args[0]);
             break;
         case 2:
-            sprintf(buff, format, args[0], args[1]);
+            snprintf(buff, size, format, args[0], args[1]);
             break;
         case 3:
-            sprintf(buff, format, args[0], args[1], args[2]);
+            snprintf(buff, size, format, args[0], args[1], args[2]);
             break;
         case 4:
-            sprintf(buff, format, args[0], args[1], args[2], args[3]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3]);
             break;
         case 5:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4]);
             break;
         case 6:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5]);
             break;
         case 7:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6]);
             break;
         case 8:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7]);
             break;
         case 9:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8]);
             break;
         case 10:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9]);
             break;
         case 11:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10]);
             break;
         case 12:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11]);
             break;
         case 13:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12]);
             break;
         case 14:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13]);
             break;
         case 15:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14]);
             break;
         case 16:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14],
+                     args[15]);
             break;
         case 17:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16]);
             break;
         case 18:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17]);
             break;
         case 19:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18]);
             break;
         case 20:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19]);
             break;
         case 21:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20]);
             break;
         case 22:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20],
+                     args[21]);
             break;
         case 23:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22]);
             break;
         case 24:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23]);
             break;
         case 25:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24]);
             break;
         case 26:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25]);
             break;
         case 27:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25], args[26]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25], args[26]);
             break;
         case 28:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25], args[26], args[27]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25], args[26],
+                     args[27]);
             break;
         case 29:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25], args[26], args[27], args[28]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25], args[26], args[27],
+                     args[28]);
             break;
         case 30:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25], args[26], args[27], args[28],
-                    args[29]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25], args[26], args[27],
+                     args[28], args[29]);
             break;
         case 31:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25], args[26], args[27], args[28],
-                    args[29], args[30]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25], args[26], args[27],
+                     args[28], args[29], args[30]);
             break;
         case 32:
-            sprintf(buff, format, args[0], args[1], args[2], args[3], args[4],
-                    args[5], args[6], args[7], args[8], args[9], args[10],
-                    args[11], args[12], args[13], args[14], args[15], args[16],
-                    args[17], args[18], args[19], args[20], args[21], args[22],
-                    args[23], args[24], args[25], args[26], args[27], args[28],
-                    args[29], args[30], args[31]);
+            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+                     args[4], args[5], args[6], args[7], args[8], args[9],
+                     args[10], args[11], args[12], args[13], args[14], args[15],
+                     args[16], args[17], args[18], args[19], args[20], args[21],
+                     args[22], args[23], args[24], args[25], args[26], args[27],
+                     args[28], args[29], args[30], args[31]);
             break;
     }
 }
@@ -4255,8 +4266,9 @@ int ONScripter::sprintfCommand() {
     script_h.readVariable();
     const char *format = script_h.readStr();
     auto out_variable = script_h.current_variable;
+    const int sprintf_buf_size = 4096;
     if (!sprintf_buf) {
-        sprintf_buf = new char[1024]{0};
+        sprintf_buf = new char[sprintf_buf_size]{0};
     } else {
         sprintf_buf[0] = '\0';
     }
@@ -4287,7 +4299,7 @@ int ONScripter::sprintfCommand() {
         memcpy(al.pa + offset, &value, ptr_size);
         offset += ptr_size;
     }
-    vsprintf(sprintf_buf, format, al.al);
+    vsnprintf(sprintf_buf, sprintf_buf_size, format, al.al);
 #else
     std::vector<void *> args;
     while (script_h.getEndStatus() & ScriptHandler::END_COMMA) {
@@ -4307,7 +4319,8 @@ int ONScripter::sprintfCommand() {
         }
         args.push_back(value);
     }
-    ons_sprintf(sprintf_buf, format, args.size(), args.data());
+    ons_sprintf(sprintf_buf, sprintf_buf_size, format, args.size(),
+                args.data());
 #endif
     setStr(&script_h.getVariableData(out_variable.var_no).str, sprintf_buf);
     args.clear();
