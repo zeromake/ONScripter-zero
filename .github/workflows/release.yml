@@ -52,14 +52,14 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -c -y -vD
+          xmake f -c -y -vD --target_minver=10.15
           xmake build -y onscripter
       - name: build-arm64
         env:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
-          xmake f -a arm64 -c -y -vD
+          xmake f -a arm64 -c -y -vD --target_minver=12.01
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
