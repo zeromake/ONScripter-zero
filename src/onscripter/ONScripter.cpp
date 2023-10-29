@@ -381,7 +381,7 @@ ONScripter::ONScripter() : surfaceCache(onscache::SurfaceCache(256)) {
 }
 
 ONScripter::~ONScripter() {
-    reset();
+    reset(true);
 
     delete[] sprite_info;
     delete[] sprite2_info;
@@ -654,7 +654,7 @@ generate_path_function ONScripter::generateFPath() {
     return ff;
 }
 
-void ONScripter::reset() {
+void ONScripter::reset(bool isDestroy) {
     automode_flag = false;
     automode_time = DEFAULT_AUTOMODE_TIME;
     autoclick_time = 0;
@@ -712,12 +712,12 @@ void ONScripter::reset() {
     mp3fadein_duration_internal = 0;
     current_cd_track = -1;
 
-    resetSub();
+    resetSub(isDestroy);
     if (blt_texture != NULL) SDL_DestroyTexture(blt_texture);
     blt_texture = NULL;
 }
 
-void ONScripter::resetSub() {
+void ONScripter::resetSub(bool isDestroy) {
     int i;
 
     for (i = 0; i < script_h.global_variable_border; i++)
@@ -746,7 +746,7 @@ void ONScripter::resetSub() {
     page_enter_status = 0;
     in_textbtn_flag = false;
 
-    resetSentenceFont();
+    if (!isDestroy) resetSentenceFont();
 
     deleteNestInfo();
     deleteButtonLink();

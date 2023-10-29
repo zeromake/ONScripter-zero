@@ -70,7 +70,7 @@ public:
     ScriptParser();
     ~ScriptParser();
 
-    void reset();
+    void reset(bool isDestroy = false);
     int  openScript();
     void setCurrentLabel( const char *label );
     void gosubReal(
@@ -247,7 +247,14 @@ protected:
     };
     enum{ NORMAL_MODE, DEFINE_MODE };
 
-    ons_font::FontConfig* font_configs[6];
+    ons_font::FontConfig* font_configs[6] = {
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr
+    };
 
     int current_mode;
     int debug_level;
