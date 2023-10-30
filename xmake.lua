@@ -76,6 +76,7 @@ end
 add_requireconfs("sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
+add_requireconfs("**.freetype", {system=false})
 add_requires("freetype", {
     system=false,
     configs={
@@ -254,9 +255,21 @@ target("onscripter")
         add_files("src/entry/*.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
         add_frameworks("AudioToolbox", "Cocoa")
+        if get_config("target_minver") then
+            local target_minver = tonumber(get_config("target_minver"))
+            if target_minver < 10.15 then
+                add_defines("INFRA_FORCE_GHC_FS")
+            end
+        end
     elseif is_plat("iphoneos") then
         add_files("src/entry/*.mm")
-        add_defines("IOS", "INFRA_FORCE_GHC_FS", "GLES_SILENCE_DEPRECATION")
+        if get_config("target_minver") then
+            local target_minver = tonumber(get_config("target_minver"))
+            if target_minver < 13.0 then
+                add_defines("INFRA_FORCE_GHC_FS")
+            end
+        end
+        add_defines("IOS", "GLES_SILENCE_DEPRECATION")
     elseif is_plat("windows", "mingw") then
         add_files("src/resource.rc")
         add_syslinks("windowscodecs")

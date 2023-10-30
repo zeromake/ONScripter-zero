@@ -52,7 +52,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -c -y -vD --target_minver=10.15 -m debug
+          xmake f -c -y -vD --target_minver=10.13 -m debug
           xmake build -y onscripter
       - name: build-arm64
         env:
