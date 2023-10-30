@@ -216,7 +216,7 @@ int ONScripter::playWave(Mix_Chunk *chunk, int format, bool loop_flag,
 int ONScripter::playMIDI(bool loop_flag, int fadetime) {
     Mix_SetMusicCMD(midi_cmd);
 
-    int __size = 256;
+    const int __size = 256;
     char midi_filename[__size];
     snprintf(midi_filename, __size, "%s%s", save_dir ? save_dir : archive_path,
              TMP_MUSIC_FILE);

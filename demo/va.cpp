@@ -214,8 +214,8 @@ int main() {
     // const char* s = "111";
     // uintptr_t value2 = (uintptr_t)s;
     // memcpy(al.pa+offset, &value2, ptr_size);
-
-    char* buff = new char[1024];
-    ons_sprintf(buff, 1024, format, arr.size(), arr.data());
+    const int __size = 1024;
+    char* buff = new char[__size];
+    ons_sprintf(buff, __size, format, arr.size(), arr.data());
     printf(buff);
 }
