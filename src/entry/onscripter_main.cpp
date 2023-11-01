@@ -71,7 +71,8 @@ void optionHelp() {
     utils::printInfo(
         "      --enable-wheeldown-advance\tadvance the text on mouse wheel "
         "down\n");
-    utils::printInfo("      --rescale \tdo rescale the images in the archives\n");
+    utils::printInfo(
+        "      --rescale \tdo rescale the images in the archives\n");
     utils::printInfo(
         "      --disable-rescale\tdo not rescale the images in the archives\n");
     utils::printInfo(
@@ -86,7 +87,8 @@ void optionHelp() {
     utils::printInfo("      --debug:1\t\tprint debug info\n");
     utils::printInfo("      --fontcache\tcache default font\n");
     utils::printInfo("  -h, --help\t\tshow this help and exit\n");
-    utils::printInfo("  -v, --version\t\tshow the version information and exit\n");
+    utils::printInfo(
+        "  -v, --version\t\tshow the version information and exit\n");
     exit(0);
 }
 
@@ -96,7 +98,8 @@ void optionVersion() {
     utils::printInfo("  (C) 2014-2018 jh10001<jh10001@live.cn>.\n");
     utils::printInfo("  (C) 2022-2023 zeromake<a390720046@gmail.com>.\n\n");
     utils::printInfo("Origin Written by Ogapee <ogapee@aqua.dti2.ne.jp>\n\n");
-    utils::printInfo("This is free software; see the source for copying conditions.\n");
+    utils::printInfo(
+        "This is free software; see the source for copying conditions.\n");
     int count = SDL_GetNumRenderDrivers();
     std::string renderDrivers = "";
     SDL_RendererInfo info;
