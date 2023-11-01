@@ -108,127 +108,21 @@ add_requires("sdl2_image", {system=false, configs=sdl2_image_config})
 
 set_rundir("$(projectdir)")
 
-target("nsaconv")
-    set_kind("binary")
-    add_packages("bzip2", "jpeg")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files(
-        "src/tools/nsaconv.cpp",
-        "src/coding2utf16.cpp",
-        "src/conv_shared.cpp",
-        "src/gbk2utf16.cpp",
-        "src/sjis2utf16.cpp",
-        "src/reader/NsaReader.cpp",
-        "src/reader/SarReader.cpp",
-        "src/reader/DirectReader.cpp",
-        "src/resize_image.cpp",
-        "src/language/*.cpp"
-    )
-
-target("nsadec")
-    set_kind("binary")
-    add_packages("bzip2")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files(
-        "src/tools/nsadec.cpp",
-        "src/coding2utf16.cpp",
-        "src/gbk2utf16.cpp",
-        "src/sjis2utf16.cpp",
-        "src/reader/NsaReader.cpp",
-        "src/reader/DirectReader.cpp",
-        "src/reader/SarReader.cpp",
-        "src/language/*.cpp"
-    )
-
-target("nsdecode")
+local function use_binary() 
     set_kind("binary")
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
     end
-    add_files(
-        "src/tools/nscriptdecode.cpp"
-    )
-
-target("sarconv")
-    set_kind("binary")
-    add_packages("bzip2", "jpeg")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files(
-        "src/tools/sarconv.cpp",
-        "src/coding2utf16.cpp",
-        "src/reader/DirectReader.cpp",
-        "src/reader/SarReader.cpp",
-        "src/conv_shared.cpp",
-        "src/resize_image.cpp"
-    )
-
-target("sardec")
-    set_kind("binary")
-    add_packages("bzip2")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files(
-        "src/coding2utf16.cpp",
-        "src/tools/sardec.cpp",
-        "src/reader/SarReader.cpp",
-        "src/reader/DirectReader.cpp"
-    )
-
-target("nsaenc")
-    set_kind("binary")
-    add_packages("bzip2", "jpeg")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files(
-        "src/tools/nsaenc.cpp",
-        "src/coding2utf16.cpp",
-        "src/gbk2utf16.cpp",
-        "src/reader/DirectReader.cpp",
-        "src/reader/NsaReader.cpp",
-        "src/reader/SarReader.cpp",
-        "src/conv_shared.cpp",
-        "src/resize_image.cpp",
-        "src/language/*.cpp"
-    )
-
-target("arcmake")
-    set_kind("binary")
-    add_packages("bzip2", "jpeg")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files(
-        "src/tools/arcmake.cpp",
-        "src/coding2utf16.cpp",
-        "src/gbk2utf16.cpp",
-        "src/reader/DirectReader.cpp",
-        "src/reader/NsaReader.cpp",
-        "src/reader/SarReader.cpp",
-        "src/conv_shared.cpp",
-        "src/resize_image.cpp",
-        "src/language/*.cpp"
-    )
-
-target("va")
-    set_kind("binary")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files("demo/va.cpp")
+end
 
 target("onscripter")
     if is_plat("android") then
         set_kind("shared")
+    elseif is_plat("iphoneos") then
+        set_kind("static")
+        add_defines("ONSCRIPTER_MAIN_RENAME=onscripter_main")
     else
-        set_kind("binary")
+        use_binary()
     end
     add_packages(
         "zlib",
@@ -246,11 +140,9 @@ target("onscripter")
         "ghc_filesystem",
         "luajit"
     )
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
+    add_links("sdl2_main")
     if is_plat("macosx") then
         add_files("src/entry/*.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
@@ -305,7 +197,7 @@ target("onscripter")
         add_defines("USE_OMP_PARALLEL=1")
     end
     add_files(
-        "src/*.cpp|conv_shared.cpp",
+        "src/*.cpp",
         "src/SDL2_rotozoom.c",
         "src/renderer/*.cpp",
         "src/reader/*.cpp",
@@ -315,52 +207,7 @@ target("onscripter")
     )
     remove_files("src/AVIWrapper.cpp")
     on_config(function (target)
-        import("script.duplicate")
-        local links = duplicate.new()
-        local link_dirs = duplicate.new()
-        local include_dirs = duplicate.new()
-        local path_sep = os.host() == 'windows' and '\\' or '/'
-        local frameworks = duplicate.new()
-        for _, framework in ipairs(target:get("frameworks")) do
-            frameworks:add(framework)
-        end
-        for name, pkg in pairs(target:pkgs()) do
-            local pkg_links = pkg:get("links")
-            if pkg_links ~= nil then
-                pkg_links = type(pkg_links) == "table" and pkg_links or {pkg_links}
-                for _, link in ipairs(pkg_links) do
-                    links:add(link)
-                end
-            end
-            local pkg_link_dirs = pkg:get("linkdirs")
-            if pkg_link_dirs ~= nil then
-                pkg_link_dirs = type(pkg_link_dirs) == "table" and pkg_link_dirs or {pkg_link_dirs}
-                for _, link_dir in ipairs(pkg_link_dirs) do
-                    local k = link_dir:split(path_sep, {plain = true})[6]
-                    link_dirs:add(link_dir, k)
-                end
-            end
-            local pkg_includes = pkg:get("sysincludedirs")
-            if pkg_includes ~= nil then
-                pkg_includes = type(pkg_includes) == "table" and pkg_includes or {pkg_includes}
-                for _, include in ipairs(pkg_includes) do
-                    local k = include:split(path_sep, {plain = true})[6]
-                    include_dirs:add(include, k)
-                end
-            end
-            
-            local pkg_frameworks = pkg:get("frameworks")
-            if pkg_frameworks ~= nil then
-                pkg_frameworks = type(pkg_frameworks) == "table" and pkg_frameworks or {pkg_frameworks}
-                for _, framework in ipairs(pkg_frameworks) do
-                    frameworks:add(framework)
-                end
-            end
-        end
-        print("links:", links.value)
-        print("link_dirs:", link_dirs.value)
-        print("include_dirs:", include_dirs.value)
-        print("frameworks:", frameworks.value)
+        import("script.generate_xcode")(target)
     end)
     after_build(function (target)
         if target:is_plat("android") then
@@ -398,98 +245,98 @@ target("onscripter")
         os.cp(target:targetfile(),  path.join(os.scriptdir(), "dist", out_name))
     end)
 
-target("main")
-    set_kind("shared")
-    add_packages(
-        "sdl2"
+
+-- target("saveconv")
+--     set_kind("binary")
+--     if is_plat("mingw") then
+--         add_ldflags("-static-libgcc", "-static-libstdc++")
+--     end
+--     add_files("src/tools/saveconv.cpp")
+
+target("nsdec")
+    use_binary()
+    add_files(
+        "src/tools/nscriptdecode.cpp"
     )
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    if is_plat("windows") then
-        add_files("src/resource.rc")
-    end
-    if is_plat("android") then
-        add_defines("ANDROID")
-    elseif is_plat("iphoneos") then
-        add_defines("IOS")
-    end
-    add_files("demo/hello.c")
 
-target("example2")
-    set_kind("binary")
-    add_packages("freetype")
-    add_files("demo/example2.cpp")
--- target("demo")
---     set_kind("binary")
---     add_packages(
---         "zlib",
---         "bzip2",
---         "jpeg",
---         "png",
---         "sdl2",
---         "sdl2_image",
---         "sdl2_ttf",
---         "sdl2_mixer",
---         "freetype",
---         "brotli",
---         "harfbuzz",
---         "webp"
---     )
---     if is_plat("mingw") then
---         add_ldflags("-static-libgcc", "-static-libstdc++")
---     end
---     if is_plat("windows") then
---         add_files("src/resource.rc")
---     end
---     add_files("demo.cpp")
+target("sardec")
+    use_binary()
+    add_packages("bzip2")
+    add_files(
+        "src/coding2utf16.cpp",
+        "src/tools/sardec.cpp",
+        "src/reader/SarReader.cpp",
+        "src/reader/DirectReader.cpp"
+    )
+
+target("nsaenc")
+    use_binary()
+    add_packages("bzip2", "jpeg")
+    add_files(
+        "src/tools/nsaenc.cpp",
+        "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/reader/DirectReader.cpp",
+        "src/reader/NsaReader.cpp",
+        "src/reader/SarReader.cpp",
+        "src/tools/conv_shared.cpp",
+        "src/resize_image.cpp",
+        "src/language/*.cpp"
+    )
+
+target("nsadec")
+    use_binary()
+    add_packages("bzip2")
+    add_files(
+        "src/tools/nsadec.cpp",
+        "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/sjis2utf16.cpp",
+        "src/reader/NsaReader.cpp",
+        "src/reader/DirectReader.cpp",
+        "src/reader/SarReader.cpp",
+        "src/language/*.cpp"
+    )
+
+target("arcmake")
+    use_binary()
+    add_packages("bzip2", "jpeg")
+    add_files(
+        "src/tools/arcmake.cpp",
+        "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/reader/DirectReader.cpp",
+        "src/reader/NsaReader.cpp",
+        "src/reader/SarReader.cpp",
+        "src/tools/conv_shared.cpp",
+        "src/resize_image.cpp",
+        "src/language/*.cpp"
+    )
 
 
--- target("demo/cache")
---     set_kind("binary")
+-- target("sarconv")
+--     use_binary()
+--     add_packages("bzip2", "jpeg")
 --     add_files(
---         "demo/cache.cpp",
---         "src/murmurhash.c"
+--         "src/tools/sarconv.cpp",
+--         "src/coding2utf16.cpp",
+--         "src/reader/DirectReader.cpp",
+--         "src/reader/SarReader.cpp",
+--         "src/tools/conv_shared.cpp",
+--         "src/resize_image.cpp"
 --     )
---     if is_plat("mingw") then
---         add_ldflags("-static-libgcc", "-static-libstdc++")
---     end
---     if is_plat("windows") then
---         add_files("src/resource.rc")
---     end
-target("demo/demo")
-    set_kind("binary")
-    add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
-    add_files("demo/demo.cpp")
-    add_files("demo/ren-font.cpp")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    if is_plat("windows") then
-        add_files("src/resource.rc")
-    elseif  is_plat("macosx") then
-        add_frameworks("AudioToolbox", "Cocoa")
-    end
-target("demo/demo1")
-    set_kind("binary")
-    add_packages("sdl2", "sdl2_ttf", "freetype", "harfbuzz")
-    add_files("demo/demo1.cpp")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    if is_plat("windows") then
-        add_files("src/resource.rc")
-    elseif  is_plat("macosx") then
-        add_frameworks("AudioToolbox", "Cocoa")
-    end
-
-target("demo/print")
-    set_kind("binary")
-    add_files("demo/print.c")
-
-target("saveconv")
-    set_kind("binary")
-    if is_plat("mingw") then
-        add_ldflags("-static-libgcc", "-static-libstdc++")
-    end
-    add_files("src/tools/saveconv.cpp")
+-- target("nsaconv")
+--     add_packages("bzip2", "jpeg")
+--     use_binary()
+--     add_files(
+--         "src/tools/nsaconv.cpp",
+--         "src/coding2utf16.cpp",
+--         "src/tools/conv_shared.cpp",
+--         "src/gbk2utf16.cpp",
+--         "src/sjis2utf16.cpp",
+--         "src/reader/NsaReader.cpp",
+--         "src/reader/SarReader.cpp",
+--         "src/reader/DirectReader.cpp",
+--         "src/resize_image.cpp",
+--         "src/language/*.cpp"
+--     )
