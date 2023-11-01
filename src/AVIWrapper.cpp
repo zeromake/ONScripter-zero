@@ -122,8 +122,9 @@ int AVIWrapper::initAV(SDL_Surface *surface, bool audio_open_flag) {
     a_stream->GetAudioDecoder()->GetOutputFormat(&wave_fmt);
     if (debug_flag)
         utils::printInfo(" format %d ch %d sample %d bit %d avg Bps %d\n",
-               wave_fmt.wFormatTag, wave_fmt.nChannels, wave_fmt.nSamplesPerSec,
-               wave_fmt.wBitsPerSample, wave_fmt.nAvgBytesPerSec);
+                         wave_fmt.wFormatTag, wave_fmt.nChannels,
+                         wave_fmt.nSamplesPerSec, wave_fmt.wBitsPerSample,
+                         wave_fmt.nAvgBytesPerSec);
 
     if (Mix_OpenAudio(wave_fmt.nSamplesPerSec, MIX_DEFAULT_FORMAT,
                       wave_fmt.nChannels, DEFAULT_AUDIOBUF) < 0) {
