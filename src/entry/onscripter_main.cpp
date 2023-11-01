@@ -396,19 +396,24 @@ void InitCrashReport(){
 }
 #endif
 
-#if defined(ANDROID)
-#include <sstream>
+#ifdef ONSCRIPTER_MAIN_RENAME
+#undef main
+#define main ONSCRIPTER_MAIN_RENAME
+#endif
 
-int SDL_main(int argc, char *argv[]) {
+// #if defined(ANDROID)
+// #include <sstream>
+
+// int SDL_main(int argc, char *argv[]) {
     // const size_t max = 30;
     // void* buffer[max];
     // std::ostringstream oss;
     // dumpBacktrace(oss, buffer, max);
     // utils::printInfo("dumpBacktrace: %s", oss.str().c_str());
-#else
-#undef main
+// #else
+// #undef main
 int main(int argc, char *argv[]) {
-#endif
+// #endif
     utils::printInfo("Version:\n");
     utils::printInfo("  ONScripter-zero\t%s\n", ONS_ZERO_VERSION);
     utils::printInfo("  ONScripter-Jh\t\t%s\n", ONS_JH_VERSION);
