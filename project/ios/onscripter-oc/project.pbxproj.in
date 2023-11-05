@@ -7,13 +7,11 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		${SOURCE_FILES}
-        ${SYSTEM_FRAMEWORKS}
+		${SOURCE_REFS}
 /* End PBXFileReference section */
 
 /* Begin PBXBuildFile section */
-		${BUILD_SOURCE_FILES}
-        ${BUILD_SYSTEM_FRAMEWORKS}
+		${BUILD_SECTION_FILES}
 /* End PBXBuildFile section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -21,7 +19,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				${BUILD_SYSTEM_FRAMEWORKS_PHASE}
+				${FRAMEWORKS_BUILD_PHASE}
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,7 +38,7 @@
 		DA316CF92951972500A927C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DA316CF82951972500A927C7 /* onscripter.app */,
+				${PRODUCTS_GROUP}
 			);
 			name = Products;
 			sourceTree = "<group>";
