@@ -61,24 +61,32 @@ function main(target)
     print("link_dirs:", link_dirs.value)
     print("include_dirs:", include_dirs.value)
     print("frameworks:", frameworks.value)
-    local ref_hash = {}
-    -- local
-    local app_hash = to_hash("onscripter.app")
-    ref_hash["onscripter.app"] = app_hash
 
-    local SOURCE_REFS = {}
-    table.insert(
-        SOURCE_REFS,
-        app_hash.." /* onscripter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = onscripter.app; sourceTree = BUILT_PRODUCTS_DIR; };"
-    )
-    for _, f in ipairs({
+    local app_name = "onscripter.app"
+    local ref_hash = {}
+    local source_files = {
         "ViewController.h",
         "ViewController.m",
         "Assets.xcassets",
         "Info.plist",
         "main.mm",
         "Main.storyboard",
-    }) do
+    }
+    -- local
+    local app_hash = to_hash(app_name)
+    ref_hash[app_name] = app_hash
+
+    local SOURCE_REFS = {}
+    table.insert(
+        SOURCE_REFS,
+        string.format(
+            '%s /* %s */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = %s; sourceTree = BUILT_PRODUCTS_DIR; };',
+            app_name,
+            app_name,
+            app_name
+        )
+    )
+    for _, f in ipairs(source_files) do
         local lastKnownFileType = "sourcecode.c.h"
         if f:endswith(".m") then
             lastKnownFileType = "sourcecode.c.objc"
@@ -125,20 +133,18 @@ function main(target)
     local BUILD_SECTION_FILES = {}
     local build_section_template = '%s /* %s */ = {isa = PBXBuildFile; fileRef = %s; };\n'
 
-    for _, name in ipairs({
-        "ViewController.m",
-        "main.mm",
-        "Main.storyboard"
-    }) do
-        local k = name..".build_section"
-        local current_hash = to_hash(k)
-        table.insert(BUILD_SECTION_FILES, string.format(
-            build_section_template,
-            current_hash,
-            name.." in Sources",
-            ref_hash[name]
-        ))
-        ref_hash[k] = current_hash
+    for _, name in ipairs(source_files) do
+        if name:endswith('.m') or name:endswith('.mm') or name:endswith('.storyboard') then
+            local k = name..".build_section"
+            local current_hash = to_hash(k)
+            table.insert(BUILD_SECTION_FILES, string.format(
+                build_section_template,
+                current_hash,
+                name.." in Sources",
+                ref_hash[name]
+            ))
+            ref_hash[k] = current_hash
+        end
     end
 
     for _, name in ipairs(frameworks.value) do
@@ -166,10 +172,48 @@ function main(target)
         ))
     end
 
-    local PBXGROUP_SECTION = {}
+    local PRODUCTS_GROUP = {}
+
+    table.insert(
+        PRODUCTS_GROUP,
+        string.format(
+            '%s /* %s */,',
+            ref_hash[app_name],
+            app_name
+        )
+    )
+
+    local SOURCE_FILES_GROUP = {}
+
+    for _, name in ipairs(source_files) do
+        table.insert(
+            SOURCE_FILES_GROUP,
+            string.format(
+                '%s /* %s */,',
+                ref_hash[name],
+                name
+            )
+        )
+    end
+
+    local FRAMEWORKS_GROUP = {}
+    for _, name in ipairs(frameworks.value) do
+        name = name..".framework"
+        table.insert(
+            FRAMEWORKS_GROUP,
+            string.format(
+                '%s /* %s */,',
+                ref_hash[name],
+                name
+            )
+        )
+    end
 
     print("SOURCE_REFS:\n", SOURCE_REFS)
     print("BUILD_SECTION_FILES:\n", BUILD_SECTION_FILES)
     print("FRAMEWORKS_BUILD_PHASE:\n", FRAMEWORKS_BUILD_PHASE)
+    print("PRODUCTS_GROUP:\n", PRODUCTS_GROUP)
+    print("SOURCE_FILES_GROUP:\n", SOURCE_FILES_GROUP)
+    print("FRAMEWORKS_GROUP:\n", FRAMEWORKS_GROUP)
     print(ref_hash)
 end

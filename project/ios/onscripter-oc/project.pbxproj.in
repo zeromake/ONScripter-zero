@@ -54,7 +54,7 @@
 		DAE79C782AEB9573000CEBA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				${SYSTEM_FRAMEWORKS_GROUP}
+				${FRAMEWORKS_GROUP}
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
