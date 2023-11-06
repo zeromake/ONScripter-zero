@@ -6,13 +6,13 @@
 	objectVersion = 55;
 	objects = {
 
-/* Begin PBXFileReference section */
-		${SOURCE_REFS}
-/* End PBXFileReference section */
-
 /* Begin PBXBuildFile section */
 		${BUILD_SECTION_FILES}
 /* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		${SOURCE_REFS}
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		DA316CF52951972500A927C7 /* Frameworks */ = {
@@ -46,7 +46,7 @@
 		DA316CFA2951972500A927C7 /* onscripter */ = {
 			isa = PBXGroup;
 			children = (
-                ${SOURCE_FILES_GROUP}
+				${SOURCE_FILES_GROUP}
 			);
 			path = onscripter;
 			sourceTree = "<group>";
@@ -75,7 +75,7 @@
 			);
 			name = onscripter;
 			productName = onscripter;
-			productReference = DA316CF82951972500A927C7 /* onscripter.app */;
+			${PRODUCT_REFERENCE}
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -115,7 +115,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				${BUILD_SOURCE_FILES_PHASE}
+				${SOURCES_BUILD_PHASE}
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +158,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -216,6 +217,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -243,7 +245,7 @@
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-                    ${HEADER_PATHS}
+					${HEADER_PATHS}
                 );
 				INFOPLIST_FILE = onscripter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "onscripter-zero";
@@ -251,19 +253,20 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
-                    ${LIBRARY_PATHS}
+					${LIBRARY_PATHS}
                 );
-				MARKETING_VERSION = ${VERSION};
+				MARKETING_VERSION = ${VERSION}
 				OTHER_LDFLAGS = (
-                    ${LDFLAGS}
+					${LDFLAGS}
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "${IDENTIFIER}";
+				PRODUCT_BUNDLE_IDENTIFIER = ${IDENTIFIER}
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -282,7 +285,7 @@
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-                    ${HEADER_PATHS}
+					${HEADER_PATHS}
                 );
 				INFOPLIST_FILE = onscripter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "onscripter-zero";
@@ -290,19 +293,20 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
-                    ${LIBRARY_PATHS}
+					${LIBRARY_PATHS}
                 );
-				MARKETING_VERSION = ${VERSION};
+				MARKETING_VERSION = ${VERSION}
 				OTHER_LDFLAGS = (
-                    ${LDFLAGS}
+					${LDFLAGS}
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "${IDENTIFIER}";
+				PRODUCT_BUNDLE_IDENTIFIER = ${IDENTIFIER}
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

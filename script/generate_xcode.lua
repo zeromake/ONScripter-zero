@@ -6,6 +6,27 @@ local function to_hash(name)
     return string.upper(string.sub(hash.md5(bytes(name)), 1, 24))
 end
 
+local function render_pbxproj(context, input_path, output_path)
+    local output = io.open(output_path, 'wb')
+    for line in io.lines(input_path) do
+        local space, variable = line:match('(\t*)%$%{([%w_]+)%}')
+        if variable then
+            local variables = context[variable]
+            variables = type(variables) == "table" and variables or {variables}
+            local buffer = ""
+            local size = #variables
+            for i, item in ipairs(variables) do
+                buffer = buffer..space..item..'\n'
+            end
+            line = line:gsub('(\t*)%$%{([%w_]+)%}', buffer)
+            output:write(line)
+        else
+            output:write(line..'\n')
+        end
+    end
+    output:close()
+end
+
 function main(target)
     local links = duplicate.new()
     local link_dirs = duplicate.new()
@@ -14,9 +35,6 @@ function main(target)
     local frameworks = duplicate.new()
     for _, framework in ipairs(target:get("frameworks")) do
         frameworks:add(framework)
-    end
-    for _, includedir in ipairs(target:get("includedirs")) do
-        include_dirs:add(includedir)
     end
     for _, link in ipairs(target:get("syslinks")) do
         links:add(link)
@@ -57,10 +75,9 @@ function main(target)
             end
         end
     end
-    print("links:", links.value)
-    print("link_dirs:", link_dirs.value)
-    print("include_dirs:", include_dirs.value)
-    print("frameworks:", frameworks.value)
+
+    table.sort(link_dirs.value)
+    table.sort(include_dirs.value)
 
     local app_name = "onscripter.app"
     local ref_hash = {}
@@ -81,7 +98,7 @@ function main(target)
         SOURCE_REFS,
         string.format(
             '%s /* %s */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = %s; sourceTree = BUILT_PRODUCTS_DIR; };',
-            app_name,
+            app_hash,
             app_name,
             app_name
         )
@@ -104,7 +121,7 @@ function main(target)
         table.insert(
             SOURCE_REFS,
             string.format(
-                '%s /* %s */ = {isa = PBXFileReference; lastKnownFileType = %s; path = %s; sourceTree = "<group>"; };\n',
+                '%s /* %s */ = {isa = PBXFileReference; lastKnownFileType = %s; path = %s; sourceTree = "<group>"; };',
                 current_hash,
                 f,
                 lastKnownFileType,
@@ -121,7 +138,7 @@ function main(target)
         table.insert(
             SOURCE_REFS,
             (string.format(
-                '%s /* %s */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = %s; path = System/Library/Frameworks/%s; sourceTree = SDKROOT; };\n',
+                '%s /* %s */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = %s; path = System/Library/Frameworks/%s; sourceTree = SDKROOT; };',
                 current_hash,
                 k,
                 k,
@@ -131,20 +148,27 @@ function main(target)
     end
 
     local BUILD_SECTION_FILES = {}
-    local build_section_template = '%s /* %s */ = {isa = PBXBuildFile; fileRef = %s; };\n'
-
+    local build_section_template = '%s /* %s */ = {isa = PBXBuildFile; fileRef = %s; };'
+    local build_source_files = {}
     for _, name in ipairs(source_files) do
         if name:endswith('.m') or name:endswith('.mm') or name:endswith('.storyboard') then
-            local k = name..".build_section"
-            local current_hash = to_hash(k)
-            table.insert(BUILD_SECTION_FILES, string.format(
-                build_section_template,
-                current_hash,
-                name.." in Sources",
-                ref_hash[name]
-            ))
-            ref_hash[k] = current_hash
+            table.insert(
+                build_source_files,
+                name
+            )
         end
+    end
+
+    for _, name in ipairs(build_source_files) do
+        local k = name..".build_section"
+        local current_hash = to_hash(k)
+        table.insert(BUILD_SECTION_FILES, string.format(
+            build_section_template,
+            current_hash,
+            name.." in Sources",
+            ref_hash[name]
+        ))
+        ref_hash[k] = current_hash
     end
 
     for _, name in ipairs(frameworks.value) do
@@ -161,7 +185,7 @@ function main(target)
     end
 
     local FRAMEWORKS_BUILD_PHASE = {}
-    local framework_build_phase_template = '%s /* %s in Frameworks */,\n'
+    local framework_build_phase_template = '%s /* %s in Frameworks */,'
     for _, name in ipairs(frameworks.value) do
         name = name..".framework"
         local k = name..".build_section"
@@ -209,11 +233,61 @@ function main(target)
         )
     end
 
-    print("SOURCE_REFS:\n", SOURCE_REFS)
-    print("BUILD_SECTION_FILES:\n", BUILD_SECTION_FILES)
-    print("FRAMEWORKS_BUILD_PHASE:\n", FRAMEWORKS_BUILD_PHASE)
-    print("PRODUCTS_GROUP:\n", PRODUCTS_GROUP)
-    print("SOURCE_FILES_GROUP:\n", SOURCE_FILES_GROUP)
-    print("FRAMEWORKS_GROUP:\n", FRAMEWORKS_GROUP)
-    print(ref_hash)
+    local PRODUCT_REFERENCE = {
+        string.format(
+            'productReference = %s /* %s */;',
+            ref_hash[app_name],
+            app_name
+        )
+    }
+
+    local SOURCES_BUILD_PHASE = {}
+    local sources_build_phase_template = '%s /* %s in Sources */,'
+    for _, name in ipairs(build_source_files) do
+        table.insert(
+            SOURCES_BUILD_PHASE,
+            string.format(
+                sources_build_phase_template,
+                ref_hash[name..".build_section"],
+                name
+            )
+        )
+    end
+
+    local VERSION = "0.9.10;"
+    local HEADER_PATHS = {}
+    for _, include_dir in ipairs(include_dirs.value) do
+        table.insert(HEADER_PATHS, string.format('"%s",', include_dir))
+    end
+
+    local LIBRARY_PATHS = {}
+    for _, link_dir in ipairs(link_dirs.value) do
+        table.insert(LIBRARY_PATHS, string.format('"%s",', link_dir))
+    end
+    local LDFLAGS = {}
+    for _, link in ipairs(links.value) do
+        table.insert(LDFLAGS, string.format('"-l%s",', link))
+    end
+
+    local IDENTIFIER = '"com.zeromake.onscripter-zero";'
+    local context = {
+        SOURCE_REFS = SOURCE_REFS,
+        BUILD_SECTION_FILES = BUILD_SECTION_FILES,
+        FRAMEWORKS_BUILD_PHASE = FRAMEWORKS_BUILD_PHASE,
+        PRODUCTS_GROUP = PRODUCTS_GROUP,
+        SOURCE_FILES_GROUP = SOURCE_FILES_GROUP,
+        FRAMEWORKS_GROUP = FRAMEWORKS_GROUP,
+        PRODUCT_REFERENCE = PRODUCT_REFERENCE,
+        SOURCES_BUILD_PHASE = SOURCES_BUILD_PHASE,
+        HEADER_PATHS = HEADER_PATHS,
+        LIBRARY_PATHS = LIBRARY_PATHS,
+        LDFLAGS = LDFLAGS,
+        VERSION = VERSION,
+        IDENTIFIER = IDENTIFIER,
+    }
+    render_pbxproj(
+        context,
+        path.join(os.scriptdir(), '../project/ios/onscripter-oc/project.pbxproj.in'),
+        path.join(os.scriptdir(), '../project/ios/onscripter-oc/onscripter.xcodeproj/project.pbxproj')
+    )
 end

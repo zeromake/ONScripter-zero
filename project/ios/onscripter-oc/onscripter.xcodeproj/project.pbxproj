@@ -7,39 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA316D032951972500A927C7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA316D022951972500A927C7 /* ViewController.m */; };
-		DA316D0E2951972700A927C7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA316D0D2951972700A927C7 /* main.mm */; };
-		DAE79C7A2AEB9573000CEBA9 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C792AEB9573000CEBA9 /* AVFAudio.framework */; };
-		DAE79C7C2AEB957F000CEBA9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C7B2AEB957F000CEBA9 /* AudioToolbox.framework */; };
-		DAE79C7E2AEB9586000CEBA9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C7D2AEB9586000CEBA9 /* UIKit.framework */; };
-		DAE79C802AEB958F000CEBA9 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C7F2AEB958F000CEBA9 /* Metal.framework */; };
-		DAE79C822AEB9598000CEBA9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C812AEB9598000CEBA9 /* CoreGraphics.framework */; };
-		DAE79C842AEB95A0000CEBA9 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C832AEB95A0000CEBA9 /* QuartzCore.framework */; };
-		DAE79C862AEB95A6000CEBA9 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C852AEB95A6000CEBA9 /* OpenGLES.framework */; };
-		DAE79C882AEB95AD000CEBA9 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C872AEB95AD000CEBA9 /* CoreHaptics.framework */; };
-		DAE79C8A2AEB95B4000CEBA9 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C892AEB95B3000CEBA9 /* GameController.framework */; };
-		DAE79C8C2AEB95BA000CEBA9 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE79C8B2AEB95BA000CEBA9 /* CoreMotion.framework */; };
-		DAE79C8F2AEBA0B5000CEBA9 /* Main.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = DAE79C8E2AEB9CF1000CEBA9 /* Main.storyboard */; };
+		96A6F8FEAE2D9DD094C9B0AE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5EF95B504D8D8C4F33F2DC9; };
+		08A5BF5F096C105E1840DF75 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 860EA3021871D5EFA8973E43; };
+		FEC28E2B2DE07EC10E6198F5 /* Main.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = 6ABCBFF69222B1BA304D88CB; };
+		0623BB78198098E8F501F7EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C0BB27A29CF01E7D8505F68; };
+		5A1AD4A0B76606957793191F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB8C7C5BAE8195A0C9CE3758; };
+		262E91172BFE1B73E84ED8CF /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 734E2EE38261FF0A27047E8A; };
+		6436C5DE4EB8630DCE918762 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81213B2D71ACDB73DF9ACC2F; };
+		40E5E10717AA0A9478350EF4 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E928C82D9FDC7BA7A70F146D; };
+		91E2FC1AFF7261AA2C1E6E42 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 197C506F2156B03293479EB5; };
+		83C8FFA8F5877806E2D53848 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DEC0120ADBC1629E1E1FED2; };
+		4D2A8716658A08C32F89B1CA /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A90B962A4B0A6669D49671B; };
+		2DB277CACE691002A5CCEEBC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AD7E9F25D20DB5CC1E44064; };
+		67D0B83A8B0521F2ACA8364E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5889ECBE76BCA339D694517; };
+		398C8AD126EC627E0FD42224 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 851E1CA096A86D7DF7A3B5B0; };
+		7590F7613209DA5E6C0B4EE9 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64AB57F360A891DAB6973DDB; };
+		86BF8A7E4A5737C8F2F1CC67 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D18335408A6F0AB77C88DB7D; };
+		11698F6223B57532967D15D8 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCA907263CE50472C5B01621; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DA316CF82951972500A927C7 /* onscripter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = onscripter.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA316D012951972500A927C7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		DA316D022951972500A927C7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		DA316D072951972700A927C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DA316D0C2951972700A927C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA316D0D2951972700A927C7 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		DAE79C792AEB9573000CEBA9 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
-		DAE79C7B2AEB957F000CEBA9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		DAE79C7D2AEB9586000CEBA9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		DAE79C7F2AEB958F000CEBA9 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
-		DAE79C812AEB9598000CEBA9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		DAE79C832AEB95A0000CEBA9 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		DAE79C852AEB95A6000CEBA9 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		DAE79C872AEB95AD000CEBA9 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
-		DAE79C892AEB95B3000CEBA9 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
-		DAE79C8B2AEB95BA000CEBA9 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
-		DAE79C8E2AEB9CF1000CEBA9 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		D3D98F31198B46F39344D7D1 /* onscripter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = onscripter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0D68A3ECF6D733C0FBCB1BFA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		A5EF95B504D8D8C4F33F2DC9 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		E9C2B90A5DCA5D29F2BEC039 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		51570F093954B65F706F7C19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		860EA3021871D5EFA8973E43 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objcpp; path = main.mm; sourceTree = "<group>"; };
+		6ABCBFF69222B1BA304D88CB /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		8C0BB27A29CF01E7D8505F68 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		FB8C7C5BAE8195A0C9CE3758 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		734E2EE38261FF0A27047E8A /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		81213B2D71ACDB73DF9ACC2F /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		E928C82D9FDC7BA7A70F146D /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
+		197C506F2156B03293479EB5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		9DEC0120ADBC1629E1E1FED2 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		4A90B962A4B0A6669D49671B /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		1AD7E9F25D20DB5CC1E44064 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		B5889ECBE76BCA339D694517 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		851E1CA096A86D7DF7A3B5B0 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		64AB57F360A891DAB6973DDB /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
+		D18335408A6F0AB77C88DB7D /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
+		CCA907263CE50472C5B01621 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,16 +55,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAE79C862AEB95A6000CEBA9 /* OpenGLES.framework in Frameworks */,
-				DAE79C7A2AEB9573000CEBA9 /* AVFAudio.framework in Frameworks */,
-				DAE79C7E2AEB9586000CEBA9 /* UIKit.framework in Frameworks */,
-				DAE79C8C2AEB95BA000CEBA9 /* CoreMotion.framework in Frameworks */,
-				DAE79C842AEB95A0000CEBA9 /* QuartzCore.framework in Frameworks */,
-				DAE79C802AEB958F000CEBA9 /* Metal.framework in Frameworks */,
-				DAE79C822AEB9598000CEBA9 /* CoreGraphics.framework in Frameworks */,
-				DAE79C882AEB95AD000CEBA9 /* CoreHaptics.framework in Frameworks */,
-				DAE79C7C2AEB957F000CEBA9 /* AudioToolbox.framework in Frameworks */,
-				DAE79C8A2AEB95B4000CEBA9 /* GameController.framework in Frameworks */,
+				0623BB78198098E8F501F7EC /* Foundation.framework in Frameworks */,
+				5A1AD4A0B76606957793191F /* CoreFoundation.framework in Frameworks */,
+				262E91172BFE1B73E84ED8CF /* ImageIO.framework in Frameworks */,
+				6436C5DE4EB8630DCE918762 /* CoreServices.framework in Frameworks */,
+				40E5E10717AA0A9478350EF4 /* AVFAudio.framework in Frameworks */,
+				91E2FC1AFF7261AA2C1E6E42 /* AudioToolbox.framework in Frameworks */,
+				83C8FFA8F5877806E2D53848 /* UIKit.framework in Frameworks */,
+				4D2A8716658A08C32F89B1CA /* Metal.framework in Frameworks */,
+				2DB277CACE691002A5CCEEBC /* CoreGraphics.framework in Frameworks */,
+				67D0B83A8B0521F2ACA8364E /* QuartzCore.framework in Frameworks */,
+				398C8AD126EC627E0FD42224 /* OpenGLES.framework in Frameworks */,
+				7590F7613209DA5E6C0B4EE9 /* CoreHaptics.framework in Frameworks */,
+				86BF8A7E4A5737C8F2F1CC67 /* GameController.framework in Frameworks */,
+				11698F6223B57532967D15D8 /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,7 +87,7 @@
 		DA316CF92951972500A927C7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DA316CF82951972500A927C7 /* onscripter.app */,
+				D3D98F31198B46F39344D7D1 /* onscripter.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,12 +95,12 @@
 		DA316CFA2951972500A927C7 /* onscripter */ = {
 			isa = PBXGroup;
 			children = (
-				DA316D012951972500A927C7 /* ViewController.h */,
-				DA316D022951972500A927C7 /* ViewController.m */,
-				DA316D072951972700A927C7 /* Assets.xcassets */,
-				DA316D0C2951972700A927C7 /* Info.plist */,
-				DA316D0D2951972700A927C7 /* main.mm */,
-				DAE79C8E2AEB9CF1000CEBA9 /* Main.storyboard */,
+				0D68A3ECF6D733C0FBCB1BFA /* ViewController.h */,
+				A5EF95B504D8D8C4F33F2DC9 /* ViewController.m */,
+				E9C2B90A5DCA5D29F2BEC039 /* Assets.xcassets */,
+				51570F093954B65F706F7C19 /* Info.plist */,
+				860EA3021871D5EFA8973E43 /* main.mm */,
+				6ABCBFF69222B1BA304D88CB /* Main.storyboard */,
 			);
 			path = onscripter;
 			sourceTree = "<group>";
@@ -96,16 +108,20 @@
 		DAE79C782AEB9573000CEBA9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DAE79C8B2AEB95BA000CEBA9 /* CoreMotion.framework */,
-				DAE79C892AEB95B3000CEBA9 /* GameController.framework */,
-				DAE79C872AEB95AD000CEBA9 /* CoreHaptics.framework */,
-				DAE79C852AEB95A6000CEBA9 /* OpenGLES.framework */,
-				DAE79C832AEB95A0000CEBA9 /* QuartzCore.framework */,
-				DAE79C812AEB9598000CEBA9 /* CoreGraphics.framework */,
-				DAE79C7F2AEB958F000CEBA9 /* Metal.framework */,
-				DAE79C7D2AEB9586000CEBA9 /* UIKit.framework */,
-				DAE79C7B2AEB957F000CEBA9 /* AudioToolbox.framework */,
-				DAE79C792AEB9573000CEBA9 /* AVFAudio.framework */,
+				8C0BB27A29CF01E7D8505F68 /* Foundation.framework */,
+				FB8C7C5BAE8195A0C9CE3758 /* CoreFoundation.framework */,
+				734E2EE38261FF0A27047E8A /* ImageIO.framework */,
+				81213B2D71ACDB73DF9ACC2F /* CoreServices.framework */,
+				E928C82D9FDC7BA7A70F146D /* AVFAudio.framework */,
+				197C506F2156B03293479EB5 /* AudioToolbox.framework */,
+				9DEC0120ADBC1629E1E1FED2 /* UIKit.framework */,
+				4A90B962A4B0A6669D49671B /* Metal.framework */,
+				1AD7E9F25D20DB5CC1E44064 /* CoreGraphics.framework */,
+				B5889ECBE76BCA339D694517 /* QuartzCore.framework */,
+				851E1CA096A86D7DF7A3B5B0 /* OpenGLES.framework */,
+				64AB57F360A891DAB6973DDB /* CoreHaptics.framework */,
+				D18335408A6F0AB77C88DB7D /* GameController.framework */,
+				CCA907263CE50472C5B01621 /* CoreMotion.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -126,7 +142,7 @@
 			);
 			name = onscripter;
 			productName = onscripter;
-			productReference = DA316CF82951972500A927C7 /* onscripter.app */;
+			productReference = D3D98F31198B46F39344D7D1 /* onscripter.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -136,7 +152,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					DA316CF72951972500A927C7 = {
 						CreatedOnToolsVersion = 13.4.1;
@@ -166,9 +182,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAE79C8F2AEBA0B5000CEBA9 /* Main.storyboard in Sources */,
-				DA316D032951972500A927C7 /* ViewController.m in Sources */,
-				DA316D0E2951972700A927C7 /* main.mm in Sources */,
+				96A6F8FEAE2D9DD094C9B0AE /* ViewController.m in Sources */,
+				08A5BF5F096C105E1840DF75 /* main.mm in Sources */,
+				FEC28E2B2DE07EC10E6198F5 /* Main.storyboard in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +313,22 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/include;
+				HEADER_SEARCH_PATHS = (
+					"/Users/zero/.xmake/packages/b/brotli/1.1.0/a96433c448a3416f837df22409a148a4/include",
+					"/Users/zero/.xmake/packages/b/bzip2/1.0.8/93b09eb95f0b4bc4b0f550127cf5f2f3/include",
+					"/Users/zero/.xmake/packages/f/freetype/2.13.2/08904dfd16a748068246de416a3cb6e2/include",
+					"/Users/zero/.xmake/packages/g/ghc_filesystem/1.5.14/3b633cfa89c548aaa072fcd4ba3fd4b7/include",
+					"/Users/zero/.xmake/packages/h/harfbuzz/8.1.1/52e19fd23dad4744b2861974cabe9f87/include",
+					"/Users/zero/.xmake/packages/j/jpeg/2022.05.07/5dd1d315222a4840b73ea8799033992f/include",
+					"/Users/zero/.xmake/packages/l/luajit/2023.09.25/e191d6c767ac4bb286685db4062bb38a/include",
+					"/Users/zero/.xmake/packages/p/png/1.6.40/623321e3762342e2acfc10354ddfe41e/include",
+					"/Users/zero/.xmake/packages/s/sdl2/2.28.4/5f2daa5c247d46e9a94a2287bbb67737/include",
+					"/Users/zero/.xmake/packages/s/sdl2_image/2.6.3/405b0057c0384c0a946a16c0eba14ea2/include",
+					"/Users/zero/.xmake/packages/s/sdl2_mixer/2.6.3/94397902c07b4cd19fedbcb5986fa1c9/include",
+					"/Users/zero/.xmake/packages/s/sdl2_ttf/2.20.2/df063bf7bcb9426f8b906cd21e588f41/include",
+					"/Users/zero/.xmake/packages/w/webp/1.3.2/eda4caf2fc974101a472877c8d801f4c/include",
+					"/Users/zero/.xmake/packages/z/zlib/1.3/b925f012959846df8882e532dd1c2fa4/include",
+                );
 				INFOPLIST_FILE = onscripter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "onscripter-zero";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
@@ -310,11 +341,37 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/lib;
-				MARKETING_VERSION = 0.9.9;
+				LIBRARY_SEARCH_PATHS = (
+					"/Users/zero/.xmake/packages/b/brotli/1.1.0/a96433c448a3416f837df22409a148a4/lib",
+					"/Users/zero/.xmake/packages/b/bzip2/1.0.8/93b09eb95f0b4bc4b0f550127cf5f2f3/lib",
+					"/Users/zero/.xmake/packages/f/freetype/2.13.2/08904dfd16a748068246de416a3cb6e2/lib",
+					"/Users/zero/.xmake/packages/h/harfbuzz/8.1.1/52e19fd23dad4744b2861974cabe9f87/lib",
+					"/Users/zero/.xmake/packages/j/jpeg/2022.05.07/5dd1d315222a4840b73ea8799033992f/lib",
+					"/Users/zero/.xmake/packages/l/luajit/2023.09.25/e191d6c767ac4bb286685db4062bb38a/lib",
+					"/Users/zero/.xmake/packages/p/png/1.6.40/623321e3762342e2acfc10354ddfe41e/lib",
+					"/Users/zero/.xmake/packages/s/sdl2/2.28.4/5f2daa5c247d46e9a94a2287bbb67737/lib",
+					"/Users/zero/.xmake/packages/s/sdl2_image/2.6.3/405b0057c0384c0a946a16c0eba14ea2/lib",
+					"/Users/zero/.xmake/packages/s/sdl2_mixer/2.6.3/94397902c07b4cd19fedbcb5986fa1c9/lib",
+					"/Users/zero/.xmake/packages/s/sdl2_ttf/2.20.2/df063bf7bcb9426f8b906cd21e588f41/lib",
+					"/Users/zero/.xmake/packages/w/webp/1.3.2/eda4caf2fc974101a472877c8d801f4c/lib",
+					"/Users/zero/.xmake/packages/z/zlib/1.3/b925f012959846df8882e532dd1c2fa4/lib",
+                );
+				MARKETING_VERSION = 0.9.10;
 				OTHER_LDFLAGS = (
-					"-lsdl2",
 					"-lsdl2_main",
+					"-ljpeg",
+					"-lbzip2",
+					"-lpng",
+					"-lzlib",
+					"-lsdl2_image",
+					"-lwebp",
+					"-lsdl2_ttf",
+					"-lharfbuzz",
+					"-lfreetype",
+					"-lsdl2_mixer",
+					"-lsdl2",
+					"-lbrotli",
+					"-lluajit",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.zeromake.onscripter-zero";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -334,7 +391,22 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/include;
+				HEADER_SEARCH_PATHS = (
+					"/Users/zero/.xmake/packages/b/brotli/1.1.0/a96433c448a3416f837df22409a148a4/include",
+					"/Users/zero/.xmake/packages/b/bzip2/1.0.8/93b09eb95f0b4bc4b0f550127cf5f2f3/include",
+					"/Users/zero/.xmake/packages/f/freetype/2.13.2/08904dfd16a748068246de416a3cb6e2/include",
+					"/Users/zero/.xmake/packages/g/ghc_filesystem/1.5.14/3b633cfa89c548aaa072fcd4ba3fd4b7/include",
+					"/Users/zero/.xmake/packages/h/harfbuzz/8.1.1/52e19fd23dad4744b2861974cabe9f87/include",
+					"/Users/zero/.xmake/packages/j/jpeg/2022.05.07/5dd1d315222a4840b73ea8799033992f/include",
+					"/Users/zero/.xmake/packages/l/luajit/2023.09.25/e191d6c767ac4bb286685db4062bb38a/include",
+					"/Users/zero/.xmake/packages/p/png/1.6.40/623321e3762342e2acfc10354ddfe41e/include",
+					"/Users/zero/.xmake/packages/s/sdl2/2.28.4/5f2daa5c247d46e9a94a2287bbb67737/include",
+					"/Users/zero/.xmake/packages/s/sdl2_image/2.6.3/405b0057c0384c0a946a16c0eba14ea2/include",
+					"/Users/zero/.xmake/packages/s/sdl2_mixer/2.6.3/94397902c07b4cd19fedbcb5986fa1c9/include",
+					"/Users/zero/.xmake/packages/s/sdl2_ttf/2.20.2/df063bf7bcb9426f8b906cd21e588f41/include",
+					"/Users/zero/.xmake/packages/w/webp/1.3.2/eda4caf2fc974101a472877c8d801f4c/include",
+					"/Users/zero/.xmake/packages/z/zlib/1.3/b925f012959846df8882e532dd1c2fa4/include",
+                );
 				INFOPLIST_FILE = onscripter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "onscripter-zero";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
@@ -347,11 +419,37 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = /Users/zero/.xmake/packages/s/sdl2/2.28.4/b96209edbafb4c8ab5e4ac69a6b9d478/lib;
-				MARKETING_VERSION = 0.9.9;
+				LIBRARY_SEARCH_PATHS = (
+					"/Users/zero/.xmake/packages/b/brotli/1.1.0/a96433c448a3416f837df22409a148a4/lib",
+					"/Users/zero/.xmake/packages/b/bzip2/1.0.8/93b09eb95f0b4bc4b0f550127cf5f2f3/lib",
+					"/Users/zero/.xmake/packages/f/freetype/2.13.2/08904dfd16a748068246de416a3cb6e2/lib",
+					"/Users/zero/.xmake/packages/h/harfbuzz/8.1.1/52e19fd23dad4744b2861974cabe9f87/lib",
+					"/Users/zero/.xmake/packages/j/jpeg/2022.05.07/5dd1d315222a4840b73ea8799033992f/lib",
+					"/Users/zero/.xmake/packages/l/luajit/2023.09.25/e191d6c767ac4bb286685db4062bb38a/lib",
+					"/Users/zero/.xmake/packages/p/png/1.6.40/623321e3762342e2acfc10354ddfe41e/lib",
+					"/Users/zero/.xmake/packages/s/sdl2/2.28.4/5f2daa5c247d46e9a94a2287bbb67737/lib",
+					"/Users/zero/.xmake/packages/s/sdl2_image/2.6.3/405b0057c0384c0a946a16c0eba14ea2/lib",
+					"/Users/zero/.xmake/packages/s/sdl2_mixer/2.6.3/94397902c07b4cd19fedbcb5986fa1c9/lib",
+					"/Users/zero/.xmake/packages/s/sdl2_ttf/2.20.2/df063bf7bcb9426f8b906cd21e588f41/lib",
+					"/Users/zero/.xmake/packages/w/webp/1.3.2/eda4caf2fc974101a472877c8d801f4c/lib",
+					"/Users/zero/.xmake/packages/z/zlib/1.3/b925f012959846df8882e532dd1c2fa4/lib",
+                );
+				MARKETING_VERSION = 0.9.10;
 				OTHER_LDFLAGS = (
-					"-lsdl2",
 					"-lsdl2_main",
+					"-ljpeg",
+					"-lbzip2",
+					"-lpng",
+					"-lzlib",
+					"-lsdl2_image",
+					"-lwebp",
+					"-lsdl2_ttf",
+					"-lharfbuzz",
+					"-lfreetype",
+					"-lsdl2_mixer",
+					"-lsdl2",
+					"-lbrotli",
+					"-lluajit",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.zeromake.onscripter-zero";
 				PRODUCT_NAME = "$(TARGET_NAME)";
