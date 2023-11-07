@@ -396,6 +396,10 @@ void InitCrashReport(){
 }
 #endif
 
+#ifndef ONSCRIPTER_MAIN_EXTREN
+#define ONSCRIPTER_MAIN_EXTREN
+#endif
+
 #ifdef ONSCRIPTER_MAIN_RENAME
 #undef main
 #define main ONSCRIPTER_MAIN_RENAME
@@ -412,7 +416,7 @@ void InitCrashReport(){
     // utils::printInfo("dumpBacktrace: %s", oss.str().c_str());
 // #else
 // #undef main
-int main(int argc, char *argv[]) {
+ONSCRIPTER_MAIN_EXTREN int main(int argc, char *argv[]) {
 // #endif
     utils::printInfo("Version:\n");
     utils::printInfo("  ONScripter-zero\t%s\n", ONS_ZERO_VERSION);

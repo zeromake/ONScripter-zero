@@ -27,7 +27,7 @@ local function render_pbxproj(context, input_path, output_path)
     output:close()
 end
 
-function main(target)
+function main(target, version)
     local links = duplicate.new()
     local link_dirs = duplicate.new()
     local include_dirs = duplicate.new()
@@ -43,9 +43,11 @@ function main(target)
         links:add(link)
     end
     for name, pkg in pairs(target:pkgs()) do
+        local priority = 0
         local pkg_links = pkg:get("links")
         if pkg_links ~= nil then
             pkg_links = type(pkg_links) == "table" and pkg_links or {pkg_links}
+            priority = #pkg_links
             for _, link in ipairs(pkg_links) do
                 links:add(link)
             end
@@ -55,7 +57,7 @@ function main(target)
             pkg_link_dirs = type(pkg_link_dirs) == "table" and pkg_link_dirs or {pkg_link_dirs}
             for _, link_dir in ipairs(pkg_link_dirs) do
                 local k = link_dir:split(path_sep, {plain = true})[6]
-                link_dirs:add(link_dir, k)
+                link_dirs:add(link_dir, k, priority)
             end
         end
         local pkg_includes = pkg:get("sysincludedirs")
@@ -63,7 +65,7 @@ function main(target)
             pkg_includes = type(pkg_includes) == "table" and pkg_includes or {pkg_includes}
             for _, include in ipairs(pkg_includes) do
                 local k = include:split(path_sep, {plain = true})[6]
-                include_dirs:add(include, k)
+                include_dirs:add(include, k, priority)
             end
         end
         
@@ -78,6 +80,8 @@ function main(target)
 
     table.sort(link_dirs.value)
     table.sort(include_dirs.value)
+    links:add("onscripter")
+    link_dirs:add(path.absolute(target:targetdir()))
 
     local app_name = "onscripter.app"
     local ref_hash = {}
@@ -146,9 +150,10 @@ function main(target)
             ))
         )
     end
+    table.sort(SOURCE_REFS)
 
     local BUILD_SECTION_FILES = {}
-    local build_section_template = '%s /* %s */ = {isa = PBXBuildFile; fileRef = %s; };'
+    local build_section_template = '%s /* %s */ = {isa = PBXBuildFile; fileRef = %s /* %s */; };'
     local build_source_files = {}
     for _, name in ipairs(source_files) do
         if name:endswith('.m') or name:endswith('.mm') or name:endswith('.storyboard') then
@@ -166,7 +171,8 @@ function main(target)
             build_section_template,
             current_hash,
             name.." in Sources",
-            ref_hash[name]
+            ref_hash[name],
+            name
         ))
         ref_hash[k] = current_hash
     end
@@ -179,10 +185,12 @@ function main(target)
             build_section_template,
             current_hash,
             name.." in Frameworks",
-            ref_hash[name]
+            ref_hash[name],
+            name
         ))
         ref_hash[k] = current_hash
     end
+    table.sort(BUILD_SECTION_FILES)
 
     local FRAMEWORKS_BUILD_PHASE = {}
     local framework_build_phase_template = '%s /* %s in Frameworks */,'
@@ -254,15 +262,15 @@ function main(target)
         )
     end
 
-    local VERSION = "0.9.10;"
+    local VERSION = string.format('"%s";', version)
     local HEADER_PATHS = {}
     for _, include_dir in ipairs(include_dirs.value) do
-        table.insert(HEADER_PATHS, string.format('"%s",', include_dir))
+        table.insert(HEADER_PATHS, string.format('%s,', include_dir))
     end
 
     local LIBRARY_PATHS = {}
     for _, link_dir in ipairs(link_dirs.value) do
-        table.insert(LIBRARY_PATHS, string.format('"%s",', link_dir))
+        table.insert(LIBRARY_PATHS, string.format('%s,', link_dir))
     end
     local LDFLAGS = {}
     for _, link in ipairs(links.value) do
