@@ -7,13 +7,21 @@ function _instance.new()
     return instance
 end
 
-function _instance:add(item, key)
+function _instance:add(item, key, count)
     if key == nil then
         key = item
     end
-    if self.duplicate[key] == nil then
-        self.duplicate[key] = true
-        table.insert(self.value, item)
+    if count == nil then
+        count = 0
+    end
+    if self.duplicate[key] == nil or self.duplicate[key][1] < count then
+        if self.duplicate[key] == nil then
+            self.duplicate[key] = {count, (#self.value)+1}
+            table.insert(self.value, item)
+        else
+            self.duplicate[key][1] = count
+            self.value[self.duplicate[key][2]] = item
+        end
     end
 end
 

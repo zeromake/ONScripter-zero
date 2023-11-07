@@ -243,10 +243,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = TU69Y9ZNC7;
+				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					${HEADER_PATHS}
-                );
+				);
 				INFOPLIST_FILE = onscripter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "onscripter-zero";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
@@ -261,7 +262,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					${LIBRARY_PATHS}
-                );
+				);
 				MARKETING_VERSION = ${VERSION}
 				OTHER_LDFLAGS = (
 					${LDFLAGS}
@@ -282,11 +283,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = TU69Y9ZNC7;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					${HEADER_PATHS}
-                );
+				);
 				INFOPLIST_FILE = onscripter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "onscripter-zero";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
@@ -301,7 +303,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					${LIBRARY_PATHS}
-                );
+				);
 				MARKETING_VERSION = ${VERSION}
 				OTHER_LDFLAGS = (
 					${LDFLAGS}

@@ -3,7 +3,7 @@ add_rules("mode.debug", "mode.release")
 add_includedirs("src")
 set_languages("c++17")
 
-local VERSION = os.getenv("VERSION") or "0.9.2"
+local VERSION = os.getenv("VERSION") or "0.9.10-development"
 if VERSION:startswith("v") then
     VERSION = VERSION:sub(2)
 end
@@ -119,8 +119,13 @@ target("onscripter")
     if is_plat("android") then
         set_kind("shared")
     elseif is_plat("iphoneos") then
+        -- ideviceinstaller -i xxx.app
+        -- ideviceinstaller -i xxx.ipa
         set_kind("static")
+        add_cxflags("-fembed-bitcode")
+        add_mxflags("-fembed-bitcode")
         add_defines("ONSCRIPTER_MAIN_RENAME=onscripter_main")
+        add_defines("ONSCRIPTER_MAIN_EXTREN=extern \"C\"")
     else
         use_binary()
     end
@@ -155,6 +160,7 @@ target("onscripter")
         end
     elseif is_plat("iphoneos") then
         add_files("src/entry/*.mm")
+        add_defines("RENDER_COPY_RECT_FULL=1")
         if get_config("target_minver") then
             local target_minver = tonumber(get_config("target_minver"))
             if target_minver < 13.0 then
@@ -206,9 +212,6 @@ target("onscripter")
         "src/language/*.cpp"
     )
     remove_files("src/AVIWrapper.cpp")
-    on_config(function (target)
-        import("script.generate_xcode")(target)
-    end)
     after_build(function (target)
         if target:is_plat("android") then
             local outDir = "project/android/app/libs/"..target:arch().."/"
@@ -226,6 +229,9 @@ target("onscripter")
                 os.cp(libfile, outDir)
             end
             os.cp(target:targetfile(), outDir)
+            return
+        elseif target:is_plat("iphoneos") then
+            import("script.generate_xcode")(target, VERSION)
             return
         end
         local out_name = "onscripter"

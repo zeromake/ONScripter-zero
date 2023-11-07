@@ -10,6 +10,10 @@
 @interface ViewController : UIViewController<UITableViewDataSource,UITableViewDelegate> {
     IBOutlet UITableView *tableView;
     NSMutableArray *data;
+    NSString *docpath;
+    NSString *script_dir;
 }
+
+-(NSString*) get_script_dir;
 
 @end
