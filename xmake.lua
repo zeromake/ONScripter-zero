@@ -93,7 +93,7 @@ local sdl2_image_config = {
 }
 if is_plat("windows", "mingw") then
     sdl2_image_config["backend"] = "wic"
-elseif is_plat("macosx", "iphoneos") then
+elseif is_plat("macosx") then
     sdl2_image_config["backend"] = "imageio"
 elseif is_plat("android") then
     -- 安卓 jpeg 库有 bug 无法显示，改用 stb 替代
