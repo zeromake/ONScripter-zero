@@ -23,27 +23,27 @@ void onscripter_init(ONScripter *ons, int argc, char *argv[]) {
     if ([[[DataCopier alloc] init] copy]) exit(-1);
 #endif
     // scripts and archives are stored under /Library/Caches
-    NSArray *cpaths = NSSearchPathForDirectoriesInDomains(
-        NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cpath =
-        [[cpaths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
-    char filename[256];
-    strcpy(filename, [cpath UTF8String]);
-    ons->setArchivePath(filename);
-    // output files are stored under /Documents
-    NSArray *dpaths = NSSearchPathForDirectoriesInDomains(
-        NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *dpath =
-        [[dpaths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
-    strcpy(filename, [dpath UTF8String]);
-    ons->setSaveDir(filename);
+    // NSArray *cpaths = NSSearchPathForDirectoriesInDomains(
+    //     NSCachesDirectory, NSUserDomainMask, YES);
+    // NSString *cpath =
+    //     [[cpaths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
+    // char filename[256];
+    // strcpy(filename, [cpath UTF8String]);
+    // ons->setArchivePath(filename);
+    // // output files are stored under /Documents
+    // NSArray *dpaths = NSSearchPathForDirectoriesInDomains(
+    //     NSDocumentDirectory, NSUserDomainMask, YES);
+    // NSString *dpath =
+    //     [[dpaths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
+    // strcpy(filename, [dpath UTF8String]);
+    // ons->setSaveDir(filename);
 
 #if defined(ZIP_URL)
     if ([[[DataDownloader alloc] init] download]) exit(-1);
 #endif
 
 #if defined(USE_SELECTOR)
-    // scripts and archives are stored under /Library/Caches
+    scripts and archives are stored under /Library/Caches
     cpath =
         [[[ScriptSelector alloc] initWithStyle:UITableViewStylePlain] select];
     strcpy(filename, [cpath UTF8String]);
@@ -90,7 +90,7 @@ void onscripter_init(ONScripter *ons, int argc, char *argv[]) {
 #if TARGET_OS_OSX
     CGFloat dpiScale = NSScreen.mainScreen.backingScaleFactor;
 #else
-    CGFloat dpiScale = UIScreen.mainScreen.scale;
+    CGFloat dpiScale = 0.0f;
 #endif
     if (dpiScale > 1.0f) {
         ons->force_render_ratio1 = 1;

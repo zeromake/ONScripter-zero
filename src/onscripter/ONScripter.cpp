@@ -89,6 +89,10 @@ void ONScripter::setScreenDirty(bool screen_dirty) {
 
 void ONScripter::setDebugLevel(int debug) { debug_level = debug; }
 
+#ifdef IOS
+extern "C" void onscripter_window_pixels(int *width, int *height);
+#endif
+
 void ONScripter::initSDL() {
     char useSimd[16];
 #if defined(USE_SIMD_X86_AVX2)
@@ -164,15 +168,23 @@ void ONScripter::initSDL() {
     screen_bpp = 32;
 
 #if (defined(IOS) || defined(ANDROID) || defined(WINRT))
+    int window_pixel_width;
+    int window_pixel_height;
+#ifdef IOS
+    onscripter_window_pixels(&window_pixel_width, &window_pixel_height);
+#else
     SDL_DisplayMode mode;
     SDL_GetDisplayMode(0, 0, &mode);
-    int width;
-    if (mode.w * screen_height > mode.h * screen_width)
-        width = (mode.h * screen_width / screen_height) &
-                (~0x01);  // to be 2 bytes aligned
-    else
-        width = mode.w;
-    screen_width = width;
+    window_pixel_width = mode.w;
+    window_pixel_height = mode.h;
+#endif
+    if (window_pixel_width > window_pixel_height) {
+        screen_height = window_pixel_height;
+        screen_width = 0;
+    } else {
+        screen_height = 0;
+        screen_width = window_pixel_width;
+    }
 #endif
 
     const double aspect_ratio =
@@ -185,10 +197,14 @@ void ONScripter::initSDL() {
         screen_device_width = force_window_height * aspect_ratio;
         screen_device_height = force_window_height;
     } else {
-        screen_device_width = screen_width;
-        screen_device_height = screen_width / aspect_ratio;
+        if (screen_width) {
+            screen_device_width = screen_width;
+            screen_device_height = screen_width / aspect_ratio;
+        } else if (screen_height) {
+            screen_device_width = screen_height * aspect_ratio;
+            screen_device_height = screen_height;
+        }
     }
-
     // use hardware scaling
     // 强制把画布放大到和窗口一样，但是在低端机上可能会比较卡，专门给手机版用的
     screen_width = script_h.screen_width;

@@ -12,6 +12,13 @@
 
 extern "C" int onscripter_main(const int argc, const char *argv[]);
 
+static int __window_size[2];
+
+extern "C" void onscripter_window_pixels(int *width, int *height) {
+    *width = __window_size[0];
+    *height = __window_size[1];
+}
+
 int main(int argc, char *argv[]) {
     SDL_Window *window;
     SDL_Event event;
@@ -22,6 +29,11 @@ int main(int argc, char *argv[]) {
     }
     
     window = SDL_CreateWindow(NULL, 0, 0, 320, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI);
+    int w = 0;
+    int h = 0;
+    SDL_GetWindowSizeInPixels(window, &w, &h);
+    __window_size[0] = w;
+    __window_size[1] = h;
     SDL_SysWMinfo systemWindowInfo;
     SDL_VERSION(&systemWindowInfo.version);
     SDL_GetWindowWMInfo(window, &systemWindowInfo);
@@ -56,7 +68,7 @@ int main(int argc, char *argv[]) {
     appWindow.rootViewController = rootVC;
     SDL_DestroyWindow(window);
     SDL_Quit();
-    const char *ons_argv[2] = {"onscripter", script_dir};
-    int ons_argc = 2;
+    const char *ons_argv[3] = {"onscripter", "--scale-window", script_dir};
+    int ons_argc = 3;
     return onscripter_main(ons_argc, ons_argv);
 }
