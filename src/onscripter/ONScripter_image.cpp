@@ -171,7 +171,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha,
 
     unsigned char *buffer = NULL;
     if (length > tmp_image_buf_length) {
-        buffer = new (std::nothrow) unsigned char[length];
+        buffer = new unsigned char[length];
         if (buffer == NULL) {
             utils::printError(
                 "failed to load [%s] because file size [%lu] is too large.\n",

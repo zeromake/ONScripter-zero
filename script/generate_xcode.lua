@@ -80,6 +80,7 @@ function main(target, version)
 
     table.sort(link_dirs.value)
     table.sort(include_dirs.value)
+    table.sort(links.value)
     links:add("onscripter")
     link_dirs:add(path.absolute(target:targetdir()))
 

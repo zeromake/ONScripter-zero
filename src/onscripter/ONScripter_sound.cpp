@@ -87,7 +87,7 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag,
     if (format & SOUND_MUSIC && length == music_buffer_length && music_buffer) {
         buffer = music_buffer;
     } else {
-        buffer = new (std::nothrow) unsigned char[length];
+        buffer = new unsigned char[length];
         if (buffer == NULL) {
             utils::printError(
                 "failed to load [%s] because file size [%lu] is too large.\n",
