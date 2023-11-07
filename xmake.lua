@@ -119,6 +119,7 @@ target("onscripter")
     if is_plat("android") then
         set_kind("shared")
     elseif is_plat("iphoneos") then
+        -- codesign --force --deep --sign - xxx.app
         -- ideviceinstaller -i xxx.app
         -- ideviceinstaller -i xxx.ipa
         set_kind("static")
