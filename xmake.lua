@@ -118,6 +118,7 @@ local function use_binary()
 end
 
 target("onscripter")
+    add_defines("ONS_RESIZE_SURFACE_IMPLEMENT=0")
     if is_plat("android") then
         set_kind("shared")
     elseif is_plat("iphoneos") then
