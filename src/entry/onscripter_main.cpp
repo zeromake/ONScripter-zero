@@ -400,6 +400,9 @@ void InitCrashReport(){
 #define ONSCRIPTER_MAIN_EXTREN
 #endif
 
+#ifdef ONSCRIPTER_UNDEF_MAIN
+#undef main
+#endif
 #ifdef ONSCRIPTER_MAIN_RENAME
 #undef main
 #define main ONSCRIPTER_MAIN_RENAME
