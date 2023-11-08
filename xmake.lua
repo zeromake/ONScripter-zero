@@ -150,8 +150,8 @@ target("onscripter")
     )
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
-    add_links("sdl2_main")
     if is_plat("macosx") then
+        add_links("sdl2_main")
         add_files("src/entry/*.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
         add_frameworks("AudioToolbox", "Cocoa")
@@ -162,6 +162,7 @@ target("onscripter")
             end
         end
     elseif is_plat("iphoneos") then
+        add_links("sdl2_main")
         add_files("src/entry/*.mm")
         add_defines("RENDER_COPY_RECT_FULL=1")
         if get_config("target_minver") then
@@ -172,6 +173,11 @@ target("onscripter")
         end
         add_defines("IOS", "GLES_SILENCE_DEPRECATION")
     elseif is_plat("windows", "mingw") then
+        add_defines("ONSCRIPTER_UNDEF_MAIN")
+        add_defines(
+            "UNICODE",
+            "_UNICODE"
+        )
         add_files("src/resource.rc")
         add_syslinks("windowscodecs")
     elseif is_plat("android") then
