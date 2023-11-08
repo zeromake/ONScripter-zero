@@ -94,11 +94,11 @@ static void setStr(char **dst, const char *src, int num = -1) {
 
     if (src) {
         if (num >= 0) {
-            *dst = new char[num + 1];
+            *dst = new char[num + 1]{0};
             memcpy(*dst, src, num);
             (*dst)[num] = '\0';
         } else {
-            *dst = new char[strlen(src) + 1];
+            *dst = new char[strlen(src) + 1]{0};
             strcpy(*dst, src);
         }
     }

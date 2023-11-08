@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
         if (length > buffer_length) {
             if (buffer) delete[] buffer;
-            buffer = new unsigned char[length];
+            buffer = new unsigned char[length]{0};
             buffer_length = length;
         }
         if (cSR.getFile(sFI.name, buffer) != length) {

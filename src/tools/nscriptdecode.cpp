@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
         std::fseek(pFile, 0x91C, 0);
         std::fread(&key, 4, 1, pFile);
     }
-    char *buffer = new char[BUFF_LENGHT];
+    char *buffer = new char[BUFF_LENGHT]{0};
     int result = std::fread(buffer, 1, BUFF_LENGHT, pFile);
     int magic_counter = 0;
     int offset = 0;

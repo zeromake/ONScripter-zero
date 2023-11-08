@@ -214,8 +214,20 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha,
     return tmp;
 }
 
+#ifndef ONS_RESIZE_SURFACE_IMPLEMENT
+#define ONS_RESIZE_SURFACE_IMPLEMENT 1
+#endif
+
 // resize 32bit surface to 32bit surface
 int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
+#if ONS_RESIZE_SURFACE_IMPLEMENT == 1
+    // 直接使用 SDL 的放大绘制
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+    SDL_BlitSurfaceScaled(src, NULL, dst, NULL);
+#else
+    SDL_BlitScaled(src, NULL, dst, NULL);
+#endif
+#else
     SDL_LockSurface(dst);
     SDL_LockSurface(src);
     Uint32 *src_buffer = (Uint32 *)src->pixels;
@@ -234,7 +246,7 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
 
     SDL_UnlockSurface(src);
     SDL_UnlockSurface(dst);
-
+#endif
     return 0;
 }
 

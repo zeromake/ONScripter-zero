@@ -776,7 +776,7 @@ int ONScripter::textCommand() {
         if (current_page->tag) delete[] current_page->tag;
         if (end_offset > start_offset) {
             int len = end_offset - start_offset;
-            current_page->tag = new char[len + 1];
+            current_page->tag = new char[len + 1]{0};
             memcpy(current_page->tag, buf + start_offset, len);
             current_page->tag[len] = 0;
         } else {

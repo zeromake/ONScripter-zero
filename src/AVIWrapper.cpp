@@ -44,7 +44,7 @@ AVIWrapper::AVIWrapper() {
     i_avi = NULL;
     v_stream = NULL;
     a_stream = NULL;
-    remaining_buffer = new char[DEFAULT_AUDIOBUF * 4];
+    remaining_buffer = new char[DEFAULT_AUDIOBUF * 4]{0};
     remaining_count = 0;
 }
 

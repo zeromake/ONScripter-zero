@@ -267,7 +267,7 @@ void ScriptParser::reset(bool isDestroy) {
 
     if (version_str) delete[] version_str;
     int __size = strlen(VERSION_STR1) + strlen(VERSION_STR2) + 3;
-    version_str = new char[__size];
+    version_str = new char[__size]{0};
     snprintf(version_str, __size, "%s\n%s\n", VERSION_STR1, VERSION_STR2);
     z_order = 499;
 
@@ -479,7 +479,7 @@ int ScriptParser::getSystemCallNo(const char *buffer) {
     else {
         utils::printInfo("rmenu add label call: %s\n", buffer);
         int no = rmenu_call_no++;
-        char *label = new char[strlen(buffer) + 1];
+        char *label = new char[strlen(buffer) + 1]{0};
         strcpy(label, buffer);
         rmenu_calls[no] = label;
         return no;
@@ -621,7 +621,7 @@ void ScriptParser::readStr(char **s) {
     *s = NULL;
 
     if (counter > 1) {
-        *s = new char[counter];
+        *s = new char[counter]{0};
         memcpy(*s, file_io_buf + file_io_buf_ptr, counter);
     }
     file_io_buf_ptr += counter;
@@ -766,11 +766,11 @@ void ScriptParser::setStr(char **dst, const char *src, int num) {
 
     if (src) {
         if (num >= 0) {
-            *dst = new char[num + 1];
+            *dst = new char[num + 1]{0};
             memcpy(*dst, src, num);
             (*dst)[num] = '\0';
         } else {
-            *dst = new char[strlen(src) + 1];
+            *dst = new char[strlen(src) + 1]{0};
             strcpy(*dst, src);
         }
     }

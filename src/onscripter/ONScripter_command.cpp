@@ -546,7 +546,7 @@ int ONScripter::splitCommand() {
         if (c < 256)
             token = token256;
         else
-            token = new char[c + 1];
+            token = new char[c + 1]{0};
 
         memcpy(token, save_buf, c);
         token[c] = '\0';
@@ -2067,7 +2067,7 @@ int ONScripter::gettextCommand() {
     script_h.readStr();
     int no = script_h.current_variable.var_no;
 
-    char *buf = new char[current_page->text_count + 1];
+    char *buf = new char[current_page->text_count + 1]{0};
     int i, j;
     for (i = 0, j = 0; i < current_page->text_count; i++) {
         if (current_page->text[i] != '\n') buf[j++] = current_page->text[i];
@@ -2425,7 +2425,7 @@ int ONScripter::getlogCommand() {
         int count = page->text_count;
         if (getlogtext_flag) {
             char *p = page->text;
-            char *p2 = buf = new char[page->text_count];
+            char *p2 = buf = new char[page->text_count]{0};
             count = 0;
             for (int i = 0; i < page->text_count; i++) {
                 if (IS_TWO_BYTE(*p)) {
@@ -2637,7 +2637,7 @@ int ONScripter::exec_dllCommand() {
         if (strncmp(buf + c, "/mkdir", 6) == 0) {
             c += 7;
             int __size = strlen(archive_path) + strlen(buf + c) + 1;
-            char *dir = new char[__size];
+            char *dir = new char[__size]{0};
             snprintf(dir, __size, "%s%s", archive_path, buf + c);
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
             mkdir(dir, 0755);
@@ -3234,7 +3234,7 @@ int ONScripter::captionCommand() {
     const char *buf = script_h.readStr();
     size_t len = strlen(buf);
 
-    char *buf2 = new char[len * 3 + 1];
+    char *buf2 = new char[len * 3 + 1]{0};
 
     DirectReader::convertCodingToUTF8(buf2, buf);
 
@@ -4284,7 +4284,7 @@ int ONScripter::sprintfCommand() {
     } al;
     size_t ptr_size = sizeof(uintptr_t);
     size_t arg_size = ptr_size * args.size();
-    al.pa = new char[arg_size];
+    al.pa = new char[arg_size]{0};
     memset(al.pa, 0, arg_size);
     int offset = 0;
     for (auto it = args.begin(); it != args.end(); it++) {

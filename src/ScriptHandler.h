@@ -274,16 +274,16 @@ private:
         };
         Alias( const char *name, int num ){
             next = NULL;
-            alias = new char[ strlen(name) + 1];
+            alias = new char[ strlen(name) + 1]{0};
             strcpy( alias, name );
             str = NULL;
             this->num = num;
         };
         Alias( const char *name, const char *str ){
             next = NULL;
-            alias = new char[ strlen(name) + 1];
+            alias = new char[ strlen(name) + 1]{0};
             strcpy( alias, name );
-            this->str = new char[ strlen(str) + 1];
+            this->str = new char[ strlen(str) + 1]{0};
             strcpy( this->str, str );
         };
         ~Alias(){

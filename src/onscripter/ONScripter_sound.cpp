@@ -288,7 +288,7 @@ int ONScripter::playMPEG(const char *filename, bool click_flag,
 
 #ifdef IOS
     const int __size = strlen(archive_path) + strlen(filename) + 1;
-    char *absolute_filename = new char[__size];
+    char *absolute_filename = new char[__size]{0};
     snprintf(absolute_filename, __size, "%s%s", archive_path, filename);
     playVideoIOS(absolute_filename, click_flag, loop_flag);
     delete[] absolute_filename;
@@ -401,7 +401,7 @@ int ONScripter::playMPEG(const char *filename, bool click_flag,
     SDL_DestroyMutex(oi.mutex);
     texture = SDL_CreateTextureFromSurface(renderer, accumulation_surface);
 #elif !defined(WINRT) && (defined(WIN32) || defined(_WIN32))
-    char *filename2 = new char[4096];
+    char *filename2 = new char[4096]{0};
     fpath(filename, filename2);
     SDL_CreateThread(call_system, "play-video", (void *)filename2);
     // system(filename2);

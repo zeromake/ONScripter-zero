@@ -84,23 +84,23 @@ AnimationInfo &AnimationInfo::operator=(const AnimationInfo &anim) {
         mutex = SDL_CreateMutex();
 
         if (image_name) {
-            image_name = new char[strlen(anim.image_name) + 1];
+            image_name = new char[strlen(anim.image_name) + 1]{0};
             strcpy(image_name, anim.image_name);
         }
         if (surface_name) {
-            surface_name = new char[strlen(anim.surface_name) + 1];
+            surface_name = new char[strlen(anim.surface_name) + 1]{0};
             strcpy(surface_name, anim.surface_name);
         }
         if (mask_surface_name) {
-            mask_surface_name = new char[strlen(anim.mask_surface_name) + 1];
+            mask_surface_name = new char[strlen(anim.mask_surface_name) + 1]{0};
             strcpy(mask_surface_name, anim.mask_surface_name);
         }
         if (file_name) {
-            file_name = new char[strlen(anim.file_name) + 1];
+            file_name = new char[strlen(anim.file_name) + 1]{0};
             strcpy(file_name, anim.file_name);
         }
         if (mask_file_name) {
-            mask_file_name = new char[strlen(anim.mask_file_name) + 1];
+            mask_file_name = new char[strlen(anim.mask_file_name) + 1]{0};
             strcpy(mask_file_name, anim.mask_file_name);
         }
         if (color_list) {
@@ -158,7 +158,7 @@ void AnimationInfo::deleteImageName() {
 void AnimationInfo::setImageName(const char *name) {
     deleteImageName();
     size_t len = strlen(name);
-    image_name = new char[len + 1];
+    image_name = new char[len + 1]{0};
     strcpy(image_name, name);
 }
 

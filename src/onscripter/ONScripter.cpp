@@ -311,9 +311,9 @@ void ONScripter::initSDL() {
                                          output_size, sharpness);
     }
 
-    wm_title_string = new char[strlen(DEFAULT_WM_TITLE) + 1];
+    wm_title_string = new char[strlen(DEFAULT_WM_TITLE) + 1]{0};
     memcpy(wm_title_string, DEFAULT_WM_TITLE, strlen(DEFAULT_WM_TITLE) + 1);
-    wm_icon_string = new char[strlen(DEFAULT_WM_ICON) + 1];
+    wm_icon_string = new char[strlen(DEFAULT_WM_ICON) + 1]{0};
     memcpy(wm_icon_string, DEFAULT_WM_TITLE, strlen(DEFAULT_WM_ICON) + 1);
     setCaption(wm_title_string, wm_icon_string);
 }
@@ -424,10 +424,11 @@ void ONScripter::setDLLFile(const char *filename) {
 }
 
 void ONScripter::setArchivePath(const char *path) {
-    if (archive_path) delete[] archive_path;
-    const int __size = RELATIVEPATHLENGTH + strlen(path) + 2;
-    archive_path = new char[__size];
-    if (archive_path[strlen(path) - 1] != DELIMITER) {
+    if (archive_path != NULL) delete[] archive_path;
+    const int path_size = strlen(path);
+    const int __size = RELATIVEPATHLENGTH + path_size + 2;
+    archive_path = new char[__size]{0};
+    if (path[path_size-1] != DELIMITER) {
         snprintf(archive_path, __size, "%s%s%c", RELATIVEPATH, path, DELIMITER);
     } else {
         snprintf(archive_path, __size, "%s%s", RELATIVEPATH, path);
@@ -437,7 +438,7 @@ void ONScripter::setArchivePath(const char *path) {
 void ONScripter::setSaveDir(const char *path) {
     if (save_dir) delete[] save_dir;
     const int __size = RELATIVEPATHLENGTH + strlen(path) + 2;
-    save_dir = new char[__size];
+    save_dir = new char[__size]{0};
     snprintf(save_dir, __size, RELATIVEPATH "%s%c", path, DELIMITER);
     script_h.setSaveDir(save_dir);
 }
@@ -479,7 +480,7 @@ int ONScripter::openScript() {
     is_script_read = true;
 
     if (archive_path == NULL) {
-        archive_path = new char[1];
+        archive_path = new char[1]{0};
         archive_path[0] = 0;
     }
 
@@ -533,11 +534,11 @@ int ONScripter::init() {
     int __size = 0;
     if (default_font) {
         __size = strlen(default_font) + 1;
-        font_file = new char[__size];
+        font_file = new char[__size]{0};
         snprintf(font_file, __size, "%s", default_font);
     } else {
         __size = strlen(FONT_FILE) + 1;
-        font_file = new char[__size];
+        font_file = new char[__size]{0};
         snprintf(font_file, __size, "%s", FONT_FILE);
 #ifdef USE_FONTCONFIG
         FILE *fp = NULL;
@@ -560,7 +561,7 @@ int ONScripter::init() {
             if (FcResultMatch ==
                 FcPatternGetString(p_pat, FC_FILE, 0, &val_s)) {
                 delete[] font_file;
-                font_file = new char[strlen((const char *)val_s) + 1];
+                font_file = new char[strlen((const char *)val_s) + 1]{0};
                 strcpy(font_file, (const char *)val_s);
                 utils::printInfo("Font: %s\n", font_file);
             }
@@ -1447,7 +1448,7 @@ void ONScripter::loadEnvData() {
             // options
             const int __size =
                 strlen(archive_path) + strlen(save_dir_envdata) + 2;
-            save_dir = new char[__size];
+            save_dir = new char[__size]{0};
             snprintf(save_dir, __size, "%s%s%c", archive_path, save_dir_envdata,
                      DELIMITER);
             script_h.setSaveDir(save_dir);

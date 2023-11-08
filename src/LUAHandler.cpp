@@ -663,7 +663,7 @@ int NSSetStrValue(lua_State *state) {
     lh->sh->getVariableData(no).str = NULL;
 
     if (str) {
-        lh->sh->getVariableData(no).str = new char[strlen(str) + 1];
+        lh->sh->getVariableData(no).str = new char[strlen(str) + 1]{0};
         strcpy(lh->sh->getVariableData(no).str, str);
     }
 
@@ -1000,7 +1000,7 @@ static int nsutf_from_ansi(lua_State *state) {
     size_t len = strlen(str) * 3 + 1;
     if (conv_buf_len < len) {
         if (conv_buf) delete[] conv_buf;
-        conv_buf = new char[len];
+        conv_buf = new char[len]{0};
         conv_buf_len = len;
     }
     DirectReader::convertCodingToUTF8(conv_buf, str);
@@ -1017,7 +1017,7 @@ static int nsutf_to_ansi(lua_State *state) {
     size_t len = strlen(str) * 2 + 1;
     if (conv_buf_len < len) {
         if (conv_buf) delete[] conv_buf;
-        conv_buf = new char[len];
+        conv_buf = new char[len]{0};
         conv_buf_len = len;
     }
     DirectReader::convertFromUTF8ToCoding(conv_buf, str);
@@ -1163,7 +1163,7 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
     } else if (strcmp(cmd2, "NSCALL_text") == 0) {
         num_argument_value = 1;
         char *p = sh->getStringBuffer() + ons->getStringBufferOffset();
-        buf = new char[strlen(p) + 1];
+        buf = new char[strlen(p) + 1]{0};
         memcpy(buf, p, strlen(p) + 1);
         lua_pushstring(state, buf);
     }
