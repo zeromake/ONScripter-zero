@@ -10,10 +10,6 @@ jobs:
     name: windows build
     runs-on: windows-latest
     steps:
-      - name: Setup Windows 10 SDK version 10.0.20348.0
-        uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.8
-        with:
-          sdk-version: 20348
       - name: Install NSIS
         run: |
           iwr -useb get.scoop.sh -outfile 'install.ps1'
