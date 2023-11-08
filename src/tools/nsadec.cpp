@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
         sAI = cNR.getArchiveInfoByIndex(i);
         sFI = sAI->fi_list[i];
         length = cNR.getFileLengthSubByIndex(sAI, i);
-        buffer = new unsigned char[length];
+        buffer = new unsigned char[length]{0};
         unsigned int len;
         if ((len = cNR.getFileSubByIndex(sAI, i, buffer)) != length) {
             fprintf(stderr, "file %s is not fully retrieved %d %lu\n",

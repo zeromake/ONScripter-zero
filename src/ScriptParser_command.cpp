@@ -66,7 +66,7 @@ int ScriptParser::versionstrCommand() {
 
     const char *buf = script_h.readStr();
     const int __size = strlen(save_buf) + strlen(buf) + strlen("\n") * 2 + 1;
-    version_str = new char[__size];
+    version_str = new char[__size]{0};
     snprintf(version_str, __size, "%s\n%s\n", save_buf, buf);
 
     return RET_CONTINUE;
@@ -342,7 +342,7 @@ int ScriptParser::savedirCommand() {
     if (!save_dir) {
         // a workaround not to overwrite save_dir given in command line options
         int __size = strlen(archive_path) + strlen(path) + 2;
-        save_dir = new char[__size];
+        save_dir = new char[__size]{0};
         snprintf(save_dir, __size, "%s%s%c", archive_path, path, DELIMITER);
 
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
@@ -515,7 +515,7 @@ int ScriptParser::nsadirCommand() {
 
     if (nsa_path) delete[] nsa_path;
     int __size = strlen(buf) + 2;
-    nsa_path = new char[__size];
+    nsa_path = new char[__size]{0};
     snprintf(nsa_path, __size, RELATIVEPATH "%s%c", buf, DELIMITER);
 
     return RET_CONTINUE;
@@ -666,7 +666,7 @@ int ScriptParser::midCommand() {
         vd.str = NULL;
     } else {
         if (start + len > strlen(save_buf)) len = strlen(save_buf) - start;
-        vd.str = new char[len + 1];
+        vd.str = new char[len + 1]{0};
         memcpy(vd.str, save_buf + start, len);
         vd.str[len] = '\0';
     }
@@ -1442,7 +1442,7 @@ int ScriptParser::atoiCommand() {
 
 int ScriptParser::arcCommand() {
     const char *buf = script_h.readStr();
-    char *buf2 = new char[strlen(buf) + 1];
+    char *buf2 = new char[strlen(buf) + 1]{0};
     strcpy(buf2, buf);
 
     int i = 0;
@@ -1498,12 +1498,12 @@ int ScriptParser::addCommand() {
         char *tmp_buffer = vd.str;
 
         if (tmp_buffer) {
-            vd.str = new char[strlen(tmp_buffer) + strlen(buf) + 1];
+            vd.str = new char[strlen(tmp_buffer) + strlen(buf) + 1]{0};
             strcpy(vd.str, tmp_buffer);
             strcat(vd.str, buf);
             delete[] tmp_buffer;
         } else {
-            vd.str = new char[strlen(buf) + 1];
+            vd.str = new char[strlen(buf) + 1]{0};
             strcpy(vd.str, buf);
         }
     } else

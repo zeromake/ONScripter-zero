@@ -68,7 +68,7 @@ int NsaReader::open(const char *nsa_path) {
                 break;
 
             archive_found = true;
-            archive_info_ns2[i].file_name = new char[strlen(archive_name) + 1];
+            archive_info_ns2[i].file_name = new char[strlen(archive_name) + 1]{0};
             memcpy(archive_info_ns2[i].file_name, archive_name,
                    strlen(archive_name) + 1);
             readArchive(&archive_info_ns2[i], ARCHIVE_TYPE_NS2, nsa_offset);
@@ -96,7 +96,7 @@ int NsaReader::open(const char *nsa_path) {
             if ((ai->file_handle = fopen(archive_name, "rb")) == NULL) break;
 
             archive_found = true;
-            ai->file_name = new char[strlen(archive_name) + 1];
+            ai->file_name = new char[strlen(archive_name) + 1]{0};
             memcpy(ai->file_name, archive_name, strlen(archive_name) + 1);
             readArchive(ai, ARCHIVE_TYPE_NSA, nsa_offset);
             num_of_nsa_archives = i + 1;

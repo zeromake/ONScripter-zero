@@ -144,12 +144,12 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
     if (anim->trans_mode != AnimationInfo::TRANS_LAYER)
 #endif
     {
-        anim->surface_name = new char[strlen(anim->file_name) + 1];
+        anim->surface_name = new char[strlen(anim->file_name) + 1]{0};
         strcpy(anim->surface_name, anim->file_name);
     }
 
     if (anim->mask_file_name) {
-        anim->mask_surface_name = new char[strlen(anim->mask_file_name) + 1];
+        anim->mask_surface_name = new char[strlen(anim->mask_file_name) + 1]{0};
         strcpy(anim->mask_surface_name, anim->mask_file_name);
     }
 
@@ -239,24 +239,25 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
              location == BaseReader::ARCHIVE_TYPE_NONE)) {
             SDL_Surface *src_s = surface;
 
-            // int w, h;
-            // if ( (w = src_s->w * screen_ratio1 / screen_ratio2) == 0 ) w = 1;
-            // if ( (h = src_s->h * screen_ratio1 / screen_ratio2) == 0 ) h = 1;
-            // SDL_PixelFormat *fmt = image_surface->format;
-            // surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-            //     w,
-            //     h,
-            //     fmt->BitsPerPixel,
-            //     fmt->Rmask,
-            //     fmt->Gmask,
-            //     fmt->Bmask,
-            //     fmt->Amask);
+            int w, h;
+            if ( (w = src_s->w * screen_ratio1 / screen_ratio2) == 0 ) w = 1;
+            if ( (h = src_s->h * screen_ratio1 / screen_ratio2) == 0 ) h = 1;
+            SDL_PixelFormat *fmt = image_surface->format;
+            surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                w,
+                h,
+                fmt->BitsPerPixel,
+                fmt->Rmask,
+                fmt->Gmask,
+                fmt->Bmask,
+                fmt->Amask);
             // SDL_Rect dest_rect{0, 0, w, h};
             // SDL_UpperBlit(src_s, NULL, surface, &dest_rect);
-            // resizeSurface(src_s, surface);
-            surface = ::rotozoomSurface(
-                src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2),
-                SMOOTHING_ON);
+            resizeSurface(src_s, surface);
+            // rotozoomSurface 性能非常的差……，甚至没有 ons 写的 resizeSurface 好
+            // surface = ::rotozoomSurface(
+            //     src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2),
+            //     SMOOTHING_ON);
             SDL_FreeSurface(src_s);
         }
 

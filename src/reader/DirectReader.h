@@ -76,7 +76,7 @@ protected:
             next = NULL;
         };
         RegisteredCompressionType( const char *ext, int type ){
-            this->ext = new char[ strlen(ext)+1 ];
+            this->ext = new char[ strlen(ext)+1 ]{0};
             for ( unsigned int i=0 ; i<strlen(ext)+1 ; i++ ){
                 this->ext[i] = ext[i];
                 if ( this->ext[i] >= 'a' && this->ext[i] <= 'z' )

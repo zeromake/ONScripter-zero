@@ -57,14 +57,14 @@ DirectReader::DirectReader(const char *path, const unsigned char *key_table) {
     file_sub_path = NULL;
     file_path_len = 0;
 
-    capital_name = new char[MAX_FILE_NAME_LENGTH * 2 + 1];
-    capital_name_tmp = new char[MAX_FILE_NAME_LENGTH * 3 + 1];
+    capital_name = new char[MAX_FILE_NAME_LENGTH * 2 + 1]{0};
+    capital_name_tmp = new char[MAX_FILE_NAME_LENGTH * 3 + 1]{0};
 
     if (path) {
-        archive_path = new char[strlen(path) + 1];
+        archive_path = new char[strlen(path) + 1]{0};
         memcpy(archive_path, path, strlen(path) + 1);
     } else {
-        archive_path = new char[1];
+        archive_path = new char[1]{0};
         archive_path[0] = 0;
     }
 
@@ -111,9 +111,9 @@ FILE *DirectReader::fopen(const char *path, const char *mode) {
     if (file_path_len < len) {
         file_path_len = len;
         if (file_full_path) delete[] file_full_path;
-        file_full_path = new char[file_path_len];
+        file_full_path = new char[file_path_len]{0};
         if (file_sub_path) delete[] file_sub_path;
-        file_sub_path = new char[file_path_len];
+        file_sub_path = new char[file_path_len]{0};
     }
     snprintf(file_full_path, file_path_len, "%s%s", archive_path, path);
 

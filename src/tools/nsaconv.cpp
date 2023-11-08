@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
         length = cSR.getFileLength(sFI.name);
         if (length > buffer_length) {
             if (buffer) delete[] buffer;
-            buffer = new unsigned char[length];
+            buffer = new unsigned char[length]{0};
             buffer_length = length;
         }
 

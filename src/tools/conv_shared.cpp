@@ -229,9 +229,9 @@ size_t rescaleJPEG(unsigned char *original_buffer, size_t length,
             cinfo.output_width * cinfo.output_height * cinfo.output_components +
             0x400;
         if (restored_buffer) delete[] restored_buffer;
-        restored_buffer = new unsigned char[restored_length];
+        restored_buffer = new unsigned char[restored_length]{0};
         if (*rescaled_buffer) delete[] *rescaled_buffer;
-        *rescaled_buffer = new unsigned char[restored_length];
+        *rescaled_buffer = new unsigned char[restored_length]{0};
     }
     int row_stride = cinfo.output_width * cinfo.output_components;
 

@@ -409,7 +409,7 @@ protected:
                 if (max_text <= 0) {
                     max_text = text_count;
                 }
-                char *text2 = new char[max_text*2];
+                char *text2 = new char[max_text*2]{0};
                 memset(text2, 0, max_text*2);
                 memcpy(text2, text, text_count);
                 delete[] text;

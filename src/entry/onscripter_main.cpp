@@ -450,7 +450,7 @@ ons.enableButtonShortCut();
     FILE *fp = NULL;
     if (ons.getArchivePath()) {
         size_t len = strlen(ons.getArchivePath()) + strlen(argfilename) + 1;
-        char *full_path = new char[len];
+        char *full_path = new char[len]{0};
         snprintf(full_path, len, "%s%s", ons.getArchivePath(), argfilename);
         fp = fopen(full_path, "r");
         delete[] full_path;
@@ -459,10 +459,10 @@ ons.enableButtonShortCut();
     if (fp) {
         char **args = new char *[16];
         int argn = 0;
-        args[argn] = new char[64];
+        args[argn] = new char[64]{0};
         while (argn < 16 && (fscanf(fp, "%s", args[argn]) > 0)) {
             ++argn;
-            if (argn < 16) args[argn] = new char[64];
+            if (argn < 16) args[argn] = new char[64]{0};
         }
         parseOption(argn, args);
         for (int i = 0; i < argn; ++i) delete[] args[i];

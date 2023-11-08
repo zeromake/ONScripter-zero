@@ -46,9 +46,9 @@ ScriptHandler::ScriptHandler() {
     log_info[FILE_LOG].filename = "NScrflog.dat";
     clickstr_list = NULL;
 
-    string_buffer = new char[STRING_BUFFER_LENGTH];
-    str_string_buffer = new char[STRING_BUFFER_LENGTH];
-    saved_string_buffer = new char[STRING_BUFFER_LENGTH];
+    string_buffer = new char[STRING_BUFFER_LENGTH]{0};
+    str_string_buffer = new char[STRING_BUFFER_LENGTH]{0};
+    saved_string_buffer = new char[STRING_BUFFER_LENGTH]{0};
 
     variable_data = NULL;
     extended_variable_data = NULL;
@@ -141,7 +141,7 @@ void ScriptHandler::reset() {
 
 void ScriptHandler::setSaveDir(const char *path) {
     if (save_dir) delete[] save_dir;
-    save_dir = new char[strlen(path) + 1];
+    save_dir = new char[strlen(path) + 1]{0};
     strcpy(save_dir, path);
 }
 
@@ -658,7 +658,7 @@ void ScriptHandler::loadKidokuData() {
     FILE *fp;
 
     setKidokuskip(true);
-    kidoku_buffer = new char[script_buffer_length / 8 + 1];
+    kidoku_buffer = new char[script_buffer_length / 8 + 1]{0};
     memset(kidoku_buffer, 0, script_buffer_length / 8 + 1);
 
     if ((fp = fopen("kidoku.dat", "rb", true)) != NULL) {
@@ -688,7 +688,7 @@ void ScriptHandler::addStrVariable(char **buf) {
 
 void ScriptHandler::setClickstr(const char *list) {
     if (clickstr_list) delete[] clickstr_list;
-    clickstr_list = new char[strlen(list) + 2];
+    clickstr_list = new char[strlen(list) + 2]{0};
     memcpy(clickstr_list, list, strlen(list) + 1);
     clickstr_list[strlen(list) + 1] = '\0';
 }
@@ -942,7 +942,7 @@ ScriptHandler::LogLink *ScriptHandler::findAndAddLog(LogInfo &info,
     if (!add_flag || cur) return cur;
 
     LogLink *link = new LogLink();
-    link->name = new char[strlen(capital_name) + 1];
+    link->name = new char[strlen(capital_name) + 1]{0};
     strcpy(link->name, capital_name);
     info.current_log->next = link;
     info.current_log = info.current_log->next;
@@ -1021,7 +1021,7 @@ ScriptHandler::VariableData &ScriptHandler::getVariableData(int no) {
 // Private methods
 
 int ScriptHandler::readScript(char *path) {
-    archive_path = new char[strlen(path) + 1];
+    archive_path = new char[strlen(path) + 1]{0};
     strcpy(archive_path, path);
 
     FILE *fp = NULL;
@@ -1099,7 +1099,7 @@ int ScriptHandler::readScript(char *path) {
         return -1;
     }
     if (script_buffer) delete[] script_buffer;
-    script_buffer = new char[estimated_buffer_length];
+    script_buffer = new char[estimated_buffer_length]{0};
 
     char *p_script_buffer;
     current_script = p_script_buffer = script_buffer;
@@ -1369,7 +1369,7 @@ int ScriptHandler::labelScript() {
             while (*(buf + 1) == '*') buf++;
             setCurrent(buf);
             readLabel();
-            label_info[++label_counter].name = new char[strlen(string_buffer)];
+            label_info[++label_counter].name = new char[strlen(string_buffer)]{0};
             strcpy(label_info[label_counter].name, string_buffer + 1);
             label_info[label_counter].label_header = buf;
             label_info[label_counter].num_of_lines = 1;
@@ -1407,7 +1407,7 @@ int ScriptHandler::findLabel(const char *label) {
         if (!strcmp(label_info[i].name, capital_label)) return i;
     }
     int size = strlen(label) + 32;
-    char *p = new char[size];
+    char *p = new char[size]{0};
     snprintf(p, size, "Label \"%s\" is not found.", label);
     errorAndExit(p);
 
@@ -1437,7 +1437,7 @@ void ScriptHandler::parseStr(char **buf) {
 
         if (findAndAddLog(log_info[FILE_LOG], str_string_buffer, false)) {
             parseStr(buf);
-            char *tmp_buf = new char[strlen(str_string_buffer) + 1];
+            char *tmp_buf = new char[strlen(str_string_buffer) + 1]{0};
             strcpy(tmp_buf, str_string_buffer);
             parseStr(buf);
             strcpy(str_string_buffer, tmp_buf);

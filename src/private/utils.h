@@ -52,7 +52,7 @@ namespace utils{
 		__android_log_vprint(ANDROID_LOG_VERBOSE, "INFO", format, ap);
 #elif defined(WINRT)
 		const int __size = 256;
-		char *buf = new char[__size];
+		char *buf = new char[__size]{0};
 		vsnprintf(buf, __size, format, ap);
 		LPWSTR wstr = new WCHAR[128];
 		MByteToWChar(buf, wstr, 256);
@@ -69,7 +69,7 @@ namespace utils{
 #ifdef ANDROID
 		__android_log_vprint(ANDROID_LOG_ERROR, "ERR", format, ap);
 #elif defined(WINRT)
-		char *buf = new char[256];
+		char *buf = new char[256]{0};
 		vsnprintf(buf, 256,format,ap);
 		LPWSTR wstr = new WCHAR[128];
 		MByteToWChar(buf, wstr, 256);

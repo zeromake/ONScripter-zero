@@ -69,8 +69,7 @@ int main(int argc, char *argv[]) {
     appWindow.rootViewController = rootVC;
     SDL_DestroyWindow(window);
     SDL_Quit();
-    // , "--scale-window"
-    const char *ons_argv[2] = {"onscripter", script_dir};
-    int ons_argc = 2;
+    const char *ons_argv[] = {"onscripter", "--scale-window", script_dir};
+    int ons_argc = 3;
     return onscripter_main(ons_argc, ons_argv);
 }

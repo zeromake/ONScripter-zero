@@ -316,7 +316,7 @@ bool ONScripter::executeSystemLoad() {
 
     bool nofile_flag;
     int __size = strlen(save_item_name) + 31 + 1;
-    char *buffer = new char[__size];
+    char *buffer = new char[__size]{0};
 
     SaveFileInfo save_file_info;
     for (unsigned int i = 1; i <= num_save_file; i++) {
@@ -425,7 +425,7 @@ void ONScripter::executeSystemSave() {
 
     bool nofile_flag;
     int __size = strlen(save_item_name) + 31 + 1;
-    char *buffer = new char[__size];
+    char *buffer = new char[__size]{0};
 
     for (unsigned int i = 1; i <= num_save_file; i++) {
         SaveFileInfo save_file_info;

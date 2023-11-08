@@ -47,7 +47,7 @@ int SarReader::open(const char *name) {
         return -1;
     }
 
-    info->file_name = new char[strlen(name) + 1];
+    info->file_name = new char[strlen(name) + 1]{0};
     memcpy(info->file_name, name, strlen(name) + 1);
 
     readArchive(info);
@@ -65,7 +65,7 @@ SarReader::ArchiveInfo *SarReader::openForCreate(const char *name) {
         delete info;
         return NULL;
     }
-    info->file_name = new char[strlen(name) + 1];
+    info->file_name = new char[strlen(name) + 1]{0};
     memcpy(info->file_name, name, strlen(name) + 1);
     last_archive_info->next = info;
     last_archive_info = last_archive_info->next;
