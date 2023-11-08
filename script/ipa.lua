@@ -8,6 +8,7 @@ local options = {
 }
 
 function main(...)
+    -- https://archive.org/details/ipaarchive?query=Shadowrocket
     local argv = option.parse({...}, options, "打包 ipa 文件")
     if not argv.input then
         argv.help()
@@ -16,9 +17,9 @@ function main(...)
     local output = path.absolute(argv.output and argv.output or argv.input:sub(1, -4).."ipa")
     local swap = output:sub(1, -4).."zip"
     local swap_dir = path.absolute(path.join(os.scriptdir(), "../build/ipa_swap"))
-    -- os.tryrm(swap_dir)
-    -- os.mkdir(path.join(swap_dir, "Payload"))
-    -- os.trycp(argv.input, path.join(swap_dir, "Payload"))
+    os.tryrm(swap_dir)
+    os.mkdir(path.join(swap_dir, "Payload"))
+    os.trycp(argv.input, path.join(swap_dir, "Payload"))
     archive.archive(swap, "Payload", {recurse = true, curdir = swap_dir})
     os.mv(swap, output)
     print(output, "done")
