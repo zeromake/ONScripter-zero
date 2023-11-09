@@ -356,3 +356,9 @@ target("arcmake")
 --         "src/resize_image.cpp",
 --         "src/language/*.cpp"
 --     )
+target("resize")
+    add_packages("sdl2", "sdl2_image")
+    use_binary()
+    add_files("demo/resize.cpp")
+    add_files("src/resize.c")
+    add_includedirs("src")
