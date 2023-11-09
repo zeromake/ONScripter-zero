@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     );
     printf("src_img: %d x %d\n", src_img->w, src_img->h);
     printf("img: %d x %d\n", img->w, img->h);
-    ResizeImage(src_img, img, LanczosFilter, 1.0);
+    ResizeImage(src_img, img, UndefinedFilter, 1.0);
     // SDL_UpperBlitScaled(src_img, NULL, img, NULL);
     SDL_Texture* texture = 
         SDL_CreateTextureFromSurface(renderer, img);
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
                     break;
             }
 
-        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xff);
         SDL_RenderClear(renderer);
 
         SDL_Rect imgRect = {0, 0, img->w, img->h};
