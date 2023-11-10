@@ -67,10 +67,15 @@ void ONScripter::searchSaveFile(SaveFileInfo &save_file_info, int no) {
     const int __size = 256;
     char file_name[__size];
 
-    script_h.getStringFromInteger(save_file_info.sjis_no, SJIS_INFO_SIZE, no,
+    script_h.getStringFromInteger(save_file_info.sjis_no,
+                                  SJIS_INFO_SIZE,
+                                  no,
                                   (num_save_file >= 10) ? 2 : 1);
-    snprintf(file_name, __size, "%ssave%d.dat",
-             save_dir ? save_dir : archive_path, no);
+    snprintf(file_name,
+             __size,
+             "%ssave%d.dat",
+             save_dir ? save_dir : archive_path,
+             no);
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
     struct stat buf;
     struct tm *tm;
@@ -110,8 +115,13 @@ void ONScripter::searchSaveFile(SaveFileInfo &save_file_info, int no) {
 
     WCHAR file_nameW[256];
     MultiByteToWideChar(CP_ACP, 0, file_name, -1, file_nameW, 256);
-    handle = CreateFile(file_nameW, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                        FILE_ATTRIBUTE_NORMAL, NULL);
+    handle = CreateFile(file_nameW,
+                        GENERIC_READ,
+                        0,
+                        NULL,
+                        OPEN_EXISTING,
+                        FILE_ATTRIBUTE_NORMAL,
+                        NULL);
 
     if (handle == INVALID_HANDLE_VALUE) {
         save_file_info.valid = false;
@@ -180,14 +190,17 @@ void ONScripter::searchSaveFile(SaveFileInfo &save_file_info, int no) {
     save_file_info.minute = ptm->tm_min;
 #endif
     save_file_info.valid = true;
-    script_h.getStringFromInteger(save_file_info.sjis_month, SJIS_INFO_SIZE,
-                                  save_file_info.month, 2);
-    script_h.getStringFromInteger(save_file_info.sjis_day, SJIS_INFO_SIZE,
-                                  save_file_info.day, 2);
-    script_h.getStringFromInteger(save_file_info.sjis_hour, SJIS_INFO_SIZE,
-                                  save_file_info.hour, 2);
-    script_h.getStringFromInteger(save_file_info.sjis_minute, SJIS_INFO_SIZE,
-                                  save_file_info.minute, 2, true);
+    script_h.getStringFromInteger(
+        save_file_info.sjis_month, SJIS_INFO_SIZE, save_file_info.month, 2);
+    script_h.getStringFromInteger(
+        save_file_info.sjis_day, SJIS_INFO_SIZE, save_file_info.day, 2);
+    script_h.getStringFromInteger(
+        save_file_info.sjis_hour, SJIS_INFO_SIZE, save_file_info.hour, 2);
+    script_h.getStringFromInteger(save_file_info.sjis_minute,
+                                  SJIS_INFO_SIZE,
+                                  save_file_info.minute,
+                                  2,
+                                  true);
 }
 
 char *ONScripter::readSaveStrFromFile(int no) {
@@ -243,13 +256,14 @@ int ONScripter::loadSaveFile(int no) {
 
     int file_version = readChar() * 100;
     file_version += readChar();
-    utils::printInfo("Save file version is %d.%d\n", file_version / 100,
-                     file_version % 100);
+    utils::printInfo(
+        "Save file version is %d.%d\n", file_version / 100, file_version % 100);
     if (file_version > SAVEFILE_VERSION_MAJOR * 100 + SAVEFILE_VERSION_MINOR) {
         utils::printError(
             "Save file is newer than %d.%d, please use the latest "
             "ONScripter.\n",
-            SAVEFILE_VERSION_MAJOR, SAVEFILE_VERSION_MINOR);
+            SAVEFILE_VERSION_MAJOR,
+            SAVEFILE_VERSION_MINOR);
         return -1;
     }
 

@@ -104,8 +104,10 @@ static void setStr(char **dst, const char *src, int num = -1) {
     }
 }
 
-static SDL_Surface *loadImage(char *file_name, bool *has_alpha,
-                              SDL_Surface *surface, BaseReader *br) {
+static SDL_Surface *loadImage(char *file_name,
+                              bool *has_alpha,
+                              SDL_Surface *surface,
+                              BaseReader *br) {
     if (!file_name) return NULL;
     unsigned long length = br->getFileLength(file_name);
 
@@ -196,8 +198,14 @@ char *FuruLayer::message(const char *message, int &ret_int) {
             AnimationInfo::alloc32bitSurface(1, 1, ons.getTextureFormat());
         if (tumbling) {
             // "Hana"
-            if (sscanf(message, "i|%d,%d,%d,%d,%d,%d", &tmp[0], &num_cells[0],
-                       &tmp[1], &num_cells[1], &tmp[2], &num_cells[2])) {
+            if (sscanf(message,
+                       "i|%d,%d,%d,%d,%d,%d",
+                       &tmp[0],
+                       &num_cells[0],
+                       &tmp[1],
+                       &num_cells[1],
+                       &tmp[2],
+                       &num_cells[2])) {
                 for (int i = 0; i < 3; i++) {
                     elements[i].setSprite(
                         new AnimationInfo(sprite_info[tmp[i]]));
@@ -205,9 +213,14 @@ char *FuruLayer::message(const char *message, int &ret_int) {
                     if (elements[i].sprite->pos.w > max_sp_w)
                         max_sp_w = elements[i].sprite->pos.w;
                 }
-            } else if (sscanf(message, "i|%120[^,],%d,%120[^,],%d,%120[^,],%d",
-                              &buf[0][0], &num_cells[0], &buf[1][0],
-                              &num_cells[1], &buf[2][0], &num_cells[2])) {
+            } else if (sscanf(message,
+                              "i|%120[^,],%d,%120[^,],%d,%120[^,],%d",
+                              &buf[0][0],
+                              &num_cells[0],
+                              &buf[1][0],
+                              &num_cells[1],
+                              &buf[2][0],
+                              &num_cells[2])) {
                 for (int i = 0; i < 3; i++) {
                     bool has_alpha = false;
                     SDL_Surface *img =
@@ -235,8 +248,11 @@ char *FuruLayer::message(const char *message, int &ret_int) {
                     if (elements[i].sprite->pos.w > max_sp_w)
                         max_sp_w = elements[i].sprite->pos.w;
                 }
-            } else if (sscanf(message, "i|%[^,],%[^,],%[^,]", &buf[0][0],
-                              &buf[1][0], &buf[2][0])) {
+            } else if (sscanf(message,
+                              "i|%[^,],%[^,],%[^,]",
+                              &buf[0][0],
+                              &buf[1][0],
+                              &buf[2][0])) {
                 for (int i = 0; i < 3; i++) {
                     Uint32 firstpix = 0;
                     bool has_alpha = false;
@@ -264,13 +280,23 @@ char *FuruLayer::message(const char *message, int &ret_int) {
         }
         SDL_FreeSurface(ref_surface);
         // Set Parameters
-    } else if (sscanf(message, "s|%d,%d,%d,%d,%d", &interval, &fall_velocity,
-                      &wind, &amplitude, &freq)) {
+    } else if (sscanf(message,
+                      "s|%d,%d,%d,%d,%d",
+                      &interval,
+                      &fall_velocity,
+                      &wind,
+                      &amplitude,
+                      &freq)) {
         furu_init();
         validate_params();
         // Transition (adjust) Parameters
-    } else if (sscanf(message, "t|%d,%d,%d,%d,%d", &tmp[0], &tmp[1], &tmp[2],
-                      &tmp[3], &tmp[4])) {
+    } else if (sscanf(message,
+                      "t|%d,%d,%d,%d,%d",
+                      &tmp[0],
+                      &tmp[1],
+                      &tmp[2],
+                      &tmp[3],
+                      &tmp[4])) {
         interval += tmp[0];
         fall_velocity += tmp[1];
         wind += tmp[2];
@@ -302,8 +328,13 @@ char *FuruLayer::message(const char *message, int &ret_int) {
         // Get Parameters
     } else if (!strcmp(message, "g")) {
         ret_int = paused ? 1 : 0;
-        snprintf(&buf[0][0], __buf_item_size, "s|%d,%d,%d,%d,%d", interval,
-                 fall_velocity, wind, amplitude,
+        snprintf(&buf[0][0],
+                 __buf_item_size,
+                 "s|%d,%d,%d,%d,%d",
+                 interval,
+                 fall_velocity,
+                 wind,
+                 amplitude,
                  (freq * 360 / FURU_AMP_TABLE_SIZE));
         setStr(&ret_str, &buf[0][0]);
         // Halt adding new elements

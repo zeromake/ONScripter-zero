@@ -73,7 +73,8 @@ SarReader::ArchiveInfo *SarReader::openForCreate(const char *name) {
     return info;
 }
 
-void SarReader::readArchive(ArchiveInfo *ai, int archive_type,
+void SarReader::readArchive(ArchiveInfo *ai,
+                            int archive_type,
                             unsigned int offset) {
     unsigned int i;
 
@@ -203,7 +204,9 @@ void SarReader::readArchive(ArchiveInfo *ai, int archive_type,
     }
 }
 
-int SarReader::writeHeaderSub(ArchiveInfo *ai, FILE *fp, int archive_type,
+int SarReader::writeHeaderSub(ArchiveInfo *ai,
+                              FILE *fp,
+                              int archive_type,
                               int nsa_offset) {
     unsigned int i, j;
 
@@ -251,9 +254,14 @@ int SarReader::writeHeader(FILE *fp) {
     return writeHeaderSub(ai, fp);
 }
 
-size_t SarReader::putFileSub(ArchiveInfo *ai, FILE *fp, int no, size_t offset,
-                             size_t length, size_t original_length,
-                             int compression_type, bool modified_flag,
+size_t SarReader::putFileSub(ArchiveInfo *ai,
+                             FILE *fp,
+                             int no,
+                             size_t offset,
+                             size_t length,
+                             size_t original_length,
+                             int compression_type,
+                             bool modified_flag,
                              unsigned char *buffer) {
     ai->fi_list[no].compression_type = compression_type;
     ai->fi_list[no].length = length;
@@ -295,15 +303,29 @@ size_t SarReader::putFileSub(ArchiveInfo *ai, FILE *fp, int no, size_t offset,
     return ai->fi_list[no].length;
 }
 
-size_t SarReader::putFile(FILE *fp, int no, size_t offset, size_t length,
-                          size_t original_length, bool modified_flag,
+size_t SarReader::putFile(FILE *fp,
+                          int no,
+                          size_t offset,
+                          size_t length,
+                          size_t original_length,
+                          bool modified_flag,
                           unsigned char *buffer) {
     ArchiveInfo *ai = archive_info.next;
-    return putFileSub(ai, fp, no, offset, length, original_length,
-                      ai->fi_list[no].compression_type, modified_flag, buffer);
+    return putFileSub(ai,
+                      fp,
+                      no,
+                      offset,
+                      length,
+                      original_length,
+                      ai->fi_list[no].compression_type,
+                      modified_flag,
+                      buffer);
 }
 
-size_t SarReader::addFile(ArchiveInfo *ai, FILE *newfp, int no, size_t offset,
+size_t SarReader::addFile(ArchiveInfo *ai,
+                          FILE *newfp,
+                          int no,
+                          size_t offset,
                           unsigned char *buffer) {
     fseek(newfp, 0L, SEEK_SET);
     if (fread(buffer, 1, ai->fi_list[no].length, newfp) !=
@@ -417,7 +439,8 @@ size_t SarReader::getFileLength(const char *file_name) {
     return info->fi_list[j].original_length;
 }
 
-size_t SarReader::getFileSubByIndex(ArchiveInfo *ai, unsigned int i,
+size_t SarReader::getFileSubByIndex(ArchiveInfo *ai,
+                                    unsigned int i,
                                     unsigned char *buf) {
     if (i == ai->num_of_files) return 0;
 
@@ -448,13 +471,15 @@ size_t SarReader::getFileSubByIndex(ArchiveInfo *ai, unsigned int i,
     return ret;
 }
 
-size_t SarReader::getFileSub(ArchiveInfo *ai, const char *file_name,
+size_t SarReader::getFileSub(ArchiveInfo *ai,
+                             const char *file_name,
                              unsigned char *buf) {
     unsigned int i = getIndexFromFile(ai, file_name);
     return getFileSubByIndex(ai, i, buf);
 }
 
-size_t SarReader::getFile(const char *file_name, unsigned char *buf,
+size_t SarReader::getFile(const char *file_name,
+                          unsigned char *buf,
                           int *location) {
     size_t ret;
     if ((ret = DirectReader::getFile(file_name, buf, location))) return ret;

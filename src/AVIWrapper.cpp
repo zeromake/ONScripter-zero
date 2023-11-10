@@ -122,12 +122,16 @@ int AVIWrapper::initAV(SDL_Surface *surface, bool audio_open_flag) {
     a_stream->GetAudioDecoder()->GetOutputFormat(&wave_fmt);
     if (debug_flag)
         utils::printInfo(" format %d ch %d sample %d bit %d avg Bps %d\n",
-                         wave_fmt.wFormatTag, wave_fmt.nChannels,
-                         wave_fmt.nSamplesPerSec, wave_fmt.wBitsPerSample,
+                         wave_fmt.wFormatTag,
+                         wave_fmt.nChannels,
+                         wave_fmt.nSamplesPerSec,
+                         wave_fmt.wBitsPerSample,
                          wave_fmt.nAvgBytesPerSec);
 
-    if (Mix_OpenAudio(wave_fmt.nSamplesPerSec, MIX_DEFAULT_FORMAT,
-                      wave_fmt.nChannels, DEFAULT_AUDIOBUF) < 0) {
+    if (Mix_OpenAudio(wave_fmt.nSamplesPerSec,
+                      MIX_DEFAULT_FORMAT,
+                      wave_fmt.nChannels,
+                      DEFAULT_AUDIOBUF) < 0) {
         fprintf(stderr, "can't open audio device\n");
         a_stream->StopStreaming();
         delete a_stream;
@@ -165,8 +169,8 @@ void AVIWrapper::audioCallback(void *userdata, Uint8 *stream, int len) {
     }
 
     while (len > 0 && !a_stream->Eof()) {
-        a_stream->ReadFrames(remaining_buffer, (size_t)len, (size_t)len,
-                             samples, ocnt);
+        a_stream->ReadFrames(
+            remaining_buffer, (size_t)len, (size_t)len, samples, ocnt);
         if ((int)ocnt <= len) {
             memcpy(stream + count, remaining_buffer, ocnt);
             len -= ocnt;

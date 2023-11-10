@@ -133,7 +133,8 @@ int NSDDLL(lua_State *state) {
     while (dll_func_table[idx].name1) {
         size_t len = strlen(dll_func_table[idx].name1);
         if (strlen(str1) >= len &&
-            strncmp(str1 + strlen(str1) - len, dll_func_table[idx].name1,
+            strncmp(str1 + strlen(str1) - len,
+                    dll_func_table[idx].name1,
                     len) == 0 &&
             strcmp(str2, dll_func_table[idx].name2) == 0)
             break;
@@ -192,8 +193,17 @@ int NSDSp2(lua_State *state) {
     float rot = luaL_checknumber(state, 10);
     int alpha = luaL_checkinteger(state, 11);
 
-    lh->ons->NSDSp2Command(num, dcx, dcy, sx, sy, w, h, (int)(xs * 100.0),
-                           (int)(xy * 100.0), (int)rot, alpha);
+    lh->ons->NSDSp2Command(num,
+                           dcx,
+                           dcy,
+                           sx,
+                           sy,
+                           w,
+                           h,
+                           (int)(xs * 100.0),
+                           (int)(xy * 100.0),
+                           (int)rot,
+                           alpha);
 
     return 0;
 }
@@ -739,7 +749,10 @@ int NSSp2Load(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
 
-    CMD_BUF_SNPRINTF(cmd_buf, "_lsp2 %d, \"%s\", %d, 0, 100, 100, 0", no, str,
+    CMD_BUF_SNPRINTF(cmd_buf,
+                     "_lsp2 %d, \"%s\", %d, 0, 100, 100, 0",
+                     no,
+                     str,
                      lh->ons->getWidth() * 2);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
@@ -762,8 +775,15 @@ int NSSp2Move(lua_State *state) {
     int opt = luaL_checkinteger(state, 8);
 
     lh->ons->getSprite2Info(no)->blending_mode = opt;
-    CMD_BUF_SNPRINTF(cmd_buf, "_amsp2 %d, %d, %d, %d, %d, %d, %d", no, x, y, sx,
-                     sy, r, alpha);
+    CMD_BUF_SNPRINTF(cmd_buf,
+                     "_amsp2 %d, %d, %d, %d, %d, %d, %d",
+                     no,
+                     x,
+                     y,
+                     sx,
+                     sy,
+                     r,
+                     alpha);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -837,8 +857,8 @@ int NSSpLoad(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
 
-    CMD_BUF_SNPRINTF(cmd_buf, "_lsp %d, \"%s\", %d, 0", no, str,
-                     lh->ons->getWidth() + 1);
+    CMD_BUF_SNPRINTF(
+        cmd_buf, "_lsp %d, \"%s\", %d, 0", no, str, lh->ons->getWidth() + 1);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -1067,7 +1087,9 @@ extern "C" int luaopen_dpshadow(lua_State *state) {
 }
 #endif
 
-void LUAHandler::init(ONScripter *ons, ScriptHandler *sh, int screen_ratio1,
+void LUAHandler::init(ONScripter *ons,
+                      ScriptHandler *sh,
+                      int screen_ratio1,
                       int screen_ratio2) {
     this->ons = ons;
     this->sh = sh;
@@ -1117,11 +1139,11 @@ void LUAHandler::loadInitScript() {
         *p2++ = *p++;
     }
 
-    if (luaL_loadbuffer(state, (const char *)buffer2, p2 - buffer2,
-                        INIT_SCRIPT) ||
+    if (luaL_loadbuffer(
+            state, (const char *)buffer2, p2 - buffer2, INIT_SCRIPT) ||
         lua_pcall(state, 0, 0, 0)) {
-        utils::printError("cannot parse %s %s\n", INIT_SCRIPT,
-                          lua_tostring(state, -1));
+        utils::printError(
+            "cannot parse %s %s\n", INIT_SCRIPT, lua_tostring(state, -1));
     }
 
     delete[] buffer;

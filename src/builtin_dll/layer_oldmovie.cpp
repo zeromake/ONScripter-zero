@@ -217,8 +217,8 @@ void OldMovieLayer::om_init() {
         AnimationInfo::allocSurface(width, MAX_GLOW, ons.getTextureFormat());
     for (SDL_Rect r = {0, 0, width, 1}; r.y < MAX_GLOW; r.y++) {
         const int ry = (r.y * 30 / MAX_GLOW) + 4;
-        SDL_FillRect(GlowSurface, &r,
-                     SDL_MapRGB(GlowSurface->format, ry, ry, ry));
+        SDL_FillRect(
+            GlowSurface, &r, SDL_MapRGB(GlowSurface->format, ry, ry, ry));
     }
 }
 
@@ -270,8 +270,14 @@ char* OldMovieLayer::message(const char* message, int& ret_int) {
     if (!sprite_info) return NULL;
 
     utils::printInfo("OldMovieLayer: got message '%s'\n", message);
-    if (sscanf(message, "s|%d,%d,%d,%d,%d,%d", &blur_level, &noise_level,
-               &glow_level, &scratch_level, &dust_level, &sprite_no)) {
+    if (sscanf(message,
+               "s|%d,%d,%d,%d,%d,%d",
+               &blur_level,
+               &noise_level,
+               &glow_level,
+               &scratch_level,
+               &dust_level,
+               &sprite_no)) {
         if (blur_level < 0)
             blur_level = 0;
         else if (blur_level > 3)
@@ -299,8 +305,10 @@ char* OldMovieLayer::message(const char* message, int& ret_int) {
     return NULL;
 }
 
-inline static void imageFilterMean(unsigned char* src1, unsigned char* src2,
-                                   unsigned char* dst, int length) {
+inline static void imageFilterMean(unsigned char* src1,
+                                   unsigned char* src2,
+                                   unsigned char* dst,
+                                   int length) {
     int n = length + 1;
     while (--n > 0) {
         int result = ((int)(*src1) + (int)(*src2)) / 2;
@@ -313,8 +321,12 @@ inline static void imageFilterMean(unsigned char* src1, unsigned char* src2,
 
 // Apply blur effect by averaging two offset copies of a source surface
 // together.
-static void BlurOnSurface(SDL_Surface* src, SDL_Surface* dst, SDL_Rect clip,
-                          int rx, int ry, int width) {
+static void BlurOnSurface(SDL_Surface* src,
+                          SDL_Surface* dst,
+                          SDL_Rect clip,
+                          int rx,
+                          int ry,
+                          int width) {
     // Calculate clipping bounds to avoid reading outside the source surface.
     const int srcx = clip.x - rx;
     const int srcy = clip.y - ry;
@@ -374,7 +386,8 @@ static void BlurOnSurface(SDL_Surface* src, SDL_Surface* dst, SDL_Rect clip,
     }
 }
 
-inline static void imageFilterSubFrom(unsigned char* dst, unsigned char* src,
+inline static void imageFilterSubFrom(unsigned char* dst,
+                                      unsigned char* src,
                                       int length) {
     int n = length + 1;
     while (--n > 0) {
@@ -384,7 +397,8 @@ inline static void imageFilterSubFrom(unsigned char* dst, unsigned char* src,
     }
 }
 
-inline static void imageFilterAddTo(unsigned char* dst, unsigned char* src,
+inline static void imageFilterAddTo(unsigned char* dst,
+                                    unsigned char* src,
                                     int length) {
     int n = length + 1;
     while (--n > 0) {
@@ -423,8 +437,8 @@ void OldMovieLayer::refresh(SDL_Surface* surface, SDL_Rect& clip) {
         // go.
         unsigned char* s = (unsigned char*)surface->pixels;
         if (noise_level > 0)
-            imageFilterSubFrom(s, (unsigned char*)NoiseSurface[ns]->pixels,
-                               sp * surface->h);
+            imageFilterSubFrom(
+                s, (unsigned char*)NoiseSurface[ns]->pixels, sp * surface->h);
         // Since the glow is stored as a single scanline for each level, we
         // always apply the glow scanline by scanline.
         if (glow_level > 0) {

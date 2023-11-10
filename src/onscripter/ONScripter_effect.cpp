@@ -38,8 +38,8 @@ void ONScripter::generateEffectDst(int effect_no) {
     int refresh_mode = refreshMode();
 
     if (effect_no == 1)
-        refreshSurface(effect_dst_surface, &dirty_rect.bounding_box,
-                       refresh_mode);
+        refreshSurface(
+            effect_dst_surface, &dirty_rect.bounding_box, refresh_mode);
     else
         refreshSurface(effect_dst_surface, NULL, refresh_mode);
 }
@@ -261,8 +261,8 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
 
         case 10:  // Cross fade
             height = 256 * effect_counter / effect_duration;
-            alphaBlend(NULL, ALPHA_BLEND_CONST, height,
-                       &dirty_rect.bounding_box);
+            alphaBlend(
+                NULL, ALPHA_BLEND_CONST, height, &dirty_rect.bounding_box);
             break;
 
         case 11:  // Left scroll
@@ -334,7 +334,8 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
             break;
 
         case 15:  // Fade with mask
-            alphaBlend(effect->anim.image_surface, ALPHA_BLEND_FADE_MASK,
+            alphaBlend(effect->anim.image_surface,
+                       ALPHA_BLEND_FADE_MASK,
                        256 * effect_counter / effect_duration,
                        &dirty_rect.bounding_box);
             break;
@@ -350,7 +351,8 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
             break;
 
         case 18:  // Cross fade with mask
-            alphaBlend(effect->anim.image_surface, ALPHA_BLEND_CROSSFADE_MASK,
+            alphaBlend(effect->anim.image_surface,
+                       ALPHA_BLEND_CROSSFADE_MASK,
                        256 * effect_counter * 2 / effect_duration,
                        &dirty_rect.bounding_box);
             break;
@@ -375,7 +377,8 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
                 quake_rect.h = -amp;
             }
             SDL_FillRect(
-                accumulation_surface, &quake_rect,
+                accumulation_surface,
+                &quake_rect,
                 SDL_MapRGBA(accumulation_surface->format, 0, 0, 0, 0xff));
             break;
 
@@ -399,7 +402,8 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
                 quake_rect.w = -amp;
             }
             SDL_FillRect(
-                accumulation_surface, &quake_rect,
+                accumulation_surface,
+                &quake_rect,
                 SDL_MapRGBA(accumulation_surface->format, 0, 0, 0, 0xff));
             break;
 
@@ -409,7 +413,8 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
             dst_rect.y =
                 effect->no * ((int)(3.0 * rand() / (RAND_MAX + 1.0)) - 1) * 2;
             SDL_FillRect(
-                accumulation_surface, NULL,
+                accumulation_surface,
+                NULL,
                 SDL_MapRGBA(accumulation_surface->format, 0, 0, 0, 0xff));
             drawEffect(&dst_rect, &src_rect, effect_dst_surface);
             break;
@@ -442,12 +447,18 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
 
                     SDL_UnlockSurface(accumulation_surface);
                     SDL_UnlockSurface(effect_src_surface);
-                    alphaBlend(NULL, ALPHA_BLEND_CONST, 64,
-                               &dirty_rect.bounding_box, effect_tmp_surface,
-                               accumulation_surface, effect_tmp_surface);
-                    alphaBlend(NULL, ALPHA_BLEND_CONST,
+                    alphaBlend(NULL,
+                               ALPHA_BLEND_CONST,
+                               64,
+                               &dirty_rect.bounding_box,
+                               effect_tmp_surface,
+                               accumulation_surface,
+                               effect_tmp_surface);
+                    alphaBlend(NULL,
+                               ALPHA_BLEND_CONST,
                                effect_counter * 256 / effect_duration,
-                               &dirty_rect.bounding_box, effect_tmp_surface);
+                               &dirty_rect.bounding_box,
+                               effect_tmp_surface);
                 }
             }
             break;
@@ -462,23 +473,25 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
                     effectCascade(effect->anim.image_name, effect_duration);
                 } else if (!strncmp(effect->anim.image_name, "whirl.dll", 9)) {
                     effectWhirl(effect->anim.image_name, effect_duration);
-                } else if (!strncmp(effect->anim.image_name, "trvswave.dll",
-                                    12)) {
+                } else if (!strncmp(
+                               effect->anim.image_name, "trvswave.dll", 12)) {
                     effectTrvswave(effect->anim.image_name, effect_duration);
                 }
 #endif
                 else {
                     // do crossfade
                     height = 256 * effect_counter / effect_duration;
-                    alphaBlend(NULL, ALPHA_BLEND_CONST, height,
+                    alphaBlend(NULL,
+                               ALPHA_BLEND_CONST,
+                               height,
                                &dirty_rect.bounding_box);
                     not_implemented = true;
                 }
             } else {  // just in case no dll is given
                 // do crossfade
                 height = 256 * effect_counter / effect_duration;
-                alphaBlend(NULL, ALPHA_BLEND_CONST, height,
-                           &dirty_rect.bounding_box);
+                alphaBlend(
+                    NULL, ALPHA_BLEND_CONST, height, &dirty_rect.bounding_box);
                 not_implemented = true;
             }
             break;
@@ -507,8 +520,10 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
 
         return true;
     } else {
-        SDL_BlitSurface(effect_dst_surface, &dirty_rect.bounding_box,
-                        accumulation_surface, &dirty_rect.bounding_box);
+        SDL_BlitSurface(effect_dst_surface,
+                        &dirty_rect.bounding_box,
+                        accumulation_surface,
+                        &dirty_rect.bounding_box);
 
         if (effect_no != 0) flush(REFRESH_NONE_MODE, NULL, clear_dirty_region);
         if (effect_no == 1) effect_counter = 0;
@@ -521,11 +536,12 @@ bool ONScripter::doEffect(EffectLink *effect, bool clear_dirty_region) {
     }
 }
 
-void ONScripter::drawEffect(SDL_Rect *dst_rect, SDL_Rect *src_rect,
+void ONScripter::drawEffect(SDL_Rect *dst_rect,
+                            SDL_Rect *src_rect,
                             SDL_Surface *surface) {
     SDL_Rect clipped_rect;
-    if (AnimationInfo::doClipping(dst_rect, &dirty_rect.bounding_box,
-                                  &clipped_rect))
+    if (AnimationInfo::doClipping(
+            dst_rect, &dirty_rect.bounding_box, &clipped_rect))
         return;
     if (src_rect != dst_rect) {
         src_rect->x += clipped_rect.x;

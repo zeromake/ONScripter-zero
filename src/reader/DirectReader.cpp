@@ -273,7 +273,8 @@ struct DirectReader::FileInfo DirectReader::getFileByIndex(unsigned int index) {
     return fi;
 }
 
-FILE *DirectReader::getFileHandle(const char *file_name, int &compression_type,
+FILE *DirectReader::getFileHandle(const char *file_name,
+                                  int &compression_type,
                                   size_t *length) {
     FILE *fp;
     unsigned int i;
@@ -323,7 +324,8 @@ size_t DirectReader::getFileLength(const char *file_name) {
     return len;
 }
 
-size_t DirectReader::getFile(const char *file_name, unsigned char *buffer,
+size_t DirectReader::getFile(const char *file_name,
+                             unsigned char *buffer,
                              int *location) {
     int compression_type;
     size_t len, c, total = 0;
@@ -580,7 +582,8 @@ size_t DirectReader::decodeSPB(FILE *fp, size_t offset, unsigned char *buf) {
     return total_size;
 }
 
-size_t DirectReader::decodeLZSS(struct ArchiveInfo *ai, int no,
+size_t DirectReader::decodeLZSS(struct ArchiveInfo *ai,
+                                int no,
                                 unsigned char *buf) {
     unsigned int count = 0;
     int i, j, k, r, c;
@@ -613,7 +616,8 @@ size_t DirectReader::decodeLZSS(struct ArchiveInfo *ai, int no,
     return count;
 }
 
-size_t DirectReader::getDecompressedFileLength(int type, FILE *fp,
+size_t DirectReader::getDecompressedFileLength(int type,
+                                               FILE *fp,
                                                size_t offset) {
     size_t length = 0;
     fseek(fp, offset, SEEK_SET);

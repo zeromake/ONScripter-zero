@@ -233,8 +233,8 @@ int ONScripter::loadSaveFile2(int file_version) {
     else
         wave_play_loop_flag = false;
     if (wave_file_name && wave_play_loop_flag)
-        playSound(wave_file_name, SOUND_CHUNK, wave_play_loop_flag,
-                  MIX_WAVE_CHANNEL);
+        playSound(
+            wave_file_name, SOUND_CHUNK, wave_play_loop_flag, MIX_WAVE_CHANNEL);
 
     // play, playonce
     if (readInt() == 1)
@@ -254,8 +254,10 @@ int ONScripter::loadSaveFile2(int file_version) {
         mp3save_flag = false;
     readStr(&music_file_name);
     if (music_file_name) {
-        playSound(music_file_name, SOUND_MUSIC | SOUND_MIDI,
-                  music_play_loop_flag, MIX_BGM_CHANNEL);
+        playSound(music_file_name,
+                  SOUND_MUSIC | SOUND_MIDI,
+                  music_play_loop_flag,
+                  MIX_BGM_CHANNEL);
     }
 
     erase_text_window_mode = readInt();
@@ -357,7 +359,9 @@ int ONScripter::loadSaveFile2(int file_version) {
     readStr(&loop_bgm_name[1]);
     if (loop_bgm_name[0]) {
         if (loop_bgm_name[1])
-            playSound(loop_bgm_name[1], SOUND_PRELOAD | SOUND_CHUNK, false,
+            playSound(loop_bgm_name[1],
+                      SOUND_PRELOAD | SOUND_CHUNK,
+                      false,
                       MIX_LOOPBGM_CHANNEL1);
         playSound(loop_bgm_name[0], SOUND_CHUNK, false, MIX_LOOPBGM_CHANNEL0);
     }

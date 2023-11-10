@@ -104,7 +104,9 @@ void _FontInfo::saveToPrev(bool use_ruby_offset) {
 
 int _FontInfo::getToPrev(int index) { return old_xy[index]; }
 
-void *_FontInfo::openFont(char *_font_file, int ratio1, int ratio2,
+void *_FontInfo::openFont(char *_font_file,
+                          int ratio1,
+                          int ratio2,
                           generate_path_function f,
                           const ons_font::FontConfig *fontConfig) {
     char font_file[4096] = {0};
@@ -139,12 +141,12 @@ void *_FontInfo::openFont(char *_font_file, int ratio1, int ratio2,
         fp->close(fp);
 #if defined(PSP)
         fc->next->rw_ops = SDL_RWFromFile(font_file, "r");
-        fc->next->font[0] = TTF_OpenFontRW(fc->next->rw_ops, SDL_TRUE,
-                                           font_size * ratio1 / ratio2);
+        fc->next->font[0] = TTF_OpenFontRW(
+            fc->next->rw_ops, SDL_TRUE, font_size * ratio1 / ratio2);
 #if (SDL_TTF_MAJOR_VERSION >= 2) && (SDL_TTF_MINOR_VERSION >= 0) && \
     (SDL_TTF_PATCHLEVEL >= 10)
-        fc->next->font[1] = TTF_OpenFontRW(fc->next->rw_ops, SDL_TRUE,
-                                           font_size * ratio1 / ratio2);
+        fc->next->font[1] = TTF_OpenFontRW(
+            fc->next->rw_ops, SDL_TRUE, font_size * ratio1 / ratio2);
         TTF_SetFontOutline(fc->next->font[1], fontConfig->outline_size);
 #endif
         fc->next->power_resume_number = psp_power_resume_number;
@@ -156,14 +158,16 @@ void *_FontInfo::openFont(char *_font_file, int ratio1, int ratio2,
         else
             fc->next->font[0] =
                 TTF_OpenFontRW(SDL_RWFromConstMem(font_cache, font_cache_size),
-                               1, font_size * ratio1 / ratio2);
+                               1,
+                               font_size * ratio1 / ratio2);
         if (useFile)
             fc->next->font[1] =
                 TTF_OpenFont(font_file, font_size * ratio1 / ratio2);
         else
             fc->next->font[1] =
                 TTF_OpenFontRW(SDL_RWFromConstMem(font_cache, font_cache_size),
-                               1, font_size * ratio1 / ratio2);
+                               1,
+                               font_size * ratio1 / ratio2);
         if (fc->next->font[1] == nullptr) {
             utils::printError("Open font failed: %s\n", TTF_GetError());
         }

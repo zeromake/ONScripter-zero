@@ -71,8 +71,13 @@ void ONScripter::effectTrvswave(char *params, int duration) {
     int ampl, wvlen;
     int y_offset = -screen_height / 2;
     int width = 256 * effect_counter / duration;
-    alphaBlend(NULL, ALPHA_BLEND_CONST, width, &dirty_rect.bounding_box, NULL,
-               NULL, effect_tmp_surface);
+    alphaBlend(NULL,
+               ALPHA_BLEND_CONST,
+               width,
+               &dirty_rect.bounding_box,
+               NULL,
+               NULL,
+               effect_tmp_surface);
     if (effect_counter * 2 < duration) {
         ampl = TRVSWAVE_AMPLITUDE * 2 * effect_counter / duration;
         wvlen =
@@ -88,7 +93,8 @@ void ONScripter::effectTrvswave(char *params, int duration) {
                        2 * (duration - effect_counter) / duration) +
                       (1.0 / TRVSWAVE_WVLEN_START)));
     }
-    SDL_FillRect(accumulation_surface, NULL,
+    SDL_FillRect(accumulation_surface,
+                 NULL,
                  SDL_MapRGBA(accumulation_surface->format, 0, 0, 0, 0xff));
     for (int i = 0; i < screen_height; i++) {
         int theta = TRIG_TABLE_SIZE * y_offset / wvlen;
@@ -96,8 +102,8 @@ void ONScripter::effectTrvswave(char *params, int duration) {
         theta %= TRIG_TABLE_SIZE;
         dst_rect.x = (Sint16)(ampl * sin_table[theta] / TRIG_FACTOR);
         // dst_rect.x = (Sint16)(ampl * sin(M_PI * 2.0 * y_offset / wvlen));
-        SDL_BlitSurface(effect_tmp_surface, &src_rect, accumulation_surface,
-                        &dst_rect);
+        SDL_BlitSurface(
+            effect_tmp_surface, &src_rect, accumulation_surface, &dst_rect);
         ++src_rect.y;
         ++dst_rect.y;
         ++y_offset;
@@ -144,8 +150,13 @@ void ONScripter::effectWhirl(char *params, int duration) {
     // float rad_base = M_PI * 2 * one_minus_cos + rad_amp;
 
     int width = 256 * effect_counter / duration;
-    alphaBlend(NULL, ALPHA_BLEND_CONST, width, &dirty_rect.bounding_box, NULL,
-               NULL, effect_tmp_surface);
+    alphaBlend(NULL,
+               ALPHA_BLEND_CONST,
+               width,
+               &dirty_rect.bounding_box,
+               NULL,
+               NULL,
+               effect_tmp_surface);
 
     SDL_LockSurface(effect_tmp_surface);
     SDL_LockSurface(accumulation_surface);

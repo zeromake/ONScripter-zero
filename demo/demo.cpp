@@ -54,16 +54,18 @@ int main(int argc, char* argv[]) {
     SDL_GetDisplayMode(0, 0, &mode);
     windowWidth = mode.w;
     windowHeight = mode.h;
-    __android_log_print(ANDROID_LOG_INFO, "MAIN", "%d * %d", windowWidth,
-                        windowHeight);
+    __android_log_print(
+        ANDROID_LOG_INFO, "MAIN", "%d * %d", windowWidth, windowHeight);
 #endif
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Event event;
     SDL_bool exit = SDL_FALSE;
     SDL_bool run = SDL_TRUE;
-    SDL_Rect mRect = {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                      windowWidth, windowHeight};
+    SDL_Rect mRect = {SDL_WINDOWPOS_CENTERED,
+                      SDL_WINDOWPOS_CENTERED,
+                      windowWidth,
+                      windowHeight};
 #ifdef __APPLE__
     mRect.w /= 2;
     mRect.h /= 2;
@@ -71,9 +73,12 @@ int main(int argc, char* argv[]) {
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-    window =
-        SDL_CreateWindow("SDL Tutorial", mRect.x, mRect.y, mRect.w, mRect.h,
-                         SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("SDL Tutorial",
+                              mRect.x,
+                              mRect.y,
+                              mRect.w,
+                              mRect.h,
+                              SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(
         window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     int windowScale = 1;
@@ -107,9 +112,11 @@ int main(int argc, char* argv[]) {
                           ".." / ".." / "fonts" / DEFAUTL_TTF);
     auto ttfPathStr = ttfPath.string();
     printf("load: %s\n", ttfPathStr.c_str());
-    cmd.fonts[0] =
-        ren_font_load(ttfPathStr.c_str(), 16, FONT_ANTIALIASING_SUBPIXEL,
-                      FONT_HINTING_SLIGHT, FONT_STYLE_UNDERLINE);
+    cmd.fonts[0] = ren_font_load(ttfPathStr.c_str(),
+                                 16,
+                                 FONT_ANTIALIASING_SUBPIXEL,
+                                 FONT_HINTING_SLIGHT,
+                                 FONT_STYLE_UNDERLINE);
     if (!cmd.fonts[0]) {
         printf("load font error!");
         return -1;
@@ -117,9 +124,11 @@ int main(int argc, char* argv[]) {
     printf("root font: %ld\n", unix_now() - rootNow);
     size_t fontOffset = 1;
     for (auto it : fonts) {
-        cmd.fonts[fontOffset] =
-            ren_font_load(it.c_str(), 16, FONT_ANTIALIASING_SUBPIXEL,
-                          FONT_HINTING_SLIGHT, FONT_STYLE_UNDERLINE);
+        cmd.fonts[fontOffset] = ren_font_load(it.c_str(),
+                                              16,
+                                              FONT_ANTIALIASING_SUBPIXEL,
+                                              FONT_HINTING_SLIGHT,
+                                              FONT_STYLE_UNDERLINE);
         if (!cmd.fonts[fontOffset]) {
             printf("load font error!");
             return -1;
@@ -131,13 +140,19 @@ int main(int argc, char* argv[]) {
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
-    auto texture = SDL_CreateTexture(
-        renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING,
-        windowWidth * windowScale, windowHeight * windowScale);
+    auto texture = SDL_CreateTexture(renderer,
+                                     SDL_PIXELFORMAT_BGRA32,
+                                     SDL_TEXTUREACCESS_STREAMING,
+                                     windowWidth * windowScale,
+                                     windowHeight * windowScale);
     ren_draw_rect(*(RenRect*)&dstRect, RenColor{0xff, 0xff, 0xff, 0xff});
     printf("draw rect: %ld\n", unix_now() - rootNow);
-    ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall SDL Tutorial", 42,
-                  130, 50, RenColor{0x00, 0x00, 0x00, 0xff});
+    ren_draw_text(cmd.fonts,
+                  u8"中文测试 \"License\" shall SDL Tutorial",
+                  42,
+                  130,
+                  50,
+                  RenColor{0x00, 0x00, 0x00, 0xff});
     // ren_draw_text(cmd.fonts, u8"中文测试 \"License\" shall", 29, 130, 100 ,
     // RenColor{0x00, 0x00, 0x00, 0xff});
 

@@ -247,18 +247,30 @@ static double Triangle(const double x, const double support) {
     return (0.0);
 }
 
-static const FilterInfo filters[SincFilter + 1] = {
-    {Box, 0.0},         {Box, 0.0},      {Box, 0.5},
-    {Triangle, 1.0},    {Hermite, 1.0},  {Hanning, 1.0},
-    {Hamming, 1.0},     {Blackman, 1.0}, {Gaussian, 1.25},
-    {Quadratic, 1.5},   {Cubic, 2.0},    {Catrom, 2.0},
-    {Mitchell, 2.0},    {Lanczos, 3.0},  {BlackmanBessel, 3.2383},
-    {BlackmanSinc, 4.0}};
+static const FilterInfo filters[SincFilter + 1] = {{Box, 0.0},
+                                                   {Box, 0.0},
+                                                   {Box, 0.5},
+                                                   {Triangle, 1.0},
+                                                   {Hermite, 1.0},
+                                                   {Hanning, 1.0},
+                                                   {Hamming, 1.0},
+                                                   {Blackman, 1.0},
+                                                   {Gaussian, 1.25},
+                                                   {Quadratic, 1.5},
+                                                   {Cubic, 2.0},
+                                                   {Catrom, 2.0},
+                                                   {Mitchell, 2.0},
+                                                   {Lanczos, 3.0},
+                                                   {BlackmanBessel, 3.2383},
+                                                   {BlackmanSinc, 4.0}};
 
 static MagickPassFail HorizontalFilter(
-    const SDL_Surface *restrict source, SDL_Surface *restrict destination,
-    const double x_factor, const FilterInfo *restrict filter_info,
-    const double blur, ContributionInfo *restrict view_data_set) {
+    const SDL_Surface *restrict source,
+    SDL_Surface *restrict destination,
+    const double x_factor,
+    const FilterInfo *restrict filter_info,
+    const double blur,
+    ContributionInfo *restrict view_data_set) {
     double scale, support;
     DoublePixelPacket zero;
     long x;
@@ -276,10 +288,14 @@ static MagickPassFail HorizontalFilter(
     ARGBPixelPacket *source_pixels = (ARGBPixelPacket *)source->pixels;
     ARGBPixelPacket *destination_pixels =
         (ARGBPixelPacket *)destination->pixels;
-    printf("HorizontalFilter source: %d x %d %d\n", source->w, source->h,
+    printf("HorizontalFilter source: %d x %d %d\n",
+           source->w,
+           source->h,
            source->w * source->h);
-    printf("HorizontalFilter destination: %d x %d %d\n", destination->w,
-           destination->h, destination->w * destination->h);
+    printf("HorizontalFilter destination: %d x %d %d\n",
+           destination->w,
+           destination->h,
+           destination->w * destination->h);
 
     for (x = 0; x < (long)destination->w; x++) {
         double center, density;
@@ -380,10 +396,14 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
     ARGBPixelPacket *source_pixels = (ARGBPixelPacket *)source->pixels;
     ARGBPixelPacket *destination_pixels =
         (ARGBPixelPacket *)destination->pixels;
-    printf("VerticalFilter source: %d x %d %d\n", source->w, source->h,
+    printf("VerticalFilter source: %d x %d %d\n",
+           source->w,
+           source->h,
            source->w * source->h);
-    printf("VerticalFilter destination: %d x %d %d\n", destination->w,
-           destination->h, destination->w * destination->h);
+    printf("VerticalFilter destination: %d x %d %d\n",
+           destination->w,
+           destination->h,
+           destination->w * destination->h);
 
     for (int y = 0; y < destination->h; y++) {
         MagickPassFail thread_status;
@@ -453,8 +473,10 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
     return status;
 }
 
-int ResizeImage(const SDL_Surface *src, SDL_Surface *dst,
-                const FilterTypes filter, const double blur) {
+int ResizeImage(const SDL_Surface *src,
+                SDL_Surface *dst,
+                const FilterTypes filter,
+                const double blur) {
     int columns = dst->w;
     int rows = dst->h;
     double support, x_factor, x_support, y_factor, y_support;
@@ -479,13 +501,23 @@ int ResizeImage(const SDL_Surface *src, SDL_Surface *dst,
     SDL_Surface *source_image = NULL;
     SDL_PixelFormat *fmt = src->format;
     if (order) {
-        source_image = SDL_CreateRGBSurface(SDL_SWSURFACE, columns, src->h,
-                                            fmt->BitsPerPixel, fmt->Rmask,
-                                            fmt->Gmask, fmt->Bmask, fmt->Amask);
+        source_image = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                            columns,
+                                            src->h,
+                                            fmt->BitsPerPixel,
+                                            fmt->Rmask,
+                                            fmt->Gmask,
+                                            fmt->Bmask,
+                                            fmt->Amask);
     } else {
-        source_image = SDL_CreateRGBSurface(SDL_SWSURFACE, src->w, rows,
-                                            fmt->BitsPerPixel, fmt->Rmask,
-                                            fmt->Gmask, fmt->Bmask, fmt->Amask);
+        source_image = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                            src->w,
+                                            rows,
+                                            fmt->BitsPerPixel,
+                                            fmt->Rmask,
+                                            fmt->Gmask,
+                                            fmt->Bmask,
+                                            fmt->Amask);
     }
 
     x_factor = (double)columns / src->w;
@@ -514,18 +546,18 @@ int ResizeImage(const SDL_Surface *src, SDL_Surface *dst,
     SDL_LockSurface(source_image);
 
     if (order) {
-        status = HorizontalFilter(src, source_image, x_factor, &filters[i],
-                                  blur, view_data_set);
+        status = HorizontalFilter(
+            src, source_image, x_factor, &filters[i], blur, view_data_set);
         if (status != MagickFail) {
-            status = VerticalFilter(source_image, dst, y_factor, &filters[i],
-                                    blur, view_data_set);
+            status = VerticalFilter(
+                source_image, dst, y_factor, &filters[i], blur, view_data_set);
         }
     } else {
-        status = VerticalFilter(src, source_image, y_factor, &filters[i], blur,
-                                view_data_set);
+        status = VerticalFilter(
+            src, source_image, y_factor, &filters[i], blur, view_data_set);
         if (status != MagickFail)
-            status = HorizontalFilter(source_image, dst, x_factor, &filters[i],
-                                      blur, view_data_set);
+            status = HorizontalFilter(
+                source_image, dst, x_factor, &filters[i], blur, view_data_set);
     }
 
     // free

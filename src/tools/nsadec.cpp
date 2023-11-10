@@ -109,8 +109,11 @@ int main(int argc, char **argv) {
         buffer = new unsigned char[length]{0};
         unsigned int len;
         if ((len = cNR.getFileSubByIndex(sAI, i, buffer)) != length) {
-            fprintf(stderr, "file %s is not fully retrieved %d %lu\n",
-                    sFI.original_name, len, length);
+            fprintf(stderr,
+                    "file %s is not fully retrieved %d %lu\n",
+                    sFI.original_name,
+                    len,
+                    length);
             length = sFI.length;
             continue;
         }
@@ -136,8 +139,11 @@ int main(int argc, char **argv) {
         }
 
         if (vLog) {
-            printf("\033[Kouting %s\t\t%.2fkb\t\t%d/%d\r", file_name,
-                   float(length) / 1024.0f, i, count);
+            printf("\033[Kouting %s\t\t%.2fkb\t\t%d/%d\r",
+                   file_name,
+                   float(length) / 1024.0f,
+                   i,
+                   count);
         } else {
             printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
         }

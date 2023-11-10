@@ -267,8 +267,8 @@ void ONScripter::initSDL() {
         init_force_ratio = true;
     }
 
-    window = SDL_CreateWindow(NULL, window_x, window_y, window_w, window_h,
-                              window_flag);
+    window = SDL_CreateWindow(
+        NULL, window_x, window_y, window_w, window_h, window_flag);
     if (window == NULL) {
         utils::printError("Could not create window: %s\n", SDL_GetError());
         exit(-1);
@@ -293,9 +293,12 @@ void ONScripter::initSDL() {
 
     underline_value = script_h.screen_height;
 
-    utils::printInfo("Display: %s %d x %d @%.2f (%d bpp)\n", info.name,
-                     screen_width, screen_height,
-                     ((float)screen_ratio1 / screen_ratio2), screen_bpp);
+    utils::printInfo("Display: %s %d x %d @%.2f (%d bpp)\n",
+                     info.name,
+                     screen_width,
+                     screen_height,
+                     ((float)screen_ratio1 / screen_ratio2),
+                     screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
 
     screen_rect.x = screen_rect.y = 0;
@@ -307,8 +310,8 @@ void ONScripter::initSDL() {
         float input_size[2] = {(float)screen_width, (float)screen_height};
         float output_size[2] = {(float)render_view_rect.w,
                                 (float)render_view_rect.h};
-        gles_renderer = new GlesRenderer(window, texture, input_size,
-                                         output_size, sharpness);
+        gles_renderer = new GlesRenderer(
+            window, texture, input_size, output_size, sharpness);
     }
 
     wm_title_string = new char[strlen(DEFAULT_WM_TITLE) + 1]{0};
@@ -326,9 +329,10 @@ void ONScripter::openAudio(int freq) {
     //     utils::printInfo("Audio device: %d %s\n", i, deviceName);
     // }
 
-    auto audioDeviceId =
-        Mix_OpenAudio((freq < 0) ? 44100 : freq, MIX_DEFAULT_FORMAT,
-                      MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF);
+    auto audioDeviceId = Mix_OpenAudio((freq < 0) ? 44100 : freq,
+                                       MIX_DEFAULT_FORMAT,
+                                       MIX_DEFAULT_CHANNELS,
+                                       DEFAULT_AUDIOBUF);
     if (audioDeviceId < 0) {
         utils::printError(
             "Couldn't open audio device!\n"
@@ -343,8 +347,11 @@ void ONScripter::openAudio(int freq) {
         Mix_QuerySpec(&freq, &format, &channels);
         auto deviceName = SDL_GetAudioDeviceName(audioDeviceId, 0);
         auto audioDriver = SDL_GetCurrentAudioDriver();
-        utils::printInfo("Audio(%s): %s %d Hz %d bit %s\n", deviceName,
-                         audioDriver, freq, (format & 0xFF),
+        utils::printInfo("Audio(%s): %s %d Hz %d bit %s\n",
+                         deviceName,
+                         audioDriver,
+                         freq,
+                         (format & 0xFF),
                          (channels > 1) ? "stereo" : "mono");
         audio_format.format = format;
         audio_format.freq = freq;
@@ -428,7 +435,7 @@ void ONScripter::setArchivePath(const char *path) {
     const int path_size = strlen(path);
     const int __size = RELATIVEPATHLENGTH + path_size + 2;
     archive_path = new char[__size]{0};
-    if (path[path_size-1] != DELIMITER) {
+    if (path[path_size - 1] != DELIMITER) {
         snprintf(archive_path, __size, "%s%s%c", RELATIVEPATH, path, DELIMITER);
     } else {
         snprintf(archive_path, __size, "%s%s", RELATIVEPATH, path);
@@ -499,8 +506,8 @@ int ONScripter::init() {
     image_surface = AnimationInfo::alloc32bitSurface(1, 1, texture_format);
     accumulation_surface = AnimationInfo::allocSurface(
         screen_width, screen_height, texture_format);
-    backup_surface = AnimationInfo::allocSurface(screen_width, screen_height,
-                                                 texture_format);
+    backup_surface = AnimationInfo::allocSurface(
+        screen_width, screen_height, texture_format);
     effect_src_surface = AnimationInfo::allocSurface(
         screen_width, screen_height, texture_format);
     effect_dst_surface = AnimationInfo::allocSurface(
@@ -515,9 +522,11 @@ int ONScripter::init() {
     user_ratio1 = script_h.user_ratio;
     user_ratio2 = 1;
 
-    texture =
-        SDL_CreateTexture(renderer, texture_format, SDL_TEXTUREACCESS_STATIC,
-                          accumulation_surface->w, accumulation_surface->h);
+    texture = SDL_CreateTexture(renderer,
+                                texture_format,
+                                SDL_TEXTUREACCESS_STATIC,
+                                accumulation_surface->w,
+                                accumulation_surface->h);
 
     effect_tmp = 0;
     tmp_image_buf = NULL;
@@ -644,7 +653,8 @@ int ONScripter::init() {
         FILE *fp = fopen(font_file, "rb");
         if (fp == NULL) {
             utils::printError("can't open cache font file(%s): %s\n",
-                              strerror(errno), font_file);
+                              strerror(errno),
+                              font_file);
             return -1;
         }
         SDL_RWops *fontfp = SDL_RWFromFP(fp, SDL_TRUE);
@@ -658,18 +668,24 @@ int ONScripter::init() {
     }
 
     auto ff = generateFPath();
-    if (sentence_font.openFont(font_file, screen_ratio1, screen_ratio2, ff,
+    if (sentence_font.openFont(font_file,
+                               screen_ratio1,
+                               screen_ratio2,
+                               ff,
                                getFontConfig(sentence_font.types)) == NULL) {
-        utils::printError("can't open font file(%s): %s\n", strerror(errno),
-                          font_file);
+        utils::printError(
+            "can't open font file(%s): %s\n", strerror(errno), font_file);
         return -1;
     }
     return 0;
 }
 
 generate_path_function ONScripter::generateFPath() {
-    auto ff = std::bind(&ONScripter::fpath, this, std::placeholders::_1,
-                        std::placeholders::_2, std::placeholders::_3);
+    auto ff = std::bind(&ONScripter::fpath,
+                        this,
+                        std::placeholders::_1,
+                        std::placeholders::_2,
+                        std::placeholders::_3);
     return ff;
 }
 
@@ -825,7 +841,9 @@ void ONScripter::resetSentenceFont() {
     sentence_font.saveToPrev(false);
 }
 
-void ONScripter::flush(int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag,
+void ONScripter::flush(int refresh_mode,
+                       SDL_Rect *rect,
+                       bool clear_dirty_flag,
                        bool direct_flag) {
     if (direct_flag) {
         flushDirect(*rect, refresh_mode);
@@ -853,7 +871,8 @@ void ONScripter::flushDirect(SDL_Rect &rect, int refresh_mode) {
         return;
     refreshSurface(accumulation_surface, &rect, refresh_mode);
     SDL_LockSurface(accumulation_surface);
-    SDL_UpdateTexture(texture, &rect,
+    SDL_UpdateTexture(texture,
+                      &rect,
                       (unsigned char *)accumulation_surface->pixels +
                           accumulation_surface->pitch * rect.y +
                           rect.x * sizeof(ONSBuf),
@@ -881,9 +900,10 @@ void ONScripter::flushDirect(SDL_Rect &rect, int refresh_mode) {
 void ONScripter::flushDirectYUV(SDL_Overlay *overlay) {
     SDL_Rect dst_rect = {(device_width - screen_device_width) / 2,
                          (device_height - screen_device_height) / 2,
-                         screen_device_width, screen_device_height};
-    SDL_UpdateTexture(texture, &screen_rect, overlay->pixels[0],
-                      overlay->pitches[0]);
+                         screen_device_width,
+                         screen_device_height};
+    SDL_UpdateTexture(
+        texture, &screen_rect, overlay->pixels[0], overlay->pitches[0]);
     SDL_RenderCopy(renderer, texture, &screen_rect, &dst_rect);
     SDL_RenderPresent(renderer);
 }
@@ -944,8 +964,8 @@ void ONScripter::mouseOverCheck(int x, int y) {
             check_src_rect = cbl->image_rect;
             if (cbl->button_type == ButtonLink::SPRITE_BUTTON) {
                 if (cbl->exbtn_ctl[0])
-                    decodeExbtnControl(cbl->exbtn_ctl[0], &check_src_rect,
-                                       &check_dst_rect);
+                    decodeExbtnControl(
+                        cbl->exbtn_ctl[0], &check_src_rect, &check_dst_rect);
                 else {
                     sprite_info[cbl->sprite_no].visible = true;
                     sprite_info[cbl->sprite_no].setCell(0);
@@ -962,18 +982,23 @@ void ONScripter::mouseOverCheck(int x, int y) {
 
         if (is_exbtn_enabled && exbtn_d_button_link.exbtn_ctl[1]) {
             decodeExbtnControl(exbtn_d_button_link.exbtn_ctl[1],
-                               &check_src_rect, &check_dst_rect);
+                               &check_src_rect,
+                               &check_dst_rect);
         }
 
         if (bl) {
             if (system_menu_mode != SYSTEM_NULL) {
                 if (menuselectvoice_file_name[MENUSELECTVOICE_OVER])
                     playSound(menuselectvoice_file_name[MENUSELECTVOICE_OVER],
-                              SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
+                              SOUND_CHUNK,
+                              false,
+                              MIX_WAVE_CHANNEL);
             } else {
                 if (selectvoice_file_name[SELECTVOICE_OVER])
                     playSound(selectvoice_file_name[SELECTVOICE_OVER],
-                              SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
+                              SOUND_CHUNK,
+                              false,
+                              MIX_WAVE_CHANNEL);
             }
             check_dst_rect = bl->image_rect;
             if (bl->button_type == ButtonLink::SPRITE_BUTTON) {
@@ -982,8 +1007,8 @@ void ONScripter::mouseOverCheck(int x, int y) {
                     sprite_info[bl->sprite_no].setCell(1);
                 }
                 if (bl->exbtn_ctl[1])
-                    decodeExbtnControl(bl->exbtn_ctl[1], &check_src_rect,
-                                       &check_dst_rect);
+                    decodeExbtnControl(
+                        bl->exbtn_ctl[1], &check_src_rect, &check_dst_rect);
             } else if (bl->button_type == ButtonLink::TMP_SPRITE_BUTTON) {
                 bl->show_flag = 1;
                 bl->anim[0]->visible = true;
@@ -1023,9 +1048,11 @@ executeLabelTop:
     while (current_line < current_label_info.num_of_lines) {
         if (debug_level > 0)
             utils::printInfo("*****  executeLabel %s:%d/%d:%d:%d *****\n",
-                             current_label_info.name, current_line,
+                             current_label_info.name,
+                             current_line,
                              current_label_info.num_of_lines,
-                             string_buffer_offset, display_mode);
+                             string_buffer_offset,
+                             display_mode);
 
         if (script_h.getStringBuffer()[0] == '~') {
             last_tilde.next_script = script_h.getNext();
@@ -1304,7 +1331,8 @@ void ONScripter::newPage() {
     flush(refreshMode(), &sentence_font_info.pos);
 }
 
-ButtonLink *ONScripter::getSelectableSentence(char *buffer, _FontInfo *info,
+ButtonLink *ONScripter::getSelectableSentence(char *buffer,
+                                              _FontInfo *info,
                                               bool flush_flag,
                                               bool nofile_flag) {
     info->savePoint();
@@ -1370,8 +1398,8 @@ void ONScripter::decodeExbtnControl(const char *ctl_str,
                 cell_no = getNumberFromBuffer(&ctl_str);
             } else
                 cell_no = 0;
-            refreshSprite(sprite_no, true, cell_no, check_src_rect,
-                          check_dst_rect);
+            refreshSprite(
+                sprite_no, true, cell_no, check_src_rect, check_dst_rect);
         } else if (com == 'S' || com == 's') {
             sprite_no = getNumberFromBuffer(&ctl_str);
             if (sprite_no < 0)
@@ -1449,7 +1477,11 @@ void ONScripter::loadEnvData() {
             const int __size =
                 strlen(archive_path) + strlen(save_dir_envdata) + 2;
             save_dir = new char[__size]{0};
-            snprintf(save_dir, __size, "%s%s%c", archive_path, save_dir_envdata,
+            snprintf(save_dir,
+                     __size,
+                     "%s%s%c",
+                     archive_path,
+                     save_dir_envdata,
                      DELIMITER);
             script_h.setSaveDir(save_dir);
         }

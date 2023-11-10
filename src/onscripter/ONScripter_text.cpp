@@ -74,9 +74,13 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface) {
     }
     SDL_UnlockSurface(surface);
 }
-void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
-                           SDL_Color &color, char *text, int xy[2],
-                           AnimationInfo *cache_info, SDL_Rect *clip,
+void ONScripter::drawGlyph(SDL_Surface *dst_surface,
+                           _FontInfo *info,
+                           SDL_Color &color,
+                           char *text,
+                           int xy[2],
+                           AnimationInfo *cache_info,
+                           SDL_Rect *clip,
                            SDL_Rect &dst_rect,
                            const ons_font::FontConfig *fontConfig) {
     unsigned short unicode;
@@ -97,8 +101,13 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
         (info->is_bold?TTF_STYLE_BOLD:TTF_STYLE_NORMAL) )
         TTF_SetFontStyle( (TTF_Font*)info->ttf_font[0], (info->is_bold?TTF_STYLE_BOLD:TTF_STYLE_NORMAL));
 #endif
-    TTF_GlyphMetrics((TTF_Font *)info->ttf_font[0], unicode, &minx, &maxx,
-                     &miny, &maxy, &advanced);
+    TTF_GlyphMetrics((TTF_Font *)info->ttf_font[0],
+                     unicode,
+                     &minx,
+                     &maxx,
+                     &miny,
+                     &maxy,
+                     &advanced);
     // utils::printInfo("min %d %d %d %d %d %d\n", minx, maxx, miny, maxy,
     // advanced,TTF_FontAscent((TTF_Font*)info->ttf_font[0])  );
 
@@ -106,12 +115,12 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
     SDL_Surface *tmp_surface = TTF_RenderGlyph_Shaded(
         (TTF_Font *)info->ttf_font[0], unicode, fcol, bcol);
     const ons_font::FontConfig *cfg = getFontConfig(info->types);
-    SDL_Color scolor = {cfg->outline_color[0], cfg->outline_color[1],
-                        cfg->outline_color[2]};
+    SDL_Color scolor = {
+        cfg->outline_color[0], cfg->outline_color[1], cfg->outline_color[2]};
     SDL_Surface *tmp_surface_s = tmp_surface;
     if (info->is_shadow && fontConfig->render_outline) {
-        tmp_surface_s = TTF_RenderGlyph_Shaded((TTF_Font *)info->ttf_font[1],
-                                               unicode, fcol, bcol);
+        tmp_surface_s = TTF_RenderGlyph_Shaded(
+            (TTF_Font *)info->ttf_font[1], unicode, fcol, bcol);
         if (tmp_surface && tmp_surface_s) {
             if ((tmp_surface_s->w - tmp_surface->w) & 1)
                 shiftHalfPixelX(tmp_surface_s);
@@ -129,8 +138,8 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
     dst_rect.y = xy[1];
 
     dst_rect.y -= (TTF_FontHeight((TTF_Font *)info->ttf_font[0]) -
-                   calcFontSizeRatio(info->font_size_xy[1], screen_ratio1,
-                                     screen_ratio2)) /
+                   calcFontSizeRatio(
+                       info->font_size_xy[1], screen_ratio1, screen_ratio2)) /
                   2;
 
     if (rotate_flag) dst_rect.x += miny - minx;
@@ -160,11 +169,19 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
         }
 
         if (cache_info)
-            cache_info->blendText(tmp_surface_s, dst_rect_s.x, dst_rect_s.y,
-                                  scolor, clip, rotate_flag);
+            cache_info->blendText(tmp_surface_s,
+                                  dst_rect_s.x,
+                                  dst_rect_s.y,
+                                  scolor,
+                                  clip,
+                                  rotate_flag);
 
         if (dst_surface)
-            alphaBlendText(dst_surface, dst_rect_s, tmp_surface_s, scolor, clip,
+            alphaBlendText(dst_surface,
+                           dst_rect_s,
+                           tmp_surface_s,
+                           scolor,
+                           clip,
                            rotate_flag);
     }
 
@@ -178,12 +195,12 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
         }
 
         if (cache_info)
-            cache_info->blendText(tmp_surface, dst_rect.x, dst_rect.y, color,
-                                  clip, rotate_flag);
+            cache_info->blendText(
+                tmp_surface, dst_rect.x, dst_rect.y, color, clip, rotate_flag);
 
         if (dst_surface)
-            alphaBlendText(dst_surface, dst_rect, tmp_surface, color, clip,
-                           rotate_flag);
+            alphaBlendText(
+                dst_surface, dst_rect, tmp_surface, color, clip, rotate_flag);
     }
 
     if (tmp_surface_s && tmp_surface_s != tmp_surface)
@@ -191,18 +208,23 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface, _FontInfo *info,
     if (tmp_surface) SDL_FreeSurface(tmp_surface);
 }
 
-int ONScripter::drawChar(char *text, _FontInfo *info, bool flush_flag,
-                         bool lookback_flag, SDL_Surface *surface,
-                         AnimationInfo *cache_info, SDL_Rect *clip) {
+int ONScripter::drawChar(char *text,
+                         _FontInfo *info,
+                         bool flush_flag,
+                         bool lookback_flag,
+                         SDL_Surface *surface,
+                         AnimationInfo *cache_info,
+                         SDL_Rect *clip) {
     // utils::printInfo("draw %x-%x[%s] %d, %d\n", text[0], text[1], text,
     // info->xy[0], info->xy[1] );
     auto fontConfig = getFontConfig(info->types);
     auto ff = generateFPath();
     if (info->ttf_font[0] == NULL) {
-        if (info->openFont(font_file, screen_ratio1, screen_ratio2, ff,
-                           fontConfig) == NULL) {
-            utils::printError("can't open font file(%s): %s\n", strerror(errno),
-                              font_file);
+        if (info->openFont(
+                font_file, screen_ratio1, screen_ratio2, ff, fontConfig) ==
+            NULL) {
+            utils::printError(
+                "can't open font file(%s): %s\n", strerror(errno), font_file);
             quit();
             exit(-1);
         }
@@ -232,10 +254,10 @@ int ONScripter::drawChar(char *text, _FontInfo *info, bool flush_flag,
         useAutoOffset = false;
     }
     if (info->isEndOfLine() ||
-        (text_rect &&
-         (info->endStatus(text_rect->x + text_rect->w,
-                          text_rect->y + text_rect->h, useAutoOffset) &
-          1))) {
+        (text_rect && (info->endStatus(text_rect->x + text_rect->w,
+                                       text_rect->y + text_rect->h,
+                                       useAutoOffset) &
+                       1))) {
         info->newLine();
         if (lookback_flag) {
             current_page->add('\n');
@@ -260,7 +282,14 @@ int ONScripter::drawChar(char *text, _FontInfo *info, bool flush_flag,
 
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
-        drawGlyph(surface, info, color, text2, xy, cache_info, clip, dst_rect,
+        drawGlyph(surface,
+                  info,
+                  color,
+                  text2,
+                  xy,
+                  cache_info,
+                  clip,
+                  dst_rect,
                   fontConfig);
 
         SDL_Rect old_dst_rect;
@@ -282,8 +311,8 @@ int ONScripter::drawChar(char *text, _FontInfo *info, bool flush_flag,
                 if (fontConfig->render_outline)
                     info->addShadeArea(dst_rect, -1, -1, 2, 2);
                 else
-                    info->addShadeArea(dst_rect, 0, 0, shade_distance[0],
-                                       shade_distance[1]);
+                    info->addShadeArea(
+                        dst_rect, 0, 0, shade_distance[0], shade_distance[1]);
             }
             flushDirect(dst_rect, REFRESH_NONE_MODE);
         }
@@ -306,15 +335,20 @@ int ONScripter::drawChar(char *text, _FontInfo *info, bool flush_flag,
 
     if (text_rect) {
         int ret = info->endStatus(text_rect->x + text_rect->w,
-                                  text_rect->y + text_rect->h, useAutoOffset);
+                                  text_rect->y + text_rect->h,
+                                  useAutoOffset);
         return ret;
     }
     return 0;
 }
 
-void ONScripter::drawString(const char *str, uchar3 color, _FontInfo *info,
-                            bool flush_flag, SDL_Surface *surface,
-                            SDL_Rect *rect, AnimationInfo *cache_info,
+void ONScripter::drawString(const char *str,
+                            uchar3 color,
+                            _FontInfo *info,
+                            bool flush_flag,
+                            SDL_Surface *surface,
+                            SDL_Rect *rect,
+                            AnimationInfo *cache_info,
                             bool pack_hankaku) {
     int i;
 
@@ -418,7 +452,10 @@ void ONScripter::drawString(const char *str, uchar3 color, _FontInfo *info,
         if (fontConfig->render_outline)
             info->addShadeArea(scaled_clipped_rect, -1, -1, 2, 2);
         else
-            info->addShadeArea(scaled_clipped_rect, 0, 0, shade_distance[0],
+            info->addShadeArea(scaled_clipped_rect,
+                               0,
+                               0,
+                               shade_distance[0],
                                shade_distance[1]);
     }
 
@@ -553,8 +590,12 @@ bool ONScripter::clickWait(char *out_text) {
         !textgosub_label) {
         clickstr_state = CLICK_NONE;
         if (out_text) {
-            drawChar(out_text, &sentence_font, false, true,
-                     accumulation_surface, &text_info);
+            drawChar(out_text,
+                     &sentence_font,
+                     false,
+                     true,
+                     accumulation_surface,
+                     &text_info);
         } else {  // called on '@'
             flush(refreshMode());
         }
@@ -564,7 +605,11 @@ bool ONScripter::clickWait(char *out_text) {
         if (waitEvent(0)) return false;
     } else {
         if (out_text) {
-            drawChar(out_text, &sentence_font, true, true, accumulation_surface,
+            drawChar(out_text,
+                     &sentence_font,
+                     true,
+                     true,
+                     accumulation_surface,
                      &text_info);
             num_chars_in_sentence++;
         }
@@ -618,7 +663,8 @@ bool ONScripter::forceClickNewPage() {
             setSaveFlag(false);
             textgosub_clickstr_state = CLICK_NEWPAGE;
             gosubReal(textgosub_label,
-                      script_h.getCurrent(true) + string_buffer_offset, true);
+                      script_h.getCurrent(true) + string_buffer_offset,
+                      true);
             event_mode = IDLE_EVENT_MODE;
             waitEvent(0);
             return false;
@@ -636,7 +682,11 @@ bool ONScripter::forceClickNewPage() {
 
 bool ONScripter::clickNewPage(char *out_text) {
     if (out_text) {
-        drawChar(out_text, &sentence_font, true, true, accumulation_surface,
+        drawChar(out_text,
+                 &sentence_font,
+                 true,
+                 true,
+                 accumulation_surface,
                  &text_info);
         num_chars_in_sentence++;
     }
@@ -710,12 +760,14 @@ void ONScripter::startRuby(const char *buf, _FontInfo &info) {
     }
     ruby_struct.ruby_end = buf;
     ruby_struct.stage = RubyStruct::BODY;
-    ruby_struct.margin = ruby_font.initRuby(info, ruby_struct.body_count / 2,
-                                            ruby_struct.ruby_count / 2);
+    ruby_struct.margin = ruby_font.initRuby(
+        info, ruby_struct.body_count / 2, ruby_struct.ruby_count / 2);
 }
 
-void ONScripter::endRuby(bool flush_flag, bool lookback_flag,
-                         SDL_Surface *surface, AnimationInfo *cache_info) {
+void ONScripter::endRuby(bool flush_flag,
+                         bool lookback_flag,
+                         SDL_Surface *surface,
+                         AnimationInfo *cache_info) {
     char out_text[3] = {'\0', '\0', '\0'};
     if (sentence_font.rubyon_flag) {
         ruby_font.clear();
@@ -723,7 +775,11 @@ void ONScripter::endRuby(bool flush_flag, bool lookback_flag,
         while (buf < ruby_struct.ruby_end) {
             out_text[0] = *buf;
             out_text[1] = *(buf + 1);
-            drawChar(out_text, &ruby_font, flush_flag, lookback_flag, surface,
+            drawChar(out_text,
+                     &ruby_font,
+                     flush_flag,
+                     lookback_flag,
+                     surface,
                      cache_info);
             buf += 2;
         }
@@ -934,11 +990,19 @@ bool ONScripter::processText() {
                             : sentence_font.wait_time;
         int drawCharStatus = 0;
         if (skip_mode || ctrl_pressed_status || wait_time == 0) {
-            drawCharStatus = drawChar(out_text, &sentence_font, false, true,
-                                      accumulation_surface, &text_info);
+            drawCharStatus = drawChar(out_text,
+                                      &sentence_font,
+                                      false,
+                                      true,
+                                      accumulation_surface,
+                                      &text_info);
         } else {
-            drawCharStatus = drawChar(out_text, &sentence_font, true, true,
-                                      accumulation_surface, &text_info);
+            drawCharStatus = drawChar(out_text,
+                                      &sentence_font,
+                                      true,
+                                      true,
+                                      accumulation_surface,
+                                      &text_info);
             event_mode = WAIT_TIMER_MODE | WAIT_INPUT_MODE;
             waitEvent(wait_time);
         }
@@ -963,9 +1027,12 @@ bool ONScripter::processText() {
                         script_h.getStringBuffer()[string_buffer_offset + 1];
                 bool flush_flag = true;
                 if (skip_mode || ctrl_pressed_status) flush_flag = false;
-                prev_end_status =
-                    drawChar(out_text, &sentence_font, flush_flag, true,
-                             accumulation_surface, &text_info);
+                prev_end_status = drawChar(out_text,
+                                           &sentence_font,
+                                           flush_flag,
+                                           true,
+                                           accumulation_surface,
+                                           &text_info);
             }
             string_buffer_offset += matched_len;
         }
@@ -1130,8 +1197,12 @@ bool ONScripter::processText() {
 
         bool flush_flag = true;
         if (skip_mode || ctrl_pressed_status) flush_flag = false;
-        prev_end_status = drawChar(out_text, &sentence_font, flush_flag, true,
-                                   accumulation_surface, &text_info);
+        prev_end_status = drawChar(out_text,
+                                   &sentence_font,
+                                   flush_flag,
+                                   true,
+                                   accumulation_surface,
+                                   &text_info);
         num_chars_in_sentence++;
 
         int wait_time = sentence_font.wait_time == -1

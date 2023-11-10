@@ -248,8 +248,10 @@ int ScriptParser::setlayerCommand() {
 
 #ifndef USE_BUILTIN_LAYER_EFFECTS
     utils::printError(
-        "setlayer: layer effect support not available (%d,%d,'%s')", no,
-        interval, dll);
+        "setlayer: layer effect support not available (%d,%d,'%s')",
+        no,
+        interval,
+        dll);
     return RET_CONTINUE;
 #else
     LayerInfo *layer = &layer_info[no];
@@ -530,8 +532,10 @@ int ScriptParser::nsaCommand() {
 
     delete script_h.cBR;
     script_h.cBR = new NsaReader(
-        nsa_offset, archive_path,
-        BaseReader::ARCHIVE_TYPE_NSA | BaseReader::ARCHIVE_TYPE_NS2, key_table);
+        nsa_offset,
+        archive_path,
+        BaseReader::ARCHIVE_TYPE_NSA | BaseReader::ARCHIVE_TYPE_NS2,
+        key_table);
     if (script_h.cBR->open(nsa_path)) {
         utils::printError(
             " *** failed to open nsa or ns2 archive, ignored.  ***\n");
@@ -763,13 +767,17 @@ int ScriptParser::lookbackspCommand() {
 
     if (filelog_flag) {
         script_h.findAndAddLog(script_h.log_info[ScriptHandler::FILE_LOG],
-                               DEFAULT_LOOKBACK_NAME0, true);
+                               DEFAULT_LOOKBACK_NAME0,
+                               true);
         script_h.findAndAddLog(script_h.log_info[ScriptHandler::FILE_LOG],
-                               DEFAULT_LOOKBACK_NAME1, true);
+                               DEFAULT_LOOKBACK_NAME1,
+                               true);
         script_h.findAndAddLog(script_h.log_info[ScriptHandler::FILE_LOG],
-                               DEFAULT_LOOKBACK_NAME2, true);
+                               DEFAULT_LOOKBACK_NAME2,
+                               true);
         script_h.findAndAddLog(script_h.log_info[ScriptHandler::FILE_LOG],
-                               DEFAULT_LOOKBACK_NAME3, true);
+                               DEFAULT_LOOKBACK_NAME3,
+                               true);
     }
 
     return RET_CONTINUE;
@@ -914,7 +922,8 @@ int ScriptParser::ifCommand() {
             script_h.readLabel();
             buf = script_h.readStr();
             f = (script_h.findAndAddLog(
-                     script_h.log_info[ScriptHandler::LABEL_LOG], buf + 1,
+                     script_h.log_info[ScriptHandler::LABEL_LOG],
+                     buf + 1,
                      false) != NULL);
             // utils::printInfo("lchk %s (%d)\n", buf, f );
         } else {
@@ -1040,8 +1049,10 @@ int ScriptParser::gotoCommand() {
     return RET_CONTINUE;
 }
 
-void ScriptParser::gosubReal(const char *label, char *next_script,
-                             bool textgosub_flag, bool skip_params) {
+void ScriptParser::gosubReal(const char *label,
+                             char *next_script,
+                             bool textgosub_flag,
+                             bool skip_params) {
     last_nest_info->next = new NestInfo();
     last_nest_info->next->previous = last_nest_info;
 
