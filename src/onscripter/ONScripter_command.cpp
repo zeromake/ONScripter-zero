@@ -106,8 +106,8 @@ int ONScripter::waveCommand() {
     wavestopCommand();
 
     setStr(&wave_file_name, script_h.readStr());
-    playSound(wave_file_name, SOUND_CHUNK, wave_play_loop_flag,
-              MIX_WAVE_CHANNEL);
+    playSound(
+        wave_file_name, SOUND_CHUNK, wave_play_loop_flag, MIX_WAVE_CHANNEL);
     return RET_CONTINUE;
 }
 
@@ -159,7 +159,10 @@ int ONScripter::vCommand() {
     const int __size = 256;
     char buf[__size];
 
-    snprintf(buf, __size, RELATIVEPATH "wav%c%s.wav", DELIMITER,
+    snprintf(buf,
+             __size,
+             RELATIVEPATH "wav%c%s.wav",
+             DELIMITER,
              script_h.getStringBuffer() + 1);
     playSound(buf, SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
     return RET_CONTINUE;
@@ -783,7 +786,9 @@ int ONScripter::selectCommand() {
     sentence_font.savePoint();
 
     if (selectvoice_file_name[SELECTVOICE_OPEN])
-        playSound(selectvoice_file_name[SELECTVOICE_OPEN], SOUND_CHUNK, false,
+        playSound(selectvoice_file_name[SELECTVOICE_OPEN],
+                  SOUND_CHUNK,
+                  false,
                   MIX_WAVE_CHANNEL);
 
     last_select_link = &root_select_link;
@@ -881,7 +886,9 @@ int ONScripter::selectCommand() {
     } while (current_button_state.button <= 0 || skip_mode & SKIP_NORMAL);
 
     if (selectvoice_file_name[SELECTVOICE_SELECT])
-        playSound(selectvoice_file_name[SELECTVOICE_SELECT], SOUND_CHUNK, false,
+        playSound(selectvoice_file_name[SELECTVOICE_SELECT],
+                  SOUND_CHUNK,
+                  false,
                   MIX_WAVE_CHANNEL);
 
     deleteButtonLink();
@@ -1236,8 +1243,10 @@ int ONScripter::ofscopyCommand() {
     SDL_Surface *tmp_surface = AnimationInfo::alloc32bitSurface(
         render_view_rect.w, render_view_rect.h, texture_format);
     SDL_LockSurface(tmp_surface);
-    SDL_RenderReadPixels(renderer, &render_view_rect,
-                         tmp_surface->format->format, tmp_surface->pixels,
+    SDL_RenderReadPixels(renderer,
+                         &render_view_rect,
+                         tmp_surface->format->format,
+                         tmp_surface->pixels,
                          tmp_surface->pitch);
     SDL_UnlockSurface(tmp_surface);
     resizeSurface(tmp_surface, accumulation_surface);
@@ -1428,8 +1437,10 @@ int ONScripter::mp3Command() {
 
         if (mp3fadein_duration > 0) music_volume = 0;
 
-        playSound(music_file_name, SOUND_MUSIC | SOUND_MIDI | SOUND_CHUNK,
-                  music_play_loop_flag, MIX_BGM_CHANNEL);
+        playSound(music_file_name,
+                  SOUND_MUSIC | SOUND_MIDI | SOUND_CHUNK,
+                  music_play_loop_flag,
+                  MIX_BGM_CHANNEL);
 
         music_volume = tmp;
 
@@ -1657,7 +1668,9 @@ int ONScripter::loopbgmCommand() {
     buf = script_h.readStr();
     setStr(&loop_bgm_name[1], buf);
 
-    playSound(loop_bgm_name[1], SOUND_PRELOAD | SOUND_CHUNK, false,
+    playSound(loop_bgm_name[1],
+              SOUND_PRELOAD | SOUND_CHUNK,
+              false,
               MIX_LOOPBGM_CHANNEL1);
     playSound(loop_bgm_name[0], SOUND_CHUNK, false, MIX_LOOPBGM_CHANNEL0);
 
@@ -1844,9 +1857,11 @@ int ONScripter::ldCommand() {
     return RET_CONTINUE;
 }
 #if defined(USE_SMPEG)
-static void smpeg_filter_callback(SDL_Overlay *dst, SDL_Overlay *src,
+static void smpeg_filter_callback(SDL_Overlay *dst,
+                                  SDL_Overlay *src,
                                   SDL_Rect *region,
-                                  SMPEG_FilterInfo *filter_info, void *data) {
+                                  SMPEG_FilterInfo *filter_info,
+                                  void *data) {
     if (dst) {
         dst->w = 0;
         dst->h = 0;
@@ -1873,7 +1888,8 @@ int ONScripter::layermessageCommand() {
 
 #ifndef USE_BUILTIN_LAYER_EFFECTS
     utils::printInfo(
-        "layermessage: layer effect support not available (%d,'%s')\n", no,
+        "layermessage: layer effect support not available (%d,'%s')\n",
+        no,
         message);
     return RET_CONTINUE;
 #else
@@ -2143,7 +2159,8 @@ int ONScripter::gettagCommand() {
                 setStr(
                     &script_h.getVariableData(script_h.pushed_variable.var_no)
                          .str,
-                    buf_start, buf - buf_start);
+                    buf_start,
+                    buf - buf_start);
             } else {
                 setStr(
                     &script_h.getVariableData(script_h.pushed_variable.var_no)
@@ -2240,13 +2257,15 @@ int ONScripter::getscreenshotCommand() {
             render_view_rect.w, render_view_rect.h, texture_format);
     if (screen_dirty_flag) {
         SDL_LockSurface(screenshot_surface);
-        SDL_RenderReadPixels(
-            renderer, &render_view_rect, screenshot_surface->format->format,
-            screenshot_surface->pixels, screenshot_surface->pitch);
+        SDL_RenderReadPixels(renderer,
+                             &render_view_rect,
+                             screenshot_surface->format->format,
+                             screenshot_surface->pixels,
+                             screenshot_surface->pitch);
         SDL_UnlockSurface(screenshot_surface);
     } else {
-        SDL_BlitSurface(accumulation_surface, nullptr, screenshot_surface,
-                        nullptr);
+        SDL_BlitSurface(
+            accumulation_surface, nullptr, screenshot_surface, nullptr);
     }
 
     return RET_CONTINUE;
@@ -2323,12 +2342,14 @@ int ONScripter::getregCommand() {
         if (reg_buf[0] == '[') {
             unsigned int c = 0;
             while (reg_buf[c] != ']' && reg_buf[c] != '\0') c++;
-            if (!strncmp(reg_buf + 1, path,
+            if (!strncmp(reg_buf + 1,
+                         path,
                          (c - 1 > strlen(path)) ? (c - 1) : strlen(path))) {
                 while (fgets(reg_buf2, 256, fp)) {
                     script_h.pushCurrent(reg_buf2);
                     buf = script_h.readStr();
-                    if (strncmp(buf, key,
+                    if (strncmp(buf,
+                                key,
                                 (strlen(buf) > strlen(key)) ? strlen(buf)
                                                             : strlen(key))) {
                         script_h.popCurrent();
@@ -2344,8 +2365,8 @@ int ONScripter::getregCommand() {
                     buf = script_h.readStr();
                     setStr(&script_h.getVariableData(no).str, buf);
                     script_h.popCurrent();
-                    utils::printInfo("  $%d = %s\n", no,
-                                     script_h.getVariableData(no).str);
+                    utils::printInfo(
+                        "  $%d = %s\n", no, script_h.getVariableData(no).str);
                     found_flag = true;
                     break;
                 }
@@ -2440,7 +2461,8 @@ int ONScripter::getlogCommand() {
         }
 
         setStr(&script_h.getVariableData(script_h.pushed_variable.var_no).str,
-               buf, count);
+               buf,
+               count);
         if (getlog2_flag) {
             setStr(&script_h.getVariableData(tagVariable.var_no).str,
                    page->tag);
@@ -2651,8 +2673,8 @@ int ONScripter::exec_dllCommand() {
 
     FILE *fp;
     if ((fp = fopen(dll_file, "r")) == NULL) {
-        utils::printError("Cannot open file [%s] while reading %s\n", dll_file,
-                          dll_name);
+        utils::printError(
+            "Cannot open file [%s] while reading %s\n", dll_file, dll_name);
         return RET_CONTINUE;
     }
 
@@ -2663,7 +2685,8 @@ int ONScripter::exec_dllCommand() {
             c = 0;
             while (dll_buf[c] != ']' && dll_buf[c] != '\0') c++;
             if (!strncmp(
-                    dll_buf + 1, dll_name,
+                    dll_buf + 1,
+                    dll_name,
                     (c - 1 > strlen(dll_name)) ? (c - 1) : strlen(dll_name))) {
                 found_flag = true;
                 while (fgets(dll_buf2, 256, fp)) {
@@ -2805,8 +2828,8 @@ int ONScripter::dwaveCommand() {
 
     if (play_mode == WAVE_PLAY_LOADED) {
         // Mix_PlayChannel(ch, wave_sample[ch], loop_flag?-1:0);
-        Mix_FadeInChannel(ch, wave_sample[ch], loop_flag ? -1 : 0,
-                          consumeSeFadetime());
+        Mix_FadeInChannel(
+            ch, wave_sample[ch], loop_flag ? -1 : 0, consumeSeFadetime());
     } else {
         const char *buf = script_h.readStr();
         int fmt = SOUND_CHUNK;
@@ -2820,7 +2843,10 @@ int ONScripter::dvCommand() {
     const int __size = 256;
     char buf[__size];
 
-    snprintf(buf, __size, RELATIVEPATH "voice%c%s.wav", DELIMITER,
+    snprintf(buf,
+             __size,
+             RELATIVEPATH "voice%c%s.wav",
+             DELIMITER,
              script_h.getStringBuffer() + 2);
     playSound(buf, SOUND_CHUNK, false, 0);
 
@@ -2883,8 +2909,8 @@ int ONScripter::drawsp2Command() {
     ai->calcAffineMatrix();
     ai->setCell(cell_no);
 
-    ai->blendOnSurface2(accumulation_surface, ai->pos.x, ai->pos.y, screen_rect,
-                        alpha);
+    ai->blendOnSurface2(
+        accumulation_surface, ai->pos.x, ai->pos.y, screen_rect, alpha);
 
     return RET_CONTINUE;
 }
@@ -2914,14 +2940,16 @@ int ONScripter::drawfillCommand() {
     int g = script_h.readInt();
     int b = script_h.readInt();
 
-    SDL_FillRect(accumulation_surface, NULL,
+    SDL_FillRect(accumulation_surface,
+                 NULL,
                  SDL_MapRGBA(accumulation_surface->format, r, g, b, 0xff));
 
     return RET_CONTINUE;
 }
 
 int ONScripter::drawclearCommand() {
-    SDL_FillRect(accumulation_surface, NULL,
+    SDL_FillRect(accumulation_surface,
+                 NULL,
                  SDL_MapRGBA(accumulation_surface->format, 0, 0, 0, 0xff));
 
     return RET_CONTINUE;
@@ -2932,8 +2960,8 @@ int ONScripter::drawbgCommand() {
     clip.x = clip.y = 0;
     clip.w = accumulation_surface->w;
     clip.h = accumulation_surface->h;
-    bg_info.blendOnSurface(accumulation_surface, bg_info.pos.x, bg_info.pos.y,
-                           clip);
+    bg_info.blendOnSurface(
+        accumulation_surface, bg_info.pos.x, bg_info.pos.y, clip);
 
     return RET_CONTINUE;
 }
@@ -2948,8 +2976,8 @@ int ONScripter::drawbg2Command() {
     bi.rot = script_h.readInt();
     bi.calcAffineMatrix();
 
-    bi.blendOnSurface2(accumulation_surface, bi.pos.x, bi.pos.y, screen_rect,
-                       255);
+    bi.blendOnSurface2(
+        accumulation_surface, bi.pos.x, bi.pos.y, screen_rect, 255);
 
     return RET_CONTINUE;
 }
@@ -3046,21 +3074,21 @@ int ONScripter::cspCommand() {
         }
     else if (nos.size() > 0) {
         auto it = nos.begin();
-        std::function<void(int no)> sp_remove = [&num, &csp2_flag, &si,
-                                                 this](int no) {
-            if (no >= 0 && no < num) {
-                if (si[no].visible) {
-                    if (csp2_flag) {
-                        dirty_rect.add(si[no].bounding_rect);
-                    } else {
-                        dirty_rect.add(si[no].pos);
+        std::function<void(int no)> sp_remove =
+            [&num, &csp2_flag, &si, this](int no) {
+                if (no >= 0 && no < num) {
+                    if (si[no].visible) {
+                        if (csp2_flag) {
+                            dirty_rect.add(si[no].bounding_rect);
+                        } else {
+                            dirty_rect.add(si[no].pos);
+                        }
                     }
+                    if (!csp2_flag) root_button_link.removeSprite(no);
+                    si[no].remove();
                 }
-                if (!csp2_flag) root_button_link.removeSprite(no);
-                si[no].remove();
-            }
-            return;
-        };
+                return;
+            };
         if (step_flag && nos.size() >= 2) {
             it += 2;
             for (int no = nos.at(0); no <= nos.at(1); no++) {
@@ -3285,8 +3313,8 @@ int ONScripter::btnwaitCommand() {
             if (bl->exbtn_ctl[0]) {
                 SDL_Rect check_src_rect = bl->image_rect;
                 SDL_Rect check_dst_rect = {0, 0, 0, 0};
-                decodeExbtnControl(bl->exbtn_ctl[0], &check_src_rect,
-                                   &check_dst_rect);
+                decodeExbtnControl(
+                    bl->exbtn_ctl[0], &check_src_rect, &check_dst_rect);
             } else {
                 sprite_info[bl->sprite_no].visible = true;
                 sprite_info[bl->sprite_no].setCell(0);
@@ -3535,10 +3563,13 @@ int ONScripter::brCommand() {
     return RET_CONTINUE;
 }
 
-static SDL_Texture *createMaximumTexture(
-    SDL_Renderer *renderer, SDL_Rect &blt_rect, const SDL_Rect &src_rect,
-    SDL_Surface *blt_surface, Uint32 texture_format, int max_texture_width,
-    int max_texture_height) {
+static SDL_Texture *createMaximumTexture(SDL_Renderer *renderer,
+                                         SDL_Rect &blt_rect,
+                                         const SDL_Rect &src_rect,
+                                         SDL_Surface *blt_surface,
+                                         Uint32 texture_format,
+                                         int max_texture_width,
+                                         int max_texture_height) {
     if (src_rect.w > max_texture_width || src_rect.h > max_texture_height)
         utils::printInfo("Texture too large");
     blt_rect.w = blt_surface->w - src_rect.x > max_texture_width
@@ -3592,10 +3623,13 @@ int ONScripter::bltCommand() {
         if (blt_texture == NULL) {
             if (btndef_info.image_surface->w > max_texture_width ||
                 btndef_info.image_surface->h > max_texture_height) {
-                blt_texture = createMaximumTexture(
-                    renderer, blt_texture_src_rect, src_rect,
-                    btndef_info.image_surface, texture_format,
-                    max_texture_width, max_texture_height);
+                blt_texture = createMaximumTexture(renderer,
+                                                   blt_texture_src_rect,
+                                                   src_rect,
+                                                   btndef_info.image_surface,
+                                                   texture_format,
+                                                   max_texture_width,
+                                                   max_texture_height);
             } else {
                 blt_texture_src_rect.x = 0;
                 blt_texture_src_rect.y = 0;
@@ -3609,10 +3643,13 @@ int ONScripter::bltCommand() {
                 sx + sw > blt_texture_src_rect.x + blt_texture_src_rect.w ||
                 sy + sh > blt_texture_src_rect.y + blt_texture_src_rect.h) {
                 SDL_DestroyTexture(blt_texture);
-                blt_texture = createMaximumTexture(
-                    renderer, blt_texture_src_rect, src_rect,
-                    btndef_info.image_surface, texture_format,
-                    max_texture_width, max_texture_height);
+                blt_texture = createMaximumTexture(renderer,
+                                                   blt_texture_src_rect,
+                                                   src_rect,
+                                                   btndef_info.image_surface,
+                                                   texture_format,
+                                                   max_texture_width,
+                                                   max_texture_height);
             }
         }
         src_rect.x -= blt_texture_src_rect.x;
@@ -3847,7 +3884,9 @@ int ONScripter::allsphideCommand() {
     return RET_CONTINUE;
 }
 
-void ONScripter::NSDCallCommand(int texnum, const char *str1, int proc,
+void ONScripter::NSDCallCommand(int texnum,
+                                const char *str1,
+                                int proc,
                                 const char *str2) {
     if (texnum < 0 || texnum >= MAX_TEXTURE_NUM) return;
 
@@ -3924,8 +3963,14 @@ void ONScripter::NSDCallCommand(int texnum, const char *str1, int proc,
         }
         *p2 = 0;
 
-        drawString(start[num_param - 1], color, &f_info, false, NULL, NULL,
-                   &texture_info[texnum], false);
+        drawString(start[num_param - 1],
+                   color,
+                   &f_info,
+                   false,
+                   NULL,
+                   NULL,
+                   &texture_info[texnum],
+                   false);
 
         ruby_struct = rs_old;
     }
@@ -3956,8 +4001,14 @@ void ONScripter::NSDLoadCommand(int texnum, const char *str) {
         }
         const int __buf_size = 32;
         char buf[__buf_size];
-        snprintf(buf, __buf_size, ">%d,%d,#%02x%02x%02x", val[0], val[1],
-                 val[2], val[3], val[4]);
+        snprintf(buf,
+                 __buf_size,
+                 ">%d,%d,#%02x%02x%02x",
+                 val[0],
+                 val[1],
+                 val[2],
+                 val[3],
+                 val[4]);
         ai->setImageName(buf);
         ai->default_alpha = val[5];
     }
@@ -3988,8 +4039,16 @@ void ONScripter::NSDPresentRectCommand(int x1, int y1, int x2, int y2) {
     flushDirect(clip, REFRESH_NONE_MODE);
 }
 
-void ONScripter::NSDSp2Command(int texnum, int dcx, int dcy, int sx, int sy,
-                               int w, int h, int xs, int ys, int rot,
+void ONScripter::NSDSp2Command(int texnum,
+                               int dcx,
+                               int dcy,
+                               int sx,
+                               int sy,
+                               int w,
+                               int h,
+                               int xs,
+                               int ys,
+                               int rot,
                                int alpha) {
     if (texnum < 0 || texnum >= MAX_TEXTURE_NUM) return;
 
@@ -4074,8 +4133,8 @@ int ONScripter::checkspCommand() {
     return RET_CONTINUE;
 }
 
-void ons_sprintf(char *buff, const int size, const char *format, int argc,
-                 void *args[]) {
+void ons_sprintf(
+    char *buff, const int size, const char *format, int argc, void *args[]) {
     switch (argc) {
         case 0:
             snprintf(buff, size, "%s", format);
@@ -4093,171 +4152,662 @@ void ons_sprintf(char *buff, const int size, const char *format, int argc,
             snprintf(buff, size, format, args[0], args[1], args[2], args[3]);
             break;
         case 5:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
                      args[4]);
             break;
         case 6:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5]);
             break;
         case 7:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6]);
             break;
         case 8:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7]);
             break;
         case 9:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8]);
             break;
         case 10:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9]);
             break;
         case 11:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
                      args[10]);
             break;
         case 12:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11]);
             break;
         case 13:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12]);
             break;
         case 14:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13]);
             break;
         case 15:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14]);
             break;
         case 16:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
                      args[15]);
             break;
         case 17:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
                      args[16]);
             break;
         case 18:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17]);
             break;
         case 19:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18]);
             break;
         case 20:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19]);
             break;
         case 21:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20]);
             break;
         case 22:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
                      args[21]);
             break;
         case 23:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
                      args[22]);
             break;
         case 24:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23]);
             break;
         case 25:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24]);
             break;
         case 26:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25]);
             break;
         case 27:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25], args[26]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25],
+                     args[26]);
             break;
         case 28:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25], args[26],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25],
+                     args[26],
                      args[27]);
             break;
         case 29:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25], args[26], args[27],
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25],
+                     args[26],
+                     args[27],
                      args[28]);
             break;
         case 30:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25], args[26], args[27],
-                     args[28], args[29]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25],
+                     args[26],
+                     args[27],
+                     args[28],
+                     args[29]);
             break;
         case 31:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25], args[26], args[27],
-                     args[28], args[29], args[30]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25],
+                     args[26],
+                     args[27],
+                     args[28],
+                     args[29],
+                     args[30]);
             break;
         case 32:
-            snprintf(buff, size, format, args[0], args[1], args[2], args[3],
-                     args[4], args[5], args[6], args[7], args[8], args[9],
-                     args[10], args[11], args[12], args[13], args[14], args[15],
-                     args[16], args[17], args[18], args[19], args[20], args[21],
-                     args[22], args[23], args[24], args[25], args[26], args[27],
-                     args[28], args[29], args[30], args[31]);
+            snprintf(buff,
+                     size,
+                     format,
+                     args[0],
+                     args[1],
+                     args[2],
+                     args[3],
+                     args[4],
+                     args[5],
+                     args[6],
+                     args[7],
+                     args[8],
+                     args[9],
+                     args[10],
+                     args[11],
+                     args[12],
+                     args[13],
+                     args[14],
+                     args[15],
+                     args[16],
+                     args[17],
+                     args[18],
+                     args[19],
+                     args[20],
+                     args[21],
+                     args[22],
+                     args[23],
+                     args[24],
+                     args[25],
+                     args[26],
+                     args[27],
+                     args[28],
+                     args[29],
+                     args[30],
+                     args[31]);
             break;
     }
 }
@@ -4319,8 +4869,8 @@ int ONScripter::sprintfCommand() {
         }
         args.push_back(value);
     }
-    ons_sprintf(sprintf_buf, sprintf_buf_size, format, args.size(),
-                args.data());
+    ons_sprintf(
+        sprintf_buf, sprintf_buf_size, format, args.size(), args.data());
 #endif
     setStr(&script_h.getVariableData(out_variable.var_no).str, sprintf_buf);
     args.clear();

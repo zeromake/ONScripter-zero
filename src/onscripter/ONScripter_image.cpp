@@ -48,8 +48,10 @@ std::shared_ptr<onscache::SurfaceBaseNode> ONScripter::loadImageCache(
 }
 #endif
 
-SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha,
-                                   int *location, unsigned char *alpha) {
+SDL_Surface *ONScripter::loadImage(char *filename,
+                                   bool *has_alpha,
+                                   int *location,
+                                   unsigned char *alpha) {
     if (!filename) return NULL;
 
     SDL_Surface *tmp = NULL;
@@ -77,7 +79,8 @@ SDL_Surface *ONScripter::loadImage(char *filename, bool *has_alpha,
     return ret;
 }
 
-SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
+SDL_Surface *ONScripter::createRectangleSurface(char *filename,
+                                                bool *has_alpha,
                                                 unsigned char *alpha) {
     int c = 1, w = 0, h = 0;
     bool decimal_flag = false;
@@ -115,9 +118,14 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
     }
 
     SDL_PixelFormat *fmt = image_surface->format;
-    SDL_Surface *tmp =
-        SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, fmt->BitsPerPixel, fmt->Rmask,
-                             fmt->Gmask, fmt->Bmask, fmt->Amask);
+    SDL_Surface *tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                            w,
+                                            h,
+                                            fmt->BitsPerPixel,
+                                            fmt->Rmask,
+                                            fmt->Gmask,
+                                            fmt->Bmask,
+                                            fmt->Amask);
 
     c = c2;
     for (int i = 0; i < n; i++) {
@@ -132,9 +140,11 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
         rect.w = w * (i + 1) / n - rect.x;
         if (i == n - 1) rect.w = w - rect.x;
         rect.h = h;
-        SDL_FillRect(tmp, &rect,
-                     SDL_MapRGBA(tmp->format, col[0], col[1], col[2],
-                                 alpha ? *alpha : 0xff));
+        SDL_FillRect(
+            tmp,
+            &rect,
+            SDL_MapRGBA(
+                tmp->format, col[0], col[1], col[2], alpha ? *alpha : 0xff));
     }
 
     if (has_alpha) {
@@ -147,7 +157,8 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha,
     return tmp;
 }
 
-SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha,
+SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
+                                               bool *has_alpha,
                                                int *location) {
     unsigned long length = script_h.cBR->getFileLength(filename);
 
@@ -157,8 +168,8 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha,
     }
 
     if (filelog_flag)
-        script_h.findAndAddLog(script_h.log_info[ScriptHandler::FILE_LOG],
-                               filename, true);
+        script_h.findAndAddLog(
+            script_h.log_info[ScriptHandler::FILE_LOG], filename, true);
     // utils::printInfo(" ... loading %s length %ld\n", filename, length );
 
     mean_size_of_loaded_images += length * 6 / 5;  // reserve 20% larger size
@@ -175,7 +186,8 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha,
         if (buffer == NULL) {
             utils::printError(
                 "failed to load [%s] because file size [%lu] is too large.\n",
-                filename, length);
+                filename,
+                length);
             return NULL;
         }
     } else {
@@ -208,8 +220,8 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha,
     if (buffer != tmp_image_buf) delete[] buffer;
 
     if (!tmp)
-        utils::printError(" *** can't load file [%s] %s ***\n", filename,
-                          IMG_GetError());
+        utils::printError(
+            " *** can't load file [%s] %s ***\n", filename, IMG_GetError());
 
     return tmp;
 }
@@ -240,9 +252,18 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
         resize_buffer = new unsigned char[len];
         resize_buffer_size = len;
     }
-    resizeImage((unsigned char *)dst_buffer, dst->w, dst->h, dst->w * 4,
-                (unsigned char *)src_buffer, src->w, src->h, src->w * 4, 4,
-                resize_buffer, src->w * 4, false);
+    resizeImage((unsigned char *)dst_buffer,
+                dst->w,
+                dst->h,
+                dst->w * 4,
+                (unsigned char *)src_buffer,
+                src->w,
+                src->h,
+                src->w * 4,
+                4,
+                resize_buffer,
+                src->w * 4,
+                false);
 
     SDL_UnlockSurface(src);
     SDL_UnlockSurface(dst);
@@ -279,9 +300,12 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
 //                       (*src2_buffer & 0x00ff00) * mask2) >> 8) & 0x00ff00;
 #ifdef USE_SIMD
 #ifdef USE_SIMD_X86_AVX2
-static void alphaBlend8Core32(Uint32 *src1_buffer, Uint32 *src2_buffer,
-                              Uint32 *dst_buffer, simd::uint16x16 m_lo,
-                              simd::uint16x16 m_hi, simd::uint8x32 zero,
+static void alphaBlend8Core32(Uint32 *src1_buffer,
+                              Uint32 *src2_buffer,
+                              Uint32 *dst_buffer,
+                              simd::uint16x16 m_lo,
+                              simd::uint16x16 m_hi,
+                              simd::uint8x32 zero,
                               simd::uint8x32 amask) {
     using namespace simd;
     uint8x32 src1 = load256_u(src1_buffer), src2 = load256_u(src2_buffer);
@@ -299,9 +323,12 @@ static void alphaBlend8Core32(Uint32 *src1_buffer, Uint32 *src2_buffer,
 }
 #endif
 
-static void alphaBlendCore32(Uint32 *src1_buffer, Uint32 *src2_buffer,
-                             Uint32 *dst_buffer, simd::uint16x8 m_lo,
-                             simd::uint16x8 m_hi, simd::uint8x16 zero,
+static void alphaBlendCore32(Uint32 *src1_buffer,
+                             Uint32 *src2_buffer,
+                             Uint32 *dst_buffer,
+                             simd::uint16x8 m_lo,
+                             simd::uint16x8 m_hi,
+                             simd::uint8x16 zero,
                              simd::uint8x16 amask) {
     using namespace simd;
     uint8x16 src1 = load_u(src1_buffer), src2 = load_u(src2_buffer);
@@ -318,8 +345,10 @@ static void alphaBlendCore32(Uint32 *src1_buffer, Uint32 *src2_buffer,
     store_u(dst_buffer, r);
 }
 
-static void alphaBlendPixelCore32(Uint32 *src1_buffer, Uint32 *src2_buffer,
-                                  Uint32 *dst_buffer, Uint8 mask,
+static void alphaBlendPixelCore32(Uint32 *src1_buffer,
+                                  Uint32 *src2_buffer,
+                                  Uint32 *dst_buffer,
+                                  Uint8 mask,
                                   simd::ivec128 zero) {
     using namespace simd;
     uint8x4 src1 = load(src1_buffer), src2 = load(src2_buffer);
@@ -335,10 +364,15 @@ static void alphaBlendPixelCore32(Uint32 *src1_buffer, Uint32 *src2_buffer,
 }
 #endif
 
-static void alphaBlend32(Uint32 *src1_buffer, Uint32 *src2_buffer,
-                         Uint32 *dst_buffer, const Uint32 *mask_buffer,
-                         Uint32 mask_value, Uint32 overflow_mask,
-                         Uint32 mask_surface_w, int rect_x, int rect_w) {
+static void alphaBlend32(Uint32 *src1_buffer,
+                         Uint32 *src2_buffer,
+                         Uint32 *dst_buffer,
+                         const Uint32 *mask_buffer,
+                         Uint32 mask_value,
+                         Uint32 overflow_mask,
+                         Uint32 mask_surface_w,
+                         int rect_x,
+                         int rect_w) {
     int j2 = rect_x;
 #ifdef USE_SIMD
     using namespace simd;
@@ -379,8 +413,8 @@ static void alphaBlend32(Uint32 *src1_buffer, Uint32 *src2_buffer,
         uint8x32 maskv = load256_a(mask2p);
         uint16x16 m_lo = widen_lo(maskv, zero);
         uint16x16 m_hi = widen_hi(maskv, zero);
-        alphaBlend8Core32(src1_buffer, src2_buffer, dst_buffer, m_lo, m_hi,
-                          zero, amask);
+        alphaBlend8Core32(
+            src1_buffer, src2_buffer, dst_buffer, m_lo, m_hi, zero, amask);
         rect_w -= 8;
         src1_buffer += 8;
         src2_buffer += 8;
@@ -392,8 +426,8 @@ static void alphaBlend32(Uint32 *src1_buffer, Uint32 *src2_buffer,
         uint8x16 maskv = load_a(mask2p);
         uint16x8 m_lo = widen_lo(maskv, zerol);
         uint16x8 m_hi = widen_hi(maskv, zerol);
-        alphaBlendCore32(src1_buffer, src2_buffer, dst_buffer, m_lo, m_hi,
-                         zerol, amaskl);
+        alphaBlendCore32(
+            src1_buffer, src2_buffer, dst_buffer, m_lo, m_hi, zerol, amaskl);
         rect_w -= 4;
         src1_buffer += 4;
         src2_buffer += 4;
@@ -401,8 +435,8 @@ static void alphaBlend32(Uint32 *src1_buffer, Uint32 *src2_buffer,
         mask2p += 4;
     }
     while (rect_w > 0) {
-        alphaBlendPixelCore32(src1_buffer, src2_buffer, dst_buffer,
-                              *((Uint8 *)mask2p), zerol);
+        alphaBlendPixelCore32(
+            src1_buffer, src2_buffer, dst_buffer, *((Uint8 *)mask2p), zerol);
         --rect_w;
         ++src1_buffer;
         ++src2_buffer;
@@ -427,8 +461,10 @@ static void alphaBlend32(Uint32 *src1_buffer, Uint32 *src2_buffer,
 #endif
 }
 
-inline static void alphaBlendConst32(Uint32 *src1_buffer, Uint32 *src2_buffer,
-                                     Uint32 *dst_buffer, Uint32 mask2,
+inline static void alphaBlendConst32(Uint32 *src1_buffer,
+                                     Uint32 *src2_buffer,
+                                     Uint32 *dst_buffer,
+                                     Uint32 mask2,
                                      int remain) {
 #ifdef USE_SIMD
     using namespace simd;
@@ -456,8 +492,8 @@ inline static void alphaBlendConst32(Uint32 *src1_buffer, Uint32 *src2_buffer,
 #endif
 #ifdef USE_SIMD_X86_AVX2
     while (remain >= 8) {
-        alphaBlend8Core32(src1_buffer, src2_buffer, dst_buffer, m, m, zero,
-                          amask);
+        alphaBlend8Core32(
+            src1_buffer, src2_buffer, dst_buffer, m, m, zero, amask);
         remain -= 8;
         src1_buffer += 8;
         src2_buffer += 8;
@@ -465,16 +501,16 @@ inline static void alphaBlendConst32(Uint32 *src1_buffer, Uint32 *src2_buffer,
     }
 #endif
     while (remain >= 4) {
-        alphaBlendCore32(src1_buffer, src2_buffer, dst_buffer, ml, ml, zerol,
-                         amaskl);
+        alphaBlendCore32(
+            src1_buffer, src2_buffer, dst_buffer, ml, ml, zerol, amaskl);
         remain -= 4;
         src1_buffer += 4;
         src2_buffer += 4;
         dst_buffer += 4;
     }
     while (remain > 0) {
-        alphaBlendPixelCore32(src1_buffer, src2_buffer, dst_buffer, mask2,
-                              zerol);
+        alphaBlendPixelCore32(
+            src1_buffer, src2_buffer, dst_buffer, mask2, zerol);
         --remain;
         ++src1_buffer;
         ++src2_buffer;
@@ -501,9 +537,12 @@ inline static void alphaBlendConst32(Uint32 *src1_buffer, Uint32 *src2_buffer,
 // dst: accumulation_surface
 // src1: effect_src_surface
 // src2: effect_dst_surface
-void ONScripter::alphaBlend(SDL_Surface *mask_surface, int trans_mode,
-                            Uint32 mask_value, SDL_Rect *clip,
-                            SDL_Surface *src1, SDL_Surface *src2,
+void ONScripter::alphaBlend(SDL_Surface *mask_surface,
+                            int trans_mode,
+                            Uint32 mask_value,
+                            SDL_Rect *clip,
+                            SDL_Surface *src1,
+                            SDL_Surface *src2,
                             SDL_Surface *dst) {
     SDL_Rect rect = screen_rect;
 
@@ -561,9 +600,15 @@ void ONScripter::alphaBlend(SDL_Surface *mask_surface, int trans_mode,
                 const ONSBuf *mask_buffer =
                     (ONSBuf *)mask_surface->pixels +
                     mask_surface->w * ((rect->y + i) % mask_surface->h);
-                alphaBlend32(src1_buffer, src2_buffer, dst_buffer, mask_buffer,
-                             mask_value, overflow_mask, mask_surface->w,
-                             rect->x, rect->w);
+                alphaBlend32(src1_buffer,
+                             src2_buffer,
+                             dst_buffer,
+                             mask_buffer,
+                             mask_value,
+                             overflow_mask,
+                             mask_surface->w,
+                             rect->x,
+                             rect->w);
             }
         } blender = {(ONSBuf *)src1->pixels + src1->w * rect.y + rect.x,
                      (ONSBuf *)src2->pixels + src2->w * rect.y + rect.x,
@@ -591,8 +636,8 @@ void ONScripter::alphaBlend(SDL_Surface *mask_surface, int trans_mode,
                 ONSBuf *src1_buffer = stsrc1_buffer + screen_width * i;
                 ONSBuf *src2_buffer = stsrc2_buffer + screen_width * i;
                 ONSBuf *dst_buffer = stdst_buffer + screen_width * i;
-                alphaBlendConst32(src1_buffer, src2_buffer, dst_buffer, mask2,
-                                  rect_w);
+                alphaBlendConst32(
+                    src1_buffer, src2_buffer, dst_buffer, mask2, rect_w);
             }
         } blender = {(ONSBuf *)src1->pixels + src1->w * rect.y + rect.x,
                      (ONSBuf *)src2->pixels + src2->w * rect.y + rect.x,
@@ -645,9 +690,12 @@ void ONScripter::alphaBlend(SDL_Surface *mask_surface, int trans_mode,
 // alphaBlendText
 // dst: ONSBuf surface (accumulation_surface)
 // src: 8bit surface (TTF_RenderGlyph_Shaded())
-void ONScripter::alphaBlendText(SDL_Surface *dst_surface, SDL_Rect dst_rect,
-                                SDL_Surface *src_surface, SDL_Color &color,
-                                SDL_Rect *clip, bool rotate_flag) {
+void ONScripter::alphaBlendText(SDL_Surface *dst_surface,
+                                SDL_Rect dst_rect,
+                                SDL_Surface *src_surface,
+                                SDL_Color &color,
+                                SDL_Rect *clip,
+                                bool rotate_flag) {
     int x2 = 0, y2 = 0;
     SDL_Rect clipped_rect;
 
@@ -789,7 +837,8 @@ void ONScripter::makeMonochromeSurface(SDL_Surface *surface, SDL_Rect &clip) {
     SDL_UnlockSurface(surface);
 }
 
-void ONScripter::refreshSurface(SDL_Surface *surface, SDL_Rect *clip_src,
+void ONScripter::refreshSurface(SDL_Surface *surface,
+                                SDL_Rect *clip_src,
                                 int refresh_mode) {
     if (refresh_mode == REFRESH_NONE_MODE) return;
 
@@ -818,8 +867,8 @@ void ONScripter::refreshSurface(SDL_Surface *surface, SDL_Rect *clip_src,
         for (i = 0; i < 3; i++) {
             if (human_order[2 - i] >= 0 &&
                 tachi_info[human_order[2 - i]].image_surface)
-                drawTaggedSurface(surface, &tachi_info[human_order[2 - i]],
-                                  clip);
+                drawTaggedSurface(
+                    surface, &tachi_info[human_order[2 - i]], clip);
         }
     }
 
@@ -898,7 +947,9 @@ void ONScripter::refreshSurface(SDL_Surface *surface, SDL_Rect *clip_src,
     }
 }
 
-void ONScripter::refreshSprite(int sprite_no, bool active_flag, int cell_no,
+void ONScripter::refreshSprite(int sprite_no,
+                               bool active_flag,
+                               int cell_no,
                                SDL_Rect *check_src_rect,
                                SDL_Rect *check_dst_rect) {
     if (sprite_info[sprite_no].image_surface &&

@@ -183,8 +183,10 @@ void ONScripter::executeSystemMenu() {
     current_font = &menu_font;
 
     if (menuselectvoice_file_name[MENUSELECTVOICE_OPEN])
-        playSound(menuselectvoice_file_name[MENUSELECTVOICE_OPEN], SOUND_CHUNK,
-                  false, MIX_WAVE_CHANNEL);
+        playSound(menuselectvoice_file_name[MENUSELECTVOICE_OPEN],
+                  SOUND_CHUNK,
+                  false,
+                  MIX_WAVE_CHANNEL);
 
     text_info.fill(0, 0, 0, 0);
     flush(refreshMode());
@@ -224,14 +226,18 @@ void ONScripter::executeSystemMenu() {
     if (current_button_state.button == -1) {
         if (menuselectvoice_file_name[MENUSELECTVOICE_CANCEL])
             playSound(menuselectvoice_file_name[MENUSELECTVOICE_CANCEL],
-                      SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
+                      SOUND_CHUNK,
+                      false,
+                      MIX_WAVE_CHANNEL);
         leaveSystemCall();
         return;
     }
 
     if (menuselectvoice_file_name[MENUSELECTVOICE_CLICK])
-        playSound(menuselectvoice_file_name[MENUSELECTVOICE_CLICK], SOUND_CHUNK,
-                  false, MIX_WAVE_CHANNEL);
+        playSound(menuselectvoice_file_name[MENUSELECTVOICE_CLICK],
+                  SOUND_CHUNK,
+                  false,
+                  MIX_WAVE_CHANNEL);
 
     link = root_rmenu_link.next;
     counter = 1;
@@ -307,8 +313,13 @@ bool ONScripter::executeSystemLoad() {
                           2;
     menu_font.setXY((menu_font.num_xy[0] - strlen(load_menu_name) / 2) / 2, 0);
     uchar3 color = {0xff, 0xff, 0xff};
-    drawString(load_menu_name, color, &menu_font, true, accumulation_surface,
-               NULL, &text_info);
+    drawString(load_menu_name,
+               color,
+               &menu_font,
+               true,
+               accumulation_surface,
+               NULL,
+               &text_info);
     menu_font.newLine();
     menu_font.newLine();
 
@@ -325,13 +336,21 @@ bool ONScripter::executeSystemLoad() {
             (menu_font.num_xy[0] - (strlen(save_item_name) / 2 + 15)) / 2);
 
         if (save_file_info.valid) {
-            snprintf(buffer, __size, MESSAGE_SAVE_EXIST, save_item_name,
-                     save_file_info.sjis_no, save_file_info.sjis_month,
-                     save_file_info.sjis_day, save_file_info.sjis_hour,
+            snprintf(buffer,
+                     __size,
+                     MESSAGE_SAVE_EXIST,
+                     save_item_name,
+                     save_file_info.sjis_no,
+                     save_file_info.sjis_month,
+                     save_file_info.sjis_day,
+                     save_file_info.sjis_hour,
                      save_file_info.sjis_minute);
             nofile_flag = false;
         } else {
-            snprintf(buffer, __size, MESSAGE_SAVE_EMPTY, save_item_name,
+            snprintf(buffer,
+                     __size,
+                     MESSAGE_SAVE_EMPTY,
+                     save_item_name,
                      save_file_info.sjis_no);
             nofile_flag = true;
         }
@@ -416,8 +435,13 @@ void ONScripter::executeSystemSave() {
                           2;
     menu_font.setXY((menu_font.num_xy[0] - strlen(save_menu_name) / 2) / 2, 0);
     uchar3 color = {0xff, 0xff, 0xff};
-    drawString(save_menu_name, color, &menu_font, true, accumulation_surface,
-               NULL, &text_info);
+    drawString(save_menu_name,
+               color,
+               &menu_font,
+               true,
+               accumulation_surface,
+               NULL,
+               &text_info);
     menu_font.newLine();
     menu_font.newLine();
 
@@ -434,13 +458,21 @@ void ONScripter::executeSystemSave() {
             (menu_font.num_xy[0] - (strlen(save_item_name) / 2 + 15)) / 2);
 
         if (save_file_info.valid) {
-            snprintf(buffer, __size, MESSAGE_SAVE_EXIST, save_item_name,
-                     save_file_info.sjis_no, save_file_info.sjis_month,
-                     save_file_info.sjis_day, save_file_info.sjis_hour,
+            snprintf(buffer,
+                     __size,
+                     MESSAGE_SAVE_EXIST,
+                     save_item_name,
+                     save_file_info.sjis_no,
+                     save_file_info.sjis_month,
+                     save_file_info.sjis_day,
+                     save_file_info.sjis_hour,
                      save_file_info.sjis_minute);
             nofile_flag = false;
         } else {
-            snprintf(buffer, __size, MESSAGE_SAVE_EMPTY, save_item_name,
+            snprintf(buffer,
+                     __size,
+                     MESSAGE_SAVE_EMPTY,
+                     save_item_name,
                      save_file_info.sjis_no);
             nofile_flag = true;
         }
@@ -484,12 +516,18 @@ bool ONScripter::executeSystemYesNo(int caller, int file_no) {
     if (caller == SYSTEM_SAVE) {
         SaveFileInfo save_file_info;
         searchSaveFile(save_file_info, file_no);
-        snprintf(name, __size, MESSAGE_SAVE_CONFIRM, save_item_name,
+        snprintf(name,
+                 __size,
+                 MESSAGE_SAVE_CONFIRM,
+                 save_item_name,
                  save_file_info.sjis_no);
     } else if (caller == SYSTEM_LOAD) {
         SaveFileInfo save_file_info;
         searchSaveFile(save_file_info, file_no);
-        snprintf(name, __size, MESSAGE_LOAD_CONFIRM, save_item_name,
+        snprintf(name,
+                 __size,
+                 MESSAGE_LOAD_CONFIRM,
+                 save_item_name,
                  save_file_info.sjis_no);
     } else if (caller == SYSTEM_RESET)
         strcpy(name, MESSAGE_RESET_CONFIRM);
@@ -506,8 +544,8 @@ bool ONScripter::executeSystemYesNo(int caller, int file_no) {
                           2;
     menu_font.setXY(0, 0);
     uchar3 color = {0xff, 0xff, 0xff};
-    drawString(name, color, &menu_font, true, accumulation_surface, NULL,
-               &text_info);
+    drawString(
+        name, color, &menu_font, true, accumulation_surface, NULL, &text_info);
 
     flush(refreshMode());
 
@@ -538,12 +576,16 @@ bool ONScripter::executeSystemYesNo(int caller, int file_no) {
     if (current_button_state.button == 1) {  // yes is selected
         if (menuselectvoice_file_name[MENUSELECTVOICE_YES])
             playSound(menuselectvoice_file_name[MENUSELECTVOICE_YES],
-                      SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
+                      SOUND_CHUNK,
+                      false,
+                      MIX_WAVE_CHANNEL);
         return true;
     } else {
         if (menuselectvoice_file_name[MENUSELECTVOICE_NO])
             playSound(menuselectvoice_file_name[MENUSELECTVOICE_NO],
-                      SOUND_CHUNK, false, MIX_WAVE_CHANNEL);
+                      SOUND_CHUNK,
+                      false,
+                      MIX_WAVE_CHANNEL);
         return false;
     }
 }
@@ -688,12 +730,18 @@ void ONScripter::executeSystemLookback() {
     }
 }
 
-void ONScripter::buildDialog(bool yesno_flag, const char *mes1,
+void ONScripter::buildDialog(bool yesno_flag,
+                             const char *mes1,
                              const char *mes2) {
     SDL_PixelFormat *fmt = image_surface->format;
-    SDL_Surface *s = SDL_CreateRGBSurface(SDL_SWSURFACE, DIALOG_W, DIALOG_H,
-                                          fmt->BitsPerPixel, fmt->Rmask,
-                                          fmt->Gmask, fmt->Bmask, fmt->Amask);
+    SDL_Surface *s = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                          DIALOG_W,
+                                          DIALOG_H,
+                                          fmt->BitsPerPixel,
+                                          fmt->Rmask,
+                                          fmt->Gmask,
+                                          fmt->Bmask,
+                                          fmt->Amask);
 
     SDL_Rect rect;
     unsigned char col = 255;
@@ -720,10 +768,14 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1,
 
     SDL_Surface *s2 = s;
     if (screen_ratio2 != screen_ratio1) {
-        s2 = SDL_CreateRGBSurface(
-            SDL_SWSURFACE, DIALOG_W * screen_ratio1 / screen_ratio2,
-            DIALOG_H * screen_ratio1 / screen_ratio2, fmt->BitsPerPixel,
-            fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+        s2 = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                  DIALOG_W * screen_ratio1 / screen_ratio2,
+                                  DIALOG_H * screen_ratio1 / screen_ratio2,
+                                  fmt->BitsPerPixel,
+                                  fmt->Rmask,
+                                  fmt->Gmask,
+                                  fmt->Bmask,
+                                  fmt->Amask);
         resizeSurface(s, s2);
         SDL_FreeSurface(s);
     }
@@ -760,9 +812,14 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1,
     }
 
     for (int i = 0; i < 2; i++) {
-        SDL_Surface *bs = SDL_CreateRGBSurface(
-            SDL_SWSURFACE, DIALOG_BUTTON_W * 2, DIALOG_BUTTON_H,
-            fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+        SDL_Surface *bs = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                               DIALOG_BUTTON_W * 2,
+                                               DIALOG_BUTTON_H,
+                                               fmt->BitsPerPixel,
+                                               fmt->Rmask,
+                                               fmt->Gmask,
+                                               fmt->Bmask,
+                                               fmt->Amask);
 
         for (int j = 0; j < 2; j++) {
             rect.x = DIALOG_BUTTON_W * j;
@@ -771,22 +828,22 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1,
             rect.h = DIALOG_BUTTON_H;
 
             col = 105;
-            SDL_FillRect(bs, &rect,
-                         SDL_MapRGBA(bs->format, col, col, col, 0xff));
+            SDL_FillRect(
+                bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
 
             rect.w--;
             rect.h--;
             col = 255;
-            SDL_FillRect(bs, &rect,
-                         SDL_MapRGBA(bs->format, col, col, col, 0xff));
+            SDL_FillRect(
+                bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
 
             rect.x++;
             rect.y++;
             rect.w--;
             rect.h--;
             col = 227;
-            SDL_FillRect(bs, &rect,
-                         SDL_MapRGBA(bs->format, col, col, col, 0xff));
+            SDL_FillRect(
+                bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
 
             rect.x++;
             rect.y++;
@@ -794,8 +851,8 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1,
             rect.h -= 2;
             col = 240;
             if (j == 1) col = 214;
-            SDL_FillRect(bs, &rect,
-                         SDL_MapRGBA(bs->format, col, col, col, 0xff));
+            SDL_FillRect(
+                bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
         }
 
         SDL_Surface *bs2 = bs;
@@ -804,7 +861,10 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1,
                 SDL_SWSURFACE,
                 DIALOG_BUTTON_W * 2 * screen_ratio1 / screen_ratio2,
                 DIALOG_BUTTON_H * screen_ratio1 / screen_ratio2,
-                fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask,
+                fmt->BitsPerPixel,
+                fmt->Rmask,
+                fmt->Gmask,
+                fmt->Bmask,
                 fmt->Amask);
             resizeSurface(bs, bs2);
             SDL_FreeSurface(bs);

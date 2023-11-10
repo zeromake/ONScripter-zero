@@ -31,7 +31,8 @@ static int font_set_load_options(RenFont* font) {
     return load_target | hinting;
 }
 
-static int font_set_style(FT_Outline* outline, int x_translation,
+static int font_set_style(FT_Outline* outline,
+                          int x_translation,
                           unsigned char style) {
     FT_Outline_Translate(outline, x_translation, 0);
     if (style & FONT_STYLE_SMOOTH) FT_Outline_Embolden(outline, 1 << 5);
@@ -43,9 +44,11 @@ static int font_set_style(FT_Outline* outline, int x_translation,
     return 0;
 }
 
-RenFont* ren_font_load(const char* path, float size,
+RenFont* ren_font_load(const char* path,
+                       float size,
                        ERenFontAntialiasing antialiasing,
-                       ERenFontHinting hinting, unsigned char style) {
+                       ERenFontHinting hinting,
+                       unsigned char style) {
     FT_Face face = NULL;
     if (FT_New_Face(library, path, 0, &face)) return NULL;
 
@@ -167,7 +170,8 @@ static void font_load_glyphset(RenFont* font, int idx) {
             int glyph_index =
                 FT_Get_Char_Index(font->face, i + idx * MAX_GLYPHSET);
             if (!glyph_index ||
-                FT_Load_Glyph(font->face, glyph_index,
+                FT_Load_Glyph(font->face,
+                              glyph_index,
                               load_option | FT_LOAD_BITMAP_METRICS_ONLY) ||
                 font_set_style(&font->face->glyph->outline,
                                j * (64 / SUBPIXEL_BITMAPS_CACHED),
@@ -196,7 +200,8 @@ static void font_load_glyphset(RenFont* font, int idx) {
             // xadvance; as FreeType doesn't correctly report the hinted advance
             // for spaces on monospace fonts (like RobotoMono). See #843.
             if (!glyph_index ||
-                FT_Load_Glyph(font->face, glyph_index,
+                FT_Load_Glyph(font->face,
+                              glyph_index,
                               (load_option | FT_LOAD_BITMAP_METRICS_ONLY |
                                FT_LOAD_NO_HINTING) &
                                   ~FT_LOAD_FORCE_AUTOHINT) ||
@@ -212,8 +217,13 @@ static void font_load_glyphset(RenFont* font, int idx) {
         }
         if (pen_x == 0) continue;
         set->surface = (SDL_Surface*)check_alloc(SDL_CreateRGBSurface(
-            0, pen_x, font->max_height,
-            font->antialiasing == FONT_ANTIALIASING_SUBPIXEL ? 24 : 8, 0, 0, 0,
+            0,
+            pen_x,
+            font->max_height,
+            font->antialiasing == FONT_ANTIALIASING_SUBPIXEL ? 24 : 8,
+            0,
+            0,
+            0,
             0));
         uint8_t* pixels = (uint8_t*)set->surface->pixels;
         for (int i = 0; i < MAX_GLYPHSET; ++i) {
@@ -223,8 +233,8 @@ static void font_load_glyphset(RenFont* font, int idx) {
                 FT_Load_Glyph(font->face, glyph_index, load_option))
                 continue;
             FT_GlyphSlot slot = font->face->glyph;
-            font_set_style(&slot->outline, (64 / bitmaps_cached) * j,
-                           font->style);
+            font_set_style(
+                &slot->outline, (64 / bitmaps_cached) * j, font->style);
             if (FT_Render_Glyph(slot, (FT_Render_Mode)render_option)) continue;
             for (unsigned int line = 0; line < slot->bitmap.rows; ++line) {
                 int target_offset = set->surface->pitch * line +
@@ -249,7 +259,8 @@ static void font_load_glyphset(RenFont* font, int idx) {
     }
 }
 
-static GlyphSet* font_get_glyphset(RenFont* font, unsigned int codepoint,
+static GlyphSet* font_get_glyphset(RenFont* font,
+                                   unsigned int codepoint,
                                    int subpixel_idx) {
     int idx = (codepoint >> 8) % MAX_LOADABLE_GLYPHSETS;
     if (!font->sets[font->antialiasing == FONT_ANTIALIASING_SUBPIXEL
@@ -261,8 +272,10 @@ static GlyphSet* font_get_glyphset(RenFont* font, unsigned int codepoint,
                                                                 : 0][idx];
 }
 
-static RenFont* font_group_get_glyph(GlyphSet** set, GlyphMetric** metric,
-                                     RenFont** fonts, unsigned int codepoint,
+static RenFont* font_group_get_glyph(GlyphSet** set,
+                                     GlyphMetric** metric,
+                                     RenFont** fonts,
+                                     unsigned int codepoint,
                                      int bitmap_index) {
     if (!metric) {
         return NULL;
@@ -310,14 +323,18 @@ void ren_draw_rect(RenRect rect, RenColor color) {
         SDL_FillRect(surface, &dest_rect, translated);
     } else {
         uint32_t* pixel = (uint32_t*)draw_rect_surface->pixels;
-        *pixel = SDL_MapRGBA(draw_rect_surface->format, color.r, color.g,
-                             color.b, color.a);
+        *pixel = SDL_MapRGBA(
+            draw_rect_surface->format, color.r, color.g, color.b, color.a);
         SDL_BlitScaled(draw_rect_surface, NULL, surface, &dest_rect);
     }
 }
 
-float ren_draw_text(RenFont** fonts, const char* text, size_t len, float x,
-                    int y, RenColor color) {
+float ren_draw_text(RenFont** fonts,
+                    const char* text,
+                    size_t len,
+                    float x,
+                    int y,
+                    RenColor color) {
     SDL_Surface* surface = renwin_get_surface(&window_renderer);
     const RenRect clip = window_renderer.clip;
 
@@ -340,14 +357,19 @@ float ren_draw_text(RenFont** fonts, const char* text, size_t len, float x,
         GlyphSet* set = NULL;
         GlyphMetric* metric = NULL;
         RenFont* font = font_group_get_glyph(
-            &set, &metric, fonts, codepoint,
+            &set,
+            &metric,
+            fonts,
+            codepoint,
             (int)(fmod(pen_x, 1.0) * SUBPIXEL_BITMAPS_CACHED));
         if (!metric) break;
         int start_x = floor(pen_x) + metric->bitmap_left;
         int end_x = (metric->x1 - metric->x0) + start_x;
         int glyph_end = metric->x1, glyph_start = metric->x0;
         if (!metric->loaded && codepoint > 0xFF)
-            ren_draw_rect(RenRect{start_x + 1, y, (int)font->space_advance - 1,
+            ren_draw_rect(RenRect{start_x + 1,
+                                  y,
+                                  (int)font->space_advance - 1,
                                   ren_font_group_get_height(fonts)},
                           color);
         if (set->surface && color.a > 0 && end_x >= clip.x &&

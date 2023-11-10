@@ -39,7 +39,8 @@ extern "C" void playVideoAndroid(const char *filename);
 #endif
 
 #if defined(IOS)
-extern "C" void playVideoIOS(const char *filename, bool click_flag,
+extern "C" void playVideoIOS(const char *filename,
+                             bool click_flag,
                              bool loop_flag);
 #endif
 
@@ -67,8 +68,11 @@ extern "C" Uint32 SDLCALL bgmfadeCallback(Uint32 interval, void *param);
 
 #define TMP_MUSIC_FILE "tmp.mus"
 
-int ONScripter::playSound(const char *filename, int format, bool loop_flag,
-                          int channel, int fadetime) {
+int ONScripter::playSound(const char *filename,
+                          int format,
+                          bool loop_flag,
+                          int channel,
+                          int fadetime) {
     if (!audio_open_flag) return SOUND_NONE;
 
     // utils::printInfo("playSound: %s %d %d\n", filename, loop_flag, channel);
@@ -91,7 +95,8 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag,
         if (buffer == NULL) {
             utils::printError(
                 "failed to load [%s] because file size [%lu] is too large.\n",
-                filename, length);
+                filename,
+                length);
             return SOUND_NONE;
         }
         script_h.cBR->getFile(filename, buffer);
@@ -104,8 +109,8 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag,
         music_info = Mix_LoadMUS_RW(SDL_RWFromMem(buffer, length));
 #endif
         if (music_info == NULL) {
-            utils::printError("can't load music \"%s\": %s\n", filename,
-                              Mix_GetError());
+            utils::printError(
+                "can't load music \"%s\": %s\n", filename, Mix_GetError());
         }
         Mix_VolumeMusic(music_volume);
         if (Mix_FadeInMusic(
@@ -122,8 +127,8 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag,
     if (format & SOUND_CHUNK) {
         Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromMem(buffer, length), 1);
         if (chunk == NULL) {
-            utils::printError("can't load chunk \"%s\": %s\n", filename,
-                              Mix_GetError());
+            utils::printError(
+                "can't load chunk \"%s\": %s\n", filename, Mix_GetError());
         }
         if (playWave(chunk, format, loop_flag, channel) == 0) {
             delete[] buffer;
@@ -181,12 +186,16 @@ void ONScripter::playCDAudio() {
         if (ret == SOUND_MUSIC) return;
 
         snprintf(filename, __size, "cd\\track%2.2d.wav", current_cd_track);
-        ret = playSound(filename, SOUND_MUSIC | SOUND_CHUNK, cd_play_loop_flag,
+        ret = playSound(filename,
+                        SOUND_MUSIC | SOUND_CHUNK,
+                        cd_play_loop_flag,
                         MIX_BGM_CHANNEL);
     }
 }
 
-int ONScripter::playWave(Mix_Chunk *chunk, int format, bool loop_flag,
+int ONScripter::playWave(Mix_Chunk *chunk,
+                         int format,
+                         bool loop_flag,
                          int channel) {
     if (!chunk) return -1;
 
@@ -218,7 +227,10 @@ int ONScripter::playMIDI(bool loop_flag, int fadetime) {
 
     const int __size = 256;
     char midi_filename[__size];
-    snprintf(midi_filename, __size, "%s%s", save_dir ? save_dir : archive_path,
+    snprintf(midi_filename,
+             __size,
+             "%s%s",
+             save_dir ? save_dir : archive_path,
              TMP_MUSIC_FILE);
     if ((midi_info = Mix_LoadMUS(midi_filename)) == NULL) return -1;
 
@@ -241,9 +253,11 @@ struct OverlayInfo {
     SDL_Overlay overlay;
     SDL_mutex *mutex;
 };
-static void smpeg_filter_callback(SDL_Overlay *dst, SDL_Overlay *src,
+static void smpeg_filter_callback(SDL_Overlay *dst,
+                                  SDL_Overlay *src,
                                   SDL_Rect *region,
-                                  SMPEG_FilterInfo *filter_info, void *data) {
+                                  SMPEG_FilterInfo *filter_info,
+                                  void *data) {
     if (dst) {
         dst->w = 0;
         dst->h = 0;
@@ -252,7 +266,8 @@ static void smpeg_filter_callback(SDL_Overlay *dst, SDL_Overlay *src,
     OverlayInfo *oi = (OverlayInfo *)data;
 
     SDL_mutexP(oi->mutex);
-    memcpy(oi->overlay.pixels[0], src->pixels[0],
+    memcpy(oi->overlay.pixels[0],
+           src->pixels[0],
            oi->overlay.w * oi->overlay.h +
                (oi->overlay.w / 2) * (oi->overlay.h / 2) * 2);
     SDL_mutexV(oi->mutex);
@@ -273,7 +288,8 @@ int call_system(void *data) {
 }
 #endif
 
-int ONScripter::playMPEG(const char *filename, bool click_flag,
+int ONScripter::playMPEG(const char *filename,
+                         bool click_flag,
                          bool loop_flag) {
     unsigned long length = script_h.cBR->getFileLength(filename);
     if (length == 0) {
@@ -311,10 +327,19 @@ int ONScripter::playMPEG(const char *filename, bool click_flag,
     if (audio_open_flag) {
         int mpegversion, frequency, layer, bitrate;
         char mode[10];
-        sscanf(info.audio_string, "MPEG-%d Layer %d %dkbit/s %dHz %s",
-               &mpegversion, &layer, &bitrate, &frequency, mode);
-        printf("MPEG-%d Layer %d %dkbit/s %dHz %s\n", mpegversion, layer,
-               bitrate, frequency, mode);
+        sscanf(info.audio_string,
+               "MPEG-%d Layer %d %dkbit/s %dHz %s",
+               &mpegversion,
+               &layer,
+               &bitrate,
+               &frequency,
+               mode);
+        printf("MPEG-%d Layer %d %dkbit/s %dHz %s\n",
+               mpegversion,
+               layer,
+               bitrate,
+               frequency,
+               mode);
 
         openAudio(frequency);
 
@@ -345,9 +370,11 @@ int ONScripter::playMPEG(const char *filename, bool click_flag,
     oi.overlay.pixels = pixels;
     oi.mutex = SDL_CreateMutex();
 
-    texture =
-        SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12,
-                          SDL_TEXTUREACCESS_TARGET, info.width, info.height);
+    texture = SDL_CreateTexture(renderer,
+                                SDL_PIXELFORMAT_YV12,
+                                SDL_TEXTUREACCESS_TARGET,
+                                info.width,
+                                info.height);
 
     layer_smpeg_filter.data = &oi;
     layer_smpeg_filter.callback = smpeg_filter_callback;
@@ -500,11 +527,15 @@ void ONScripter::stopAllDWAVE() {
 void ONScripter::playClickVoice() {
     if (clickstr_state == CLICK_NEWPAGE) {
         if (clickvoice_file_name[CLICKVOICE_NEWPAGE])
-            playSound(clickvoice_file_name[CLICKVOICE_NEWPAGE], SOUND_CHUNK,
-                      false, MIX_WAVE_CHANNEL);
+            playSound(clickvoice_file_name[CLICKVOICE_NEWPAGE],
+                      SOUND_CHUNK,
+                      false,
+                      MIX_WAVE_CHANNEL);
     } else if (clickstr_state == CLICK_WAIT) {
         if (clickvoice_file_name[CLICKVOICE_NORMAL])
-            playSound(clickvoice_file_name[CLICKVOICE_NORMAL], SOUND_CHUNK,
-                      false, MIX_WAVE_CHANNEL);
+            playSound(clickvoice_file_name[CLICKVOICE_NORMAL],
+                      SOUND_CHUNK,
+                      false,
+                      MIX_WAVE_CHANNEL);
     }
 }

@@ -355,7 +355,8 @@ void ONScripter::flushEventSub(SDL_Event &event) {
                 if (event.user.code == MIX_LOOPBGM_CHANNEL0 &&
                     loop_bgm_name[1] && wave_sample[MIX_LOOPBGM_CHANNEL1])
                     Mix_PlayChannel(MIX_LOOPBGM_CHANNEL1,
-                                    wave_sample[MIX_LOOPBGM_CHANNEL1], -1);
+                                    wave_sample[MIX_LOOPBGM_CHANNEL1],
+                                    -1);
             } else {
                 prev_chunk_skip[event.user.code] = false;
             }
@@ -492,15 +493,15 @@ bool ONScripter::mousePressEvent(SDL_MouseButtonEvent *event) {
             if (!bexec_flag) current_button_state.button = 0;
             BUTTON_STATE_SNPRINTF(current_button_state.str, "LCLICK");
         } else {
-            BUTTON_STATE_SNPRINTF(current_button_state.str, "S%d",
-                                  current_over_button);
+            BUTTON_STATE_SNPRINTF(
+                current_button_state.str, "S%d", current_over_button);
             if (bexec_flag && current_button_link) {
                 ButtonLink *cbl = current_button_link;
                 if (current_button_link->exbtn_ctl[2]) {
                     SDL_Rect check_src_rect = cbl->image_rect;
                     SDL_Rect check_dst_rect = {0, 0, 0, 0};
-                    decodeExbtnControl(cbl->exbtn_ctl[2], &check_src_rect,
-                                       &check_dst_rect);
+                    decodeExbtnControl(
+                        cbl->exbtn_ctl[2], &check_src_rect, &check_dst_rect);
                 } else {
                     sprite_info[cbl->sprite_no].visible = true;
                     sprite_info[cbl->sprite_no].setCell(2);
@@ -740,19 +741,25 @@ void ONScripter::variableEditMode(SDL_KeyboardEvent *event) {
     }
 
     if (variable_edit_mode == EDIT_SELECT_MODE) {
-        snprintf(wm_edit_string, WM_WDIT_STRING_SIZE, "%s%s", EDIT_MODE_PREFIX,
+        snprintf(wm_edit_string,
+                 WM_WDIT_STRING_SIZE,
+                 "%s%s",
+                 EDIT_MODE_PREFIX,
                  EDIT_SELECT_STRING);
     } else if (variable_edit_mode == EDIT_VARIABLE_INDEX_MODE) {
-        snprintf(wm_edit_string, WM_WDIT_STRING_SIZE, "%s%s%d",
-                 EDIT_MODE_PREFIX, "Variable Index?  %",
+        snprintf(wm_edit_string,
+                 WM_WDIT_STRING_SIZE,
+                 "%s%s%d",
+                 EDIT_MODE_PREFIX,
+                 "Variable Index?  %",
                  variable_edit_sign * variable_edit_num);
     } else if (variable_edit_mode >= EDIT_VARIABLE_NUM_MODE) {
         int p = 0;
 
         switch (variable_edit_mode) {
             case EDIT_VARIABLE_NUM_MODE:
-                snprintf(var_index, __var_index_size, "%%%d",
-                         variable_edit_index);
+                snprintf(
+                    var_index, __var_index_size, "%%%d", variable_edit_index);
                 var_name = var_index;
                 p = script_h.getVariableData(variable_edit_index).num;
                 break;
@@ -775,9 +782,14 @@ void ONScripter::variableEditMode(SDL_KeyboardEvent *event) {
             default:
                 var_name = "";
         }
-        snprintf(wm_edit_string, WM_WDIT_STRING_SIZE,
-                 "%sCurrent %s=%d  New value? %s%d", EDIT_MODE_PREFIX, var_name,
-                 p, (variable_edit_sign == 1) ? "" : "-", variable_edit_num);
+        snprintf(wm_edit_string,
+                 WM_WDIT_STRING_SIZE,
+                 "%sCurrent %s=%d  New value? %s%d",
+                 EDIT_MODE_PREFIX,
+                 var_name,
+                 p,
+                 (variable_edit_sign == 1) ? "" : "-",
+                 variable_edit_num);
     }
 
     setCaption(wm_edit_string, wm_icon_string);
@@ -921,8 +933,11 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
             variable_edit_mode = EDIT_SELECT_MODE;
             variable_edit_sign = 1;
             variable_edit_num = 0;
-            snprintf(wm_edit_string, WM_WDIT_STRING_SIZE, "%s%s",
-                     EDIT_MODE_PREFIX, EDIT_SELECT_STRING);
+            snprintf(wm_edit_string,
+                     WM_WDIT_STRING_SIZE,
+                     "%s%s",
+                     EDIT_MODE_PREFIX,
+                     EDIT_SELECT_STRING);
             setCaption(wm_edit_string, wm_icon_string);
         }
     }
@@ -957,14 +972,15 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
                 if (!bexec_flag) current_button_state.button = 0;
                 BUTTON_STATE_SNPRINTF(current_button_state.str, "RETURN");
             } else {
-                BUTTON_STATE_SNPRINTF(current_button_state.str, "S%d",
-                                      current_over_button);
+                BUTTON_STATE_SNPRINTF(
+                    current_button_state.str, "S%d", current_over_button);
                 if (bexec_flag && current_button_link) {
                     ButtonLink *cbl = current_button_link;
                     if (current_button_link->exbtn_ctl[2]) {
                         SDL_Rect check_src_rect = cbl->image_rect;
                         SDL_Rect check_dst_rect = {0, 0, 0, 0};
-                        decodeExbtnControl(cbl->exbtn_ctl[2], &check_src_rect,
+                        decodeExbtnControl(cbl->exbtn_ctl[2],
+                                           &check_src_rect,
                                            &check_dst_rect);
                     } else {
                         sprite_info[cbl->sprite_no].visible = true;
@@ -1071,17 +1087,19 @@ bool ONScripter::keyPressEvent(SDL_KeyboardEvent *event) {
         } else if (getfunction_flag && event->keysym.sym >= SDLK_F1 &&
                    event->keysym.sym <= SDLK_F12) {
             current_button_state.button = -21 - (event->keysym.sym - SDLK_F1);
-            BUTTON_STATE_SNPRINTF(current_button_state.str, "F%d",
+            BUTTON_STATE_SNPRINTF(current_button_state.str,
+                                  "F%d",
                                   event->keysym.sym - SDLK_F1 + 1);
         } else if (bexec_flag && event->keysym.sym >= SDLK_0 &&
                    event->keysym.sym <= SDLK_9) {
             current_button_state.button = -1;  // dummy
-            BUTTON_STATE_SNPRINTF(current_button_state.str, "%d",
-                                  event->keysym.sym - SDLK_0);
+            BUTTON_STATE_SNPRINTF(
+                current_button_state.str, "%d", event->keysym.sym - SDLK_0);
         } else if (bexec_flag && event->keysym.sym >= SDLK_a &&
                    event->keysym.sym <= SDLK_z) {
             current_button_state.button = -1;  // dummy
-            BUTTON_STATE_SNPRINTF(current_button_state.str, "%c",
+            BUTTON_STATE_SNPRINTF(current_button_state.str,
+                                  "%c",
                                   'A' + event->keysym.sym - SDLK_a);
         } else if (bexec_flag && (event->keysym.sym == SDLK_RSHIFT ||
                                   event->keysym.sym == SDLK_LSHIFT)) {
@@ -1253,14 +1271,17 @@ void ONScripter::runEventLoop() {
         // ignore continous SDL_MOUSEMOTION
         while (event.type == SDL_MOUSEMOTION ||
                event.type == SDL_FINGERMOTION) {
-            if (SDL_PeepEvents(&tmp_event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT,
+            if (SDL_PeepEvents(&tmp_event,
+                               1,
+                               SDL_PEEKEVENT,
+                               SDL_FIRSTEVENT,
                                SDL_LASTEVENT) == 0)
                 break;
             if (tmp_event.type != SDL_MOUSEMOTION &&
                 tmp_event.type != SDL_FINGERMOTION)
                 break;
-            SDL_PeepEvents(&tmp_event, 1, SDL_GETEVENT, SDL_FIRSTEVENT,
-                           SDL_LASTEVENT);
+            SDL_PeepEvents(
+                &tmp_event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 
             event = tmp_event;
         }

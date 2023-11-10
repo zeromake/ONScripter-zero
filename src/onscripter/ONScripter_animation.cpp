@@ -177,14 +177,21 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         }
 
         if (f_info.ttf_font[0] == NULL) {
-            f_info.openFont(font_file, screen_ratio1, screen_ratio2,
-                            generateFPath(), getFontConfig(f_info.types));
+            f_info.openFont(font_file,
+                            screen_ratio1,
+                            screen_ratio2,
+                            generateFPath(),
+                            getFontConfig(f_info.types));
         }
 
         SDL_Rect pos;
         if (anim->is_tight_region) {
-            drawString(anim->file_name, anim->color_list[anim->current_cell],
-                       &f_info, false, NULL, &pos);
+            drawString(anim->file_name,
+                       anim->color_list[anim->current_cell],
+                       &f_info,
+                       false,
+                       NULL,
+                       &pos);
         } else {
             f_info.savePoint();
 
@@ -202,15 +209,20 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         anim->orig_pos.w = pos.w;
         anim->orig_pos.h = pos.h;
         anim->scalePosWH(screen_ratio1, screen_ratio2);
-        anim->allocImage(anim->pos.w * anim->num_of_cells, anim->pos.h,
-                         texture_format);
+        anim->allocImage(
+            anim->pos.w * anim->num_of_cells, anim->pos.h, texture_format);
         anim->fill(0, 0, 0, 0);
 
         f_info.top_xy[0] = f_info.top_xy[1] = 0;
         for (int i = 0; i < anim->num_of_cells; i++) {
             f_info.clear();
-            drawString(anim->file_name, anim->color_list[i], &f_info, false,
-                       NULL, NULL, anim);
+            drawString(anim->file_name,
+                       anim->color_list[i],
+                       &f_info,
+                       false,
+                       NULL,
+                       NULL,
+                       anim);
             f_info.top_xy[0] += anim->orig_pos.w;
         }
     }
@@ -225,8 +237,8 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         int location;
         SDL_Surface *_surface1 = nullptr;
         SDL_Surface *_surface2 = nullptr;
-        _surface1 = loadImage(anim->file_name, &has_alpha, &location,
-                              &anim->default_alpha);
+        _surface1 = loadImage(
+            anim->file_name, &has_alpha, &location, &anim->default_alpha);
 
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
             _surface2 = loadImage(anim->mask_file_name);
@@ -240,22 +252,22 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
             SDL_Surface *src_s = surface;
 
             int w, h;
-            if ( (w = src_s->w * screen_ratio1 / screen_ratio2) == 0 ) w = 1;
-            if ( (h = src_s->h * screen_ratio1 / screen_ratio2) == 0 ) h = 1;
+            if ((w = src_s->w * screen_ratio1 / screen_ratio2) == 0) w = 1;
+            if ((h = src_s->h * screen_ratio1 / screen_ratio2) == 0) h = 1;
             SDL_PixelFormat *fmt = image_surface->format;
             surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                w,
-                h,
-                fmt->BitsPerPixel,
-                fmt->Rmask,
-                fmt->Gmask,
-                fmt->Bmask,
-                fmt->Amask);
+                                           w,
+                                           h,
+                                           fmt->BitsPerPixel,
+                                           fmt->Rmask,
+                                           fmt->Gmask,
+                                           fmt->Bmask,
+                                           fmt->Amask);
             // SDL_Rect dest_rect{0, 0, w, h};
             // SDL_UpperBlit(src_s, NULL, surface, &dest_rect);
             resizeSurface(src_s, surface);
-            // rotozoomSurface 性能非常的差……，甚至没有 ons 写的 resizeSurface 好
-            // surface = ::rotozoomSurface(
+            // rotozoomSurface 性能非常的差……，甚至没有 ons 写的 resizeSurface
+            // 好 surface = ::rotozoomSurface(
             //     src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2),
             //     SMOOTHING_ON);
             SDL_FreeSurface(src_s);
@@ -431,7 +443,8 @@ void ONScripter::parseTaggedString(AnimationInfo *anim) {
 }
 
 void ONScripter::drawTaggedSurface(SDL_Surface *dst_surface,
-                                   AnimationInfo *anim, SDL_Rect &clip) {
+                                   AnimationInfo *anim,
+                                   SDL_Rect &clip) {
 #ifdef USE_BUILTIN_LAYER_EFFECTS
     if (anim->trans_mode == AnimationInfo::TRANS_LAYER) {
         if (anim->layer_no >= 0) {
@@ -448,11 +461,11 @@ void ONScripter::drawTaggedSurface(SDL_Surface *dst_surface,
     }
 
     if (!anim->affine_flag)
-        anim->blendOnSurface(dst_surface, poly_rect.x, poly_rect.y, clip,
-                             anim->trans);
+        anim->blendOnSurface(
+            dst_surface, poly_rect.x, poly_rect.y, clip, anim->trans);
     else
-        anim->blendOnSurface2(dst_surface, poly_rect.x, poly_rect.y, clip,
-                              anim->trans);
+        anim->blendOnSurface2(
+            dst_surface, poly_rect.x, poly_rect.y, clip, anim->trans);
 }
 
 void ONScripter::stopAnimation(int click) {
@@ -479,8 +492,8 @@ void ONScripter::stopAnimation(int click) {
     flushDirect(dst_rect, refreshMode());
 }
 
-void ONScripter::loadCursor(int no, const char *str, int x, int y,
-                            bool abs_flag) {
+void ONScripter::loadCursor(
+    int no, const char *str, int x, int y, bool abs_flag) {
     AnimationInfo *ai = &cursor_info[no];
 
     if (str) {
@@ -500,7 +513,8 @@ void ONScripter::loadCursor(int no, const char *str, int x, int y,
 
     if (filelog_flag)
         script_h.findAndAddLog(script_h.log_info[ScriptHandler::FILE_LOG],
-                               ai->file_name, true);  // a trick for save file
+                               ai->file_name,
+                               true);  // a trick for save file
     ai->abs_flag = abs_flag;
     if (ai->image_surface)
         ai->visible = true;

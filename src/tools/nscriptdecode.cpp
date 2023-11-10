@@ -123,7 +123,9 @@ int main(int argc, char *argv[]) {
     }
     auto *pFile = std::fopen(input.data(), "rb");
     if (pFile == nullptr) {
-        fprintf(stderr, "file input %s is open err: %s\n", *(argv + 1),
+        fprintf(stderr,
+                "file input %s is open err: %s\n",
+                *(argv + 1),
                 strerror(errno));
         return 1;
     }
@@ -133,12 +135,16 @@ int main(int argc, char *argv[]) {
     }
     auto *pOutFile = std::fopen(outFile.data(), "wb");
     if (pFile == nullptr) {
-        fprintf(stderr, "file output %s is open err: %s\n", *(argv + 2),
+        fprintf(stderr,
+                "file output %s is open err: %s\n",
+                *(argv + 2),
                 strerror(errno));
         return 1;
     }
-    printf("nsdecode\n  extract: %s\n  output: %s\n  mode: %d\n", input.data(),
-           outFile.data(), mode);
+    printf("nsdecode\n  extract: %s\n  output: %s\n  mode: %d\n",
+           input.data(),
+           outFile.data(),
+           mode);
     size_t data_size = getfilesize(pFile) - 0x920;
     unsigned char key_buf[4];
     int32_t key = 0;

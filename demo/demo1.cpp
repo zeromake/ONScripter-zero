@@ -34,8 +34,8 @@ int main() {
     TTF_Init();
 
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-    SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_ALLOW_HIGHDPI, &window,
-                                &renderer);
+    SDL_CreateWindowAndRenderer(
+        800, 600, SDL_WINDOW_ALLOW_HIGHDPI, &window, &renderer);
     int textScale = 1;
 #ifdef __APPLE__
     int rw = 0, rh = 0;

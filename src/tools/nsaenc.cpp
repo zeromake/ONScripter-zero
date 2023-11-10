@@ -36,9 +36,13 @@ std::string normalPath(const std::string p) {
     return path.string();
 }
 
-int processFile(NsaReader::ArchiveInfo *ai, NsaReader::FileInfo *fi,
-                const std::string &fullname, const std::string &name,
-                unsigned long &offset, bool enhanced_flag, int base_offset) {
+int processFile(NsaReader::ArchiveInfo *ai,
+                NsaReader::FileInfo *fi,
+                const std::string &fullname,
+                const std::string &name,
+                unsigned long &offset,
+                bool enhanced_flag,
+                int base_offset) {
     std::FILE *fp = NULL;
     char magic[5];
     const char *cc = name.c_str();
@@ -167,9 +171,13 @@ int main(int argc, char *argv[]) {
     sAI->fi_list = new NsaReader::FileInfo[count];
     NsaReader::FileInfo *sFI = sAI->fi_list;
     for (auto &itr : files) {
-        processFile(sAI, sFI, itr.c_str(),
-                    itr.substr(dirPath.string().length()).c_str(), offset,
-                    enhanced_flag, base_offset);
+        processFile(sAI,
+                    sFI,
+                    itr.c_str(),
+                    itr.substr(dirPath.string().length()).c_str(),
+                    offset,
+                    enhanced_flag,
+                    base_offset);
         sFI++;
     }
     sFI = sAI->fi_list;
@@ -184,8 +192,11 @@ int main(int argc, char *argv[]) {
     std::FILE *fp = nullptr;
     sFI = sAI->fi_list;
     for (int i = 0; i < sAI->num_of_files; i++, sFI++) {
-        printf("adding %d of %d (%s), length=%d\n", i + 1, sAI->num_of_files,
-               sFI->name, (int)sFI->original_length);
+        printf("adding %d of %d (%s), length=%d\n",
+               i + 1,
+               sAI->num_of_files,
+               sFI->name,
+               (int)sFI->original_length);
         length = sFI->original_length;
         if (length > buffer_length) {
             if (buffer) delete[] buffer;
@@ -205,7 +216,8 @@ int main(int argc, char *argv[]) {
         if (sFI->original_length != sFI->length) {
             offset_sub += sFI->original_length - sFI->length;
             printf("    NBZ compressed: %d -> %d (%d%%)\n",
-                   (int)sFI->original_length, (int)sFI->length,
+                   (int)sFI->original_length,
+                   (int)sFI->length,
                    (int)(sFI->length * 100 / sFI->original_length));
         }
         fclose(fp);

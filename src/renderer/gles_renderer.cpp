@@ -49,7 +49,8 @@ void main() {
 // static GLuint AU1_AF1(GLfloat a){union{GLfloat f;GLuint
 // u;}bits;bits.f=a;return bits.u;}
 
-static void casSetup(GLfloat con[4 * 2], float sharpness,
+static void casSetup(GLfloat con[4 * 2],
+                     float sharpness,
                      const float inputSizeInPixels[2],
                      const float outputSizeInPixels[2]) {
     // Scaling terms.
@@ -93,25 +94,27 @@ void GlesRenderer::initVertexData() {
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof vertex_data, &vertex_data,
-                 GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER, sizeof vertex_data, &vertex_data, GL_STATIC_DRAW);
 }
 
-GlesRenderer::GlesRenderer(SDL_Window *window, SDL_Texture *texture,
+GlesRenderer::GlesRenderer(SDL_Window *window,
+                           SDL_Texture *texture,
                            const float input_size[2],
-                           const float output_size[2], const float sharpness) {
+                           const float output_size[2],
+                           const float sharpness) {
 #if defined(IOS) || defined(ANDROID)
 // #define SDL_PROC(ret,func,params) func=func;
 #else
-#define SDL_PROC(ret, func, params)                                         \
-    do {                                                                    \
-        func = (func##_T)SDL_GL_GetProcAddress(#func);                      \
-        if (!func) {                                                        \
-            SDL_SetError("Couldn't load GLES2 function %s: %s", #func,      \
-                         SDL_GetError());                                   \
-            utils::printError("Couldn't load GLES2 function %s: %s", #func, \
-                              SDL_GetError());                              \
-        }                                                                   \
+#define SDL_PROC(ret, func, params)                                            \
+    do {                                                                       \
+        func = (func##_T)SDL_GL_GetProcAddress(#func);                         \
+        if (!func) {                                                           \
+            SDL_SetError(                                                      \
+                "Couldn't load GLES2 function %s: %s", #func, SDL_GetError()); \
+            utils::printError(                                                 \
+                "Couldn't load GLES2 function %s: %s", #func, SDL_GetError()); \
+        }                                                                      \
     } while (0);
 #include "gles2funcs.h"
 #undef SDL_PROC
@@ -182,9 +185,15 @@ void GlesRenderer::copy(const int window_x, const int window_y) {
     glUseProgram(post_program);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(0);
-    glUniform4f(const_buffer_location[0], cas_con[0], cas_con[1], cas_con[2],
+    glUniform4f(const_buffer_location[0],
+                cas_con[0],
+                cas_con[1],
+                cas_con[2],
                 cas_con[3]);
-    glUniform4f(const_buffer_location[1], cas_con[4], cas_con[5], cas_con[6],
+    glUniform4f(const_buffer_location[1],
+                cas_con[4],
+                cas_con[5],
+                cas_con[6],
                 cas_con[7]);
     glUniform4f(const_buffer_location[2], window_x, window_y, 0.0f, 0.0f);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

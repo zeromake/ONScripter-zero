@@ -48,7 +48,8 @@ void ThreadPool::createThread() {
             SDL_DestroySemaphore(td->sem);
             return 0;
         },
-        "Parallel", &thread->threadData);
+        "Parallel",
+        &thread->threadData);
     SDL_DetachThread(thread->thread);
     ++threadCreated;
 }

@@ -31,14 +31,17 @@ static unsigned long tmp_acc[4];
 static unsigned long tmp_acc_num[4];
 
 static void calcWeightedSumColumnInit(unsigned char **src,
-                                      int interpolation_height, int image_width,
-                                      int image_height, int image_pixel_width,
+                                      int interpolation_height,
+                                      int image_width,
+                                      int image_height,
+                                      int image_pixel_width,
                                       int byte_per_pixel) {
     int y_end = -interpolation_height / 2 + interpolation_height;
 
-    memset(pixel_accum, 0,
-           image_width * byte_per_pixel * sizeof(unsigned long));
-    memset(pixel_accum_num, 0,
+    memset(
+        pixel_accum, 0, image_width * byte_per_pixel * sizeof(unsigned long));
+    memset(pixel_accum_num,
+           0,
            image_width * byte_per_pixel * sizeof(unsigned long));
     for (int s = 0; s < byte_per_pixel; s++) {
         for (int i = 0; i < y_end - 1; i++) {
@@ -54,9 +57,12 @@ static void calcWeightedSumColumnInit(unsigned char **src,
     }
 }
 
-static void calcWeightedSumColumn(unsigned char **src, int y,
-                                  int interpolation_height, int image_width,
-                                  int image_height, int image_pixel_width,
+static void calcWeightedSumColumn(unsigned char **src,
+                                  int y,
+                                  int interpolation_height,
+                                  int image_width,
+                                  int image_height,
+                                  int image_pixel_width,
                                   int byte_per_pixel) {
     int y_start = y - interpolation_height / 2;
     int y_end = y - interpolation_height / 2 + interpolation_height;
@@ -84,8 +90,11 @@ static void calcWeightedSumColumn(unsigned char **src, int y,
     }
 }
 
-static void calcWeightedSum(unsigned char **dst, unsigned char **src, int x,
-                            int interpolation_width, int image_width,
+static void calcWeightedSum(unsigned char **dst,
+                            unsigned char **src,
+                            int x,
+                            int interpolation_width,
+                            int image_width,
                             int byte_per_pixel) {
     int x_start = x - interpolation_width / 2;
     int x_end = x - interpolation_width / 2 + interpolation_width;
@@ -103,10 +112,17 @@ static void calcWeightedSum(unsigned char **dst, unsigned char **src, int x,
     }
 }
 
-void resizeImage(unsigned char *dst_buffer, int dst_width, int dst_height,
-                 int dst_total_width, unsigned char *src_buffer, int src_width,
-                 int src_height, int src_total_width, int byte_per_pixel,
-                 unsigned char *tmp_buffer, int tmp_total_width,
+void resizeImage(unsigned char *dst_buffer,
+                 int dst_width,
+                 int dst_height,
+                 int dst_total_width,
+                 unsigned char *src_buffer,
+                 int src_width,
+                 int src_height,
+                 int src_total_width,
+                 int byte_per_pixel,
+                 unsigned char *tmp_buffer,
+                 int tmp_total_width,
                  bool palette_flag) {
     if (dst_width == 0 || dst_height == 0) return;
 
@@ -141,11 +157,20 @@ void resizeImage(unsigned char *dst_buffer, int dst_width, int dst_height,
     }
     /* smoothing */
     if (byte_per_pixel >= 3) {
-        calcWeightedSumColumnInit(&src_buf, interpolation_height, src_width,
-                                  src_height, src_total_width, byte_per_pixel);
+        calcWeightedSumColumnInit(&src_buf,
+                                  interpolation_height,
+                                  src_width,
+                                  src_height,
+                                  src_total_width,
+                                  byte_per_pixel);
         for (i = 0; i < src_height; i++) {
-            calcWeightedSumColumn(&src_buf, i, interpolation_height, src_width,
-                                  src_height, src_total_width, byte_per_pixel);
+            calcWeightedSumColumn(&src_buf,
+                                  i,
+                                  interpolation_height,
+                                  src_width,
+                                  src_height,
+                                  src_total_width,
+                                  byte_per_pixel);
             for (s = 0; s < byte_per_pixel; s++) {
                 tmp_acc[s] = 0;
                 tmp_acc_num[s] = 0;
@@ -159,8 +184,12 @@ void resizeImage(unsigned char *dst_buffer, int dst_width, int dst_height,
             }
 
             for (j = 0; j < src_width; j++)
-                calcWeightedSum(&tmp_buf, &src_buf, j, interpolation_width,
-                                src_width, byte_per_pixel);
+                calcWeightedSum(&tmp_buf,
+                                &src_buf,
+                                j,
+                                interpolation_width,
+                                src_width,
+                                byte_per_pixel);
             tmp_buf += tmp_offset;
         }
     } else {

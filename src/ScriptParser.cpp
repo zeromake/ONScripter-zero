@@ -490,11 +490,11 @@ void ScriptParser::saveGlovalData() {
     if (!globalon_flag) return;
 
     file_io_buf_ptr = 0;
-    writeVariables(script_h.global_variable_border, script_h.variable_range,
-                   false);
+    writeVariables(
+        script_h.global_variable_border, script_h.variable_range, false);
     allocFileIOBuf();
-    writeVariables(script_h.global_variable_border, script_h.variable_range,
-                   true);
+    writeVariables(
+        script_h.global_variable_border, script_h.variable_range, true);
 
     if (saveFileIOBuf("gloval.sav"))
         errorAndExit("can't open gloval.sav for writing.");
@@ -516,7 +516,8 @@ void ScriptParser::allocFileIOBuf() {
     file_io_buf_ptr = 0;
 }
 
-int ScriptParser::saveFileIOBuf(const char *filename, int offset,
+int ScriptParser::saveFileIOBuf(const char *filename,
+                                int offset,
                                 const char *savestr) {
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
@@ -742,10 +743,15 @@ void ScriptParser::readLog(ScriptHandler::LogInfo &info) {
 void ScriptParser::errorAndExit(const char *str, const char *reason) {
     if (reason)
         utils::printError(" *** Parse error at %s:%d [%s]; %s ***\n",
-                          current_label_info.name, current_line, str, reason);
+                          current_label_info.name,
+                          current_line,
+                          str,
+                          reason);
     else
         utils::printError(" *** Parse error at %s:%d [%s] ***\n",
-                          current_label_info.name, current_line, str);
+                          current_label_info.name,
+                          current_line,
+                          str);
     exit(-1);
 }
 
@@ -847,7 +853,8 @@ ScriptParser::EffectLink *ScriptParser::parseEffect(bool init_flag) {
     return NULL;
 }
 
-FILE *ScriptParser::fopen(const char *path, const char *mode,
+FILE *ScriptParser::fopen(const char *path,
+                          const char *mode,
                           bool use_save_dir) {
     return script_h.fopen(path, mode, use_save_dir);
 }
@@ -896,7 +903,8 @@ void ScriptParser::createKeyTable(const char *key_exe) {
         key_table[ring_buffer[(ring_start + i) % 256]] = i;
 }
 
-void ScriptParser::setKinsoku(const char *start_chrs, const char *end_chrs,
+void ScriptParser::setKinsoku(const char *start_chrs,
+                              const char *end_chrs,
                               bool add) {
     int i;
     const char *kchr;

@@ -145,7 +145,8 @@ void ScriptHandler::setSaveDir(const char *path) {
     strcpy(save_dir, path);
 }
 
-FILE *ScriptHandler::fopen(const char *path, const char *mode,
+FILE *ScriptHandler::fopen(const char *path,
+                           const char *mode,
                            bool use_save_dir) {
     char filename[STRING_BUFFER_LENGTH] = {0};
     fpath(path, filename, use_save_dir);
@@ -184,7 +185,8 @@ void ScriptHandler::setKeyTable(const unsigned char *key_table) {
     }
 }
 
-bool readVariableTextCompatible(const char *buf, char *out,
+bool readVariableTextCompatible(const char *buf,
+                                char *out,
                                 int &variable_count) {
     int offset = 0;
     int outOffset = 0;
@@ -371,8 +373,8 @@ readTokenTop:
         addStringBuffer(ch);
         markAsKidoku(buf++);
     } else if (ch != '\0') {
-        utils::printError("readToken: skip unknown heading character %c (%x)\n",
-                          ch, ch);
+        utils::printError(
+            "readToken: skip unknown heading character %c (%x)\n", ch, ch);
         buf++;
         goto readTokenTop;
     }
@@ -834,8 +836,10 @@ void ScriptHandler::setNumVariable(int no, int val) {
     vd.num = val;
 }
 
-int ScriptHandler::getStringFromInteger(char *buffer, const int buffer_size,
-                                        int no, int num_column,
+int ScriptHandler::getStringFromInteger(char *buffer,
+                                        const int buffer_size,
+                                        int no,
+                                        int num_column,
                                         bool is_zero_inserted) {
     int i, num_space = 0, num_minus = 0;
     if (no < 0) {
@@ -1005,7 +1009,8 @@ ScriptHandler::VariableData &ScriptHandler::getVariableData(int no) {
         extended_variable_data =
             new ExtendedVariableData[max_extended_variable_data * 2];
         if (tmp) {
-            memcpy(extended_variable_data, tmp,
+            memcpy(extended_variable_data,
+                   tmp,
                    sizeof(ExtendedVariableData) * max_extended_variable_data);
             delete[] tmp;
         }
@@ -1095,7 +1100,8 @@ int ScriptHandler::readScript(char *path) {
     if (estimated_buffer_length > BUFFER_MAX) {
         // 超过 100MB 的大小可能是 bug
         utils::printError("can't open buffer_length: %d > %d\n",
-                          estimated_buffer_length, BUFFER_MAX);
+                          estimated_buffer_length,
+                          BUFFER_MAX);
         return -1;
     }
     if (script_buffer) delete[] script_buffer;
@@ -1369,7 +1375,8 @@ int ScriptHandler::labelScript() {
             while (*(buf + 1) == '*') buf++;
             setCurrent(buf);
             readLabel();
-            label_info[++label_counter].name = new char[strlen(string_buffer)]{0};
+            label_info[++label_counter].name =
+                new char[strlen(string_buffer)]{0};
             strcpy(label_info[label_counter].name, string_buffer + 1);
             label_info[label_counter].label_header = buf;
             label_info[label_counter].num_of_lines = 1;
@@ -1578,8 +1585,8 @@ int ScriptHandler::parseInt(char **buf, bool ignore_exit) {
         current_variable.var_no = parseArray(buf, av, ignore_exit);
         current_variable.type = VAR_ARRAY;
         current_variable.array = av;
-        int *ret = getArrayPtr(current_variable.var_no, current_variable.array,
-                               0, ignore_exit);
+        int *ret = getArrayPtr(
+            current_variable.var_no, current_variable.array, 0, ignore_exit);
         if (!ret) {
             return 0;
         }
@@ -1753,7 +1760,8 @@ int ScriptHandler::calcArithmetic(int num1, int op, int num2) {
     return ret;
 }
 
-int ScriptHandler::parseArray(char **buf, struct ArrayVariable &array,
+int ScriptHandler::parseArray(char **buf,
+                              struct ArrayVariable &array,
                               bool ignore_exit) {
     SKIP_SPACE(*buf);
 
@@ -1781,7 +1789,9 @@ int ScriptHandler::parseArray(char **buf, struct ArrayVariable &array,
     return no;
 }
 
-int *ScriptHandler::getArrayPtr(int no, ArrayVariable &array, int offset,
+int *ScriptHandler::getArrayPtr(int no,
+                                ArrayVariable &array,
+                                int offset,
                                 bool ignore_exit) {
     ArrayVariable *av = root_array_variable;
     while (av) {

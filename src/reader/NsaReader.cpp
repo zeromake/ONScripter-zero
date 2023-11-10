@@ -30,7 +30,9 @@
 #define NSA_ARCHIVE_NAME "arc"
 #define NSA_ARCHIVE_NAME2 "arc%d"
 
-NsaReader::NsaReader(unsigned int nsa_offset, char *path, int archive_type,
+NsaReader::NsaReader(unsigned int nsa_offset,
+                     char *path,
+                     int archive_type,
                      const unsigned char *key_table)
     : SarReader(path, key_table) {
     sar_flag = true;
@@ -61,15 +63,21 @@ int NsaReader::open(const char *nsa_path) {
 
     if (archive_type & ARCHIVE_TYPE_NS2) {
         for (i = 0; i < MAX_NS2_ARCHIVE; i++) {
-            snprintf(archive_name, __size, "%s%02d.%s",
-                     nsa_path ? nsa_path : "", i, ns2_archive_ext);
+            snprintf(archive_name,
+                     __size,
+                     "%s%02d.%s",
+                     nsa_path ? nsa_path : "",
+                     i,
+                     ns2_archive_ext);
             if ((archive_info_ns2[i].file_handle = fopen(archive_name, "rb")) ==
                 NULL)
                 break;
 
             archive_found = true;
-            archive_info_ns2[i].file_name = new char[strlen(archive_name) + 1]{0};
-            memcpy(archive_info_ns2[i].file_name, archive_name,
+            archive_info_ns2[i].file_name =
+                new char[strlen(archive_name) + 1]{0};
+            memcpy(archive_info_ns2[i].file_name,
+                   archive_name,
                    strlen(archive_name) + 1);
             readArchive(&archive_info_ns2[i], ARCHIVE_TYPE_NS2, nsa_offset);
             num_of_ns2_archives = i + 1;
@@ -81,14 +89,20 @@ int NsaReader::open(const char *nsa_path) {
             ArchiveInfo *ai;
 
             if (i == -1) {
-                snprintf(archive_name, __size, "%s%s.%s",
-                         nsa_path ? nsa_path : "", NSA_ARCHIVE_NAME,
+                snprintf(archive_name,
+                         __size,
+                         "%s%s.%s",
+                         nsa_path ? nsa_path : "",
+                         NSA_ARCHIVE_NAME,
                          nsa_archive_ext);
                 ai = &archive_info;
             } else {
                 snprintf(archive_name2, __size, NSA_ARCHIVE_NAME2, i + 1);
-                snprintf(archive_name, __size, "%s%s.%s",
-                         nsa_path ? nsa_path : "", archive_name2,
+                snprintf(archive_name,
+                         __size,
+                         "%s%s.%s",
+                         nsa_path ? nsa_path : "",
+                         archive_name2,
                          nsa_archive_ext);
                 ai = &archive_info2[i];
             }
@@ -108,7 +122,8 @@ int NsaReader::open(const char *nsa_path) {
     return 0;
 }
 
-int NsaReader::openForConvert(char *nsa_name, int archive_type,
+int NsaReader::openForConvert(char *nsa_name,
+                              int archive_type,
                               unsigned int nsa_offset) {
     sar_flag = false;
     if ((archive_info.file_handle = ::fopen(nsa_name, "rb")) == NULL) {
@@ -138,12 +153,24 @@ int NsaReader::writeHeader(FILE *fp, int archive_type, int nsa_offset) {
     return writeHeaderSub(ai, fp, archive_type, nsa_offset);
 }
 
-size_t NsaReader::putFile(FILE *fp, int no, size_t offset, size_t length,
-                          size_t original_length, int compression_type,
-                          bool modified_flag, unsigned char *buffer) {
+size_t NsaReader::putFile(FILE *fp,
+                          int no,
+                          size_t offset,
+                          size_t length,
+                          size_t original_length,
+                          int compression_type,
+                          bool modified_flag,
+                          unsigned char *buffer) {
     ArchiveInfo *ai = &archive_info;
-    return putFileSub(ai, fp, no, offset, length, original_length,
-                      compression_type, modified_flag, buffer);
+    return putFileSub(ai,
+                      fp,
+                      no,
+                      offset,
+                      length,
+                      original_length,
+                      compression_type,
+                      modified_flag,
+                      buffer);
 }
 
 const char *NsaReader::getArchiveName() const { return "nsa"; }
@@ -215,7 +242,8 @@ size_t NsaReader::getFileLength(const char *file_name) {
     return 0;
 }
 
-size_t NsaReader::getFile(const char *file_name, unsigned char *buffer,
+size_t NsaReader::getFile(const char *file_name,
+                          unsigned char *buffer,
                           int *location) {
     size_t ret;
 

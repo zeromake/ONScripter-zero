@@ -105,19 +105,22 @@ AnimationInfo &AnimationInfo::operator=(const AnimationInfo &anim) {
         }
         if (color_list) {
             color_list = new uchar3[anim.num_of_cells];
-            memcpy(color_list, anim.color_list,
+            memcpy(color_list,
+                   anim.color_list,
                    sizeof(uchar3) * anim.num_of_cells);
         }
         if (duration_list) {
             duration_list = new int[anim.num_of_cells];
-            memcpy(duration_list, anim.duration_list,
+            memcpy(duration_list,
+                   anim.duration_list,
                    sizeof(int) * anim.num_of_cells);
         }
 
         if (image_surface) {
-            image_surface = allocSurface(anim.image_surface->w,
-                                         anim.image_surface->h, texture_format);
-            memcpy(image_surface->pixels, anim.image_surface->pixels,
+            image_surface = allocSurface(
+                anim.image_surface->w, anim.image_surface->h, texture_format);
+            memcpy(image_surface->pixels,
+                   anim.image_surface->pixels,
                    anim.image_surface->pitch * anim.image_surface->h);
         }
     }
@@ -277,7 +280,8 @@ void AnimationInfo::setCell(int cell) {
     current_cell = cell;
 }
 
-int AnimationInfo::doClipping(SDL_Rect *dst, SDL_Rect *clip,
+int AnimationInfo::doClipping(SDL_Rect *dst,
+                              SDL_Rect *clip,
                               SDL_Rect *clipped) {
     if (clipped) clipped->x = clipped->y = 0;
 
@@ -312,7 +316,8 @@ int AnimationInfo::doClipping(SDL_Rect *dst, SDL_Rect *clip,
 
 #ifdef USE_SIMD
 static void blendPixel32(const Uint32 *src_buffer,
-                         Uint32 *__restrict dst_buffer, Uint8 alpha,
+                         Uint32 *__restrict dst_buffer,
+                         Uint8 alpha,
                          Uint8 *alphap) {
     using namespace simd;
     uint8x4 src = load(src_buffer), dst = load(dst_buffer);
@@ -328,8 +333,10 @@ static void blendPixel32(const Uint32 *src_buffer,
 }
 
 static void blend4Pixel32(const Uint32 *src_buffer,
-                          Uint32 *__restrict dst_buffer, simd::uint16x8 alpha,
-                          simd::uint8x16 alpha_mask, simd::ivec128 zero,
+                          Uint32 *__restrict dst_buffer,
+                          simd::uint16x8 alpha,
+                          simd::uint8x16 alpha_mask,
+                          simd::ivec128 zero,
                           simd::uint8x16 amask) {
     using namespace simd;
     uint8x16 src = load_u(src_buffer), dst = load_u(dst_buffer);
@@ -364,8 +371,10 @@ static void blend4Pixel32(const Uint32 *src_buffer,
 
 #ifdef USE_SIMD_X86_AVX2
 static void blend8Pixel32(const Uint32 *src_buffer,
-                          Uint32 *__restrict dst_buffer, simd::uint16x16 alpha,
-                          simd::uint8x32 alpha_mask, simd::ivec256 zero,
+                          Uint32 *__restrict dst_buffer,
+                          simd::uint16x16 alpha,
+                          simd::uint8x32 alpha_mask,
+                          simd::ivec256 zero,
                           simd::uint8x32 amask) {
     using namespace simd;
     uint8x32 src = load256_u(src_buffer), dst = load256_u(dst_buffer);
@@ -455,7 +464,8 @@ inline void rainAddBlendPixel32(const Uint32 *src_buffer,
 
 #ifdef USE_SIMD
 inline void rainAddBlend32(const Uint32 *src_buffer,
-                           Uint32 *__restrict dst_buffer, int remain) {
+                           Uint32 *__restrict dst_buffer,
+                           int remain) {
     using namespace simd;
     while (remain >= 4) {
         uint8x16 srcvec = load_u(src_buffer), dstvec = load_u(dst_buffer);
@@ -491,8 +501,8 @@ inline void rainAddBlend32(const Uint32 *src_buffer,
         alphap += 4;                                                           \
     }
 
-void AnimationInfo::blendOnSurface(SDL_Surface *dst_surface, int dst_x,
-                                   int dst_y, SDL_Rect &clip, int alpha) {
+void AnimationInfo::blendOnSurface(
+    SDL_Surface *dst_surface, int dst_x, int dst_y, SDL_Rect &clip, int alpha) {
     if (image_surface == NULL) return;
 
     SDL_Rect dst_rect, src_rect;
@@ -579,8 +589,12 @@ void AnimationInfo::blendOnSurface(SDL_Surface *dst_surface, int dst_x,
                     }
 #ifdef USE_SIMD_X86_AVX2
                     else if (remain >= 8) {
-                        blend8Pixel32(src_buffer, dst_buffer, uint16x16(alpha),
-                                      mask, zero, amask);
+                        blend8Pixel32(src_buffer,
+                                      dst_buffer,
+                                      uint16x16(alpha),
+                                      mask,
+                                      zero,
+                                      amask);
                         remain -= 8;
                         src_buffer += 8;
                         dst_buffer += 8;
@@ -588,8 +602,12 @@ void AnimationInfo::blendOnSurface(SDL_Surface *dst_surface, int dst_x,
                     }
 #endif
                     else if (remain >= 4) {
-                        blend4Pixel32(src_buffer, dst_buffer, uint16x8(alpha),
-                                      maskl, zerol, amaskl);
+                        blend4Pixel32(src_buffer,
+                                      dst_buffer,
+                                      uint16x8(alpha),
+                                      maskl,
+                                      zerol,
+                                      amaskl);
                         remain -= 4;
                         src_buffer += 4;
                         dst_buffer += 4;
@@ -630,8 +648,8 @@ void AnimationInfo::blendOnSurface(SDL_Surface *dst_surface, int dst_x,
     SDL_mutexV(mutex);
 }
 
-void AnimationInfo::blendOnSurface2(SDL_Surface *dst_surface, int dst_x,
-                                    int dst_y, SDL_Rect &clip, int alpha) {
+void AnimationInfo::blendOnSurface2(
+    SDL_Surface *dst_surface, int dst_x, int dst_y, SDL_Rect &clip, int alpha) {
     if (image_surface == NULL) return;
     if (scale_x == 0 || scale_y == 0) return;
 
@@ -681,7 +699,8 @@ void AnimationInfo::blendOnSurface2(SDL_Surface *dst_surface, int dst_x,
         const int alpha, pitch, dst_x, dst_y, cx2, cy2;
         const int (*src_rect)[2];
 
-        void blendLine(Uint32 *line_buffer, int size,
+        void blendLine(Uint32 *line_buffer,
+                       int size,
                        ONSBuf **dst_buffer_p) const {
             ONSBuf *&src_buffer = line_buffer;
             ONSBuf *dst_buffer = *dst_buffer_p;
@@ -709,8 +728,12 @@ void AnimationInfo::blendOnSurface2(SDL_Surface *dst_surface, int dst_x,
 #else
                         unsigned char *alphap = (unsigned char *)line_buffer;
 #endif
-                        blend8Pixel32(line_buffer, dst_buffer, uint16x16(alpha),
-                                      mask, zero, amask);
+                        blend8Pixel32(line_buffer,
+                                      dst_buffer,
+                                      uint16x16(alpha),
+                                      mask,
+                                      zero,
+                                      amask);
                         dst_buffer += 8;
                         line_buffer += 8;
                         size -= 8;
@@ -732,8 +755,12 @@ void AnimationInfo::blendOnSurface2(SDL_Surface *dst_surface, int dst_x,
 #else
                         unsigned char *alphap = (unsigned char *)line_buffer;
 #endif
-                        blend4Pixel32(line_buffer, dst_buffer, uint16x8(alpha),
-                                      maskl, zerol, amaskl);
+                        blend4Pixel32(line_buffer,
+                                      dst_buffer,
+                                      uint16x8(alpha),
+                                      maskl,
+                                      zerol,
+                                      amaskl);
                         dst_buffer += 4;
                         line_buffer += 4;
                         size -= 4;
@@ -849,7 +876,10 @@ void AnimationInfo::blendOnSurface2(SDL_Surface *dst_surface, int dst_x,
                  src_rect};
 #if defined(USE_PARALLEL) || defined(USE_OMP_PARALLEL)
     parallel::For(
-        min_xy[1], max_xy[1] + 1, 1, blender,
+        min_xy[1],
+        max_xy[1] + 1,
+        1,
+        blender,
         (max_xy[1] - min_xy[1] + 1) * (max_xy[0] + 1 - min_xy[0]) * 4);
 #else
     for (int y = min_xy[1]; y <= max_xy[1]; y++) blender(y);
@@ -897,8 +927,11 @@ void AnimationInfo::blendOnSurface2(SDL_Surface *dst_surface, int dst_x,
 // used to draw characters on text_surface
 // Alpha = 1 - (1-Da)(1-Sa)
 // Color = (DaSaSc + Da(1-Sa)Dc + Sa(1-Da)Sc)/A
-void AnimationInfo::blendText(SDL_Surface *surface, int dst_x, int dst_y,
-                              SDL_Color &color, SDL_Rect *clip,
+void AnimationInfo::blendText(SDL_Surface *surface,
+                              int dst_x,
+                              int dst_y,
+                              SDL_Color &color,
+                              SDL_Rect *clip,
                               bool rotate_flag) {
     if (image_surface == NULL || surface == NULL) return;
 
@@ -1031,21 +1064,34 @@ void AnimationInfo::calcAffineMatrix() {
 SDL_Surface *AnimationInfo::allocSurface(int w, int h, Uint32 texture_format) {
     SDL_Surface *surface;
     if (texture_format == SDL_PIXELFORMAT_RGB565)
-        surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 16, 0xf800, 0x07e0,
-                                       0x001f, 0);
+        surface = SDL_CreateRGBSurface(
+            SDL_SWSURFACE, w, h, 16, 0xf800, 0x07e0, 0x001f, 0);
     else if (texture_format == SDL_PIXELFORMAT_ABGR8888)
-        surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, 0x000000ff,
-                                       0x0000ff00, 0x00ff0000, 0xff000000);
+        surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                       w,
+                                       h,
+                                       32,
+                                       0x000000ff,
+                                       0x0000ff00,
+                                       0x00ff0000,
+                                       0xff000000);
     else  // texture_format == SDL_PIXELFORMAT_ARGB8888
-        surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 32, 0x00ff0000,
-                                       0x0000ff00, 0x000000ff, 0xff000000);
+        surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                       w,
+                                       h,
+                                       32,
+                                       0x00ff0000,
+                                       0x0000ff00,
+                                       0x000000ff,
+                                       0xff000000);
 
     SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 
     return surface;
 }
 
-SDL_Surface *AnimationInfo::alloc32bitSurface(int w, int h,
+SDL_Surface *AnimationInfo::alloc32bitSurface(int w,
+                                              int h,
                                               Uint32 texture_format) {
     if (texture_format == SDL_PIXELFORMAT_RGB565)
         return allocSurface(w, h, SDL_PIXELFORMAT_ARGB8888);
@@ -1073,7 +1119,8 @@ void AnimationInfo::allocImage(int w, int h, Uint32 texture_format) {
     affine_pos.h = pos.h;
 }
 
-void AnimationInfo::copySurface(SDL_Surface *surface, SDL_Rect *src_rect,
+void AnimationInfo::copySurface(SDL_Surface *surface,
+                                SDL_Rect *src_rect,
                                 SDL_Rect *dst_rect) {
     if (!image_surface || !surface) return;
 
@@ -1180,9 +1227,14 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
         const int w3 = w22 * num_of_cells;
         orig_pos.w = w3;
         SDL_PixelFormat *fmt = surface->format;
-        SDL_Surface *surface2 = SDL_CreateRGBSurface(
-            SDL_SWSURFACE, w3, h, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask,
-            fmt->Bmask, fmt->Amask);
+        SDL_Surface *surface2 = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                                     w3,
+                                                     h,
+                                                     fmt->BitsPerPixel,
+                                                     fmt->Rmask,
+                                                     fmt->Gmask,
+                                                     fmt->Bmask,
+                                                     fmt->Amask);
         SDL_LockSurface(surface2);
         Uint32 *buffer2 = (Uint32 *)surface2->pixels;
 

@@ -91,12 +91,14 @@ void ONScripter::effectCascade(char *params, int duration) {
                 dst_rect.x = start;
             }
             src_rect.x = 0;
-            SDL_BlitSurface(effect_src_surface, &dst_rect, accumulation_surface,
-                            &src_rect);
+            SDL_BlitSurface(
+                effect_src_surface, &dst_rect, accumulation_surface, &src_rect);
             for (int i = start; i < end; i++) {
                 dst_rect.x = i;
-                SDL_BlitSurface(accumulation_surface, &src_rect,
-                                effect_src_surface, &dst_rect);
+                SDL_BlitSurface(accumulation_surface,
+                                &src_rect,
+                                effect_src_surface,
+                                &dst_rect);
             }
         }
         if (mode & CASCADE_DIR) {
@@ -146,12 +148,14 @@ void ONScripter::effectCascade(char *params, int duration) {
                 dst_rect.y = start;
             }
             src_rect.y = 0;
-            SDL_BlitSurface(effect_src_surface, &dst_rect, accumulation_surface,
-                            &src_rect);
+            SDL_BlitSurface(
+                effect_src_surface, &dst_rect, accumulation_surface, &src_rect);
             for (int i = start; i < end; i++) {
                 dst_rect.y = i;
-                SDL_BlitSurface(accumulation_surface, &src_rect,
-                                effect_src_surface, &dst_rect);
+                SDL_BlitSurface(accumulation_surface,
+                                &src_rect,
+                                effect_src_surface,
+                                &dst_rect);
             }
         }
         if (mode & CASCADE_DIR) {
@@ -183,8 +187,12 @@ void ONScripter::effectCascade(char *params, int duration) {
     if (mode & CASCADE_CROSS) {
         // do crossfade
         width = 256 * effect_counter / duration;
-        alphaBlend(NULL, ALPHA_BLEND_CONST, width, &dirty_rect.bounding_box,
-                   NULL, dst_surface);
+        alphaBlend(NULL,
+                   ALPHA_BLEND_CONST,
+                   width,
+                   &dirty_rect.bounding_box,
+                   NULL,
+                   dst_surface);
     }
 }
 #endif

@@ -35,10 +35,13 @@ Coding2UTF16 *coding2utf16;
 extern int scale_ratio_upper;
 extern int scale_ratio_lower;
 
-extern size_t rescaleJPEG(unsigned char *original_buffer, size_t length,
-                          unsigned char **rescaled_buffer, int quality);
+extern size_t rescaleJPEG(unsigned char *original_buffer,
+                          size_t length,
+                          unsigned char **rescaled_buffer,
+                          int quality);
 extern size_t rescaleBMP(unsigned char *original_buffer,
-                         unsigned char **rescaled_buffer, bool output_jpeg_flag,
+                         unsigned char **rescaled_buffer,
+                         bool output_jpeg_flag,
                          int quality);
 
 #ifdef main
@@ -114,27 +117,46 @@ int main(int argc, char **argv) {
             (strlen(sFI.name) > 4 &&
              !strcmp(sFI.name + strlen(sFI.name) - 4, "JPEG"))) {
             if (cSR.getFile(sFI.name, buffer) != length) {
-                fprintf(stderr, "file %s can't be retrieved %ld\n", sFI.name,
+                fprintf(stderr,
+                        "file %s can't be retrieved %ld\n",
+                        sFI.name,
                         length);
                 continue;
             }
             sFI.length = rescaleJPEG(buffer, length, &rescaled_buffer, quality);
-            cSR.putFile(fp, i, sFI.offset, sFI.length, sFI.length, true,
+            cSR.putFile(fp,
+                        i,
+                        sFI.offset,
+                        sFI.length,
+                        sFI.length,
+                        true,
                         rescaled_buffer);
         } else if (strlen(sFI.name) > 3 &&
                    !strcmp(sFI.name + strlen(sFI.name) - 3, "BMP")) {
             if (cSR.getFile(sFI.name, buffer) != length) {
-                fprintf(stderr, "file %s can't be retrieved %ld\n", sFI.name,
+                fprintf(stderr,
+                        "file %s can't be retrieved %ld\n",
+                        sFI.name,
                         length);
                 continue;
             }
             sFI.length =
                 rescaleBMP(buffer, &rescaled_buffer, bmp2jpeg_flag, quality);
-            cSR.putFile(fp, i, sFI.offset, sFI.length, sFI.length, true,
+            cSR.putFile(fp,
+                        i,
+                        sFI.offset,
+                        sFI.length,
+                        sFI.length,
+                        true,
                         rescaled_buffer);
         } else {
-            cSR.putFile(fp, i, sFI.offset, sFI.length, sFI.original_length,
-                        false, buffer);
+            cSR.putFile(fp,
+                        i,
+                        sFI.offset,
+                        sFI.length,
+                        sFI.original_length,
+                        false,
+                        buffer);
         }
 
         offset += sFI.length;

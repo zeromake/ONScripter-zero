@@ -63,8 +63,12 @@ struct dirnode {
 };
 static dirnode dirn;
 
-int processFile(reader::ArchiveInfo *ai, reader::FileInfo *fi, char *fullname,
-                char *name, unsigned long &offset, bool enhanced_flag) {
+int processFile(reader::ArchiveInfo *ai,
+                reader::FileInfo *fi,
+                char *fullname,
+                char *name,
+                unsigned long &offset,
+                bool enhanced_flag) {
     FILE *fp = NULL;
     char magic[5];
     char fullpath[512];
@@ -210,8 +214,8 @@ int main(int argc, char **argv) {
                         if (errno == ENOTDIR)
                             fprintf(stderr, "'%s' is not a directory\n", indir);
                         else
-                            fprintf(stderr, "can't open directory '%s'\n",
-                                    indir);
+                            fprintf(
+                                stderr, "can't open directory '%s'\n", indir);
                         exit(-1);
                     }
                     sprintf(fnptr, "%s%c", indir, DELIMITER);
@@ -226,14 +230,18 @@ int main(int argc, char **argv) {
                     if (!cur->dir) {
                         if (errno == ENOTDIR) {
                             if (t) {
-                                processFile(sAI, sFI, (char *)&file_name, fnptr,
-                                            offset, enhanced_flag);
+                                processFile(sAI,
+                                            sFI,
+                                            (char *)&file_name,
+                                            fnptr,
+                                            offset,
+                                            enhanced_flag);
                                 sFI++;
                             }
                             count++;
                         } else {
-                            fprintf(stderr, "can't open directory '%s'\n",
-                                    fnptr);
+                            fprintf(
+                                stderr, "can't open directory '%s'\n", fnptr);
                             exit(-1);
                         }
                         j++;
@@ -268,8 +276,12 @@ int main(int argc, char **argv) {
                                 cur->namelen++;
                             } else {
                                 if (t) {
-                                    processFile(sAI, sFI, (char *)&file_name,
-                                                fnptr, offset, enhanced_flag);
+                                    processFile(sAI,
+                                                sFI,
+                                                (char *)&file_name,
+                                                fnptr,
+                                                offset,
+                                                enhanced_flag);
                                     sFI++;
                                 }
                                 count++;
@@ -315,8 +327,11 @@ printf("creating NSA archive '%s', %d files total\n", arcname, total);
 #endif
         for (i = 0; i < sAI->num_of_files; i++, sFI++) {
             // now add the file
-            printf("adding %d of %d (%s), length=%d\n", i + 1,
-                   sAI->num_of_files, sFI->name, (int)sFI->original_length);
+            printf("adding %d of %d (%s), length=%d\n",
+                   i + 1,
+                   sAI->num_of_files,
+                   sFI->name,
+                   (int)sFI->original_length);
             fflush(stdout);
             length = sFI->original_length;
             if (length > buffer_length) {
@@ -342,7 +357,8 @@ printf("creating NSA archive '%s', %d files total\n", arcname, total);
             if (sFI->original_length != sFI->length) {
                 offset_sub += sFI->original_length - sFI->length;
                 printf("    NBZ compressed: %d -> %d (%d%%)\n",
-                       (int)sFI->original_length, (int)sFI->length,
+                       (int)sFI->original_length,
+                       (int)sFI->length,
                        (int)(sFI->length * 100 / sFI->original_length));
             }
 #else

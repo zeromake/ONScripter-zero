@@ -122,7 +122,9 @@ struct TGAHeader {
 #pragma pack(pop)
 #endif
 
-bool WriteTGA(const std::string &filename, const Pixel32 *pxl, uint16 width,
+bool WriteTGA(const std::string &filename,
+              const Pixel32 *pxl,
+              uint16 width,
               uint16 height) {
     std::ofstream file(filename.c_str(), std::ios::binary);
     if (file) {
@@ -157,7 +159,9 @@ typedef std::vector<Span> Spans;
 // Each time the renderer calls us back we just push another span entry on
 // our list.
 
-void RasterCallback(const int y, const int count, const FT_Span *const spans,
+void RasterCallback(const int y,
+                    const int count,
+                    const FT_Span *const spans,
                     void *const user) {
     Spans *sptr = (Spans *)user;
     for (int i = 0; i < count; ++i)
@@ -179,9 +183,13 @@ void RenderSpans(FT_Library &library, FT_Outline *const outline, Spans *spans) {
 // Render the specified character as a colored glyph with a colored outline
 // and dump it to a TGA.
 
-void WriteGlyphAsTGA(FT_Library &library, const std::string &fileName,
-                     wchar_t ch, FT_Face &face, int size,
-                     const Pixel32 &fontCol, const Pixel32 outlineCol,
+void WriteGlyphAsTGA(FT_Library &library,
+                     const std::string &fileName,
+                     wchar_t ch,
+                     FT_Face &face,
+                     int size,
+                     const Pixel32 &fontCol,
+                     const Pixel32 outlineCol,
                      float outlineWidth) {
     // Set the size to use.
     if (FT_Set_Char_Size(face, size << 6, size << 6, 90, 90) == 0) {
@@ -200,9 +208,11 @@ void WriteGlyphAsTGA(FT_Library &library, const std::string &fileName,
                 // Set up a stroker.
                 FT_Stroker stroker;
                 FT_Stroker_New(library, &stroker);
-                FT_Stroker_Set(stroker, (int)(outlineWidth * 64),
+                FT_Stroker_Set(stroker,
+                               (int)(outlineWidth * 64),
                                FT_STROKER_LINECAP_ROUND,
-                               FT_STROKER_LINEJOIN_ROUND, 0);
+                               FT_STROKER_LINEJOIN_ROUND,
+                               0);
 
                 FT_Glyph glyph;
                 if (FT_Get_Glyph(face->glyph, &glyph) == 0) {
@@ -223,15 +233,19 @@ void WriteGlyphAsTGA(FT_Library &library, const std::string &fileName,
                     if (!spans.empty()) {
                         // Figure out what the bounding rect is for both the
                         // span lists.
-                        Rect rect(spans.front().x, spans.front().y,
-                                  spans.front().x, spans.front().y);
+                        Rect rect(spans.front().x,
+                                  spans.front().y,
+                                  spans.front().x,
+                                  spans.front().y);
                         for (Spans::iterator s = spans.begin();
-                             s != spans.end(); ++s) {
+                             s != spans.end();
+                             ++s) {
                             rect.Include(Vec2(s->x, s->y));
                             rect.Include(Vec2(s->x + s->width - 1, s->y));
                         }
                         for (Spans::iterator s = outlineSpans.begin();
-                             s != outlineSpans.end(); ++s) {
+                             s != outlineSpans.end();
+                             ++s) {
                             rect.Include(Vec2(s->x, s->y));
                             rect.Include(Vec2(s->x + s->width - 1, s->y));
                         }
@@ -256,25 +270,31 @@ void WriteGlyphAsTGA(FT_Library &library, const std::string &fileName,
                         // Loop over the outline spans and just draw them into
                         // the image.
                         for (Spans::iterator s = outlineSpans.begin();
-                             s != outlineSpans.end(); ++s)
+                             s != outlineSpans.end();
+                             ++s)
                             for (int w = 0; w < s->width; ++w)
                                 pxl[(int)((imgHeight - 1 - (s->y - rect.ymin)) *
                                               imgWidth +
                                           s->x - rect.xmin + w)] =
-                                    Pixel32(outlineCol.r, outlineCol.g,
-                                            outlineCol.b, s->coverage);
+                                    Pixel32(outlineCol.r,
+                                            outlineCol.g,
+                                            outlineCol.b,
+                                            s->coverage);
 
                         // Then loop over the regular glyph spans and blend them
                         // into the image.
                         for (Spans::iterator s = spans.begin();
-                             s != spans.end(); ++s)
+                             s != spans.end();
+                             ++s)
                             for (int w = 0; w < s->width; ++w) {
                                 Pixel32 &dst = pxl[(
                                     int)((imgHeight - 1 - (s->y - rect.ymin)) *
                                              imgWidth +
                                          s->x - rect.xmin + w)];
-                                Pixel32 src = Pixel32(fontCol.r, fontCol.g,
-                                                      fontCol.b, s->coverage);
+                                Pixel32 src = Pixel32(fontCol.r,
+                                                      fontCol.g,
+                                                      fontCol.b,
+                                                      s->coverage);
                                 dst.r =
                                     (int)(dst.r +
                                           ((src.r - dst.r) * src.a) / 255.0f);
@@ -327,8 +347,14 @@ int main(int argc, char **argv) {
         FT_New_Memory_Face(library, fontBuffer, fontFileSize, 0, &face);
 
         // Dump out a single glyph to a tga.
-        WriteGlyphAsTGA(library, argv[2], L'车', face, 300,
-                        Pixel32(255, 255, 255), Pixel32(255, 90, 30), 2.0f);
+        WriteGlyphAsTGA(library,
+                        argv[2],
+                        L'车',
+                        face,
+                        300,
+                        Pixel32(255, 255, 255),
+                        Pixel32(255, 90, 30),
+                        2.0f);
 
         // Now that we are done it is safe to delete the memory.
         delete[] fontBuffer;
