@@ -118,7 +118,7 @@ local function use_binary()
 end
 
 target("onscripter")
-    add_defines("ONS_RESIZE_SURFACE_IMPLEMENT=0")
+    -- add_defines("ONS_RESIZE_SURFACE_IMPLEMENT=2")
     if is_plat("android") then
         set_kind("shared")
     elseif is_plat("iphoneos") then
@@ -221,6 +221,7 @@ target("onscripter")
         "src/builtin_dll/*.cpp",
         "src/language/*.cpp"
     )
+    add_files("src/resize/*.c")
     remove_files("src/AVIWrapper.cpp")
     after_build(function (target)
         if target:is_plat("android") then
@@ -360,5 +361,5 @@ target("resize")
     add_packages("sdl2", "sdl2_image")
     use_binary()
     add_files("demo/resize.cpp")
-    add_files("src/resize.c")
+    add_files("src/resize/*.c")
     add_includedirs("src")

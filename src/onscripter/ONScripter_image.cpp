@@ -33,6 +33,15 @@
 #ifdef USE_SIMD
 #include "simd/simd.h"
 #endif
+
+#ifndef ONS_RESIZE_SURFACE_IMPLEMENT
+#define ONS_RESIZE_SURFACE_IMPLEMENT 2
+#endif
+
+#if ONS_RESIZE_SURFACE_IMPLEMENT == 2
+#include <resize/SDL_resize.h>
+#endif
+
 #ifdef USE_IMAGE_CACHE
 std::shared_ptr<onscache::SurfaceBaseNode> ONScripter::loadImageCache(
     char *filename, bool *has_alpha, int *location, unsigned char *alpha) {
@@ -226,10 +235,6 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
     return tmp;
 }
 
-#ifndef ONS_RESIZE_SURFACE_IMPLEMENT
-#define ONS_RESIZE_SURFACE_IMPLEMENT 1
-#endif
-
 // resize 32bit surface to 32bit surface
 int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
 #if ONS_RESIZE_SURFACE_IMPLEMENT == 1
@@ -239,7 +244,13 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
 #else
     SDL_BlitScaled(src, NULL, dst, NULL);
 #endif
+#elif ONS_RESIZE_SURFACE_IMPLEMENT == 2
+    // 从 GraphicsMagick magick/resize.c
+    // 移植的实现，现在看起来效果最佳，比起原来的内置实现 ios 的问题也得到了解决
+    return SDLSurfaceResize(src, dst, UndefinedFilter, 1.0);
 #else
+    // 之前的 ons 的内置实现，windows/osx/android 都很正常，但是 ios
+    // 下有特别的小图片效果比较奇怪
     SDL_LockSurface(dst);
     SDL_LockSurface(src);
     Uint32 *src_buffer = (Uint32 *)src->pixels;
