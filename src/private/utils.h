@@ -27,66 +27,69 @@
 #elif defined(WINRT)
 #include "debugapi.h"
 #include "windows.h"
-static BOOL MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize)
-{
-	DWORD dwMinSize;
-	dwMinSize = MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, NULL, 0);
-	if (dwSize < dwMinSize)
-	{
-		return FALSE;
-	}
-	MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, lpwszStr, dwMinSize);
-	return TRUE;
+static BOOL MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize) {
+    DWORD dwMinSize;
+    dwMinSize = MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, NULL, 0);
+    if (dwSize < dwMinSize) {
+        return FALSE;
+    }
+    MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, lpwszStr, dwMinSize);
+    return TRUE;
 }
 #endif
-#include <stdio.h>
 #include <stdarg.h>
-#include <utility>
+#include <stdio.h>
+
 #include <string>
+#include <utility>
 
-namespace utils{
-	inline void printInfo(const char *format, ...){
-		va_list ap;
-		va_start(ap, format);
+namespace utils {
+inline void printInfo(const char *format, ...) {
+    va_list ap;
+    va_start(ap, format);
 #ifdef ANDROID
-		__android_log_vprint(ANDROID_LOG_VERBOSE, "INFO", format, ap);
+    __android_log_vprint(ANDROID_LOG_VERBOSE, "INFO", format, ap);
 #elif defined(WINRT)
-		const int __size = 256;
-		char *buf = new char[__size]{0};
-		vsnprintf(buf, __size, format, ap);
-		LPWSTR wstr = new WCHAR[128];
-		MByteToWChar(buf, wstr, 256);
-		OutputDebugString(wstr);
+    const int __size = 256;
+    char *buf = new char[__size]{0};
+    vsnprintf(buf, __size, format, ap);
+    LPWSTR wstr = new WCHAR[128];
+    MByteToWChar(buf, wstr, 256);
+    OutputDebugString(wstr);
 #else
-		vprintf(format, ap);
+    vprintf(format, ap);
 #endif
-		va_end(ap);
-	}
-
-	inline void printError(const char *format, ...){
-		va_list ap;
-		va_start(ap, format);
-#ifdef ANDROID
-		__android_log_vprint(ANDROID_LOG_ERROR, "ERR", format, ap);
-#elif defined(WINRT)
-		char *buf = new char[256]{0};
-		vsnprintf(buf, 256,format,ap);
-		LPWSTR wstr = new WCHAR[128];
-		MByteToWChar(buf, wstr, 256);
-		OutputDebugString(wstr);
-#else
-		vfprintf(stderr, format, ap);
-#endif
-		va_end(ap);
-	}
-
-	template<typename T> T (min)(T a, T b) {
-        return a < b ? a : b;
-    }
-
-	template<typename T> T (clamp)(T x, T min, T max) {
-        return x < min ? min : (x > max ? max : x);
-    }
+    va_end(ap);
 }
+
+inline void printError(const char *format, ...) {
+    va_list ap;
+    va_start(ap, format);
+#ifdef ANDROID
+    __android_log_vprint(ANDROID_LOG_ERROR, "ERR", format, ap);
+#elif defined(WINRT)
+    char *buf = new char[256]{0};
+    vsnprintf(buf, 256, format, ap);
+    LPWSTR wstr = new WCHAR[128];
+    MByteToWChar(buf, wstr, 256);
+    OutputDebugString(wstr);
+#else
+    vfprintf(stderr, format, ap);
+#endif
+    va_end(ap);
+}
+
+template <typename T>
+T(min)
+(T a, T b) {
+    return a < b ? a : b;
+}
+
+template <typename T>
+T(clamp)
+(T x, T min, T max) {
+    return x < min ? min : (x > max ? max : x);
+}
+}  // namespace utils
 
 #endif

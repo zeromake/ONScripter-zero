@@ -25,33 +25,36 @@
 #ifndef __DIRECT_READER_H__
 #define __DIRECT_READER_H__
 
-#include "BaseReader.h"
 #include <string.h>
+
+#include "BaseReader.h"
 
 #define MAX_FILE_NAME_LENGTH 256
 
-class DirectReader : public BaseReader
-{
-public:
-    DirectReader( const char *path=NULL, const unsigned char *key_table=NULL );
+class DirectReader : public BaseReader {
+   public:
+    DirectReader(const char *path = NULL,
+                 const unsigned char *key_table = NULL);
     ~DirectReader();
 
-    int open( const char *name=NULL );
+    int open(const char *name = NULL);
     int close();
 
     const char *getArchiveName() const;
     int getNumFiles();
-    void registerCompressionType( const char *ext, int type );
+    void registerCompressionType(const char *ext, int type);
 
-    struct FileInfo getFileByIndex( unsigned int index );
-    size_t getFileLength( const char *file_name );
-    size_t getFile( const char *file_name, unsigned char *buffer, int *location=NULL );
+    struct FileInfo getFileByIndex(unsigned int index);
+    size_t getFileLength(const char *file_name);
+    size_t getFile(const char *file_name,
+                   unsigned char *buffer,
+                   int *location = NULL);
 
-    static void convertCodingToEUC( char *buf );
-    static void convertCodingToUTF8( char *dst_buf, const char *src_buf );
-    static void convertFromUTF8ToCoding( char *dst_buf, const char *src_buf );
+    static void convertCodingToEUC(char *buf);
+    static void convertCodingToUTF8(char *dst_buf, const char *src_buf);
+    static void convertFromUTF8ToCoding(char *dst_buf, const char *src_buf);
 
-protected:
+   protected:
     char *file_full_path;
     char *file_sub_path;
     size_t file_path_len;
@@ -61,54 +64,56 @@ protected:
     char *archive_path;
     unsigned char key_table[256];
     bool key_table_flag;
-    int  getbit_mask;
+    int getbit_mask;
     size_t getbit_len, getbit_count;
     unsigned char *read_buf;
     unsigned char *decomp_buffer;
     size_t decomp_buffer_len;
 
-    struct RegisteredCompressionType{
+    struct RegisteredCompressionType {
         RegisteredCompressionType *next;
         char *ext;
         int type;
-        RegisteredCompressionType(){
+        RegisteredCompressionType() {
             ext = NULL;
             next = NULL;
         };
-        RegisteredCompressionType( const char *ext, int type ){
-            this->ext = new char[ strlen(ext)+1 ]{0};
-            for ( unsigned int i=0 ; i<strlen(ext)+1 ; i++ ){
+        RegisteredCompressionType(const char *ext, int type) {
+            this->ext = new char[strlen(ext) + 1]{0};
+            for (unsigned int i = 0; i < strlen(ext) + 1; i++) {
                 this->ext[i] = ext[i];
-                if ( this->ext[i] >= 'a' && this->ext[i] <= 'z' )
+                if (this->ext[i] >= 'a' && this->ext[i] <= 'z')
                     this->ext[i] += 'A' - 'a';
             }
             this->type = type;
             this->next = NULL;
         };
-        ~RegisteredCompressionType(){
+        ~RegisteredCompressionType() {
             if (ext) delete[] ext;
         };
     } root_registered_compression_type, *last_registered_compression_type;
 
     FILE *fopen(const char *path, const char *mode);
-    unsigned char readChar( FILE *fp );
-    unsigned short readShort( FILE *fp );
-    unsigned long readLong( FILE *fp );
-    void writeChar( FILE *fp, unsigned char ch );
-    void writeShort( FILE *fp, unsigned short ch );
-    void writeLong( FILE *fp, unsigned long ch );
-    static unsigned short swapShort( unsigned short ch );
-    static unsigned long swapLong( unsigned long ch );
-    size_t decodeNBZ( FILE *fp, size_t offset, unsigned char *buf );
-    size_t encodeNBZ( FILE *fp, size_t length, unsigned char *buf );
-    int getbit( FILE *fp, int n );
-    size_t decodeSPB( FILE *fp, size_t offset, unsigned char *buf );
-    size_t decodeLZSS( struct ArchiveInfo *ai, int no, unsigned char *buf );
-    int getRegisteredCompressionType( const char *file_name );
-    size_t getDecompressedFileLength( int type, FILE *fp, size_t offset );
+    unsigned char readChar(FILE *fp);
+    unsigned short readShort(FILE *fp);
+    unsigned long readLong(FILE *fp);
+    void writeChar(FILE *fp, unsigned char ch);
+    void writeShort(FILE *fp, unsigned short ch);
+    void writeLong(FILE *fp, unsigned long ch);
+    static unsigned short swapShort(unsigned short ch);
+    static unsigned long swapLong(unsigned long ch);
+    size_t decodeNBZ(FILE *fp, size_t offset, unsigned char *buf);
+    size_t encodeNBZ(FILE *fp, size_t length, unsigned char *buf);
+    int getbit(FILE *fp, int n);
+    size_t decodeSPB(FILE *fp, size_t offset, unsigned char *buf);
+    size_t decodeLZSS(struct ArchiveInfo *ai, int no, unsigned char *buf);
+    int getRegisteredCompressionType(const char *file_name);
+    size_t getDecompressedFileLength(int type, FILE *fp, size_t offset);
 
-private:
-    FILE *getFileHandle( const char *file_name, int &compression_type, size_t *length );
+   private:
+    FILE *getFileHandle(const char *file_name,
+                        int &compression_type,
+                        size_t *length);
 };
 
-#endif // __DIRECT_READER_H__
+#endif  // __DIRECT_READER_H__

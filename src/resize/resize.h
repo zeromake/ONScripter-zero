@@ -5,27 +5,26 @@
 extern "C" {
 #endif /* defined(__cplusplus) || defined(c_plusplus) */
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
-typedef enum
-{
-  UndefinedFilter,
-  PointFilter,
-  BoxFilter,
-  TriangleFilter,
-  HermiteFilter,
-  HanningFilter,
-  HammingFilter,
-  BlackmanFilter,
-  GaussianFilter,
-  QuadraticFilter,
-  CubicFilter,
-  CatromFilter,
-  MitchellFilter,
-  LanczosFilter,
-  BesselFilter,
-  SincFilter
+typedef enum {
+    UndefinedFilter,
+    PointFilter,
+    BoxFilter,
+    TriangleFilter,
+    HermiteFilter,
+    HanningFilter,
+    HammingFilter,
+    BlackmanFilter,
+    GaussianFilter,
+    QuadraticFilter,
+    CubicFilter,
+    CatromFilter,
+    MitchellFilter,
+    LanczosFilter,
+    BesselFilter,
+    SincFilter
 } FilterTypes;
 
 typedef uint8_t MagickQuantum;
@@ -35,18 +34,16 @@ typedef struct _MagickPixelOrder {
 } MagickPixelOrder;
 
 typedef struct _MagickImage {
-  MagickPixelPacket4* pixels; // image pixel ptr
-  MagickPixelOrder order; // 4byte is rgba or brga
-  uint64_t columns; // image pixel width
-  uint64_t rows; // image pixel heigth
+    MagickPixelPacket4 *pixels;  // image pixel ptr
+    MagickPixelOrder order;      // 4byte is rgba or brga
+    uint64_t columns;            // image pixel width
+    uint64_t rows;               // image pixel heigth
 } MagickImage;
 
-int ResizeImage(
-  const MagickImage *src,
-  const MagickImage *dst,
-  const FilterTypes filter,
-  const double blur
-);
+int ResizeImage(const MagickImage *src,
+                const MagickImage *dst,
+                const FilterTypes filter,
+                const double blur);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }
