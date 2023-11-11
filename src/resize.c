@@ -18,17 +18,13 @@ typedef struct _DoublePixelPacket {
 
 typedef unsigned char Quantum;
 
-typedef struct _RGBAPixelPacket {
-    Quantum red, green, blue, opacity;
-} RGBAPixelPacket;
+typedef Quantum PixelPacket4[4];
+typedef struct _PixelIndex {
+    int red, green, blue, opacity;
+} PixelIndex;
 
-typedef struct _ARGBPixelPacket {
-    Quantum opacity, red, green, blue;
-} ARGBPixelPacket;
-
-typedef struct _BGRAPixelPacket {
-    Quantum blue, green, red, opacity;
-} BGRAPixelPacket;
+#define GET_PIXEL_PACKET(p, k) p[k]
+#define SET_PIXEL_PACKET(p, k, v) p[k] = v
 
 static double J1(double x) {
     double p, q;
@@ -264,13 +260,13 @@ static const FilterInfo filters[SincFilter + 1] = {{Box, 0.0},
                                                    {BlackmanBessel, 3.2383},
                                                    {BlackmanSinc, 4.0}};
 
-static MagickPassFail HorizontalFilter(
-    const SDL_Surface *restrict source,
-    SDL_Surface *restrict destination,
-    const double x_factor,
-    const FilterInfo *restrict filter_info,
-    const double blur,
-    ContributionInfo *restrict view_data_set) {
+static MagickPassFail HorizontalFilter(const SDL_Surface *restrict source,
+                                       SDL_Surface *restrict destination,
+                                       const double x_factor,
+                                       const FilterInfo *restrict filter_info,
+                                       const double blur,
+                                       ContributionInfo *restrict view_data_set,
+                                       const PixelIndex pixel_index) {
     double scale, support;
     DoublePixelPacket zero;
     long x;
@@ -285,9 +281,8 @@ static MagickPassFail HorizontalFilter(
     scale = 1.0 / scale;
     (void)memset(&zero, 0, sizeof(DoublePixelPacket));
     ContributionInfo *restrict contribution = view_data_set;
-    ARGBPixelPacket *source_pixels = (ARGBPixelPacket *)source->pixels;
-    ARGBPixelPacket *destination_pixels =
-        (ARGBPixelPacket *)destination->pixels;
+    PixelPacket4 *source_pixels = (PixelPacket4 *)source->pixels;
+    PixelPacket4 *destination_pixels = (PixelPacket4 *)destination->pixels;
     printf("HorizontalFilter source: %d x %d %d\n",
            source->w,
            source->h,
@@ -325,9 +320,9 @@ static MagickPassFail HorizontalFilter(
             for (i = 0; i < n; i++) contribution[i].weight *= density;
         }
         size_t p_offset = contribution[0].pixel;
-        ARGBPixelPacket *p = (source_pixels + p_offset);
+        PixelPacket4 *p = (source_pixels + p_offset);
         size_t q_offset = x;
-        ARGBPixelPacket *q = (destination_pixels + q_offset);
+        PixelPacket4 *q = (destination_pixels + q_offset);
 
         if (thread_status != MagickFail) {
             if (matte) {
@@ -351,12 +346,19 @@ static MagickPassFail HorizontalFilter(
                         // %d] [%d, %d] [%d, %d]\n", x, y, i, j, p_offset,
                         // q_offset, jj, yy); fflush(stdout);
                         transparency_coeff =
+                            weight * (1 - ((double)GET_PIXEL_PACKET(
+                                               p[jj], pixel_index.opacity) /
+                                           TransparentOpacity));
+                        pixel.red += transparency_coeff *
+                                     GET_PIXEL_PACKET(p[jj], pixel_index.red);
+                        pixel.green +=
+                            transparency_coeff *
+                            GET_PIXEL_PACKET(p[jj], pixel_index.green);
+                        pixel.blue += transparency_coeff *
+                                      GET_PIXEL_PACKET(p[jj], pixel_index.blue);
+                        pixel.opacity +=
                             weight *
-                            (1 - ((double)p[jj].opacity / TransparentOpacity));
-                        pixel.red += transparency_coeff * p[jj].red;
-                        pixel.green += transparency_coeff * p[jj].green;
-                        pixel.blue += transparency_coeff * p[jj].blue;
-                        pixel.opacity += weight * p[jj].opacity;
+                            GET_PIXEL_PACKET(p[jj], pixel_index.opacity);
                         normalize += transparency_coeff;
                     }
                     normalize = 1.0 / (AbsoluteValue(normalize) <= MagickEpsilon
@@ -365,10 +367,18 @@ static MagickPassFail HorizontalFilter(
                     pixel.red *= normalize;
                     pixel.green *= normalize;
                     pixel.blue *= normalize;
-                    q[yy].red = RoundDoubleToQuantum(pixel.red);
-                    q[yy].green = RoundDoubleToQuantum(pixel.green);
-                    q[yy].blue = RoundDoubleToQuantum(pixel.blue);
-                    q[yy].opacity = RoundDoubleToQuantum(pixel.opacity);
+                    SET_PIXEL_PACKET(q[yy],
+                                     pixel_index.red,
+                                     RoundDoubleToQuantum(pixel.red));
+                    SET_PIXEL_PACKET(q[yy],
+                                     pixel_index.green,
+                                     RoundDoubleToQuantum(pixel.green));
+                    SET_PIXEL_PACKET(q[yy],
+                                     pixel_index.blue,
+                                     RoundDoubleToQuantum(pixel.blue));
+                    SET_PIXEL_PACKET(q[yy],
+                                     pixel_index.opacity,
+                                     RoundDoubleToQuantum(pixel.opacity));
                 }
             }
         }
@@ -380,7 +390,8 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
                                      const double y_factor,
                                      const FilterInfo *restrict filter_info,
                                      const double blur,
-                                     ContributionInfo *restrict view_data_set) {
+                                     ContributionInfo *restrict view_data_set,
+                                     const PixelIndex pixel_index) {
     const SDL_bool matte = SDL_ISPIXELFORMAT_ALPHA(destination->format->format);
     MagickPassFail status = MagickPass;
     double scale = blur * Max(1.0 / y_factor, 1.0);
@@ -393,9 +404,8 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
     DoublePixelPacket zero;
     (void)memset(&zero, 0, sizeof(DoublePixelPacket));
     ContributionInfo *restrict contribution = view_data_set;
-    ARGBPixelPacket *source_pixels = (ARGBPixelPacket *)source->pixels;
-    ARGBPixelPacket *destination_pixels =
-        (ARGBPixelPacket *)destination->pixels;
+    PixelPacket4 *source_pixels = (PixelPacket4 *)source->pixels;
+    PixelPacket4 *destination_pixels = (PixelPacket4 *)destination->pixels;
     printf("VerticalFilter source: %d x %d %d\n",
            source->w,
            source->h,
@@ -427,9 +437,9 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
             for (i = 0; i < n; i++) contribution[i].weight *= density;
         }
         size_t p_offset = source->w * contribution[0].pixel;
-        ARGBPixelPacket *p = (source_pixels + p_offset);
+        PixelPacket4 *p = (source_pixels + p_offset);
         size_t q_offset = destination->w * y;
-        ARGBPixelPacket *q = (destination_pixels + q_offset);
+        PixelPacket4 *q = (destination_pixels + q_offset);
 
         if (thread_status != MagickFail) {
             if (matte) {
@@ -448,12 +458,19 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
                         // printf("VerticalFilter: [%d, %d] [%d, %d]\n", x, y,
                         // i, j);
                         transparency_coeff =
+                            weight * (1 - ((double)GET_PIXEL_PACKET(
+                                               p[j], pixel_index.opacity) /
+                                           TransparentOpacity));
+                        pixel.red += transparency_coeff *
+                                     GET_PIXEL_PACKET(p[j], pixel_index.red);
+                        pixel.green +=
+                            transparency_coeff *
+                            GET_PIXEL_PACKET(p[j], pixel_index.green);
+                        pixel.blue += transparency_coeff *
+                                      GET_PIXEL_PACKET(p[j], pixel_index.blue);
+                        pixel.opacity +=
                             weight *
-                            (1 - ((double)p[j].opacity / TransparentOpacity));
-                        pixel.red += transparency_coeff * p[j].red;
-                        pixel.green += transparency_coeff * p[j].green;
-                        pixel.blue += transparency_coeff * p[j].blue;
-                        pixel.opacity += weight * p[j].opacity;
+                            GET_PIXEL_PACKET(p[j], pixel_index.opacity);
                         normalize += transparency_coeff;
                     }
                     normalize = 1.0 / (AbsoluteValue(normalize) <= MagickEpsilon
@@ -462,10 +479,17 @@ static MagickPassFail VerticalFilter(const SDL_Surface *restrict source,
                     pixel.red *= normalize;
                     pixel.green *= normalize;
                     pixel.blue *= normalize;
-                    q[x].red = RoundDoubleToQuantum(pixel.red);
-                    q[x].green = RoundDoubleToQuantum(pixel.green);
-                    q[x].blue = RoundDoubleToQuantum(pixel.blue);
-                    q[x].opacity = RoundDoubleToQuantum(pixel.opacity);
+                    SET_PIXEL_PACKET(
+                        q[x], pixel_index.red, RoundDoubleToQuantum(pixel.red));
+                    SET_PIXEL_PACKET(q[x],
+                                     pixel_index.green,
+                                     RoundDoubleToQuantum(pixel.green));
+                    SET_PIXEL_PACKET(q[x],
+                                     pixel_index.blue,
+                                     RoundDoubleToQuantum(pixel.blue));
+                    SET_PIXEL_PACKET(q[x],
+                                     pixel_index.opacity,
+                                     RoundDoubleToQuantum(pixel.opacity));
                 }
             }
         }
@@ -486,6 +510,8 @@ int ResizeImage(const SDL_Surface *src,
     Uint64 quantum;
     SDL_bool order;
     SDL_assert(((int)filter >= 0) && ((int)filter <= SincFilter));
+    SDL_assert(SDL_BITSPERPIXEL(src->format->format) == 32);
+    SDL_assert(SDL_BITSPERPIXEL(dst->format->format) == 32);
 
     if (src->w == 0 || src->h == 0 || columns == 0 || rows == 0) {
         return 1;
@@ -544,20 +570,56 @@ int ResizeImage(const SDL_Surface *src,
     SDL_LockSurface(dst);
     SDL_LockSurface(src);
     SDL_LockSurface(source_image);
-
+    PixelIndex pixel_index = {0, 1, 2, 3};
+    switch (dst->format->format) {
+        case SDL_PIXELFORMAT_RGBA32:
+            break;
+        case SDL_PIXELFORMAT_ARGB32:
+            pixel_index = (PixelIndex){1, 2, 3, 0};
+            break;
+        case SDL_PIXELFORMAT_BGRA32:
+            pixel_index = (PixelIndex){2, 1, 0, 3};
+            break;
+        case SDL_PIXELFORMAT_ABGR32:
+            pixel_index = (PixelIndex){3, 1, 2, 0};
+            break;
+        default:
+            return 3;
+            break;
+    }
     if (order) {
-        status = HorizontalFilter(
-            src, source_image, x_factor, &filters[i], blur, view_data_set);
+        status = HorizontalFilter(src,
+                                  source_image,
+                                  x_factor,
+                                  &filters[i],
+                                  blur,
+                                  view_data_set,
+                                  pixel_index);
         if (status != MagickFail) {
-            status = VerticalFilter(
-                source_image, dst, y_factor, &filters[i], blur, view_data_set);
+            status = VerticalFilter(source_image,
+                                    dst,
+                                    y_factor,
+                                    &filters[i],
+                                    blur,
+                                    view_data_set,
+                                    pixel_index);
         }
     } else {
-        status = VerticalFilter(
-            src, source_image, y_factor, &filters[i], blur, view_data_set);
+        status = VerticalFilter(src,
+                                source_image,
+                                y_factor,
+                                &filters[i],
+                                blur,
+                                view_data_set,
+                                pixel_index);
         if (status != MagickFail)
-            status = HorizontalFilter(
-                source_image, dst, x_factor, &filters[i], blur, view_data_set);
+            status = HorizontalFilter(source_image,
+                                      dst,
+                                      x_factor,
+                                      &filters[i],
+                                      blur,
+                                      view_data_set,
+                                      pixel_index);
     }
 
     // free
@@ -567,7 +629,7 @@ int ResizeImage(const SDL_Surface *src,
     free(view_data_set);
     SDL_FreeSurface(source_image);
     if (status == MagickFail) {
-        return 3;
+        return 4;
     }
     return 0;
 }
