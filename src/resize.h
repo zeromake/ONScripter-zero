@@ -1,6 +1,10 @@
 #ifndef _MAGICK_RESIZE_H
 #define _MAGICK_RESIZE_H
 
+#if defined(__cplusplus) || defined(c_plusplus)
+extern "C" {
+#endif /* defined(__cplusplus) || defined(c_plusplus) */
+
 #include <SDL.h>
 
 #define ARG_NOT_USED(arg) (void) arg
@@ -44,12 +48,7 @@ typedef enum
   SincFilter
 } FilterTypes;
 
-
-#if defined(__cplusplus) || defined(c_plusplus)
-extern "C" {
-#endif /* defined(__cplusplus) || defined(c_plusplus) */
-
-extern int ResizeImage(const SDL_Surface *src, SDL_Surface *dst, const FilterTypes filter, const double blur);
+int ResizeImage(const SDL_Surface *src, SDL_Surface *dst, const FilterTypes filter, const double blur);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }
