@@ -26,20 +26,20 @@
 #define __FONT_INFO_H__
 
 #include <SDL.h>
+
 #include <functional>
-#include "BaseReader.h"
-#include "FontConfig.h"
 #include <map>
 
+#include "BaseReader.h"
+#include "FontConfig.h"
 
-typedef std::function<int (const char *, char*, bool)> generate_path_function;
+typedef std::function<int(const char *, char *, bool)> generate_path_function;
 
 typedef unsigned char uchar3[3];
 
-struct Position
-{
+struct Position {
     int xy[2];
-    struct Position* next;
+    struct Position *next;
 };
 
 typedef struct {
@@ -49,28 +49,26 @@ typedef struct {
     int all_height;
 } PositionOffset;
 
-class _FontInfo{
-private:
-    int xy[2]; // Current position
-    int old_xy[2]; // Prev position
-    struct Position* stash;
-    PositionOffset positionOffset; // maxWidth, allWidth,maxHeight,allHeight
+class _FontInfo {
+   private:
+    int xy[2];      // Current position
+    int old_xy[2];  // Prev position
+    struct Position *stash;
+    PositionOffset positionOffset;  // maxWidth, allWidth,maxHeight,allHeight
     void resetPosition();
-public:
-    enum Direction {
-        YOKO_MODE = 0,
-        TATE_MODE = 1
-    };
+
+   public:
+    enum Direction { YOKO_MODE = 0, TATE_MODE = 1 };
     static char *cache_font_file;
     static void *font_cache;
     static int font_cache_size;
-    void *ttf_font[2]; // 0...normal rendering, 1...outline rendering
+    void *ttf_font[2];  // 0...normal rendering, 1...outline rendering
     uchar3 color;
     uchar3 on_color, off_color, nofile_color;
     int font_size_xy[2];
-    int top_xy[2]; // Top left origin
-    int num_xy[2]; // Row and column of the text windows
-    int pitch_xy[2]; // Width and height of a character
+    int top_xy[2];    // Top left origin
+    int num_xy[2];    // Row and column of the text windows
+    int pitch_xy[2];  // Width and height of a character
     int wait_time;
     bool is_bold;
     bool is_shadow;
@@ -78,7 +76,7 @@ public:
     bool is_newline_accepted;
     uchar3 window_color;
 
-    int line_offset_xy[2]; // ruby offset for each line
+    int line_offset_xy[2];  // ruby offset for each line
     bool rubyon_flag;
     int tateyoko_mode;
     ons_font::FONT_TYPE types;
@@ -87,29 +85,27 @@ public:
     void reset();
     int getToPrev(int index = 0);
     int getSavePoint(int index);
-    void saveToPrev(bool use_ruby_offset=true);
+    void saveToPrev(bool use_ruby_offset = true);
     void savePoint();
     void rollback(int mode = 3);
     void copyPosition(_FontInfo *font);
-    void *openFont(
-        char *font_file,
-        int ratio1,
-        int ratio2,
-        generate_path_function f = nullptr,
-        const ons_font::FontConfig* fontConfig = nullptr
-    );
+    void *openFont(char *font_file,
+                   int ratio1,
+                   int ratio2,
+                   generate_path_function f = nullptr,
+                   const ons_font::FontConfig *fontConfig = nullptr);
     void setTateyokoMode(int tateyoko_mode);
     int getTateyokoMode();
     int getRemainingLine();
 
-    int x(bool use_ruby_offset=true);
-    int y(bool use_ruby_offset=true);
-    void setXY( int x=-1, int y=-1 );
+    int x(bool use_ruby_offset = true);
+    int y(bool use_ruby_offset = true);
+    void setXY(int x = -1, int y = -1);
     void clear();
     void newLine();
     void setLineArea(int num);
 
-    bool isEndOfLine(int margin=0);
+    bool isEndOfLine(int margin = 0);
     int endStatus(int x, int y, bool useAutoOffset = true);
     bool isLineEmpty();
     void advanceCharInHankaku(int offest, int width = 0, int heigth = 0);
@@ -121,4 +117,4 @@ public:
     int initRuby(_FontInfo &body_info, int body_count, int ruby_count);
 };
 
-#endif // __FONT_INFO_H__
+#endif  // __FONT_INFO_H__

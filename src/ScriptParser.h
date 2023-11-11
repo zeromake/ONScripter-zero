@@ -25,18 +25,19 @@
 #ifndef __SCRIPT_PARSER_H__
 #define __SCRIPT_PARSER_H__
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <time.h>
+
 #include <map>
 
-#include "ScriptHandler.h"
-#include "NsaReader.h"
-#include "DirectReader.h"
 #include "AnimationInfo.h"
+#include "DirectReader.h"
 #include "FontInfo.h"
+#include "NsaReader.h"
+#include "ScriptHandler.h"
 #ifdef USE_LUA
 #include "LUAHandler.h"
 #endif
@@ -61,29 +62,26 @@ extern Coding2UTF16 *coding2utf16;
 #define DEFAULT_LOOKBACK_NAME3 "doffcur.bmp"
 
 #define DEFAULT_START_KINSOKU coding2utf16->DEFAULT_START_KINSOKU
-#define DEFAULT_END_KINSOKU   coding2utf16->DEFAULT_END_KINSOKU
+#define DEFAULT_END_KINSOKU coding2utf16->DEFAULT_END_KINSOKU
 
 typedef unsigned char uchar3[3];
 
-class ScriptParser
-{
-public:
+class ScriptParser {
+   public:
     ScriptParser();
     ~ScriptParser();
 
     void reset(bool isDestroy = false);
-    int  openScript();
-    void setCurrentLabel( const char *label );
-    void gosubReal(
-        const char *label,
-        char *next_script,
-        bool textgosub_flag=false,
-        bool skip_params=false
-    );
-    int getStringBufferOffset(){return string_buffer_offset;};
+    int openScript();
+    void setCurrentLabel(const char *label);
+    void gosubReal(const char *label,
+                   char *next_script,
+                   bool textgosub_flag = false,
+                   bool skip_params = false);
+    int getStringBufferOffset() { return string_buffer_offset; };
 
-    FILE *fopen(const char *path, const char *mode, bool use_save_dir=false);
-    int fpath(const char *path, char *result, bool use_save_dir=false);
+    FILE *fopen(const char *path, const char *mode, bool use_save_dir = false);
+    int fpath(const char *path, char *result, bool use_save_dir = false);
     void saveGlovalData();
 
     /* Command */
@@ -138,7 +136,7 @@ public:
     int luacallCommand();
     int lookbackspCommand();
     int lookbackcolorCommand();
-    //int lookbackbuttonCommand();
+    // int lookbackbuttonCommand();
     int loadgosubCommand();
     int linepageCommand();
     int lenCommand();
@@ -154,7 +152,7 @@ public:
     int gosubCommand();
     int globalonCommand();
     int getparamCommand();
-    //int gameCommand();
+    // int gameCommand();
     int forCommand();
     int filelogCommand();
     int englishCommand();
@@ -183,39 +181,38 @@ public:
     int addCommand();
     int elseCommand();
     void setRescale(int scale1, int scale2);
-    void setFontConfig(const char* buf);
+    void setFontConfig(const char *buf);
 
-protected:
-    struct UserFuncLUT{
+   protected:
+    struct UserFuncLUT {
         struct UserFuncLUT *next;
         char *command;
         bool lua_flag;
-        UserFuncLUT(){
+        UserFuncLUT() {
             next = NULL;
             command = NULL;
             lua_flag = false;
         };
-        ~UserFuncLUT(){
+        ~UserFuncLUT() {
             if (command) delete[] command;
         };
     };
 
-    struct UserFuncHash{
+    struct UserFuncHash {
         UserFuncLUT root;
         UserFuncLUT *last;
-    } user_func_hash['z'-'a'+1];
+    } user_func_hash['z' - 'a' + 1];
 
-    struct NestInfo{
-        enum { LABEL = 0,
-               FOR   = 1 };
+    struct NestInfo {
+        enum { LABEL = 0, FOR = 1 };
         struct NestInfo *previous, *next;
-        int  nest_mode;
-        char *next_script; // used in gosub and for
-        int  var_no, to, step; // used in for
-        bool textgosub_flag; // used in textgosub and pretextgosub
+        int nest_mode;
+        char *next_script;     // used in gosub and for
+        int var_no, to, step;  // used in for
+        bool textgosub_flag;   // used in textgosub and pretextgosub
         bool skip_params;
 
-        NestInfo(){
+        NestInfo() {
             previous = next = NULL;
             nest_mode = LABEL;
             textgosub_flag = false;
@@ -223,39 +220,31 @@ protected:
         };
     } last_tilde;
 
-    enum { SYSTEM_NULL        = 0,
-           SYSTEM_SKIP        = 1,
-           SYSTEM_RESET       = 2,
-           SYSTEM_SAVE        = 3,
-           SYSTEM_LOAD        = 4,
-           SYSTEM_LOOKBACK    = 5,
-           SYSTEM_WINDOWERASE = 6,
-           SYSTEM_MENU        = 7,
-           SYSTEM_YESNO       = 8,
-           SYSTEM_AUTOMODE    = 9,
-           SYSTEM_END         = 10
+    enum {
+        SYSTEM_NULL = 0,
+        SYSTEM_SKIP = 1,
+        SYSTEM_RESET = 2,
+        SYSTEM_SAVE = 3,
+        SYSTEM_LOAD = 4,
+        SYSTEM_LOOKBACK = 5,
+        SYSTEM_WINDOWERASE = 6,
+        SYSTEM_MENU = 7,
+        SYSTEM_YESNO = 8,
+        SYSTEM_AUTOMODE = 9,
+        SYSTEM_END = 10
     };
-    enum { RET_NOMATCH   = 0,
-           RET_SKIP_LINE = 1,
-           RET_CONTINUE  = 2,
-           RET_NO_READ   = 4,
-           RET_EOL       = 8 // end of line ('\n' is found)
+    enum {
+        RET_NOMATCH = 0,
+        RET_SKIP_LINE = 1,
+        RET_CONTINUE = 2,
+        RET_NO_READ = 4,
+        RET_EOL = 8  // end of line ('\n' is found)
     };
-    enum { CLICK_NONE    = 0,
-           CLICK_WAIT    = 1,
-           CLICK_NEWPAGE = 2,
-           CLICK_EOL     = 4
-    };
-    enum{ NORMAL_MODE, DEFINE_MODE };
+    enum { CLICK_NONE = 0, CLICK_WAIT = 1, CLICK_NEWPAGE = 2, CLICK_EOL = 4 };
+    enum { NORMAL_MODE, DEFINE_MODE };
 
-    ons_font::FontConfig* font_configs[6] = {
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr
-    };
+    ons_font::FontConfig *font_configs[6] = {
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
     int current_mode;
     int debug_level;
@@ -282,7 +271,7 @@ protected:
     bool force_button_shortcut_flag;
     bool zenkakko_flag;
     bool pagetag_flag;
-    int  windowchip_sprite_no;
+    int windowchip_sprite_no;
 
     int string_buffer_offset;
 
@@ -312,25 +301,25 @@ protected:
     char *save_dir_envdata;
 
     void deleteNestInfo();
-    void setStr( char **dst, const char *src, int num=-1 );
+    void setStr(char **dst, const char *src, int num = -1);
 
     void readToken();
-    
+
     const int calcFontSize(const int v, ons_font::FONT_TYPE type);
     const int calcUserRatio(const int v);
     const int calcUnUserRatio(const int v);
-    const ons_font::FontConfig* getFontConfig(const ons_font::FONT_TYPE types);
+    const ons_font::FontConfig *getFontConfig(const ons_font::FONT_TYPE types);
 
     /* ---------------------------------------- */
     /* Effect related variables */
-    struct EffectLink{
+    struct EffectLink {
         struct EffectLink *next;
         int no;
         int effect;
         int duration;
         AnimationInfo anim;
 
-        EffectLink(){
+        EffectLink() {
             next = NULL;
             effect = 10;
             duration = 0;
@@ -342,12 +331,12 @@ protected:
     int effect_blank;
     bool effect_cut_flag;
 
-    int readEffect( EffectLink *effect );
+    int readEffect(EffectLink *effect);
     EffectLink *parseEffect(bool init_flag);
 
     /* ---------------------------------------- */
     /* Lookback related variables */
-    //char *lookback_image_name[4];
+    // char *lookback_image_name[4];
     int lookback_sp[2];
     uchar3 lookback_color;
 
@@ -361,9 +350,9 @@ protected:
 
     /* ---------------------------------------- */
     /* Save/Load related variables */
-    struct SaveFileInfo{
+    struct SaveFileInfo {
         bool valid;
-        int  year, month, day, hour, minute;
+        int year, month, day, hour, minute;
         char sjis_no[SJIS_INFO_SIZE];
         char sjis_month[SJIS_INFO_SIZE];
         char sjis_day[SJIS_INFO_SIZE];
@@ -386,7 +375,7 @@ protected:
     /* Text related variables */
     char *default_env_font;
     int default_text_speed[3];
-    struct Page{
+    struct Page {
         struct Page *next, *previous;
 
         char *text;
@@ -395,22 +384,22 @@ protected:
 
         char *tag;
 
-        Page(){
+        Page() {
             text = NULL;
             text_count = 0;
             tag = NULL;
         }
-        ~Page(){
+        ~Page() {
             if (text) delete[] text;
-            if (tag)  delete[] tag;
+            if (tag) delete[] tag;
         }
-        char add(char ch){
-            if (text_count >= max_text){
+        char add(char ch) {
+            if (text_count >= max_text) {
                 if (max_text <= 0) {
                     max_text = text_count;
                 }
-                char *text2 = new char[max_text*2]{0};
-                memset(text2, 0, max_text*2);
+                char *text2 = new char[max_text * 2]{0};
+                memset(text2, 0, max_text * 2);
                 memcpy(text2, text, text_count);
                 delete[] text;
                 text = text2;
@@ -421,14 +410,15 @@ protected:
             text[text_count++] = ch;
             return ch;
         };
-    } *page_list, *start_page, *current_page; // ring buffer
-    int  max_page_list;
-    int  clickstr_line;
-    int  clickstr_state;
-    int  linepage_mode;
-    int  num_chars_in_sentence;
-    int  line_enter_status; // 0 ... no enter, 1 ... pretext, 2 ... body
-    int  page_enter_status; // 0 ... no enter, 1 ... body until @,\ used when pagetag is enabled
+    } *page_list, *start_page, *current_page;  // ring buffer
+    int max_page_list;
+    int clickstr_line;
+    int clickstr_state;
+    int linepage_mode;
+    int num_chars_in_sentence;
+    int line_enter_status;  // 0 ... no enter, 1 ... pretext, 2 ... body
+    int page_enter_status;  // 0 ... no enter, 1 ... body until @,\ used when
+                            // pagetag is enabled
     bool in_textbtn_flag;
     bool english_mode;
 
@@ -447,37 +437,34 @@ protected:
     int voice_volume;
     int se_volume;
 
-    enum { CLICKVOICE_NORMAL  = 0,
-           CLICKVOICE_NEWPAGE = 1,
-           CLICKVOICE_NUM     = 2
-    };
+    enum { CLICKVOICE_NORMAL = 0, CLICKVOICE_NEWPAGE = 1, CLICKVOICE_NUM = 2 };
     char *clickvoice_file_name[CLICKVOICE_NUM];
 
-    enum { SELECTVOICE_OPEN   = 0,
-           SELECTVOICE_OVER   = 1,
-           SELECTVOICE_SELECT = 2,
-           SELECTVOICE_NUM    = 3
+    enum {
+        SELECTVOICE_OPEN = 0,
+        SELECTVOICE_OVER = 1,
+        SELECTVOICE_SELECT = 2,
+        SELECTVOICE_NUM = 3
     };
     char *selectvoice_file_name[SELECTVOICE_NUM];
 
-    enum { MENUSELECTVOICE_OPEN   = 0,
-           MENUSELECTVOICE_CANCEL = 1,
-           MENUSELECTVOICE_OVER   = 2,
-           MENUSELECTVOICE_CLICK  = 3,
-           MENUSELECTVOICE_WARN   = 4,
-           MENUSELECTVOICE_YES    = 5,
-           MENUSELECTVOICE_NO     = 6,
-           MENUSELECTVOICE_NUM    = 7
+    enum {
+        MENUSELECTVOICE_OPEN = 0,
+        MENUSELECTVOICE_CANCEL = 1,
+        MENUSELECTVOICE_OVER = 2,
+        MENUSELECTVOICE_CLICK = 3,
+        MENUSELECTVOICE_WARN = 4,
+        MENUSELECTVOICE_YES = 5,
+        MENUSELECTVOICE_NO = 6,
+        MENUSELECTVOICE_NUM = 7
     };
     char *menuselectvoice_file_name[MENUSELECTVOICE_NUM];
 
     /* ---------------------------------------- */
     /* Font related variables */
     _FontInfo *current_font, sentence_font, menu_font, ruby_font, dialog_font;
-    struct RubyStruct{
-        enum { NONE,
-               BODY,
-               RUBY };
+    struct RubyStruct {
+        enum { NONE, BODY, RUBY };
         int stage;
         int body_count;
         const char *ruby_start;
@@ -488,61 +475,63 @@ protected:
         int font_size_xy[2];
         char *font_name;
 
-        RubyStruct(){
+        RubyStruct() {
             stage = NONE;
             font_size_xy[0] = 0;
             font_size_xy[1] = 0;
             font_name = NULL;
         };
-        ~RubyStruct(){
-            if ( font_name ) delete[] font_name;
+        ~RubyStruct() {
+            if (font_name) delete[] font_name;
         };
     } ruby_struct;
     int shade_distance[2];
 
     /* ---------------------------------------- */
     /* RMenu related variables */
-    struct RMenuLink{
+    struct RMenuLink {
         RMenuLink *next;
         char *label;
         int system_call_no;
 
-        RMenuLink(){
-            next  = NULL;
+        RMenuLink() {
+            next = NULL;
             label = NULL;
         };
-        ~RMenuLink(){
+        ~RMenuLink() {
             if (label) delete[] label;
         };
     } root_rmenu_link;
     unsigned int rmenu_link_num, rmenu_link_width;
 
-    std::map<int, char*> rmenu_calls;
+    std::map<int, char *> rmenu_calls;
     unsigned int rmenu_call_no = 1000;
 
     void deleteRMenuLink();
-    int getSystemCallNo( const char *buffer );
-    unsigned char convHexToDec( char ch );
-    void readColor( uchar3 *color, const char *buf );
+    int getSystemCallNo(const char *buffer);
+    unsigned char convHexToDec(char ch);
+    void readColor(uchar3 *color, const char *buf);
 
-    void errorAndExit( const char *str, const char *reason=NULL );
+    void errorAndExit(const char *str, const char *reason = NULL);
 
     void allocFileIOBuf();
-    int saveFileIOBuf( const char *filename, int offset=0, const char *savestr=NULL );
-    size_t loadFileIOBuf( const char *filename );
+    int saveFileIOBuf(const char *filename,
+                      int offset = 0,
+                      const char *savestr = NULL);
+    size_t loadFileIOBuf(const char *filename);
 
-    void writeChar( char c, bool output_flag );
+    void writeChar(char c, bool output_flag);
     char readChar();
-    void writeInt( int i, bool output_flag );
+    void writeInt(int i, bool output_flag);
     int readInt();
-    void writeStr( char *s, bool output_flag );
-    void readStr( char **s );
-    void writeVariables( int from, int to, bool output_flag );
-    void readVariables( int from, int to );
-    void writeArrayVariable( bool output_flag );
+    void writeStr(char *s, bool output_flag);
+    void readStr(char **s);
+    void writeVariables(int from, int to, bool output_flag);
+    void readVariables(int from, int to);
+    void writeArrayVariable(bool output_flag);
     void readArrayVariable();
-    void writeLog( ScriptHandler::LogInfo &info );
-    void readLog( ScriptHandler::LogInfo &info );
+    void writeLog(ScriptHandler::LogInfo &info);
+    void readLog(ScriptHandler::LogInfo &info);
 
     /* ---------------------------------------- */
     /* System customize related variables */
@@ -550,13 +539,13 @@ protected:
     char *pretextgosub_label;
     char *pretext_buf;
     char *loadgosub_label;
-    int  textgosub_clickstr_state;
+    int textgosub_clickstr_state;
 
     ScriptHandler script_h;
 
     unsigned char *key_table;
 
-    void createKeyTable( const char *key_exe );
+    void createKeyTable(const char *key_exe);
 };
 
-#endif // __SCRIPT_PARSER_H__
+#endif  // __SCRIPT_PARSER_H__

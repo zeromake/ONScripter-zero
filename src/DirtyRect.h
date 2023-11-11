@@ -26,22 +26,21 @@
 
 #include <SDL.h>
 
-struct DirtyRect
-{
+struct DirtyRect {
     DirtyRect();
-    DirtyRect( const DirtyRect &d );
-    DirtyRect& operator =( const DirtyRect &d );
+    DirtyRect(const DirtyRect &d);
+    DirtyRect &operator=(const DirtyRect &d);
     ~DirtyRect();
 
     void setDimension(int w, int h);
-    void add( SDL_Rect src );
+    void add(SDL_Rect src);
     void clear();
-    void fill( int w, int h );
+    void fill(int w, int h);
 
-    SDL_Rect calcBoundingBox( SDL_Rect src1, SDL_Rect &src2 );
+    SDL_Rect calcBoundingBox(SDL_Rect src1, SDL_Rect &src2);
 
     int screen_width, screen_height;
     SDL_Rect bounding_box;
 };
 
-#endif // __DIRTY_RECT__
+#endif  // __DIRTY_RECT__

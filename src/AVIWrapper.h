@@ -1,6 +1,7 @@
 /* -*- C++ -*-
  *
- *  AVIWrapper.h - avifile library wrapper class to play AVI video & audio stream
+ *  AVIWrapper.h - avifile library wrapper class to play AVI video & audio
+ * stream
  *
  *  Copyright (c) 2001-2008 Ogapee. All rights reserved.
  *
@@ -30,28 +31,25 @@
 #include <avm_fourcc.h>
 #include <utils.h>
 
-class AVIWrapper
-{
-public:
-    enum { AVI_STOP = 0,
-           AVI_PLAYING = 1
-    };
+class AVIWrapper {
+   public:
+    enum { AVI_STOP = 0, AVI_PLAYING = 1 };
     AVIWrapper();
     ~AVIWrapper();
 
-    int init( char *filename, bool debug_flag );
-    int initAV( SDL_Surface *surface, bool audio_open_flag );
-    int play( bool click_flag );
+    int init(char *filename, bool debug_flag);
+    int initAV(SDL_Surface *surface, bool audio_open_flag);
+    int play(bool click_flag);
 
-    void audioCallback( void *userdata, Uint8 *stream, int len );
-    int playVideo( void *userdata );
+    void audioCallback(void *userdata, Uint8 *stream, int len);
+    int playVideo(void *userdata);
 
-    unsigned int getWidth(){ return width; };
-    unsigned int getHeight(){ return height; };
+    unsigned int getWidth() { return width; };
+    unsigned int getHeight() { return height; };
 
-private:
+   private:
     double getAudioTime();
-    int drawFrame( avm::CImage *image );
+    int drawFrame(avm::CImage *image);
 
     SDL_Overlay *screen_overlay;
     SDL_Rect screen_rect;
@@ -71,4 +69,4 @@ private:
     double frame_start;
 };
 
-#endif // __AVI_WRAPPER_H__
+#endif  // __AVI_WRAPPER_H__

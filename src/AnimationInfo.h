@@ -30,19 +30,20 @@
 
 typedef unsigned char uchar3[3];
 
-class AnimationInfo{
-public:
+class AnimationInfo {
+   public:
     typedef Uint32 ONSBuf;
-    enum { TRANS_ALPHA          = 1,
-           TRANS_TOPLEFT        = 2,
-           TRANS_COPY           = 3,
-           TRANS_STRING         = 4,
-           TRANS_DIRECT         = 5,
-           TRANS_PALLETTE       = 6,
-           TRANS_TOPRIGHT       = 7,
-           TRANS_MASK           = 8,
+    enum {
+        TRANS_ALPHA = 1,
+        TRANS_TOPLEFT = 2,
+        TRANS_COPY = 3,
+        TRANS_STRING = 4,
+        TRANS_DIRECT = 5,
+        TRANS_PALLETTE = 6,
+        TRANS_TOPRIGHT = 7,
+        TRANS_MASK = 8,
 #ifdef USE_BUILTIN_LAYER_EFFECTS
-           TRANS_LAYER          = 9
+        TRANS_LAYER = 9
 #endif
     };
 
@@ -55,9 +56,10 @@ public:
     uchar3 direct_color;
     int pallette_number;
     uchar3 color;
-    SDL_Rect orig_pos; // position and size of the image before resizing
-    SDL_Rect pos; // position and size of the current cell
-    SDL_Rect affine_pos; // topleft position and width/height for affince transformation
+    SDL_Rect orig_pos;    // position and size of the image before resizing
+    SDL_Rect pos;         // position and size of the current cell
+    SDL_Rect affine_pos;  // topleft position and width/height for affince
+                          // transformation
 
     int num_of_cells;
     int current_cell;
@@ -67,7 +69,7 @@ public:
     int loop_mode;
     bool is_animatable;
     bool is_single_line;
-    bool is_tight_region; // valid under TRANS_STRING, if false, ruby is parsed
+    bool is_tight_region;  // valid under TRANS_STRING, if false, ruby is parsed
     bool is_ruby_drawable;
 
     char *file_name;
@@ -79,8 +81,8 @@ public:
     bool affine_flag;
     int trans;
     char *image_name;
-    char *surface_name; // used to avoid reloading images
-    char *mask_surface_name; // used to avoid reloading images
+    char *surface_name;       // used to avoid reloading images
+    char *mask_surface_name;  // used to avoid reloading images
     SDL_Surface *image_surface;
     unsigned char *alpha_buf;
     Uint32 texture_format;
@@ -92,32 +94,29 @@ public:
     int corner_xy[4][2];
     SDL_Rect bounding_rect;
 
-    enum { BLEND_NORMAL = 0,
-           BLEND_ADD    = 1,
-           BLEND_SUB    = 2
-    };
+    enum { BLEND_NORMAL = 0, BLEND_ADD = 1, BLEND_SUB = 2 };
     int blending_mode;
     int cos_i, sin_i;
 
-    int font_size_xy[2]; // used by prnum and lsp string
-    int font_pitch[2]; // used by lsp string
+    int font_size_xy[2];  // used by prnum and lsp string
+    int font_pitch[2];    // used by lsp string
     int next_time;
 
-    int param; // used by prnum and bar
-    int max_param; // used by bar
-    int max_width; // used by bar
+    int param;      // used by prnum and bar
+    int max_param;  // used by bar
+    int max_width;  // used by bar
 
     AnimationInfo();
     AnimationInfo(const AnimationInfo &anim);
     ~AnimationInfo();
 
-    AnimationInfo& operator =(const AnimationInfo &anim);
+    AnimationInfo &operator=(const AnimationInfo &anim);
 
-    void scalePosXY(int screen_ratio1, int screen_ratio2){
+    void scalePosXY(int screen_ratio1, int screen_ratio2) {
         pos.x = orig_pos.x * screen_ratio1 / screen_ratio2;
         pos.y = orig_pos.y * screen_ratio1 / screen_ratio2;
     };
-    void scalePosWH(int screen_ratio1, int screen_ratio2){
+    void scalePosWH(int screen_ratio1, int screen_ratio2) {
         pos.w = orig_pos.w * screen_ratio1 / screen_ratio2;
         pos.h = orig_pos.h * screen_ratio1 / screen_ratio2;
     };
@@ -125,30 +124,46 @@ public:
     void reset();
 
     void deleteImageName();
-    void setImageName( const char *name );
-    void deleteSurface(bool delete_surface_name=true);
+    void setImageName(const char *name);
+    void deleteSurface(bool delete_surface_name = true);
     void remove();
     void removeTag();
 
     bool proceedAnimation(int current_time);
 
     void setCell(int cell);
-    static int doClipping( SDL_Rect *dst, SDL_Rect *clip, SDL_Rect *clipped=NULL );
-    void blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst_y,
-                         SDL_Rect &clip, int alpha=255 );
-    void blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int dst_y,
-                          SDL_Rect &clip, int alpha=255 );
-    void blendText( SDL_Surface *surface, int dst_x, int dst_y,
-                    SDL_Color &color, SDL_Rect *clip, bool rotate_flag );
+    static int doClipping(SDL_Rect *dst,
+                          SDL_Rect *clip,
+                          SDL_Rect *clipped = NULL);
+    void blendOnSurface(SDL_Surface *dst_surface,
+                        int dst_x,
+                        int dst_y,
+                        SDL_Rect &clip,
+                        int alpha = 255);
+    void blendOnSurface2(SDL_Surface *dst_surface,
+                         int dst_x,
+                         int dst_y,
+                         SDL_Rect &clip,
+                         int alpha = 255);
+    void blendText(SDL_Surface *surface,
+                   int dst_x,
+                   int dst_y,
+                   SDL_Color &color,
+                   SDL_Rect *clip,
+                   bool rotate_flag);
     void calcAffineMatrix();
 
-    static SDL_Surface *allocSurface( int w, int h, Uint32 texture_format );
-    static SDL_Surface *alloc32bitSurface( int w, int h, Uint32 texture_format );
-    void allocImage( int w, int h, Uint32 texture_format );
-    void copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_Rect *dst_rect = NULL );
-    void fill( Uint8 r, Uint8 g, Uint8 b, Uint8 a );
-    SDL_Surface *setupImageAlpha( SDL_Surface *surface, SDL_Surface *surface_m, bool has_alpha );
-    void setImage( SDL_Surface *surface, Uint32 texture_format );
+    static SDL_Surface *allocSurface(int w, int h, Uint32 texture_format);
+    static SDL_Surface *alloc32bitSurface(int w, int h, Uint32 texture_format);
+    void allocImage(int w, int h, Uint32 texture_format);
+    void copySurface(SDL_Surface *surface,
+                     SDL_Rect *src_rect,
+                     SDL_Rect *dst_rect = NULL);
+    void fill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+    SDL_Surface *setupImageAlpha(SDL_Surface *surface,
+                                 SDL_Surface *surface_m,
+                                 bool has_alpha);
+    void setImage(SDL_Surface *surface, Uint32 texture_format);
     unsigned char getAlpha(int x, int y);
 
 #ifdef USE_SMPEG
@@ -156,4 +171,4 @@ public:
 #endif
 };
 
-#endif // __ANIMATION_INFO_H__
+#endif  // __ANIMATION_INFO_H__

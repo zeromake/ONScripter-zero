@@ -21,6 +21,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-void resizeImage( unsigned char *dst_buffer, int dst_width, int dst_height, int dst_total_width,
-                  unsigned char *src_buffer, int src_width, int src_height, int src_total_width,
-                  int byte_per_pixel, unsigned char *tmp_buffer, int tmp_total_width, bool palette_flag );
+void resizeImage(unsigned char *dst_buffer,
+                 int dst_width,
+                 int dst_height,
+                 int dst_total_width,
+                 unsigned char *src_buffer,
+                 int src_width,
+                 int src_height,
+                 int src_total_width,
+                 int byte_per_pixel,
+                 unsigned char *tmp_buffer,
+                 int tmp_total_width,
+                 bool palette_flag);

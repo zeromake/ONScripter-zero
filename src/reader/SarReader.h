@@ -26,39 +26,69 @@
 
 #include "DirectReader.h"
 
-class SarReader : public DirectReader
-{
-public:
-    SarReader( const char *path=NULL, const unsigned char *key_table=NULL );
+class SarReader : public DirectReader {
+   public:
+    SarReader(const char *path = NULL, const unsigned char *key_table = NULL);
     ~SarReader();
 
-    int open( const char *name=NULL );
+    int open(const char *name = NULL);
     int close();
     const char *getArchiveName() const;
     int getNumFiles();
 
-    size_t getFileLength( const char *file_name );
-    size_t getFile( const char *file_name, unsigned char *buf, int *location=NULL );
+    size_t getFileLength(const char *file_name);
+    size_t getFile(const char *file_name,
+                   unsigned char *buf,
+                   int *location = NULL);
     FileInfo getFileByIndex(unsigned int index);
-    size_t getFileSubByIndex(ArchiveInfo *ai, unsigned int index, unsigned char *buf);
+    size_t getFileSubByIndex(ArchiveInfo *ai,
+                             unsigned int index,
+                             unsigned char *buf);
 
-    int writeHeader( FILE *fp );
-    size_t putFile( FILE *fp, int no, size_t offset, size_t length, size_t original_length, bool modified_flag, unsigned char *buffer );
-    size_t addFile(ArchiveInfo *ai, FILE *newfp, int no, size_t offset, unsigned char *buffer);
+    int writeHeader(FILE *fp);
+    size_t putFile(FILE *fp,
+                   int no,
+                   size_t offset,
+                   size_t length,
+                   size_t original_length,
+                   bool modified_flag,
+                   unsigned char *buffer);
+    size_t addFile(ArchiveInfo *ai,
+                   FILE *newfp,
+                   int no,
+                   size_t offset,
+                   unsigned char *buffer);
 
-protected:
+   protected:
     ArchiveInfo archive_info;
     ArchiveInfo *root_archive_info, *last_archive_info;
     int num_of_sar_archives;
 
-    void readArchive( ArchiveInfo *ai, int archive_type = ARCHIVE_TYPE_SAR, unsigned int offset=0 );
-    int readArchiveSub( ArchiveInfo *ai, int archive_type = ARCHIVE_TYPE_SAR, bool check_size = true );
-    int getIndexFromFile( ArchiveInfo *ai, const char *file_name );
-    size_t getFileSub( ArchiveInfo *ai, const char *file_name, unsigned char *buf );
+    void readArchive(ArchiveInfo *ai,
+                     int archive_type = ARCHIVE_TYPE_SAR,
+                     unsigned int offset = 0);
+    int readArchiveSub(ArchiveInfo *ai,
+                       int archive_type = ARCHIVE_TYPE_SAR,
+                       bool check_size = true);
+    int getIndexFromFile(ArchiveInfo *ai, const char *file_name);
+    size_t getFileSub(ArchiveInfo *ai,
+                      const char *file_name,
+                      unsigned char *buf);
 
-    int writeHeaderSub( ArchiveInfo *ai, FILE *fp, int archive_type = ARCHIVE_TYPE_SAR, int nsa_offset=0 );
-    size_t putFileSub( ArchiveInfo *ai, FILE *fp, int no, size_t offset, size_t length, size_t original_length, int compression_type, bool modified_flag, unsigned char *buffer );
-    SarReader::ArchiveInfo* openForCreate(const char *name);
+    int writeHeaderSub(ArchiveInfo *ai,
+                       FILE *fp,
+                       int archive_type = ARCHIVE_TYPE_SAR,
+                       int nsa_offset = 0);
+    size_t putFileSub(ArchiveInfo *ai,
+                      FILE *fp,
+                      int no,
+                      size_t offset,
+                      size_t length,
+                      size_t original_length,
+                      int compression_type,
+                      bool modified_flag,
+                      unsigned char *buffer);
+    SarReader::ArchiveInfo *openForCreate(const char *name);
 };
 
-#endif // __SAR_READER_H__
+#endif  // __SAR_READER_H__
