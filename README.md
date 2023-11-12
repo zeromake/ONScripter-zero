@@ -16,7 +16,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复并支持某些游戏的换页判断: `。]\`，`。` 和 `\` 都是换页符号，现在会检查换页符号后 5 个字符是否还有换页符号，如果有跳过该换页符号。
 - [x] 修复 android 的 aaudio 音频驱动方式有问题，会出现音乐断续，播放完一个以后会变正常，现在先切换到默认 openslES 后正常驱动。
 - [x] 修复 android 下后台锁屏后黑屏，缺少画布大小变更事件监听后刷新绘制。
-- [x] 修复 osx 上 simd 动画计算加速，xmake 的 `add_vectorexts("avx2")` 选项的 `-mavx2` 编译参数有奇怪的动画加载 bug，改用 `-march=knl` 就没事。
+- [x] 修复 osx 上 simd 动画计算加速，xmake 的 `add_vectorexts("avx2")` 选项的 `-mavx2` 编译参数有奇怪的动画加载 bug，改用 `-march=knl` 就没事(黑苹果 bug)。
 - [x] 修复各种奇怪的文字截断，主要是字体并非是正方形也不是等宽和等高的，但是 FontInfo 是完全以字体大小来计算偏移和精灵文字的绘制范围。
 - [x] 修复文字带有描边会被截断，描边字体并未被算做绘制区域强制加上描边长度到绘制区域。
 - [x] 修复 xmake 的 android 打包问题，新版 xmake 的依赖 api 有部分变化。
