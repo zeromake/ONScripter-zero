@@ -16,6 +16,12 @@ option("simd")
     set_description('开启 simd 优化')
 option_end()
 
+option("simd_knl")
+    set_default(false)
+    set_showmenu(true)
+    set_description('强制使用 -march=knl 选项')
+option_end()
+
 option("omp")
     set_default(false)
     set_showmenu(true)
@@ -193,7 +199,7 @@ target("onscripter")
     if get_config('simd') then
         add_defines("USE_SIMD=1")
         if is_arch("x86", "x64", "i386", "x86_64") then
-            if is_plat("macosx") then
+            if get_config("simd_knl") then
                 add_cxflags("-march=knl")
             else
                 add_vectorexts("avx2")
