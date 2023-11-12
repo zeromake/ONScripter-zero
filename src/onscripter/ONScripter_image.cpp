@@ -40,6 +40,19 @@
 
 #if ONS_RESIZE_SURFACE_IMPLEMENT == 2
 #include <resize/SDL_resize.h>
+#elif ONS_RESIZE_SURFACE_IMPLEMENT == 3
+#ifdef USE_SIMD
+    #define STBIR_SIMD
+    #ifdef USE_SIMD_X86_AVX2
+        #define STBIR_AVX2
+    #elif defined(USE_SIMD_X86_SSE2)
+        #define STBIR_SSE2
+    #elif defined(USE_SIMD_ARM_NEON)
+        #define STBIR_NEON
+    #endif
+#endif
+#define STB_IMAGE_RESIZE2_IMPLEMENTATION
+#include <stb/stb_image_resize2.h>
 #endif
 
 #ifdef USE_IMAGE_CACHE
@@ -248,6 +261,38 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
     // 从 GraphicsMagick magick/resize.c
     // 移植的实现，现在看起来效果最佳，比起原来的内置实现 ios 的问题也得到了解决
     return SDLSurfaceResize(src, dst, UndefinedFilter, 1.0);
+#elif ONS_RESIZE_SURFACE_IMPLEMENT == 3
+    stbir_pixel_layout pixel_layout = STBIR_RGBA;
+    switch (src->format->format) {
+        case SDL_PIXELFORMAT_RGBA32:
+            break;
+        case SDL_PIXELFORMAT_ARGB32:
+            pixel_layout = STBIR_ABGR;
+            break;
+        case SDL_PIXELFORMAT_BGRA32:
+            pixel_layout = STBIR_BGRA;
+            break;
+        case SDL_PIXELFORMAT_ABGR32:
+            pixel_layout = STBIR_ABGR;
+            break; 
+    }
+    SDL_LockSurface(dst);
+    SDL_LockSurface(src);
+    unsigned char *src_buffer = (unsigned char *)src->pixels;
+    unsigned char *dst_buffer = (unsigned char *)dst->pixels;
+    stbir_resize_uint8_srgb(
+        src_buffer,
+        src->w,
+        src->h,
+        0,
+        dst_buffer,
+        dst->w,
+        dst->h,
+        0,
+        pixel_layout
+    );
+    SDL_UnlockSurface(src);
+    SDL_UnlockSurface(dst);
 #else
     // 之前的 ons 的内置实现，windows/osx/android 都很正常，但是 ios
     // 下有特别的小图片效果比较奇怪

@@ -327,6 +327,7 @@
 					/Users/zero/.xmake/packages/s/sdl2_image/2.6.3/3b195f01552a42a2843a02ee31687d24/include,
 					/Users/zero/.xmake/packages/s/sdl2_mixer/2.6.3/94397902c07b4cd19fedbcb5986fa1c9/include,
 					/Users/zero/.xmake/packages/s/sdl2_ttf/2.20.2/df063bf7bcb9426f8b906cd21e588f41/include,
+					/Users/zero/.xmake/packages/s/stb/2023.10.12/8eedc88e8bea4de89550c3eb54edec85/include,
 					/Users/zero/.xmake/packages/w/webp/1.3.2/eda4caf2fc974101a472877c8d801f4c/include,
 					/Users/zero/.xmake/packages/z/zlib/1.3/b925f012959846df8882e532dd1c2fa4/include,
 				);
@@ -408,6 +409,7 @@
 					/Users/zero/.xmake/packages/s/sdl2_image/2.6.3/3b195f01552a42a2843a02ee31687d24/include,
 					/Users/zero/.xmake/packages/s/sdl2_mixer/2.6.3/94397902c07b4cd19fedbcb5986fa1c9/include,
 					/Users/zero/.xmake/packages/s/sdl2_ttf/2.20.2/df063bf7bcb9426f8b906cd21e588f41/include,
+					/Users/zero/.xmake/packages/s/stb/2023.10.12/8eedc88e8bea4de89550c3eb54edec85/include,
 					/Users/zero/.xmake/packages/w/webp/1.3.2/eda4caf2fc974101a472877c8d801f4c/include,
 					/Users/zero/.xmake/packages/z/zlib/1.3/b925f012959846df8882e532dd1c2fa4/include,
 				);

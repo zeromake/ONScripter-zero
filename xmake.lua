@@ -59,7 +59,8 @@ local deps = {
     "sdl2_mixer",
     "brotli",
     "ghc_filesystem",
-    "luajit"
+    "luajit",
+    "stb",
 }
 local sdlConfigs = {
     bmp_compat = true
@@ -147,7 +148,8 @@ target("onscripter")
         "sdl2_mixer",
         "brotli",
         "ghc_filesystem",
-        "luajit"
+        "luajit",
+        "stb"
     )
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
