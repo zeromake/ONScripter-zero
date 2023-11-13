@@ -23,6 +23,7 @@
  */
 
 #include <new>
+#include <chrono>
 
 #include "ONScripter.h"
 #include "private/utils.h"
@@ -75,6 +76,7 @@ SDL_Surface *ONScripter::loadImage(char *filename,
                                    int *location,
                                    unsigned char *alpha) {
     if (!filename) return NULL;
+    auto start = std::chrono::steady_clock::now();
 
     SDL_Surface *tmp = NULL;
     if (location) *location = BaseReader::ARCHIVE_TYPE_NONE;
@@ -84,7 +86,6 @@ SDL_Surface *ONScripter::loadImage(char *filename,
     else
         tmp = createSurfaceFromFile(filename, has_alpha, location);
     if (tmp == NULL) return NULL;
-
     SDL_Surface *ret;
     if ((tmp->w * tmp->format->BytesPerPixel == tmp->pitch) &&
         (tmp->format->BitsPerPixel == image_surface->format->BitsPerPixel) &&
@@ -97,7 +98,9 @@ SDL_Surface *ONScripter::loadImage(char *filename,
         ret = SDL_ConvertSurface(tmp, image_surface->format, SDL_SWSURFACE);
         SDL_FreeSurface(tmp);
     }
-
+    auto end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() / 1000.f;
+    utils::printInfo("load img %fms %s\n", ms, filename);
     return ret;
 }
 
