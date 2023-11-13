@@ -35,22 +35,12 @@
 #endif
 
 #ifndef ONS_RESIZE_SURFACE_IMPLEMENT
-#define ONS_RESIZE_SURFACE_IMPLEMENT 2
+#define ONS_RESIZE_SURFACE_IMPLEMENT 3
 #endif
 
 #if ONS_RESIZE_SURFACE_IMPLEMENT == 2
 #include <resize/SDL_resize.h>
 #elif ONS_RESIZE_SURFACE_IMPLEMENT == 3
-#ifdef USE_SIMD
-    #define STBIR_SIMD
-    #ifdef USE_SIMD_X86_AVX2
-        #define STBIR_AVX2
-    #elif defined(USE_SIMD_X86_SSE2)
-        #define STBIR_SSE2
-    #elif defined(USE_SIMD_ARM_NEON)
-        #define STBIR_NEON
-    #endif
-#endif
 #define STB_IMAGE_RESIZE2_IMPLEMENTATION
 #include <stb/stb_image_resize2.h>
 #endif
@@ -280,7 +270,7 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
     SDL_LockSurface(src);
     unsigned char *src_buffer = (unsigned char *)src->pixels;
     unsigned char *dst_buffer = (unsigned char *)dst->pixels;
-    stbir_resize_uint8_srgb(
+    stbir_resize_uint8_linear(
         src_buffer,
         src->w,
         src->h,
