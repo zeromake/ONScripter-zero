@@ -28,6 +28,12 @@ option("omp")
     set_description('使用 opennmp 进行并行')
 option_end()
 
+option("c++_shared")
+    set_default(false)
+    set_showmenu(true)
+    set_description('安卓编译把 libc++_shared.so 拷贝到 app 里')
+option_end()
+
 add_defines(
     "ONS_ZERO_VERSION=\""..VERSION.."\"",
     "ONS_JH_VERSION=\"0.8.0\"",
@@ -248,6 +254,18 @@ target("onscripter")
                 os.cp(libfile, outDir)
             end
             os.cp(target:targetfile(), outDir)
+            local dirs = {
+                ['armeabi-v7a'] = 'arm-linux-androideabi',
+                ['arm64-v8a'] = 'aarch64-linux-android',
+                ['x86_64'] = 'x86_64-linux-android',
+                ['x86'] = 'i686-linux-android',
+            }
+            if get_config("c++_shared") then
+                local ndk_sysroot = target:toolchain("ndk")._CONFIGS.ndk_sysroot
+                local cpp_shared_file = path.join(ndk_sysroot, "usr/lib/"..dirs[target:arch()].."/libc++_shared.so")
+                print("cp "..cpp_shared_file.." "..outDir)
+                os.cp(cpp_shared_file, outDir)
+            end
             return
         elseif target:is_plat("iphoneos") then
             import("script.generate_xcode")(target, VERSION)
