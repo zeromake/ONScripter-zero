@@ -373,20 +373,20 @@ target("resize")
     add_includedirs("src")
 target_end()
 
-add_requires("benchmark")
+-- add_requires("benchmark")
 
-target("benchmark_resize")
-    add_includedirs("src")
-    add_files("demo/benchmark_resize.cpp")
-    add_files("src/resize_image.cpp")
-    add_files("src/resize/resize.c")
-    add_packages(
-        "benchmark",
-        "stb"
-    )
-    if is_arch("x86", "x64", "i386", "x86_64") then
-        add_vectorexts("avx2")
-    elseif is_arch("arm.*") then
-        add_vectorexts("neon")
-    end
+-- target("benchmark_resize")
+--     add_includedirs("src")
+--     add_files("demo/benchmark_resize.cpp")
+--     add_files("src/resize_image.cpp")
+--     add_files("src/resize/resize.c")
+--     add_packages(
+--         "benchmark",
+--         "stb"
+--     )
+--     if is_arch("x86", "x64", "i386", "x86_64") then
+--         add_vectorexts("avx2")
+--     elseif is_arch("arm.*") then
+--         add_vectorexts("neon")
+--     end
 

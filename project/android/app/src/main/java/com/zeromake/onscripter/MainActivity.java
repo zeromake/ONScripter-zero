@@ -119,7 +119,9 @@ public class MainActivity extends Activity implements
             }
         } else {
             XXPermissions.with(this).permission(
-                    Permission.READ_EXTERNAL_STORAGE,
+                    Permission.READ_MEDIA_IMAGES,
+                    Permission.READ_MEDIA_VIDEO,
+                    Permission.READ_MEDIA_AUDIO,
                     Permission.WRITE_EXTERNAL_STORAGE
             ).request(this);
         }
