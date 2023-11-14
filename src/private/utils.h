@@ -42,8 +42,36 @@ static BOOL MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize) {
 
 #include <string>
 #include <utility>
+#include <chrono>
 
 namespace utils {
+
+inline std::chrono::steady_clock::time_point now() {
+    return std::chrono::steady_clock::now();
+}
+
+inline float duration(std::chrono::steady_clock::time_point prev) {
+    return std::chrono::duration_cast<std::chrono::microseconds>(now() - prev).count() / 1000.0f;
+}
+
+inline void printDebug(const char *format, ...) {
+    va_list ap;
+    va_start(ap, format);
+#ifdef ANDROID
+    __android_log_vprint(ANDROID_LOG_DEBUG, "DEBUG", format, ap);
+#elif defined(WINRT)
+    const int __size = 256;
+    char *buf = new char[__size]{0};
+    vsnprintf(buf, __size, format, ap);
+    LPWSTR wstr = new WCHAR[128];
+    MByteToWChar(buf, wstr, 256);
+    OutputDebugString(wstr);
+#else
+    vprintf(format, ap);
+#endif
+    va_end(ap);
+}
+
 inline void printInfo(const char *format, ...) {
     va_list ap;
     va_start(ap, format);
