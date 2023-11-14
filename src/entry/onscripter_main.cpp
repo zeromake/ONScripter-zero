@@ -167,17 +167,6 @@ JNIEnv *GetJniEnv() {
 #define JAVA_EXPORT_NAME1(name, package) JAVA_EXPORT_NAME2(name, package)
 #define JAVA_EXPORT_NAME(name) JAVA_EXPORT_NAME1(name, SDL_JAVA_PACKAGE_PATH)
 
-JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks)(
-    JNIEnv *jniEnv, jobject thiz) {
-    JavaONScripter = jniEnv->NewGlobalRef(thiz);
-    jclass JavaONScripterClass = jniEnv->GetObjectClass(JavaONScripter);
-    JavaPlayVideo =
-        jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
-    // JavaGetFD = jniEnv->GetMethodID(JavaONScripterClass, "getFD", "([CI)I");
-    // JavaMkdir = jniEnv->GetMethodID(JavaONScripterClass, "mkdir", "([C)I");
-    return 0;
-}
-
 JNIEXPORT jint JNICALL
 JAVA_EXPORT_NAME(ONScripter_nativeGetWidth)(JNIEnv *env, jobject thiz) {
     return ons.getWidth();
@@ -186,6 +175,14 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetWidth)(JNIEnv *env, jobject thiz) {
 JNIEXPORT jint JNICALL
 JAVA_EXPORT_NAME(ONScripter_nativeGetHeight)(JNIEnv *env, jobject thiz) {
     return ons.getHeight();
+}
+
+JNIEXPORT jint JNICALL
+JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks)(JNIEnv *env, jobject thiz) {
+    JavaONScripter = env->NewGlobalRef(thiz);
+    jclass JavaONScripterClass = env->GetObjectClass(JavaONScripter);
+    JavaPlayVideo = env->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
+    return 0;
 }
 
 void playVideoAndroid(const char *filename) {
