@@ -16,6 +16,9 @@ jobs:
           .\install.ps1 -RunAsAdmin
           scoop update
           scoop install main/xmake
+          $env:path+=";$Home\scoop\shims"
+          xmake --version
+          xmake update -s https://github.com/zeromake/xmake#master
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
@@ -25,7 +28,7 @@ jobs:
         shell: powershell
         run: |
           $env:path+=";$Home\scoop\shims"
-          xmake f -c -y -vD
+          xmake f -c -y
           tree /f .xmake\windows\x64\repositories\xrepo
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
@@ -41,6 +44,7 @@ jobs:
         run: |
           brew install xmake
           xmake --version
+          xmake update -s https://github.com/zeromake/xmake#master
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
@@ -48,14 +52,14 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -c -y -vD --target_minver=10.13 -m debug
+          xmake f -c -y --target_minver=10.13 -m debug
           xmake build -y onscripter
       - name: build-arm64
         env:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
-          xmake f -a arm64 -c -y -vD --target_minver=12.01 -m debug
+          xmake f -a arm64 -c -y --target_minver=12.01 -m debug
           xmake build -y onscripter
       - uses: actions/upload-artifact@v3
         with:
@@ -75,6 +79,7 @@ jobs:
           sudo apt-get install -y ./xmake-amd64.deb
           rm ./xmake-amd64.deb
           xmake --version
+          xmake update -s https://github.com/zeromake/xmake#master
       - name: cert
         env:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
@@ -94,7 +99,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c -vD
+          xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c
           xmake build -y onscripter
       - name: cc-32
         run: |
@@ -105,7 +110,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c -vD
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
           xmake build -y onscripter
       - name: build-apk
         run: |
