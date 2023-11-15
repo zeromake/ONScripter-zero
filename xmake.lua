@@ -287,6 +287,9 @@ target("onscripter")
         end
         os.cp(target:targetfile(),  path.join(os.scriptdir(), "dist", out_name))
     end)
+    if is_plat("android") and is_arch("arm.*") and not is_arch("arm64.*") then
+        add_cxflags("-mfpu=neon-vfpv4", {force = true})
+    end
 
 
 -- target("saveconv")
