@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -143,16 +144,19 @@ public class MainActivity extends Activity implements
             settingPopupWindow.dismiss();
         } else {
             View linearLayout = LayoutInflater.from(this).inflate(R.layout.popup, null);
-            settingPopupWindow = new PopupWindow((View) linearLayout, -2, -2, true);
+            settingPopupWindow = new PopupWindow(
+                    linearLayout,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    true
+            );
             settingPopupWindow.setAnimationStyle(R.style.Animation_ConfigPanelAnimation);
             settingPopupWindow.setTouchable(true);
             settingPopupWindow.setOutsideTouchable(true);
             settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.config_upper));
-            settingPopupWindow.showAtLocation(this.background, 5, 0, 0);
-            View okCancelButton3 = linearLayout.findViewById(R.id.popup_path);
-            okCancelButton3.setOnClickListener(view -> {
-                this.chooseDir();
-            });
+            settingPopupWindow.showAtLocation(this.background, Gravity.END, 0, 0);
+            View popupButton = linearLayout.findViewById(R.id.popup_path);
+            popupButton.setOnClickListener(view -> this.chooseDir());
         }
     }
 
@@ -164,7 +168,7 @@ public class MainActivity extends Activity implements
         builder.setInverseBackgroundForced(true);
         builder.setTitle(getString(R.string.Launch_ChooseDirectory));
         builder.setItems(strArr, this);
-        builder.setNegativeButton(getString(R.string.Cancel), (DialogInterface.OnClickListener) null);
+        builder.setNegativeButton(getString(R.string.Cancel), null);
         builder.setCancelable(true);
         builder.create().show();
     }
@@ -201,9 +205,9 @@ public class MainActivity extends Activity implements
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.Error));
             builder.setMessage(getString(R.string.Launch_CouldNotOpenDirectory) + "\n" + Globals.CurrentDirectoryPathForLauncher);
-            builder.setPositiveButton(getString(R.string.OK), (DialogInterface.OnClickListener) null);
+            builder.setPositiveButton(getString(R.string.OK), null);
             builder.create().show();
-            this.games.setAdapter((ListAdapter) new ArrayAdapter<>(this, R.layout.gamelist_item, new String[0]));
+            this.games.setAdapter(new ArrayAdapter<>(this, R.layout.gamelist_item, new String[0]));
         }
     }
 
