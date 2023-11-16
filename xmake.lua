@@ -297,12 +297,16 @@ if is_plat("iphoneos") then
         add_packages(
             "sdl2_image"
         )
+        set_configdir("$(buildir)/config")
+        add_configfiles("project/ios/onscripter-oc/Info.plist.in")
+        set_configvar("VERSION", VERSION)
         add_files("project/ios/onscripter-oc/onscripter/*.xcassets")
         add_files("project/ios/onscripter-oc/onscripter/*.mm")
         add_files("project/ios/onscripter-oc/onscripter/*.m")
         add_files("project/ios/onscripter-oc/onscripter/*.storyboard")
-        add_files("project/ios/onscripter-oc/Info.plist")
+        add_files("$(buildir)/config/Info.plist")
         add_deps("onscripter")
+        add_links("sdl2_main")
 end
 
 target("nsdec")
