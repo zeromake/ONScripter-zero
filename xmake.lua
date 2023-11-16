@@ -291,13 +291,19 @@ target("onscripter")
         add_cxflags("-mfpu=neon-vfpv4", {force = true})
     end
 
-
--- target("saveconv")
---     set_kind("binary")
---     if is_plat("mingw") then
---         add_ldflags("-static-libgcc", "-static-libstdc++")
---     end
---     add_files("src/tools/saveconv.cpp")
+if is_plat("iphoneos") then
+    target("onscripter-oc")
+        add_rules("xcode.application")
+        add_packages(
+            "sdl2_image"
+        )
+        add_files("project/ios/onscripter-oc/onscripter/*.xcassets")
+        add_files("project/ios/onscripter-oc/onscripter/*.mm")
+        add_files("project/ios/onscripter-oc/onscripter/*.m")
+        add_files("project/ios/onscripter-oc/onscripter/*.storyboard")
+        add_files("project/ios/onscripter-oc/Info.plist")
+        add_deps("onscripter")
+end
 
 target("nsdec")
     use_binary()
