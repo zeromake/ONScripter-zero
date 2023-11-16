@@ -50,21 +50,31 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -c -y --target_minver=10.13 -m debug
+          xmake f -c -y --target_minver=10.13
           xmake build -y onscripter
       - name: build-arm64
         env:
           VERSION: ${{ github.ref_name }}
           ARCH: arm64
         run: |
-          xmake f -a arm64 -c -y --target_minver=12.01 -m debug
+          xmake f -a arm64 -c -y --target_minver=12.01
           xmake build -y onscripter
+      - name: build-iphone
+        env:
+          VERSION: ${{ github.ref_name }}
+          ARCH: arm64
+        run: |
+          xmake f -p iphoneos --target_minver=12.0 -y -c
+          xmake b onscripter-oc
+          xmake package onscripter-oc
+          cp build/iphoneos/arm64/release/onscripter-oc.ipa dist/
       - uses: actions/upload-artifact@v3
         with:
           name: onscripter-osx-${{ github.run_id }}
           path: |
             dist/onscripter-darwin-x86_64
             dist/onscripter-darwin-arm64
+            dist/onscripter-oc.ipa
   build-android:
     runs-on: ubuntu-latest
     steps:

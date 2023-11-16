@@ -19,6 +19,8 @@ extern "C" void onscripter_window_pixels(int *width, int *height) {
     *height = __window_size[1];
 }
 
+#undef main
+
 int main(int argc, char *argv[]) {
     SDL_Window *window;
     SDL_Event event;
