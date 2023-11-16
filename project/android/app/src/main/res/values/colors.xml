@@ -10,4 +10,5 @@
     <color name="sao_grey">#757575</color>
     <color name="sao_orange">#fbad06</color>
     <color name="sao_transparent_white">#bfffffff</color>
+    <color name="transparent">#00000000</color>
 </resources>
