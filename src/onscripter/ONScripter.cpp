@@ -1150,13 +1150,17 @@ int ONScripter::parseLine() {
         FuncHash &fh = func_hash[cmd[0] - 'a'];
         for (int i = 0; i < fh.num; i++) {
             if (!strcmp(fh.func[i].command, cmd)) {
+#ifndef NDEBUG
                 auto now = utils::now();
+#endif
                 // if (saveon_flag) saveSaveFile(false);
                 auto ret = (this->*fh.func[i].method)();
+#ifndef NDEBUG
                 auto duration = utils::duration(now);
                 if (duration > 50 && strcmp(fh.func[i].command, "btnwait")) {
                     utils::printDebug("command %s exec %.3fms\n", fh.func[i].command, duration);
                 }
+#endif
                 return ret;
             }
         }
