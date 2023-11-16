@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -144,17 +146,22 @@ public class MainActivity extends Activity implements
             settingPopupWindow.dismiss();
         } else {
             View linearLayout = LayoutInflater.from(this).inflate(R.layout.popup, null);
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int width = size.x;
+            int height = size.y;
             settingPopupWindow = new PopupWindow(
                     linearLayout,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    width/4,
+                    height/3,
                     true
             );
             settingPopupWindow.setAnimationStyle(R.style.Animation_ConfigPanelAnimation);
             settingPopupWindow.setTouchable(true);
             settingPopupWindow.setOutsideTouchable(true);
-            settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.config_upper));
-            settingPopupWindow.showAtLocation(this.background, Gravity.END, 0, 0);
+            settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup));
+            settingPopupWindow.showAtLocation(this.background, Gravity.END|Gravity.BOTTOM, width / 14, height / 24);
             View popupButton = linearLayout.findViewById(R.id.popup_path);
             popupButton.setOnClickListener(view -> this.chooseDir());
         }
