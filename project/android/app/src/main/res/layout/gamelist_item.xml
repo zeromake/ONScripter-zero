@@ -33,8 +33,11 @@
             android:layout_toRightOf="@+id/icon"
             android:singleLine="true"
             android:textColor="#757575"
-            android:textSize="24dp"
-            android:typeface="sans" />
+            android:textSize="24sp"
+            android:typeface="sans"
+            android:layout_marginStart="9dp"
+            android:layout_marginEnd="18dp"
+            android:layout_toEndOf="@+id/icon" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -44,7 +47,10 @@
         android:clickable="true"
         android:paddingLeft="40dp"
         android:paddingRight="10dp"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:focusable="true"
+        android:paddingStart="40dp"
+        android:paddingEnd="10dp">
 
         <ImageView
             android:id="@+id/btn_play"
@@ -55,7 +61,10 @@
             android:layout_marginRight="10dp"
             android:clickable="true"
             android:contentDescription="@string/alt_play"
-            android:src="@drawable/play_button" />
+            android:src="@drawable/play_button"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:focusable="true" />
 
         <ImageView
             android:id="@+id/btn_config"
@@ -66,6 +75,9 @@
             android:layout_toLeftOf="@+id/btn_play"
             android:clickable="true"
             android:contentDescription="@string/alt_config"
-            android:src="@drawable/config_button" />
+            android:src="@drawable/config_button"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/btn_play"
+            android:focusable="true" />
     </RelativeLayout>
 </RelativeLayout>

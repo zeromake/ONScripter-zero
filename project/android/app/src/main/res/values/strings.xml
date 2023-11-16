@@ -16,4 +16,5 @@
     <string name="Cancel">取消</string>
     <string name="Error">错误</string>
     <string name="crash_log">获取日志</string>
+    <string name="path_settings">游戏路径设置</string>
 </resources>

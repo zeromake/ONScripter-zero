@@ -31,7 +31,9 @@
             android:shadowDy="1"
             android:shadowRadius="2"
             android:textColor="@color/sao_white"
-            android:textSize="18dp" />
+            android:textSize="18sp"
+            android:layout_marginStart="345dp"
+            android:layout_marginEnd="10dp" />
 
         <ImageView
             android:id="@+id/cover"
@@ -44,7 +46,10 @@
             android:layout_marginBottom="100dp"
             android:contentDescription="@string/alt_cover"
             android:scaleType="fitCenter"
-            android:src="@drawable/dbkg_und" />
+            android:src="@drawable/dbkg_und"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="355dp"
+            android:layout_marginEnd="20dp" />
 
         <ListView
             android:id="@+id/games"
@@ -61,7 +66,9 @@
             android:dividerHeight="3dp"
             android:fadingEdgeLength="48dp"
             android:requiresFadingEdge="vertical"
-            android:scrollbars="none" />
+            android:scrollbars="none"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="24dp" />
 
         <RelativeLayout
             android:layout_width="240dp"
@@ -69,7 +76,9 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp">
             <ImageView
                 android:id="@+id/btn_settings"
                 android:layout_width="80dp"
@@ -77,7 +86,9 @@
                 android:layout_alignParentRight="true"
                 android:background="@drawable/settings_button"
                 android:clickable="true"
-                android:contentDescription="@string/alt_settings" />
+                android:contentDescription="@string/alt_settings"
+                android:layout_alignParentEnd="true"
+                android:focusable="true" />
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

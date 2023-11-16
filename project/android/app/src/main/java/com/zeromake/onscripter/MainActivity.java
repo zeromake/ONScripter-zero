@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -138,27 +139,21 @@ public class MainActivity extends Activity implements
     }
 
     public void setting() {
-        LinearLayout linearLayout = new LinearLayout(this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.setGravity(17);
         if (settingPopupWindow != null && settingPopupWindow.isShowing()) {
             settingPopupWindow.dismiss();
         } else {
+            View linearLayout = LayoutInflater.from(this).inflate(R.layout.popup, null);
             settingPopupWindow = new PopupWindow((View) linearLayout, -2, -2, true);
             settingPopupWindow.setAnimationStyle(R.style.Animation_ConfigPanelAnimation);
             settingPopupWindow.setTouchable(true);
             settingPopupWindow.setOutsideTouchable(true);
             settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.config_upper));
-            settingPopupWindow.showAtLocation(this.cover, 5, 0, 0);
+            settingPopupWindow.showAtLocation(this.background, 5, 0, 0);
+            View okCancelButton3 = linearLayout.findViewById(R.id.popup_path);
+            okCancelButton3.setOnClickListener(view -> {
+                this.chooseDir();
+            });
         }
-        Button okCancelButton3 = new Button(this);
-        okCancelButton3.setBackgroundColor(Color.argb(0, 0, 0, 0));
-        okCancelButton3.setTextSize(21.0f);
-        okCancelButton3.setText("游戏路径设置");
-        okCancelButton3.setOnClickListener(view -> {
-            this.chooseDir();
-        });
-        linearLayout.addView(okCancelButton3);
     }
 
     private void chooseDir() {
