@@ -9,11 +9,9 @@
 
 @interface ViewController : UIViewController<UITableViewDataSource,UITableViewDelegate> {
     IBOutlet UITableView *tableView;
-    NSMutableArray *data;
-    NSString *docpath;
-    NSString *script_dir;
 }
-
+@property (nonatomic, strong) NSMutableArray *data;
+@property (nonatomic, copy) NSString *docpath;
+@property (nonatomic, copy) NSString *script_dir;
 -(NSString*) get_script_dir;
-
 @end
