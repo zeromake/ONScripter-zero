@@ -9,6 +9,8 @@
 
 #include "charset/gb2312.h"
 
+// https://github.com/python/cpython/blob/main/Modules/cjkcodecs/_codecs_cn.c
+
 static auto cd = iconv_open("UTF-8", "GBK");
 
 void gb_to_utf8(char* src, char* dst, size_t len) {
