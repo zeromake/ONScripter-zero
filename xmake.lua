@@ -329,6 +329,7 @@ target("nsaenc")
     use_binary()
     add_packages("bzip2", "jpeg")
     add_files(
+        "src/charset/*.c",
         "src/tools/nsaenc.cpp",
         "src/coding2utf16.cpp",
         "src/gbk2utf16.cpp",
@@ -344,6 +345,7 @@ target("nsadec")
     use_binary()
     add_packages("bzip2")
     add_files(
+        "src/charset/*.c",
         "src/tools/nsadec.cpp",
         "src/coding2utf16.cpp",
         "src/gbk2utf16.cpp",
@@ -420,4 +422,12 @@ target_end()
 --     elseif is_arch("arm.*") then
 --         add_vectorexts("neon")
 --     end
-
+target("gbk2utf8")
+    use_binary()
+    add_syslinks("iconv")
+    add_files(
+        "src/charset/*.c",
+        "demo/gbk2utf8.cpp"
+    )
+    add_includedirs("src")
+target_end()

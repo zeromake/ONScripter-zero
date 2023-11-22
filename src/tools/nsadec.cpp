@@ -30,6 +30,7 @@
 #include <sys/types.h>
 
 #include <string>
+#include "charset/gb2312.h"
 
 #include "NsaReader.h"
 #include "coding2utf16.h"
@@ -48,12 +49,39 @@ inline int mkdir(const char *pathname, int unused) { return _mkdir(pathname); }
 extern int errno;
 Coding2UTF16 *coding2utf16 = new GBK2UTF16();
 
+int gbk2utf8(const char *in, char *out, int size) {
+    int i = 0;
+    int j = 0;
+    int32_t n = 0;
+    while (in[i] != '\0')
+    {
+        uint8_t c = in[i];
+        if (c <= 0x7f) {
+            out[j] = in[i];
+        } else {
+            uint8_t next_c = in[i+1];
+            uint32_t prev_code = (uint32_t)c;
+            prev_code = prev_code << 8 | (uint32_t)next_c;
+            uint32_t code = charset_gb2312_to_ucs4(prev_code);
+            i++;
+            n = charset_ucs4_to_utf8(code, (uint8_t*)out+j);
+            if (code == 0) {
+                printf("n: %x => %x : %x [%x, %x]\n", n, prev_code, code, c, next_c);
+            }
+            j += n - 1;
+        }
+        i++;
+        j++;
+    }
+    out[j] = '\0';
+}
+
 int main(int argc, char **argv) {
     NsaReader cNR;
     unsigned int nsa_offset = 0;
     unsigned long length;
     unsigned char *buffer;
-    char file_name[256], dir_name[256];
+    char file_name[4096], dir_name[4096];
     unsigned int i, j, count;
     int archive_type = BaseReader::ARCHIVE_TYPE_NSA;
     FILE *fp;
@@ -87,9 +115,9 @@ int main(int argc, char **argv) {
     }
     if (argc != 2) {
         fprintf(
-            stderr,
+            stdout,
             "Usage: nsadec [-offset ##] [-ns2] [-out dir] [-lower] arc_file\n");
-        exit(-1);
+        return 0;
     }
     if (out) {
         if (access(out, 0) != 0) {
@@ -102,29 +130,32 @@ int main(int argc, char **argv) {
     BaseReader::ArchiveInfo *sAI;
     BaseReader::FileInfo sFI;
 
+    char original_name[2048];
     for (i = 0; i < count; i++) {
         sAI = cNR.getArchiveInfoByIndex(i);
         sFI = sAI->fi_list[i];
+        memset(original_name, 0, 2048);
+        gbk2utf8(sFI.original_name, original_name, 2048);
         length = cNR.getFileLengthSubByIndex(sAI, i);
         buffer = new unsigned char[length]{0};
         unsigned int len;
         if ((len = cNR.getFileSubByIndex(sAI, i, buffer)) != length) {
             fprintf(stderr,
                     "file %s is not fully retrieved %d %lu\n",
-                    sFI.original_name,
+                    original_name,
                     len,
                     length);
             length = sFI.length;
             continue;
         }
         if (out[0] != '\0') {
-            snprintf(file_name, 256, "%s/%s", out, sFI.original_name);
+            snprintf(file_name, 256, "%s/%s", out, original_name);
         } else {
-            strcpy(file_name, sFI.original_name);
+            strcpy(file_name, original_name);
         }
         if (useLower) {
             std::string s = file_name;
-            std::transform(s.begin(), s.end(), s.begin(), std::tolower);
+            std::transform(s.begin(), s.end(), s.begin(), ::tolower);
             strcpy(file_name, s.c_str());
         }
         for (j = 0; j < strlen(file_name); j++) {
@@ -145,7 +176,7 @@ int main(int argc, char **argv) {
                    i,
                    count);
         } else {
-            printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
+            // printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
         }
         if ((fp = fopen(file_name, "wb"))) {
             fwrite(buffer, 1, length, fp);
@@ -153,7 +184,6 @@ int main(int argc, char **argv) {
         } else {
             printf("opening %s ... falied\n", file_name);
         }
-
         delete[] buffer;
     }
 
