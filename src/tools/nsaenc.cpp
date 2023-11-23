@@ -7,6 +7,7 @@
 
 #include "NsaReader.h"
 #include "gbk2utf16.h"
+#include "charset/utf8.h"
 
 Coding2UTF16 *coding2utf16 = new GBK2UTF16();
 
@@ -45,11 +46,19 @@ int processFile(NsaReader::ArchiveInfo *ai,
                 int base_offset) {
     std::FILE *fp = NULL;
     char magic[5];
-    const char *cc = name.c_str();
-    if (*cc == '/' || *cc == '\\') {
-        strcpy(fi->name, cc + 1);
+    const char *filename = name.c_str();
+    // to gbk
+    char gbkname[4096]{0};
+#ifdef UTF8_FILESYSTEM
+    coding2utf16->convUTF8ToCoing(filename, gbkname, 4096);
+#else
+    strcpy(gbkname, filename);
+#endif
+    strcpy(fi->original_name, filename);
+    if (*gbkname == '/' || *gbkname == '\\') {
+        strcpy(fi->name, gbkname + 1);
     } else {
-        strcpy(fi->name, cc);
+        strcpy(fi->name, gbkname);
     }
     std::string fullpath = normalPath(fullname);
     if ((fp = std::fopen(fullpath.c_str(), "rb")) == NULL) {
@@ -68,18 +77,18 @@ int processFile(NsaReader::ArchiveInfo *ai,
         fi->compression_type = BaseReader::NBZ_COMPRESSION;
     }
 
-    if ((strstr(fi->name, ".nbz") != NULL) ||
-        (strstr(fi->name, ".NBZ") != NULL))
+    if ((strstr(filename, ".nbz") != NULL) ||
+        (strstr(filename, ".NBZ") != NULL))
         fi->compression_type = BaseReader::NBZ_COMPRESSION;
-    else if (enhanced_flag && ((((strstr(fi->name, ".bmp") != NULL) ||
-                                 (strstr(fi->name, ".BMP") != NULL)) &&
+    else if (enhanced_flag && ((((strstr(filename, ".bmp") != NULL) ||
+                                 (strstr(filename, ".BMP") != NULL)) &&
                                 (magic[0] == 'B') && (magic[1] == 'M')) ||
-                               (((strstr(fi->name, ".wav") != NULL) ||
-                                 (strstr(fi->name, ".WAV") != NULL)) &&
+                               (((strstr(filename, ".wav") != NULL) ||
+                                 (strstr(filename, ".WAV") != NULL)) &&
                                 (magic[0] == 'R') && (magic[1] == 'I') &&
                                 (magic[2] == 'F') && (magic[3] == 'F')) ||
-                               ((strstr(fi->name, ".ogg") != NULL) ||
-                                (strstr(fi->name, ".ogg") != NULL)))) {
+                               ((strstr(filename, ".ogg") != NULL) ||
+                                (strstr(filename, ".ogg") != NULL)))) {
         // If enhanced, use NBZ compression on (true) BMP & WAV files in NSA
         // archive
         fi->compression_type = BaseReader::NBZ_COMPRESSION;
@@ -121,6 +130,7 @@ int file_iterator(std::fs::path dirPath, std::vector<std::string> &files) {
 
 // https://github.com/playmer/onscripter-en/blob/22135bb2ac543cfad5b9e6b6b5820cb219a48ca3/tools/arcmake.cpp
 int main(int argc, char *argv[]) {
+    coding2utf16->init();
     argc--;  // skip command name
     argv++;
     unsigned int nsa_offset = 0;
@@ -170,11 +180,15 @@ int main(int argc, char *argv[]) {
     int count = files.size();
     sAI->fi_list = new NsaReader::FileInfo[count];
     NsaReader::FileInfo *sFI = sAI->fi_list;
+    size_t dirLength = dirPath.string().size();
+    if (dirLength > 0) {
+        dirLength++;
+    }
     for (auto &itr : files) {
         processFile(sAI,
                     sFI,
-                    itr.c_str(),
-                    itr.substr(dirPath.string().length()).c_str(),
+                    itr,
+                    itr.substr(dirLength),
                     offset,
                     enhanced_flag,
                     base_offset);
@@ -195,7 +209,7 @@ int main(int argc, char *argv[]) {
         printf("adding %d of %d (%s), length=%d\n",
                i + 1,
                sAI->num_of_files,
-               sFI->name,
+               sFI->original_name,
                (int)sFI->original_length);
         length = sFI->original_length;
         if (length > buffer_length) {

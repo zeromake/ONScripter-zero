@@ -10,6 +10,9 @@
 #include "charset/gb2312.h"
 
 // https://github.com/python/cpython/blob/main/Modules/cjkcodecs/_codecs_cn.c
+// https://uic.io/en/charset/show/gb2312/
+// https://uic.io/en/charset/show/gb18030/
+// https://uic.io/en/charset/show/shift_jis/
 
 static auto cd = iconv_open("UTF-8", "GBK");
 auto coding2utf16 = new GBK2UTF16();

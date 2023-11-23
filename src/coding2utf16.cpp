@@ -20,6 +20,7 @@
  */
 
 #include "coding2utf16.h"
+#include "charset/utf8.h"
 
 char Coding2UTF16::space[4];
 char Coding2UTF16::minus[4];
@@ -85,4 +86,53 @@ unsigned short Coding2UTF16::convUTF8ToUTF16(const char **src) {
     }
 
     return utf16;
+}
+
+int32_t Coding2UTF16::convUTF8ToCoing(const char *input, char *output, uint32_t size) {
+    int32_t i = 0;
+    int32_t j = 0;
+    int32_t n = 0;
+    uint32_t ch = 0;
+    while (input[i] != '\0' && j < size)
+    {
+        if (input[i] & 0x80) {
+            ch = 0;
+            n = charset_utf8_to_ucs4((uint8_t*)input+i, &ch);
+            i += n;
+            ch = this->convUTF162Coding(ch);
+            output[j] = (ch >> 8);
+            output[j+1] = ch & 0xff;
+            j += 2;
+        } else {
+            output[j] = input[i];
+            i++;
+            j++;
+        }
+    }
+    output[j] = '\0';
+    return j;
+}
+int32_t Coding2UTF16::convCoingToUTF8(const char *input, char *output, uint32_t size) {
+    int32_t i = 0;
+    int32_t j = 0;
+    int32_t n = 0;
+    while (input[i] != '\0' && j < size)
+    {
+        uint8_t c = input[i];
+        if (c <= 0x7f) {
+            output[j] = input[i];
+        } else {
+            uint8_t next_c = input[i+1];
+            uint32_t prev_code = (uint32_t)c;
+            prev_code = prev_code << 8 | (uint32_t)next_c;
+            uint32_t code = this->conv2UTF16(prev_code);
+            i++;
+            n = charset_ucs4_to_utf8(code, (uint8_t*)output+j);
+            j += n - 1;
+        }
+        i++;
+        j++;
+    }
+    output[j] = '\0';
+    return j;
 }

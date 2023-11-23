@@ -30,7 +30,7 @@
 #include <sys/types.h>
 
 #include <string>
-#include "charset/gb2312.h"
+#include "charset/utf8.h"
 
 #include "NsaReader.h"
 #include "coding2utf16.h"
@@ -48,32 +48,6 @@ inline int mkdir(const char *pathname, int unused) { return _mkdir(pathname); }
 
 extern int errno;
 auto *coding2utf16 = new GBK2UTF16();
-
-int gbk2utf8(const char *in, char *out, int size) {
-    int i = 0;
-    int j = 0;
-    int32_t n = 0;
-    while (in[i] != '\0')
-    {
-        uint8_t c = in[i];
-        if (c <= 0x7f) {
-            out[j] = in[i];
-        } else {
-            uint8_t next_c = in[i+1];
-            uint32_t prev_code = (uint32_t)c;
-            prev_code = prev_code << 8 | (uint32_t)next_c;
-            uint32_t code = coding2utf16->conv2UTF16(prev_code);
-            i++;
-            n = charset_ucs4_to_utf8(code, (uint8_t*)out+j);
-            j += n - 1;
-        }
-        i++;
-        j++;
-    }
-    out[j] = '\0';
-    return 0;
-}
-
 int main(int argc, char **argv) {
     coding2utf16->init();
     NsaReader cNR;
@@ -135,7 +109,7 @@ int main(int argc, char **argv) {
         sFI = sAI->fi_list[i];
         memset(original_name, 0, 2048);
 #ifdef UTF8_FILESYSTEM
-        gbk2utf8(sFI.original_name, original_name, 2048);
+        coding2utf16->convCoingToUTF8(sFI.original_name, original_name, 2048);
 #else
         strcpy(original_name, sFI.original_name);
 #endif

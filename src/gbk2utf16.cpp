@@ -24,6 +24,7 @@
 #include <string.h>
 
 static const uint16_t CODINGLEFT = 0x8140, CODINGRIGHT = 0xfefe;
+static const uint16_t UTF16_CONINGLIFT = 0x00a4, UTF16_CODINGRIGHT = 0xffe5;
 
 static unsigned short *utf16_2_gbk_4e;
 
@@ -23993,7 +23994,7 @@ void GBK2UTF16::init() {
     init_static_string();
 
     gbk_2_utf16 = new uint16_t[CODINGRIGHT - CODINGLEFT + 1];
-    utf16_2_gbk_4e = new uint16_t[0x9fA5 - 0x4E00 + 1];
+    utf16_2_gbk_4e = new uint16_t[UTF16_CODINGRIGHT - UTF16_CONINGLIFT + 1];
 
     int i = 0;
 
@@ -24001,9 +24002,8 @@ void GBK2UTF16::init() {
         unsigned short sjis = gbk_2_utf16_org[i][0];
         unsigned short utf16 = gbk_2_utf16_org[i][1];
         gbk_2_utf16[sjis - CODINGLEFT] = utf16;
-
-        if (utf16 >= 0x4E00 && utf16 <= 0x9FA5)  // 0x4E00-0x9FA5
-            utf16_2_gbk_4e[utf16 - 0x4E00] = sjis;
+        if (utf16 >= UTF16_CONINGLIFT && utf16 <= UTF16_CODINGRIGHT)
+            utf16_2_gbk_4e[utf16 - UTF16_CONINGLIFT] = sjis;
         ++i;
     }
 }
@@ -24013,8 +24013,7 @@ uint16_t GBK2UTF16::conv2UTF16(uint16_t in) const {
 }
 
 uint16_t GBK2UTF16::convUTF162Coding(uint16_t in) const {
-    if (in >= 0x4E00 && in <= 0x9FA5)  // 0x4E00-0x9FA5
-        return utf16_2_gbk_4e[in - 0x4E00];
-
+    if (in >= UTF16_CONINGLIFT && in <= UTF16_CODINGRIGHT)
+        return utf16_2_gbk_4e[in - UTF16_CONINGLIFT];
     return 0x0000;
 }
