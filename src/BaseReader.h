@@ -77,6 +77,7 @@ struct BaseReader {
         size_t offset;
         size_t length;
         size_t original_length;
+        // use utf8 encodeing
         char original_name[256];
     };
 

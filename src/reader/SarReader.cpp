@@ -25,12 +25,20 @@
 #include "SarReader.h"
 
 #include "private/utils.h"
+#include "coding2utf16.h"
 #define WRITE_LENGTH 4096
 
 #if defined(PSP)
 extern int psp_power_resume_number;
 #endif
 
+#ifdef _WIN32
+#define strcasecmp stricmp
+#else
+#include <strings.h>
+#endif
+
+extern Coding2UTF16 *coding2utf16;
 SarReader::SarReader(const char *path, const unsigned char *key_table)
     : DirectReader(path, key_table) {
     root_archive_info = last_archive_info = &archive_info;
@@ -164,18 +172,14 @@ void SarReader::readArchive(ArchiveInfo *ai,
 
             while ((ch = key_table[fgetc(ai->file_handle)])) {
                 origin_ch = ch;
-                if ('a' <= ch && ch <= 'z')
-                    ch += 'A' - 'a';
-                else if (REPLACE_DELIMITER == ch) {
+                if (REPLACE_DELIMITER == ch) {
                     ch = DEFAULT_DELIMITER;
                 }
                 ai->fi_list[i].name[count] = ch;
-                ai->fi_list[i].original_name[count] = origin_ch;
                 count++;
             }
-            ai->fi_list[i].name[count] = ch;
-            ai->fi_list[i].original_name[count] = ch;
-
+            ai->fi_list[i].name[count] = '\0';
+            coding2utf16->convCoingToUTF8(ai->fi_list[i].name, ai->fi_list[i].original_name, 256);
             if (archive_type == ARCHIVE_TYPE_NSA)
                 ai->fi_list[i].compression_type = readChar(ai->file_handle);
             else
@@ -402,13 +406,13 @@ int SarReader::getIndexFromFile(ArchiveInfo *ai, const char *file_name) {
     capital_name[len] = '\0';
 
     for (i = 0; i < len; i++) {
-        if ('a' <= capital_name[i] && capital_name[i] <= 'z')
-            capital_name[i] += 'A' - 'a';
-        else if (capital_name[i] == REPLACE_DELIMITER)
+        if (capital_name[i] == REPLACE_DELIMITER)
             capital_name[i] = DEFAULT_DELIMITER;
     }
     for (i = 0; i < ai->num_of_files; i++) {
-        if (!strcmp(capital_name, ai->fi_list[i].name)) break;
+        if (
+            !strcasecmp(capital_name, ai->fi_list[i].name) ||
+            !strcasecmp(capital_name, ai->fi_list[i].original_name)) break;
     }
     return i;
 }

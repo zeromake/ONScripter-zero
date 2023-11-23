@@ -50,6 +50,8 @@ class Coding2UTF16 {
     virtual uint16_t convUTF162Coding(uint16_t) const = 0;
     int convUTF16ToUTF8(unsigned char*, uint16_t) const;
     unsigned short convUTF8ToUTF16(const char**);
+    int32_t convUTF8ToCoing(const char *input, char *output, uint32_t size);
+    int32_t convCoingToUTF8(const char *input, char *output, uint32_t size);
     virtual ~Coding2UTF16(){};
 };
 

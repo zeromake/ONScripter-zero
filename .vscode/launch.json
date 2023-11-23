@@ -43,11 +43,16 @@
             "args": ["-r", "/Users/zero/Documents/eden/eden"]
         },
         {
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
-            "name": "font-debug",
-            "program": "${workspaceFolder}/build/macosx/x86_64/debug/demo/font",
-            "args": []
+            "name": "nsaenc",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/macosx/x86_64/debug/nsaenc",
+            "args": ["${workspaceFolder}/demo/game", "${workspaceFolder}/1.nsa"],
+            "environment": [],
+            "externalConsole": false,
+            "stopAtEntry": true,
+            "MIMode": "lldb"
         }
     ]
 }
