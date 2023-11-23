@@ -47,7 +47,7 @@ inline int mkdir(const char *pathname, int unused) { return _mkdir(pathname); }
 #endif
 
 extern int errno;
-Coding2UTF16 *coding2utf16 = new GBK2UTF16();
+auto *coding2utf16 = new GBK2UTF16();
 
 int gbk2utf8(const char *in, char *out, int size) {
     int i = 0;
@@ -62,21 +62,20 @@ int gbk2utf8(const char *in, char *out, int size) {
             uint8_t next_c = in[i+1];
             uint32_t prev_code = (uint32_t)c;
             prev_code = prev_code << 8 | (uint32_t)next_c;
-            uint32_t code = charset_gb2312_to_ucs4(prev_code);
+            uint32_t code = coding2utf16->conv2UTF16(prev_code);
             i++;
             n = charset_ucs4_to_utf8(code, (uint8_t*)out+j);
-            if (code == 0) {
-                printf("n: %x => %x : %x [%x, %x]\n", n, prev_code, code, c, next_c);
-            }
             j += n - 1;
         }
         i++;
         j++;
     }
     out[j] = '\0';
+    return 0;
 }
 
 int main(int argc, char **argv) {
+    coding2utf16->init();
     NsaReader cNR;
     unsigned int nsa_offset = 0;
     unsigned long length;
@@ -135,7 +134,11 @@ int main(int argc, char **argv) {
         sAI = cNR.getArchiveInfoByIndex(i);
         sFI = sAI->fi_list[i];
         memset(original_name, 0, 2048);
+#ifdef UTF8_FILESYSTEM
         gbk2utf8(sFI.original_name, original_name, 2048);
+#else
+        strcpy(original_name, sFI.original_name);
+#endif
         length = cNR.getFileLengthSubByIndex(sAI, i);
         buffer = new unsigned char[length]{0};
         unsigned int len;
@@ -176,7 +179,7 @@ int main(int argc, char **argv) {
                    i,
                    count);
         } else {
-            // printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
+            printf("\033[Kouting %s\t\t%d/%d\r", out, i, count);
         }
         if ((fp = fopen(file_name, "wb"))) {
             fwrite(buffer, 1, length, fp);
