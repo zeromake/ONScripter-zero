@@ -12,6 +12,7 @@
 // https://github.com/python/cpython/blob/main/Modules/cjkcodecs/_codecs_cn.c
 
 static auto cd = iconv_open("UTF-8", "GBK");
+auto coding2utf16 = new GBK2UTF16();
 
 void gb_to_utf8(char* src, char* dst, size_t len) {
     int ret = 0;
@@ -34,7 +35,8 @@ int gbk2utf8(const char *in, char *out, int size) {
             uint8_t next_c = in[i+1];
             uint32_t code = (uint32_t)c;
             code = code << 8 | (uint32_t)next_c;
-            code = charset_gb2312_to_ucs4(code);
+            code = coding2utf16->conv2UTF16(code);
+            // code = charset_gb2312_to_ucs4(code);
             i++;
             n = charset_ucs4_to_utf8(code, (uint8_t*)out+j);
             printf("[%d, %d] => [", c, next_c);
@@ -51,6 +53,7 @@ int gbk2utf8(const char *in, char *out, int size) {
 }
 
 int main(int argc, char **argv) {
+    coding2utf16->init();
     FILE* fp = fopen(argv[1], "rb");
     char buf[2048]{0};
     size_t n = fread(buf, 1, 256, fp);

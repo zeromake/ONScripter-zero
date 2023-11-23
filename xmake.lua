@@ -128,6 +128,10 @@ local function use_binary()
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
     end
+    if is_plat("windows", "mingw") then
+        add_files("src/resource.rc")
+    end
+    add_defines("UTF8_FILESYSTEM=1")
 end
 
 target("onscripter")
@@ -193,7 +197,6 @@ target("onscripter")
             "UNICODE",
             "_UNICODE"
         )
-        add_files("src/resource.rc")
         add_syslinks("windowscodecs")
     elseif is_plat("android") then
         add_packages("ndk-cpufeatures")
@@ -427,7 +430,10 @@ target("gbk2utf8")
     add_syslinks("iconv")
     add_files(
         "src/charset/*.c",
-        "demo/gbk2utf8.cpp"
+        "demo/gbk2utf8.cpp",
+        "src/coding2utf16.cpp",
+        "src/gbk2utf16.cpp",
+        "src/language/*.cpp"
     )
     add_includedirs("src")
 target_end()
