@@ -24,8 +24,8 @@
 
 #include "SarReader.h"
 
-#include "private/utils.h"
 #include "coding2utf16.h"
+#include "private/utils.h"
 #define WRITE_LENGTH 4096
 
 #if defined(PSP)
@@ -81,14 +81,33 @@ SarReader::ArchiveInfo *SarReader::openForCreate(const char *name) {
     return info;
 }
 
+static inline void archiveEncodeCompatible(const BaseReader::ArchiveInfo *ai,
+                                           const int index) {
+    if (ai->flags & BaseReader::ArchiveFlag::ARCHIVE_FLAG_ENCODING_UTF8) {
+        strcpy(ai->fi_list[index].unicode_name, ai->fi_list[index].name);
+        // 兼容模式把 nsa 里的 utf8 文字转换为 gbk
+        coding2utf16->convUTF8ToCoing(
+            ai->fi_list[index].unicode_name, ai->fi_list[index].name, 256);
+    } else {
+        // 兼容模式把 nsa 里的 gbk 文字转换为 utf8
+        coding2utf16->convCoingToUTF8(
+            ai->fi_list[index].name, ai->fi_list[index].unicode_name, 1024);
+    }
+}
+
 void SarReader::readArchive(ArchiveInfo *ai,
                             int archive_type,
                             unsigned int offset) {
     unsigned int i;
 
     /* Read header */
-    for (i = 0; i < offset; i++)
-        readChar(ai->file_handle);  // for commands "ns2" and "ns3"
+    for (i = 0; i < offset; i++) {
+        if (i == 0) {
+            ai->flags = readChar(ai->file_handle);
+        } else {
+            readChar(ai->file_handle);  // for commands "ns2" and "ns3"
+        }
+    }
 
     if (archive_type == ARCHIVE_TYPE_NS2) {
         // new archive type since NScr2.91
@@ -136,17 +155,14 @@ void SarReader::readArchive(ArchiveInfo *ai,
             unsigned char origin_ch;
             while ((ch = key_table[fgetc(ai->file_handle)]) != '"') {
                 origin_ch = ch;
-                if ('a' <= ch && ch <= 'z')
-                    ch += 'A' - 'a';
-                else if (REPLACE_DELIMITER == ch) {
+                if (REPLACE_DELIMITER == ch) {
                     ch = DEFAULT_DELIMITER;
                 }
                 ai->fi_list[i].name[count] = ch;
-                ai->fi_list[i].original_name[count] = origin_ch;
                 count++;
             }
             ai->fi_list[i].name[count] = '\0';
-            ai->fi_list[i].original_name[count] = '\0';
+            archiveEncodeCompatible(ai, i);
             if (ai->fi_list[i].compression_type == NO_COMPRESSION) {
                 ai->fi_list[i].compression_type =
                     getRegisteredCompressionType(ai->fi_list[i].name);
@@ -179,7 +195,7 @@ void SarReader::readArchive(ArchiveInfo *ai,
                 count++;
             }
             ai->fi_list[i].name[count] = '\0';
-            coding2utf16->convCoingToUTF8(ai->fi_list[i].name, ai->fi_list[i].original_name, 256);
+            archiveEncodeCompatible(ai, i);
             if (archive_type == ARCHIVE_TYPE_NSA)
                 ai->fi_list[i].compression_type = readChar(ai->file_handle);
             else
@@ -215,7 +231,13 @@ int SarReader::writeHeaderSub(ArchiveInfo *ai,
     unsigned int i, j;
 
     fseek(fp, 0L, SEEK_SET);
-    for (int k = 0; k < nsa_offset; k++) fputc(0, fp);
+    for (int k = 0; k < nsa_offset; k++) {
+        if (k == 0) {
+            fputc(ai->flags, fp);
+        } else {
+            fputc(0, fp);
+        }
+    }
 
     if (archive_type == ARCHIVE_TYPE_NS2) {
         writeLong(fp, swapLong(ai->base_offset - nsa_offset));
@@ -225,17 +247,22 @@ int SarReader::writeHeaderSub(ArchiveInfo *ai,
     }
 
     for (i = 0; i < ai->num_of_files; i++) {
+        if (archive_type == ARCHIVE_TYPE_NS2)
+            writeChar(fp, ai->fi_list[i].compression_type);
         if (archive_type == ARCHIVE_TYPE_NS2) fputc('"', fp);
 
-        for (j = 0; ai->fi_list[i].name[j]; j++)
-            fputc(ai->fi_list[i].name[j], fp);
+        const char *name =
+            (ai->flags & BaseReader::ArchiveFlag::ARCHIVE_FLAG_ENCODING_UTF8)
+                ? ai->fi_list[i].unicode_name
+                : ai->fi_list[i].name;
+        for (j = 0; name[j]; j++) fputc(name[j], fp);
 
         if (archive_type == ARCHIVE_TYPE_NS2)
             fputc('"', fp);
         else
-            fputc(ai->fi_list[i].name[j], fp);
+            fputc(name[j], fp);
 
-        if (archive_type >= ARCHIVE_TYPE_NSA)
+        if (archive_type == ARCHIVE_TYPE_NSA)
             writeChar(fp, ai->fi_list[i].compression_type);
 
         if (archive_type == ARCHIVE_TYPE_NS2)
@@ -243,8 +270,7 @@ int SarReader::writeHeaderSub(ArchiveInfo *ai,
         else {
             writeLong(fp, ai->fi_list[i].offset - ai->base_offset);
             writeLong(fp, ai->fi_list[i].length);
-
-            if (archive_type >= ARCHIVE_TYPE_NSA) {
+            if (archive_type == ARCHIVE_TYPE_NSA) {
                 writeLong(fp, ai->fi_list[i].original_length);
             }
         }
@@ -410,9 +436,9 @@ int SarReader::getIndexFromFile(ArchiveInfo *ai, const char *file_name) {
             capital_name[i] = DEFAULT_DELIMITER;
     }
     for (i = 0; i < ai->num_of_files; i++) {
-        if (
-            !strcasecmp(capital_name, ai->fi_list[i].name) ||
-            !strcasecmp(capital_name, ai->fi_list[i].original_name)) break;
+        if (!strcasecmp(capital_name, ai->fi_list[i].name) ||
+            !strcasecmp(capital_name, ai->fi_list[i].unicode_name))
+            break;
     }
     return i;
 }

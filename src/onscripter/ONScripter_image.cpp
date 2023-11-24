@@ -22,8 +22,8 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <new>
 #include <chrono>
+#include <new>
 
 #include "ONScripter.h"
 #include "private/utils.h"
@@ -263,23 +263,21 @@ int ONScripter::resizeSurface(SDL_Surface *src, SDL_Surface *dst) {
             break;
         case SDL_PIXELFORMAT_ABGR32:
             pixel_layout = STBIR_ABGR;
-            break; 
+            break;
     }
     SDL_LockSurface(dst);
     SDL_LockSurface(src);
     unsigned char *src_buffer = (unsigned char *)src->pixels;
     unsigned char *dst_buffer = (unsigned char *)dst->pixels;
-    stbir_resize_uint8_linear(
-        src_buffer,
-        src->w,
-        src->h,
-        0,
-        dst_buffer,
-        dst->w,
-        dst->h,
-        0,
-        pixel_layout
-    );
+    stbir_resize_uint8_linear(src_buffer,
+                              src->w,
+                              src->h,
+                              0,
+                              dst_buffer,
+                              dst->w,
+                              dst->h,
+                              0,
+                              pixel_layout);
     SDL_UnlockSurface(src);
     SDL_UnlockSurface(dst);
 #else

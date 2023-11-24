@@ -1158,7 +1158,9 @@ int ONScripter::parseLine() {
 #ifndef NDEBUG
                 auto duration = utils::duration(now);
                 if (duration > 50 && strcmp(fh.func[i].command, "btnwait")) {
-                    utils::printDebug("command %s exec %.3fms\n", fh.func[i].command, duration);
+                    utils::printDebug("command %s exec %.3fms\n",
+                                      fh.func[i].command,
+                                      duration);
                 }
 #endif
                 return ret;

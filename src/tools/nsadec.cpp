@@ -30,9 +30,9 @@
 #include <sys/types.h>
 
 #include <string>
-#include "charset/utf8.h"
 
 #include "NsaReader.h"
+#include "charset/utf8.h"
 #include "coding2utf16.h"
 #include "gbk2utf16.h"
 #ifdef _WIN32
@@ -103,15 +103,13 @@ int main(int argc, char **argv) {
     BaseReader::ArchiveInfo *sAI;
     BaseReader::FileInfo sFI;
 
-    char original_name[2048];
     for (i = 0; i < count; i++) {
         sAI = cNR.getArchiveInfoByIndex(i);
         sFI = sAI->fi_list[i];
-        memset(original_name, 0, 2048);
 #ifdef UTF8_FILESYSTEM
-        coding2utf16->convCoingToUTF8(sFI.original_name, original_name, 2048);
+        const char *original_name = sFI.unicode_name;
 #else
-        strcpy(original_name, sFI.original_name);
+        const char *original_name = sFI.name;
 #endif
         length = cNR.getFileLengthSubByIndex(sAI, i);
         buffer = new unsigned char[length]{0};

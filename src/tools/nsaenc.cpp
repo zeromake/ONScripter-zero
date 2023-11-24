@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "NsaReader.h"
-#include "gbk2utf16.h"
 #include "charset/utf8.h"
+#include "gbk2utf16.h"
 
 Coding2UTF16 *coding2utf16 = new GBK2UTF16();
 
@@ -46,20 +46,23 @@ int processFile(NsaReader::ArchiveInfo *ai,
                 int base_offset) {
     std::FILE *fp = NULL;
     char magic[5];
-    const char *filename = name.c_str();
-    // to gbk
-    char gbkname[4096]{0};
-#ifdef UTF8_FILESYSTEM
-    coding2utf16->convUTF8ToCoing(filename, gbkname, 4096);
-#else
-    strcpy(gbkname, filename);
-#endif
-    strcpy(fi->original_name, filename);
-    if (*gbkname == '/' || *gbkname == '\\') {
-        strcpy(fi->name, gbkname + 1);
-    } else {
-        strcpy(fi->name, gbkname);
+    char filename[4096]{0};
+    char unicode_name[4096]{0};
+    strcpy(filename, name.c_str());
+    int filenamelen = strlen(filename);
+    for (int i = 0; i < filenamelen; i++) {
+        if (REPLACE_DELIMITER == filename[i]) {
+            filename[i] = DEFAULT_DELIMITER;
+        }
     }
+#ifdef UTF8_FILESYSTEM
+    strcpy(unicode_name, filename);
+    coding2utf16->convUTF8ToCoing(unicode_name, filename, 4096);
+#else
+    coding2utf16->convCoingToUTF8(filename, unicode_name, 4096);
+#endif
+    strcpy(fi->unicode_name, unicode_name);
+    strcpy(fi->name, filename);
     std::string fullpath = normalPath(fullname);
     if ((fp = std::fopen(fullpath.c_str(), "rb")) == NULL) {
         fprintf(stderr, "can't open file %s, skipping\n", fullpath.c_str());
@@ -104,7 +107,11 @@ int processFile(NsaReader::ArchiveInfo *ai,
     fi->original_length = fi->length;
     fi->offset = offset;
     offset += fi->length;
-    ai->base_offset += strlen(fi->name) + base_offset;
+    ai->base_offset +=
+        strlen((ai->flags & BaseReader::ArchiveFlag::ARCHIVE_FLAG_ENCODING_UTF8)
+                   ? fi->unicode_name
+                   : fi->name) +
+        base_offset;
     ai->num_of_files++;
     return 0;
 }
@@ -135,7 +142,8 @@ int main(int argc, char *argv[]) {
     argv++;
     unsigned int nsa_offset = 0;
     bool enhanced_flag = false;
-    int archive_type = BaseReader::ARCHIVE_TYPE_NSA;
+    char archive_flags = 0;
+    int archive_type = 0;
     int base_offset = 14;
     int init_base_offset = 6;
     while (argc > 2) {
@@ -143,14 +151,19 @@ int main(int argc, char *argv[]) {
             argc--;
             argv++;
             int version = atoi(argv[0]);
+            nsa_offset = version - 1;
             if (version == 2) {
                 archive_type = BaseReader::ARCHIVE_TYPE_NS2;
-                init_base_offset = 5;  // nsa_offset + base_offset
-                base_offset = 6;
+                init_base_offset = nsa_offset + 4;  // nsa_offset + size(4)
+                base_offset = 7;  // compression_type(1),double_quote(2),size(4)
+            } else {
+                archive_type = BaseReader::ARCHIVE_TYPE_NSA;
             }
-            nsa_offset = version - 1;
         } else if (!strcmp(argv[0], "-e")) {
             enhanced_flag = true;
+        } else if (!strcmp(argv[0], "-u")) {
+            archive_flags |=
+                BaseReader::ArchiveFlag::ARCHIVE_FLAG_ENCODING_UTF8;
         }
         argc--;
         argv++;
@@ -164,9 +177,26 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "can't find dir %s.\n", basePath.c_str());
         exit(-1);
     }
+    std::string output = argv[1];
+    if (archive_type == 0) {
+        if (endsWith(output, ".ns2")) {
+            nsa_offset = 1;
+            archive_type = BaseReader::ARCHIVE_TYPE_NS2;
+            init_base_offset = nsa_offset + 4;  // nsa_offset + size(4)
+            base_offset = 7;  // compression_type(1),double_quote(2),size(4)
+        } else if (endsWith(output, ".nsa")) {
+            archive_type = BaseReader::ARCHIVE_TYPE_NSA;
+            nsa_offset = 0;
+        }
+    }
+    if (nsa_offset == 0) {
+        archive_flags = 0;
+    }
+
     NsaReader cSR;
     NsaReader::ArchiveInfo *sAI =
-        cSR.openForCreate(argv[1], archive_type, nsa_offset);
+        cSR.openForCreate(output.c_str(), archive_type, nsa_offset);
+    sAI->flags = archive_flags;
 
     std::vector<std::string> files;
     int code = file_iterator(dirPath, files);
@@ -206,10 +236,15 @@ int main(int argc, char *argv[]) {
     std::FILE *fp = nullptr;
     sFI = sAI->fi_list;
     for (int i = 0; i < sAI->num_of_files; i++, sFI++) {
+#ifdef UTF8_FILESYSTEM
+        const char *name = sFI->unicode_name;
+#else
+        const char *name = sFI->name;
+#endif
         printf("adding %d of %d (%s), length=%d\n",
                i + 1,
                sAI->num_of_files,
-               sFI->original_name,
+               name,
                (int)sFI->original_length);
         length = sFI->original_length;
         if (length > buffer_length) {
