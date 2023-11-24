@@ -1016,7 +1016,6 @@ void ONScripter::createBackground() {
     bg_info.pos.x = 0;
     bg_info.pos.y = 0;
     bg_info.allocImage(screen_width, screen_height, texture_format);
-
     if (!strcmp(bg_info.file_name, "white")) {
         bg_info.color[0] = bg_info.color[1] = bg_info.color[2] = 0xff;
     } else if (!strcmp(bg_info.file_name, "black") ||
@@ -1031,7 +1030,7 @@ void ONScripter::createBackground() {
         anim.trans_mode = AnimationInfo::TRANS_COPY;
         setupAnimationInfo(&anim);
 
-        bg_info.fill(0, 0, 0, 0xff);
+        bg_info.fill(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
         if (anim.image_surface) {
             SDL_Rect src_rect;
             src_rect.x = src_rect.y = 0;
@@ -1044,14 +1043,14 @@ void ONScripter::createBackground() {
                 src_rect.x = (anim.image_surface->w - screen_width) / 2;
                 src_rect.w = screen_width;
             }
-
             if (screen_height >= anim.image_surface->h) {
                 dst_rect.y = (screen_height - anim.image_surface->h) / 2;
             } else {
                 src_rect.y = (anim.image_surface->h - screen_height) / 2;
                 src_rect.h = screen_height;
             }
-            bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect);
+            SDL_UpperBlit(anim.image_surface, &src_rect, bg_info.image_surface, &dst_rect);
+            // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect, true);
         }
         return;
     }

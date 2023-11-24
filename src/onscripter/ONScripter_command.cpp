@@ -4884,3 +4884,8 @@ int ONScripter::consumeSeFadetime() {
     }
     return v;
 }
+
+int ONScripter::clear_colorCommand() {
+    script_h.readColor(&clear_color);
+    return RET_CONTINUE;
+}

@@ -29,6 +29,7 @@
 #include <string.h>
 
 typedef unsigned char uchar3[3];
+typedef unsigned char uchar4[4];
 
 class AnimationInfo {
    public:
@@ -158,7 +159,7 @@ class AnimationInfo {
     void allocImage(int w, int h, Uint32 texture_format);
     void copySurface(SDL_Surface *surface,
                      SDL_Rect *src_rect,
-                     SDL_Rect *dst_rect = NULL);
+                     SDL_Rect *dst_rect = NULL, bool blended = false);
     void fill(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     SDL_Surface *setupImageAlpha(SDL_Surface *surface,
                                  SDL_Surface *surface_m,
