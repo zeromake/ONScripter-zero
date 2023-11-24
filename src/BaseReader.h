@@ -71,6 +71,11 @@ struct BaseReader {
         ARCHIVE_TYPE_NS2 = 4  // new format since NScr2.91, uses ext ".ns2"
     };
 
+    enum ArchiveFlag {
+        ARCHIVE_FLAG_NONE = 0,
+        ARCHIVE_FLAG_ENCODING_UTF8 = 1 << 0
+    };
+
     struct FileInfo {
         char name[256];
         int compression_type;
@@ -78,7 +83,7 @@ struct BaseReader {
         size_t length;
         size_t original_length;
         // use utf8 encodeing
-        char original_name[256];
+        char unicode_name[1024];
     };
 
     struct ArchiveInfo {
@@ -89,6 +94,7 @@ struct BaseReader {
         FileInfo *fi_list;
         unsigned int num_of_files;
         unsigned long base_offset;
+        char flags;
 
         ArchiveInfo() {
             next = NULL;
@@ -97,6 +103,7 @@ struct BaseReader {
             file_name = NULL;
             fi_list = NULL;
             num_of_files = 0;
+            flags = ArchiveFlag::ARCHIVE_FLAG_NONE;
         }
         ~ArchiveInfo() {
             if (file_handle) fclose(file_handle);

@@ -177,8 +177,8 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetHeight)(JNIEnv *env, jobject thiz) {
     return ons.getHeight();
 }
 
-JNIEXPORT jint JNICALL
-JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks)(JNIEnv *env, jobject thiz) {
+JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks)(
+    JNIEnv *env, jobject thiz) {
     JavaONScripter = env->NewGlobalRef(thiz);
     jclass JavaONScripterClass = env->GetObjectClass(JavaONScripter);
     JavaPlayVideo = env->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
