@@ -321,6 +321,7 @@ class ONScripter : public ScriptParser {
     int sefadetimeCommand();
     int sprintfCommand();
     int checkspCommand();
+    int clear_colorCommand();
 
     void NSDCallCommand(int texnum,
                         const char *str1,
@@ -359,6 +360,7 @@ class ONScripter : public ScriptParser {
     };
     int event_mode;
     int sefadetime;
+    uchar4 clear_color;
 
     bool is_script_read;
     char *wm_title_string;

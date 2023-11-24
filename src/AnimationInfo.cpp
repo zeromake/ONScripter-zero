@@ -1121,7 +1121,7 @@ void AnimationInfo::allocImage(int w, int h, Uint32 texture_format) {
 
 void AnimationInfo::copySurface(SDL_Surface *surface,
                                 SDL_Rect *src_rect,
-                                SDL_Rect *dst_rect) {
+                                SDL_Rect *dst_rect, bool blended) {
     if (!image_surface || !surface) return;
 
     SDL_Rect _dst_rect = {0, 0};
@@ -1151,14 +1151,56 @@ void AnimationInfo::copySurface(SDL_Surface *surface,
     SDL_LockSurface(image_surface);
 
     int i;
-    for (i = 0; i < _src_rect.h; i++)
-        memcpy((ONSBuf *)((unsigned char *)image_surface->pixels +
-                          image_surface->pitch * (_dst_rect.y + i)) +
-                   _dst_rect.x,
-               (ONSBuf *)((unsigned char *)surface->pixels +
-                          surface->pitch * (_src_rect.y + i)) +
-                   _src_rect.x,
-               _src_rect.w * sizeof(ONSBuf));
+    SDL_PixelFormat *src_fmt = image_surface->format;
+    SDL_PixelFormat *dst_fmt = image_surface->format;
+#define GET_PALETTE_COLOR(code, fmt, name) ((code & fmt->name##mask) >> fmt->name##shift) << fmt->name##loss;
+    if (blended) {
+        for (i = 0; i < _src_rect.h; i++) {
+            ONSBuf *src = (ONSBuf *)((unsigned char *)surface->pixels +
+                            surface->pitch * (_src_rect.y + i)) +
+                    _src_rect.x;
+            ONSBuf *dst = (ONSBuf *)((unsigned char *)image_surface->pixels +
+                            image_surface->pitch * (_dst_rect.y + i)) +
+                    _dst_rect.x;
+            int n = _src_rect.w;
+            for (int j = 0; j < n; j++) {
+                Uint8 A1 = GET_PALETTE_COLOR(src[j], src_fmt, A);
+                Uint8 R1 = GET_PALETTE_COLOR(src[j], src_fmt, R);
+                Uint8 G1 = GET_PALETTE_COLOR(src[j], src_fmt, G);
+                Uint8 B1 = GET_PALETTE_COLOR(src[j], src_fmt, B);
+
+                Uint8 A2 = GET_PALETTE_COLOR(dst[j], dst_fmt, A);
+                Uint8 R2 = GET_PALETTE_COLOR(dst[j], dst_fmt, R);
+                Uint8 G2 = GET_PALETTE_COLOR(dst[j], dst_fmt, G);
+                Uint8 B2 = GET_PALETTE_COLOR(dst[j], dst_fmt, B);
+                float alpha1 = A1 / 255.0f;
+                float alpha2 = A2 / 255.0f;
+                float A = 1.0f - (1.0f - alpha1) * (1.0 - alpha2);
+                float R = (R1 * alpha1 + R2 * alpha2 * (1.0f - alpha1)) / A;
+                float G = (G1 * alpha1 + G2 * alpha2 * (1.0f - alpha1)) / A;
+                float B = (B1 * alpha1 + B2 * alpha2 * (1.0f - alpha1)) / A;
+
+                Uint8 A3 = 255 * A;
+                Uint8 R3 = R;
+                Uint8 G3 = G;
+                Uint8 B3 = B;
+                Uint32 rgba = (((R3 >> dst_fmt->Rloss) << dst_fmt->Rshift) |
+                            ((G3 >> dst_fmt->Gloss) << dst_fmt->Gshift) |
+                            ((B3 >> dst_fmt->Bloss) << dst_fmt->Bshift) |
+                            ((A3 >> dst_fmt->Aloss) << dst_fmt->Ashift));
+                dst[j] = rgba;
+            }
+        }
+    } else {
+        for (i = 0; i < _src_rect.h; i++)
+            memcpy((ONSBuf *)((unsigned char *)image_surface->pixels +
+                            image_surface->pitch * (_dst_rect.y + i)) +
+                    _dst_rect.x,
+                (ONSBuf *)((unsigned char *)surface->pixels +
+                            surface->pitch * (_src_rect.y + i)) +
+                    _src_rect.x,
+                _src_rect.w * sizeof(ONSBuf));
+    }
 
     SDL_UnlockSurface(image_surface);
     SDL_UnlockSurface(surface);
@@ -1172,7 +1214,7 @@ void AnimationInfo::fill(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     SDL_LockSurface(image_surface);
 
     SDL_PixelFormat *fmt = image_surface->format;
-    Uint32 rgb = (((r >> fmt->Rloss) << fmt->Rshift) |
+    Uint32 rgba = (((r >> fmt->Rloss) << fmt->Rshift) |
                   ((g >> fmt->Gloss) << fmt->Gshift) |
                   ((b >> fmt->Bloss) << fmt->Bshift) |
                   ((a >> fmt->Aloss) << fmt->Ashift));
@@ -1181,7 +1223,7 @@ void AnimationInfo::fill(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     for (int i = 0; i < image_surface->h; i++) {
         ONSBuf *dst_buffer = (ONSBuf *)image_surface->pixels + pitch * i;
         for (int j = 0; j < image_surface->w; j++) {
-            *dst_buffer++ = rgb;
+            *dst_buffer++ = rgba;
         }
     }
     SDL_UnlockSurface(image_surface);

@@ -432,7 +432,6 @@ unsigned char ScriptParser::convHexToDec(char ch) {
         return ch - 'A' + 10;
     else
         errorAndExit("convHexToDec: not valid character for color.");
-
     return 0;
 }
 

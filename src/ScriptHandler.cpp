@@ -465,6 +465,44 @@ int ScriptHandler::readInt() {
     return ret;
 }
 
+static unsigned char convHexToDec(char ch) {
+    if ('0' <= ch && ch <= '9')
+        return ch - '0';
+    else if ('a' <= ch && ch <= 'f')
+        return ch - 'a' + 10;
+    else if ('A' <= ch && ch <= 'F')
+        return ch - 'A' + 10;
+    return 0;
+}
+
+bool ScriptHandler::readColor(uchar4 *color) {
+    end_status = END_NONE;
+    current_script = next_script;
+    SKIP_SPACE(current_script);
+    if (*current_script != '#') {
+        return false;
+    }
+    char *buf = current_script+1;
+    (*color)[3] = 255;
+    int size = 0;
+    while (
+        ('0' <= buf[size] && buf[size] <= '9') ||
+        ('a' <= buf[size] && buf[size] <= 'f') ||
+        ('A' <= buf[size] && buf[size] <= 'F') ) {
+        size++;
+    }
+    bool is_repeat = size == 3 || size == 4;
+    int sep = is_repeat ? 1 : 2;
+    int offset = 0;
+    for (int i = 0; i < size; i += sep) {
+        (*color)[offset] = convHexToDec(buf[i]) << 4 | convHexToDec(is_repeat ? buf[i] : buf[i+1]);
+        offset++;
+    }
+    buf+=size;
+    next_script = checkComma(buf);
+    return true;
+}
+
 void ScriptHandler::skipToken() {
     SKIP_SPACE(current_script);
     char *buf = current_script;

@@ -40,6 +40,7 @@
 #define STRING_BUFFER_LENGTH 4096
 
 typedef unsigned char uchar3[3];
+typedef unsigned char uchar4[4];
 
 class ScriptHandler {
    public:
@@ -124,6 +125,7 @@ class ScriptHandler {
     int parseIntExpression(char **buf);
     void readVariable(bool reread_flag = false);
     void skipAnyVariable();
+    bool readColor(uchar4 *color);
 
     // function for string access
     inline char *getStringBuffer() { return string_buffer; };
