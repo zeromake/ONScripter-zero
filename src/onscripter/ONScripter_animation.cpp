@@ -71,6 +71,11 @@ int ONScripter::calcDurationToNextAnimation() {
 }
 
 void ONScripter::proceedAnimation(int current_time) {
+    // 需要额外执行 sentence_font_info 的动画否则会导致 setwindow 的文本框图片无法显示（实际上是动画未执行导致一直在动画的第一帧刚好是隐藏）
+    if (sentence_font_info.proceedAnimation(current_time))
+        flushDirect(
+            sentence_font_info.pos,
+            refreshMode() | (draw_cursor_flag ? REFRESH_CURSOR_MODE : 0));
     for (int i = 0; i < 3; i++)
         if (tachi_info[i].proceedAnimation(current_time))
             flushDirect(
@@ -82,6 +87,7 @@ void ONScripter::proceedAnimation(int current_time) {
             flushDirect(
                 sprite_info[i].pos,
                 refreshMode() | (draw_cursor_flag ? REFRESH_CURSOR_MODE : 0));
+    
 
 #ifdef USE_LUA
     if (lua_handler.is_animatable && !script_h.isExternalScript()) {
@@ -237,18 +243,50 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         int location;
         SDL_Surface *_surface1 = nullptr;
         SDL_Surface *_surface2 = nullptr;
+        bool has_rescale = anim->load_size == NULL &&
+            screen_ratio2 != screen_ratio1 &&
+            (!disable_rescale_flag || location == BaseReader::ARCHIVE_TYPE_NONE);
+        SDL_Point temp_size;
+        SDL_Point *load_size = anim->load_size;
+        if (has_rescale && (anim->orig_pos.w > 0 || anim->orig_pos.h > 0)) {
+            temp_size.x = utils::min(anim->orig_pos.w, screen_width);
+            temp_size.y = utils::min(anim->orig_pos.h, screen_height);
+            load_size = &temp_size;
+        }
+        bool image_can_rescale = load_size == NULL && (*anim->file_name == '>' || strstr((char *)anim->file_name, ".svg"));
         _surface1 = loadImage(
-            anim->file_name, &has_alpha, &location, &anim->default_alpha);
-
+            anim->file_name,
+            &has_alpha,
+            &location,
+            &anim->default_alpha,
+            load_size);
+        // 通过新的大小重新 load 一次
+        if (image_can_rescale && has_rescale) {
+            int w, h;
+            if ((w = _surface1->w * screen_ratio1 / screen_ratio2) == 0) w = 1;
+            if ((h = _surface1->h * screen_ratio1 / screen_ratio2) == 0) h = 1;
+            temp_size.x = w;
+            temp_size.y = h;
+            load_size = &temp_size;
+            _surface1 = loadImage(
+                anim->file_name,
+                &has_alpha,
+                &location,
+                &anim->default_alpha,
+                load_size);
+        }
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
             _surface2 = loadImage(anim->mask_file_name);
 
-        SDL_Surface *surface =
+        // SDL_Surface *surface = _surface1;
+        SDL_Surface *surface = 
             anim->setupImageAlpha(_surface1, _surface2, has_alpha);
 
-        if (surface && screen_ratio2 != screen_ratio1 &&
-            (!disable_rescale_flag ||
-             location == BaseReader::ARCHIVE_TYPE_NONE)) {
+
+        bool is_rescaled = load_size &&
+            ((load_size->x > 0 && surface->w == load_size->x) ||
+            (load_size->y > 0 && surface->h == load_size->y));
+        if (surface && has_rescale && !is_rescaled) {
             SDL_Surface *src_s = surface;
 
             int w, h;

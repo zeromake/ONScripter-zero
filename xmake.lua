@@ -169,10 +169,12 @@ target("onscripter")
     )
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
+    if not is_plat("windows", "mingw") then
+        add_defines("RENDER_COPY_RECT_FULL=1")
+    end
     if is_plat("macosx") then
         add_links("sdl2_main")
         add_files("src/entry/*.mm")
-        add_defines("RENDER_COPY_RECT_FULL=1")
         add_frameworks("AudioToolbox", "Cocoa")
         if get_config("target_minver") then
             local target_minver = tonumber(get_config("target_minver"))
@@ -183,7 +185,6 @@ target("onscripter")
     elseif is_plat("iphoneos") then
         add_links("sdl2_main")
         add_files("src/entry/*.mm")
-        add_defines("RENDER_COPY_RECT_FULL=1")
         if get_config("target_minver") then
             local target_minver = tonumber(get_config("target_minver"))
             if target_minver < 13.0 then
@@ -237,7 +238,8 @@ target("onscripter")
         "src/reader/*.cpp",
         "src/onscripter/*.cpp",
         "src/builtin_dll/*.cpp",
-        "src/language/*.cpp"
+        "src/language/*.cpp",
+        "src/private/*.cpp"
     )
     add_files("src/resize/*.c")
     remove_files("src/AVIWrapper.cpp")

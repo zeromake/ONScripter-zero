@@ -64,16 +64,17 @@ std::shared_ptr<onscache::SurfaceBaseNode> ONScripter::loadImageCache(
 SDL_Surface *ONScripter::loadImage(char *filename,
                                    bool *has_alpha,
                                    int *location,
-                                   unsigned char *alpha) {
+                                   unsigned char *alpha,
+                                   const SDL_Point *load_size) {
     if (!filename) return NULL;
 
     SDL_Surface *tmp = NULL;
     if (location) *location = BaseReader::ARCHIVE_TYPE_NONE;
 
     if (filename[0] == '>')
-        tmp = createRectangleSurface(filename, has_alpha, alpha);
+        tmp = createRectangleSurface(filename, has_alpha, alpha, load_size);
     else
-        tmp = createSurfaceFromFile(filename, has_alpha, location);
+        tmp = createSurfaceFromFile(filename, has_alpha, location, load_size);
     if (tmp == NULL) return NULL;
     SDL_Surface *ret;
     if ((tmp->w * tmp->format->BytesPerPixel == tmp->pitch) &&
@@ -90,9 +91,11 @@ SDL_Surface *ONScripter::loadImage(char *filename,
     return ret;
 }
 
-SDL_Surface *ONScripter::createRectangleSurface(char *filename,
-                                                bool *has_alpha,
-                                                unsigned char *alpha) {
+SDL_Surface *ONScripter::createRectangleSurface(
+    char *filename,
+    bool *has_alpha,
+    unsigned char *alpha,
+    const SDL_Point *load_size) {
     int c = 1, w = 0, h = 0;
     bool decimal_flag = false;
     while (filename[c] != '\n' && filename[c] != 0x00) {
@@ -119,13 +122,24 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename,
     }
 
     while (filename[c] == ' ' || filename[c] == '\t') c++;
-    int n = 0, c2 = c;
+    int c2 = c;
+    std::vector<utils::uchar4> colors;
     while (filename[c] == '#') {
-        uchar3 col;
-        readColor(&col, filename + c);
-        n++;
-        c += 7;
+        utils::uchar4 col{0};
+        int nn = utils::readColor(filename + c, &col);
+        if (nn == 0) {
+            break;
+        }
+        c += nn;
+        colors.push_back(std::move(col));
         while (filename[c] == ' ' || filename[c] == '\t') c++;
+    }
+
+    if (load_size && load_size->x > 0) {
+        w = load_size->x;
+    }
+    if (load_size && load_size->y > 0) {
+        h = load_size->y;
     }
 
     SDL_PixelFormat *fmt = image_surface->format;
@@ -137,14 +151,9 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename,
                                             fmt->Gmask,
                                             fmt->Bmask,
                                             fmt->Amask);
-
-    c = c2;
+    int n = colors.size();      
     for (int i = 0; i < n; i++) {
-        uchar3 col;
-        readColor(&col, filename + c);
-        c += 7;
-        while (filename[c] == ' ' || filename[c] == '\t') c++;
-
+        auto col = colors[i];
         SDL_Rect rect;
         rect.x = w * i / n;
         rect.y = 0;
@@ -155,7 +164,11 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename,
             tmp,
             &rect,
             SDL_MapRGBA(
-                tmp->format, col[0], col[1], col[2], alpha ? *alpha : 0xff));
+                tmp->format,
+                col.rgba[0],
+                col.rgba[1],
+                col.rgba[2],
+                col.rgba[3] == 255 ? (alpha ? *alpha : 0xff) : col.rgba[3]));
     }
 
     if (has_alpha) {
@@ -170,7 +183,8 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename,
 
 SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
                                                bool *has_alpha,
-                                               int *location) {
+                                               int *location,
+                                               const SDL_Point *load_size) {
     unsigned long length = script_h.cBR->getFileLength(filename);
 
     if (length == 0) {
@@ -211,9 +225,16 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
     char *ext = strrchr(filename, '.');
 
     SDL_RWops *src = SDL_RWFromMem(buffer, length);
+    int is_svg = !strncmp((char *)buffer, "<?xml", 5);
     int is_png = IMG_isPNG(src);
 
-    SDL_Surface *tmp = IMG_Load_RW(src, 0);
+    SDL_Surface *tmp = NULL;
+    if (is_svg && load_size) {
+        tmp = IMG_LoadSizedSVG_RW(src, load_size->x, load_size->y);
+    }
+    if (tmp == NULL) {
+        tmp = IMG_Load_RW(src, 0);
+    }
     if (!tmp && ext && (!strcmp(ext + 1, "JPG") || !strcmp(ext + 1, "jpg"))) {
         utils::printError(" *** force-loading a JPG image [%s]\n", filename);
         tmp = IMG_LoadJPG_RW(src);
@@ -1012,7 +1033,7 @@ void ONScripter::refreshSprite(int sprite_no,
 
 void ONScripter::createBackground() {
     bg_info.num_of_cells = 1;
-    bg_info.trans_mode = AnimationInfo::TRANS_COPY;
+    bg_info.trans_mode = AnimationInfo::TRANS_ALPHA;
     bg_info.pos.x = 0;
     bg_info.pos.y = 0;
     bg_info.allocImage(screen_width, screen_height, texture_format);
@@ -1027,10 +1048,15 @@ void ONScripter::createBackground() {
         AnimationInfo anim;
         setStr(&anim.image_name, bg_info.file_name);
         parseTaggedString(&anim);
-        anim.trans_mode = AnimationInfo::TRANS_COPY;
+        anim.trans_mode = AnimationInfo::TRANS_ALPHA;
+        // svg 适配
+        if (screen_width > screen_height) {
+            anim.setLoadSize(screen_width, 0);
+        } else {
+            anim.setLoadSize(0, screen_height);
+        }
         setupAnimationInfo(&anim);
-
-        bg_info.fill(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
+        bg_info.fill(clear_color.rgba[0], clear_color.rgba[1], clear_color.rgba[2], clear_color.rgba[3]);
         if (anim.image_surface) {
             SDL_Rect src_rect;
             src_rect.x = src_rect.y = 0;
@@ -1050,7 +1076,7 @@ void ONScripter::createBackground() {
                 src_rect.h = screen_height;
             }
             SDL_UpperBlit(anim.image_surface, &src_rect, bg_info.image_surface, &dst_rect);
-            // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect, true);
+            // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect, false);
         }
         return;
     }

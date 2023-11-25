@@ -66,7 +66,10 @@ AnimationInfo::AnimationInfo() {
         for (int i = 1; i < 255; i++) inv_alpha_lut[i] = (Uint32)(0xffff / i);
         is_inv_alpha_lut_initialized = true;
     }
-
+    if (load_size != NULL) {
+        delete load_size;
+        load_size = NULL;
+    }
     reset();
 }
 
@@ -163,6 +166,15 @@ void AnimationInfo::setImageName(const char *name) {
     size_t len = strlen(name);
     image_name = new char[len + 1]{0};
     strcpy(image_name, name);
+}
+
+
+void AnimationInfo::setLoadSize(const int w, const int h) {
+    if (load_size == NULL) {
+        load_size = new SDL_Point;
+    }
+    load_size->x = w;
+    load_size->y = h;
 }
 
 void AnimationInfo::deleteSurface(bool delete_surface_name) {
