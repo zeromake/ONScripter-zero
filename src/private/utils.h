@@ -21,91 +21,25 @@
 
 #ifndef __UTILS_H__
 #define __UTILS_H__
-
-#ifdef ANDROID
-#include <android/log.h>
-#elif defined(WINRT)
-#include "debugapi.h"
-#include "windows.h"
-static BOOL MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize) {
-    DWORD dwMinSize;
-    dwMinSize = MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, NULL, 0);
-    if (dwSize < dwMinSize) {
-        return FALSE;
-    }
-    MultiByteToWideChar(CP_ACP, 0, lpcszStr, -1, lpwszStr, dwMinSize);
-    return TRUE;
-}
-#endif
-#include <stdarg.h>
-#include <stdio.h>
-
-#include <string>
-#include <utility>
 #include <chrono>
 
 namespace utils {
 
-inline std::chrono::steady_clock::time_point now() {
-    return std::chrono::steady_clock::now();
-}
+typedef struct _uchar4 {
+    unsigned char rgba[4];
+} uchar4;
 
-inline float duration(std::chrono::steady_clock::time_point prev) {
-    return std::chrono::duration_cast<std::chrono::microseconds>(now() - prev).count() / 1000.0f;
-}
+std::chrono::steady_clock::time_point now();
 
-inline void printDebug(const char *format, ...) {
-    va_list ap;
-    va_start(ap, format);
-#ifdef ANDROID
-    __android_log_vprint(ANDROID_LOG_DEBUG, "DEBUG", format, ap);
-#elif defined(WINRT)
-    const int __size = 256;
-    char *buf = new char[__size]{0};
-    vsnprintf(buf, __size, format, ap);
-    LPWSTR wstr = new WCHAR[128];
-    MByteToWChar(buf, wstr, 256);
-    OutputDebugString(wstr);
-#else
-    vprintf(format, ap);
-#endif
-    va_end(ap);
-}
+float duration(std::chrono::steady_clock::time_point prev);
 
-inline void printInfo(const char *format, ...) {
-    va_list ap;
-    va_start(ap, format);
-#ifdef ANDROID
-    __android_log_vprint(ANDROID_LOG_VERBOSE, "INFO", format, ap);
-#elif defined(WINRT)
-    const int __size = 256;
-    char *buf = new char[__size]{0};
-    vsnprintf(buf, __size, format, ap);
-    LPWSTR wstr = new WCHAR[128];
-    MByteToWChar(buf, wstr, 256);
-    OutputDebugString(wstr);
-#else
-    vprintf(format, ap);
-#endif
-    va_end(ap);
-}
+void printDebug(const char *format, ...);
 
-inline void printError(const char *format, ...) {
-    va_list ap;
-    va_start(ap, format);
-#ifdef ANDROID
-    __android_log_vprint(ANDROID_LOG_ERROR, "ERR", format, ap);
-#elif defined(WINRT)
-    char *buf = new char[256]{0};
-    vsnprintf(buf, 256, format, ap);
-    LPWSTR wstr = new WCHAR[128];
-    MByteToWChar(buf, wstr, 256);
-    OutputDebugString(wstr);
-#else
-    vfprintf(stderr, format, ap);
-#endif
-    va_end(ap);
-}
+void printInfo(const char *format, ...);
+
+void printError(const char *format, ...);
+
+int readColor(const char *buf, uchar4 *color);
 
 template <typename T>
 T(min)

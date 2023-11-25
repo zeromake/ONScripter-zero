@@ -360,7 +360,7 @@ class ONScripter : public ScriptParser {
     };
     int event_mode;
     int sefadetime;
-    uchar4 clear_color;
+    utils::uchar4 clear_color;
 
     bool is_script_read;
     char *wm_title_string;
@@ -700,13 +700,16 @@ class ONScripter : public ScriptParser {
     SDL_Surface *loadImage(char *filename,
                            bool *has_alpha = NULL,
                            int *location = NULL,
-                           unsigned char *alpha = NULL);
+                           unsigned char *alpha = NULL,
+                           const SDL_Point *load_size = NULL);
     SDL_Surface *createRectangleSurface(char *filename,
                                         bool *has_alpha,
-                                        unsigned char *alpha = NULL);
+                                        unsigned char *alpha = NULL,
+                                        const SDL_Point *load_size = NULL);
     SDL_Surface *createSurfaceFromFile(char *filename,
                                        bool *has_alpha,
-                                       int *location);
+                                       int *location,
+                                       const SDL_Point *load_size = NULL);
 
     int resizeSurface(SDL_Surface *src, SDL_Surface *dst);
     void alphaBlend(SDL_Surface *mask_surface,

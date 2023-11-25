@@ -29,7 +29,6 @@
 #include <string.h>
 
 typedef unsigned char uchar3[3];
-typedef unsigned char uchar4[4];
 
 class AnimationInfo {
    public:
@@ -61,6 +60,7 @@ class AnimationInfo {
     SDL_Rect pos;         // position and size of the current cell
     SDL_Rect affine_pos;  // topleft position and width/height for affince
                           // transformation
+    SDL_Point *load_size = NULL;
 
     int num_of_cells;
     int current_cell;
@@ -123,6 +123,7 @@ class AnimationInfo {
     };
 
     void reset();
+    void setLoadSize(const int w, const int h);
 
     void deleteImageName();
     void setImageName(const char *name);
