@@ -71,11 +71,6 @@ int ONScripter::calcDurationToNextAnimation() {
 }
 
 void ONScripter::proceedAnimation(int current_time) {
-    // 需要额外执行 sentence_font_info 的动画否则会导致 setwindow 的文本框图片无法显示（实际上是动画未执行导致一直在动画的第一帧刚好是隐藏）
-    if (sentence_font_info.proceedAnimation(current_time))
-        flushDirect(
-            sentence_font_info.pos,
-            refreshMode() | (draw_cursor_flag ? REFRESH_CURSOR_MODE : 0));
     for (int i = 0; i < 3; i++)
         if (tachi_info[i].proceedAnimation(current_time))
             flushDirect(

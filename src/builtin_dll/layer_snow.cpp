@@ -124,7 +124,7 @@ static SDL_Surface *loadImage(char *file_name,
         tmp = IMG_LoadJPG_RW(src);
         SDL_RWclose(src);
     }
-    if (tmp && has_alpha) *has_alpha = tmp->format->Amask;
+    if (tmp && has_alpha) *has_alpha = SDL_ISPIXELFORMAT_ALPHA(tmp->format->format);
 
     delete[] buffer;
     if (!tmp) {

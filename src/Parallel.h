@@ -44,7 +44,7 @@ namespace parallel {
 #ifdef USE_OMP_PARALLEL
 static const int thread_num = omp_get_num_procs();
 #elif defined(USE_PARALLEL)
-static const int thread_num = std::min(SDL_GetCPUCount(), 64);
+static const int thread_num = (utils::min)(SDL_GetCPUCount(), 64);
 
 class ThreadPool {
     struct Thread {
