@@ -172,10 +172,7 @@ SDL_Surface *ONScripter::createRectangleSurface(
     }
 
     if (has_alpha) {
-        if (fmt->Amask)
-            *has_alpha = true;
-        else
-            *has_alpha = false;
+        *has_alpha = SDL_ISPIXELFORMAT_ALPHA(fmt->format);
     }
 
     return tmp;
@@ -241,10 +238,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
     }
 
     if (tmp && has_alpha) {
-        if (tmp->format->Amask || is_png)
-            *has_alpha = true;
-        else
-            *has_alpha = false;
+        *has_alpha = SDL_ISPIXELFORMAT_ALPHA(tmp->format->format) || is_png || is_svg;
     }
 
     SDL_RWclose(src);
@@ -1033,7 +1027,7 @@ void ONScripter::refreshSprite(int sprite_no,
 
 void ONScripter::createBackground() {
     bg_info.num_of_cells = 1;
-    bg_info.trans_mode = AnimationInfo::TRANS_ALPHA;
+    bg_info.trans_mode = AnimationInfo::TRANS_COPY;
     bg_info.pos.x = 0;
     bg_info.pos.y = 0;
     bg_info.allocImage(screen_width, screen_height, texture_format);
@@ -1048,7 +1042,7 @@ void ONScripter::createBackground() {
         AnimationInfo anim;
         setStr(&anim.image_name, bg_info.file_name);
         parseTaggedString(&anim);
-        anim.trans_mode = AnimationInfo::TRANS_ALPHA;
+        anim.trans_mode = AnimationInfo::TRANS_COPY;
         // svg 适配
         if (screen_width > screen_height) {
             anim.setLoadSize(screen_width, 0);
@@ -1076,7 +1070,7 @@ void ONScripter::createBackground() {
                 src_rect.h = screen_height;
             }
             SDL_UpperBlit(anim.image_surface, &src_rect, bg_info.image_surface, &dst_rect);
-            // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect, false);
+            // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect);
         }
         return;
     }

@@ -1246,6 +1246,8 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
                                             SDL_Surface *surface_m,
                                             bool has_alpha) {
     if (surface == NULL) return NULL;
+    // 有透明通道的图片不做这些内置处理
+    if (has_alpha) return surface;
 
     SDL_LockSurface(surface);
     Uint32 *buffer = (Uint32 *)surface->pixels;
