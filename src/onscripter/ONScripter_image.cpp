@@ -24,6 +24,7 @@
 
 #include <chrono>
 #include <new>
+#include <vector>
 
 #include "ONScripter.h"
 #include "private/utils.h"
