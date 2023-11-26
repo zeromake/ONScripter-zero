@@ -173,7 +173,7 @@ SDL_Surface *ONScripter::createRectangleSurface(
     }
 
     if (has_alpha) {
-        *has_alpha = SDL_ISPIXELFORMAT_ALPHA(fmt->format);
+        *has_alpha = fmt->Amask;
     }
 
     return tmp;
@@ -225,6 +225,8 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
     SDL_RWops *src = SDL_RWFromMem(buffer, length);
     int is_svg = !strncmp((char *)buffer, "<?xml", 5);
     int is_png = IMG_isPNG(src);
+    int is_jpeg = IMG_isJPG(src);
+    int is_not_alpha = is_jpeg || IMG_isBMP(src);
 
     SDL_Surface *tmp = NULL;
     if (is_svg && load_size) {
@@ -233,13 +235,13 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
     if (tmp == NULL) {
         tmp = IMG_Load_RW(src, 0);
     }
-    if (!tmp && ext && (!strcmp(ext + 1, "JPG") || !strcmp(ext + 1, "jpg"))) {
+    if (!tmp && is_jpeg) {
         utils::printError(" *** force-loading a JPG image [%s]\n", filename);
         tmp = IMG_LoadJPG_RW(src);
     }
 
     if (tmp && has_alpha) {
-        *has_alpha = SDL_ISPIXELFORMAT_ALPHA(tmp->format->format) || is_png || is_svg;
+        *has_alpha = (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
     }
 
     SDL_RWclose(src);

@@ -344,7 +344,8 @@ target("nsaenc")
         "src/reader/SarReader.cpp",
         "src/tools/conv_shared.cpp",
         "src/resize_image.cpp",
-        "src/language/*.cpp"
+        "src/language/*.cpp",
+        "src/private/*.cpp"
     )
 
 target("nsadec")
@@ -359,7 +360,8 @@ target("nsadec")
         "src/reader/NsaReader.cpp",
         "src/reader/DirectReader.cpp",
         "src/reader/SarReader.cpp",
-        "src/language/*.cpp"
+        "src/language/*.cpp",
+        "src/private/*.cpp"
     )
 
 target("arcmake")

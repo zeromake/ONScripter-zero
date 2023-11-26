@@ -115,16 +115,18 @@ static SDL_Surface *loadImage(char *file_name,
     unsigned char *buffer = new unsigned char[length];
     int location;
     br->getFile(file_name, buffer, &location);
-    SDL_Surface *tmp = IMG_Load_RW(SDL_RWFromMem(buffer, length), 1);
+    SDL_RWops *src = SDL_RWFromMem(buffer, length);
+    int is_jpeg = IMG_isJPG(src);
+    int is_not_alpha = is_jpeg || IMG_isJPG(src);
+    SDL_Surface *tmp = IMG_Load_RW(src, 1);
 
     char *ext = strrchr(file_name, '.');
-    if (!tmp && ext && (!strcmp(ext + 1, "JPG") || !strcmp(ext + 1, "jpg"))) {
+    if (!tmp && ext && is_jpeg) {
         fprintf(stderr, " *** force-loading a JPG image [%s]\n", file_name);
-        SDL_RWops *src = SDL_RWFromMem(buffer, length);
         tmp = IMG_LoadJPG_RW(src);
         SDL_RWclose(src);
     }
-    if (tmp && has_alpha) *has_alpha = SDL_ISPIXELFORMAT_ALPHA(tmp->format->format);
+    if (tmp && has_alpha) *has_alpha = tmp->format->Amask && !is_not_alpha;
 
     delete[] buffer;
     if (!tmp) {
