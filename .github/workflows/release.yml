@@ -117,7 +117,7 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_HOME}/ndk/23.2.8568313 -y -c
+          xmake f -p android -a armeabi-v7a --ndk_sdkver=16 --ndk=${ANDROID_NDK} -y -c
           xmake build -y onscripter
       - name: build-apk
         run: |
