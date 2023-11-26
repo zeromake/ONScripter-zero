@@ -108,12 +108,6 @@ jobs:
         run: |
           xmake f -p android -a arm64-v8a --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c
           xmake build -y onscripter
-      - name: build-x64-so
-        env:
-          VERSION: ${{ github.ref_name }}
-        run: |
-          xmake f -p android -a x86_64 --ndk_sdkver=21 --ndk=${ANDROID_NDK} -y -c
-          xmake build -y onscripter
       - name: build-apk
         run: |
           export JAVA_HOME=$JAVA_HOME_17_X64
