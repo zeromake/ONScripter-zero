@@ -238,25 +238,28 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         int location;
         SDL_Surface *_surface1 = nullptr;
         SDL_Surface *_surface2 = nullptr;
-        bool has_rescale = anim->load_size == NULL &&
-            screen_ratio2 != screen_ratio1 &&
+        bool has_rescale = screen_ratio2 != screen_ratio1 &&
             (!disable_rescale_flag || location == BaseReader::ARCHIVE_TYPE_NONE);
         SDL_Point temp_size;
         SDL_Point *load_size = anim->load_size;
-        if (has_rescale && (anim->orig_pos.w > 0 || anim->orig_pos.h > 0)) {
-            temp_size.x = utils::min(anim->orig_pos.w, screen_width);
-            temp_size.y = utils::min(anim->orig_pos.h, screen_height);
-            load_size = &temp_size;
-        }
-        bool image_can_rescale = load_size == NULL && (*anim->file_name == '>' || strstr((char *)anim->file_name, ".svg"));
+        bool image_can_rescale = (*anim->file_name == '>' || strstr((char *)anim->file_name, ".svg"));
+        // 存档里的 orig_pos 里已经是缩放后的，没法对应到现在的动态情况
+        // if (has_rescale && image_can_rescale && (anim->orig_pos.w > 0 || anim->orig_pos.h > 0)) {
+        //     temp_size.x = utils::min(anim->orig_pos.w, screen_width);
+        //     temp_size.y = utils::min(anim->orig_pos.h, screen_height);
+        //     load_size = &temp_size;
+        // }
         _surface1 = loadImage(
             anim->file_name,
             &has_alpha,
             &location,
             &anim->default_alpha,
             load_size);
+        bool is_rescaled = load_size &&
+            ((load_size->x > 0 && _surface1->w == load_size->x) ||
+            (load_size->y > 0 && _surface1->h == load_size->y));
         // 通过新的大小重新 load 一次
-        if (image_can_rescale && has_rescale) {
+        if (image_can_rescale && has_rescale && !is_rescaled) {
             int w, h;
             if ((w = _surface1->w * screen_ratio1 / screen_ratio2) == 0) w = 1;
             if ((h = _surface1->h * screen_ratio1 / screen_ratio2) == 0) h = 1;
@@ -269,6 +272,9 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
                 &location,
                 &anim->default_alpha,
                 load_size);
+            is_rescaled = load_size &&
+                ((load_size->x > 0 && _surface1->w == load_size->x) ||
+                (load_size->y > 0 && _surface1->h == load_size->y));
         }
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
             _surface2 = loadImage(anim->mask_file_name);
@@ -277,10 +283,6 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         SDL_Surface *surface = 
             anim->setupImageAlpha(_surface1, _surface2, has_alpha);
 
-
-        bool is_rescaled = load_size &&
-            ((load_size->x > 0 && surface->w == load_size->x) ||
-            (load_size->y > 0 && surface->h == load_size->y));
         if (surface && has_rescale && !is_rescaled) {
             SDL_Surface *src_s = surface;
 
