@@ -244,11 +244,11 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         SDL_Point *load_size = anim->load_size;
         bool image_can_rescale = (*anim->file_name == '>' || strstr((char *)anim->file_name, ".svg"));
         // 存档里的 orig_pos 里已经是缩放后的，没法对应到现在的动态情况
-        // if (has_rescale && image_can_rescale && (anim->orig_pos.w > 0 || anim->orig_pos.h > 0)) {
-        //     temp_size.x = utils::min(anim->orig_pos.w, screen_width);
-        //     temp_size.y = utils::min(anim->orig_pos.h, screen_height);
-        //     load_size = &temp_size;
-        // }
+        if (has_rescale && image_can_rescale && (anim->pos.w > 0 || anim->pos.h > 0)) {
+            temp_size.x = utils::min(anim->pos.w, screen_width);
+            temp_size.y = utils::min(anim->pos.h, screen_height);
+            load_size = &temp_size;
+        }
         _surface1 = loadImage(
             anim->file_name,
             &has_alpha,
@@ -298,16 +298,9 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
                                            fmt->Gmask,
                                            fmt->Bmask,
                                            fmt->Amask);
-            // SDL_Rect dest_rect{0, 0, w, h};
-            // SDL_UpperBlit(src_s, NULL, surface, &dest_rect);
             resizeSurface(src_s, surface);
-            // rotozoomSurface 性能非常的差……，甚至没有 ons 写的 resizeSurface
-            // 好 surface = ::rotozoomSurface(
-            //     src_s, 0, ((double)screen_ratio1 / (double)screen_ratio2),
-            //     SMOOTHING_ON);
             SDL_FreeSurface(src_s);
         }
-
         anim->setImage(surface, texture_format);
         if (_surface2) SDL_FreeSurface(_surface2);
     }
