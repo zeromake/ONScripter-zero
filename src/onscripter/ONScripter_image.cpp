@@ -47,21 +47,6 @@
 #include <stb/stb_image_resize2.h>
 #endif
 
-#ifdef USE_IMAGE_CACHE
-std::shared_ptr<onscache::SurfaceBaseNode> ONScripter::loadImageCache(
-    char *filename, bool *has_alpha, int *location, unsigned char *alpha) {
-    auto node = surfaceCache.Get(filename);
-    if (node == nullptr) {
-        SDL_Surface *surface = loadImage(filename, has_alpha, location, alpha);
-        if (surface) {
-            return surfaceCache.Put(filename, surface);
-        }
-        return nullptr;
-    }
-    return node;
-}
-#endif
-
 SDL_Surface *ONScripter::loadImage(char *filename,
                                    bool *has_alpha,
                                    int *location,
@@ -177,80 +162,141 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename,
     return tmp;
 }
 
-SDL_Surface *ONScripter::createSurfaceFromFile(char *filename,
+SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
                                                bool *has_alpha,
                                                int *location,
                                                const SDL_Point *load_size) {
-    unsigned long length = script_h.cBR->getFileLength(filename);
-
-    if (length == 0) {
-        utils::printError(" *** can't find file [%s] ***\n", filename);
-        return NULL;
+    std::string filename = _filename;
+    size_t pos = filename.find('?');
+    SDL_Rect source_rect{0};
+    if (pos != std::string::npos) {
+        std::string query = filename.substr(pos + 1);
+        filename = filename.substr(0, pos);
+        std::vector<std::string> items;
+        utils::split(items, query, '&');
+        for (auto item: items) {
+            size_t next = item.find('=');
+            std::string k = item.substr(0, next);
+            size_t end = item.find('&', next+1);
+            std::string v = end == std::string::npos ? query.substr(next+1) : query.substr(next+1, end);
+            if (k == "clip") {
+                std::vector<std::string> rect;
+                rect.reserve(4);
+                utils::split(rect, v, ',');
+                if (rect.size() == 4) {
+                    source_rect.x = atoi(rect[0].c_str());
+                    source_rect.y = atoi(rect[1].c_str());
+                    source_rect.w = atoi(rect[2].c_str());
+                    source_rect.h = atoi(rect[3].c_str());
+                }
+            }
+        }
     }
-
-    if (filelog_flag)
-        script_h.findAndAddLog(
-            script_h.log_info[ScriptHandler::FILE_LOG], filename, true);
-    // utils::printInfo(" ... loading %s length %ld\n", filename, length );
-
-    mean_size_of_loaded_images += length * 6 / 5;  // reserve 20% larger size
-    num_loaded_images++;
-    if (tmp_image_buf_length < mean_size_of_loaded_images / num_loaded_images) {
-        tmp_image_buf_length = mean_size_of_loaded_images / num_loaded_images;
-        if (tmp_image_buf) delete[] tmp_image_buf;
-        tmp_image_buf = NULL;
-    }
-
-    unsigned char *buffer = NULL;
-    if (length > tmp_image_buf_length) {
-        buffer = new unsigned char[length];
-        if (buffer == NULL) {
-            utils::printError(
-                "failed to load [%s] because file size [%lu] is too large.\n",
-                filename,
-                length);
+    std::shared_ptr<onscache::SurfaceNode> node = nullptr;
+    #ifdef USE_IMAGE_CACHE
+        if (!load_size && surfaceCache->Cached(filename)) {
+            node = surfaceCache->Get(filename);
+        }
+    #endif
+    if (node == nullptr) {
+        unsigned long length = script_h.cBR->getFileLength(filename.c_str());
+        if (length == 0) {
+            utils::printError(" *** can't find file [%s] ***\n", _filename);
             return NULL;
         }
-    } else {
-        if (!tmp_image_buf)
-            tmp_image_buf = new unsigned char[tmp_image_buf_length];
-        buffer = tmp_image_buf;
+
+        if (filelog_flag)
+            script_h.findAndAddLog(
+                script_h.log_info[ScriptHandler::FILE_LOG], _filename, true);
+        // utils::printInfo(" ... loading %s length %ld\n", filename, length );
+
+        mean_size_of_loaded_images += length * 6 / 5;  // reserve 20% larger size
+        num_loaded_images++;
+        if (tmp_image_buf_length < mean_size_of_loaded_images / num_loaded_images) {
+            tmp_image_buf_length = mean_size_of_loaded_images / num_loaded_images;
+            if (tmp_image_buf) delete[] tmp_image_buf;
+            tmp_image_buf = NULL;
+        }
+
+        unsigned char *buffer = NULL;
+        if (length > tmp_image_buf_length) {
+            buffer = new unsigned char[length];
+            if (buffer == NULL) {
+                utils::printError(
+                    "failed to load [%s] because file size [%lu] is too large.\n",
+                    _filename,
+                    length);
+                return NULL;
+            }
+        } else {
+            if (!tmp_image_buf)
+                tmp_image_buf = new unsigned char[tmp_image_buf_length];
+            buffer = tmp_image_buf;
+        }
+
+        script_h.cBR->getFile(filename.c_str(), buffer, location);
+        SDL_RWops *src = SDL_RWFromMem(buffer, length);
+        int is_svg = !strncmp((char *)buffer, "<?xml", 5);
+        int is_png = IMG_isPNG(src);
+        int is_jpeg = IMG_isJPG(src);
+        int is_not_alpha = is_jpeg || IMG_isBMP(src);
+
+        SDL_Surface *tmp = NULL;
+        if (is_svg && load_size) {
+            tmp = IMG_LoadSizedSVG_RW(src, load_size->x, load_size->y);
+        }
+        if (tmp == NULL) {
+            tmp = IMG_Load_RW(src, 0);
+        }
+        if (!tmp && is_jpeg) {
+            utils::printError(" *** force-loading a JPG image [%s]\n", _filename);
+            tmp = IMG_LoadJPG_RW(src);
+        }
+
+        if (tmp && has_alpha) {
+            *has_alpha = (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
+        }
+
+        SDL_RWclose(src);
+
+        if (buffer != tmp_image_buf) delete[] buffer;
+
+        if (!tmp)
+            utils::printError(
+                " *** can't load file [%s] %s ***\n", _filename, IMG_GetError());
+        node = std::make_shared<onscache::SurfaceNode>(tmp);
+        #ifdef USE_IMAGE_CACHE
+        if (!load_size) {
+            surfaceCache->Put(filename, node);
+        }
+        #endif
     }
-
-    script_h.cBR->getFile(filename, buffer, location);
-    char *ext = strrchr(filename, '.');
-
-    SDL_RWops *src = SDL_RWFromMem(buffer, length);
-    int is_svg = !strncmp((char *)buffer, "<?xml", 5);
-    int is_png = IMG_isPNG(src);
-    int is_jpeg = IMG_isJPG(src);
-    int is_not_alpha = is_jpeg || IMG_isBMP(src);
-
-    SDL_Surface *tmp = NULL;
-    if (is_svg && load_size) {
-        tmp = IMG_LoadSizedSVG_RW(src, load_size->x, load_size->y);
+    // 处理 clip
+    SDL_Surface *temp = node->Get();
+    if (!SDL_RectEmpty(&source_rect)) {
+        SDL_Surface *surface = SDL_CreateRGBSurface(
+            SDL_SWSURFACE,
+            source_rect.w,
+            source_rect.h,
+            temp->format->BitsPerPixel,
+            temp->format->Rmask,
+            temp->format->Gmask,
+            temp->format->Bmask,
+            temp->format->Amask);
+        SDL_UpperBlit(temp, &source_rect, surface, NULL);
+        return surface;
     }
-    if (tmp == NULL) {
-        tmp = IMG_Load_RW(src, 0);
-    }
-    if (!tmp && is_jpeg) {
-        utils::printError(" *** force-loading a JPG image [%s]\n", filename);
-        tmp = IMG_LoadJPG_RW(src);
-    }
-
-    if (tmp && has_alpha) {
-        *has_alpha = (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
-    }
-
-    SDL_RWclose(src);
-
-    if (buffer != tmp_image_buf) delete[] buffer;
-
-    if (!tmp)
-        utils::printError(
-            " *** can't load file [%s] %s ***\n", filename, IMG_GetError());
-
-    return tmp;
+    SDL_Surface *surface = SDL_CreateRGBSurface(
+            SDL_SWSURFACE,
+            temp->w,
+            temp->h,
+            temp->format->BitsPerPixel,
+            temp->format->Rmask,
+            temp->format->Gmask,
+            temp->format->Bmask,
+            temp->format->Amask);
+    SDL_UpperBlit(temp, NULL, surface, NULL);
+    return surface;
 }
 
 // resize 32bit surface to 32bit surface

@@ -22,6 +22,8 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 #include <chrono>
+#include <string>
+#include <vector>
 
 namespace utils {
 
@@ -40,6 +42,7 @@ void printInfo(const char *format, ...);
 void printError(const char *format, ...);
 
 int readColor(const char *buf, uchar4 *color);
+void split(std::vector<std::string> &output, std::string &input, const char sep);
 
 template <typename T>
 T(min)

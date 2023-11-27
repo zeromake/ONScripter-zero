@@ -34,6 +34,20 @@ float duration(std::chrono::steady_clock::time_point prev) {
            1000.0f;
 }
 
+void split(std::vector<std::string> &output, std::string &input, const char sep) {
+    size_t prev = 0;
+    while (true) {
+        size_t pos = input.find(sep, prev);
+        if (pos != std::string::npos) {
+            output.push_back(std::move(input.substr(prev, pos)));
+            prev = pos + 1;
+            continue;
+        }
+        output.push_back(std::move(input.substr(prev)));
+        break;
+    }
+}
+
 void printDebug(const char *format, ...) {
 #ifndef NDEBUG
     va_list ap;
