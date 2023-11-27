@@ -82,7 +82,6 @@ void ONScripter::proceedAnimation(int current_time) {
             flushDirect(
                 sprite_info[i].pos,
                 refreshMode() | (draw_cursor_flag ? REFRESH_CURSOR_MODE : 0));
-    
 
 #ifdef USE_LUA
     if (lua_handler.is_animatable && !script_h.isExternalScript()) {
@@ -239,25 +238,26 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         SDL_Surface *_surface1 = nullptr;
         SDL_Surface *_surface2 = nullptr;
         bool has_rescale = screen_ratio2 != screen_ratio1 &&
-            (!disable_rescale_flag || location == BaseReader::ARCHIVE_TYPE_NONE);
+                           (!disable_rescale_flag ||
+                            location == BaseReader::ARCHIVE_TYPE_NONE);
         SDL_Point temp_size;
         SDL_Point *load_size = anim->load_size;
-        bool image_can_rescale = (*anim->file_name == '>' || strstr((char *)anim->file_name, ".svg"));
-        // 存档里的 orig_pos 里已经是缩放后的，没法对应到现在的动态情况
-        if (has_rescale && image_can_rescale && (anim->pos.w > 0 || anim->pos.h > 0)) {
+        bool image_can_rescale = (*anim->file_name == '>' ||
+                                  strstr((char *)anim->file_name, ".svg"));
+        if (has_rescale && image_can_rescale &&
+            (anim->pos.w > 0 || anim->pos.h > 0)) {
             temp_size.x = utils::min(anim->pos.w, screen_width);
             temp_size.y = utils::min(anim->pos.h, screen_height);
             load_size = &temp_size;
         }
-        _surface1 = loadImage(
-            anim->file_name,
-            &has_alpha,
-            &location,
-            &anim->default_alpha,
-            load_size);
-        bool is_rescaled = load_size &&
-            ((load_size->x > 0 && _surface1->w == load_size->x) ||
-            (load_size->y > 0 && _surface1->h == load_size->y));
+        _surface1 = loadImage(anim->file_name,
+                              &has_alpha,
+                              &location,
+                              &anim->default_alpha,
+                              load_size);
+        bool is_rescaled =
+            load_size && ((load_size->x > 0 && _surface1->w == load_size->x) ||
+                          (load_size->y > 0 && _surface1->h == load_size->y));
         // 通过新的大小重新 load 一次
         if (image_can_rescale && has_rescale && !is_rescaled) {
             int w, h;
@@ -266,21 +266,20 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
             temp_size.x = w;
             temp_size.y = h;
             load_size = &temp_size;
-            _surface1 = loadImage(
-                anim->file_name,
-                &has_alpha,
-                &location,
-                &anim->default_alpha,
-                load_size);
+            _surface1 = loadImage(anim->file_name,
+                                  &has_alpha,
+                                  &location,
+                                  &anim->default_alpha,
+                                  load_size);
             is_rescaled = load_size &&
-                ((load_size->x > 0 && _surface1->w == load_size->x) ||
-                (load_size->y > 0 && _surface1->h == load_size->y));
+                          ((load_size->x > 0 && _surface1->w == load_size->x) ||
+                           (load_size->y > 0 && _surface1->h == load_size->y));
         }
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
             _surface2 = loadImage(anim->mask_file_name);
 
         // SDL_Surface *surface = _surface1;
-        SDL_Surface *surface = 
+        SDL_Surface *surface =
             anim->setupImageAlpha(_surface1, _surface2, has_alpha);
 
         if (surface && has_rescale && !is_rescaled) {
@@ -319,7 +318,22 @@ void ONScripter::parseTaggedString(AnimationInfo *anim) {
         while (*++buffer == ' ')
             ;
 
-        if (buffer[0] == 'a') {
+        if (buffer[0] == 'n') {
+            anim->trans_mode = AnimationInfo::TRANS_NONE;
+            buffer++;
+        } else if (buffer[0] == 'm' && buffer[1] == 't') {
+            anim->trans_mode = AnimationInfo::TRANS_MASK_TOP;
+            buffer += 2;
+        } else if (buffer[0] == 'm' && buffer[1] == 'b') {
+            anim->trans_mode = AnimationInfo::TRANS_MASK_BOTTOM;
+            buffer += 2;
+        } else if (buffer[0] == 'm' && buffer[1] == 'l') {
+            anim->trans_mode = AnimationInfo::TRANS_MASK_LEFT;
+            buffer += 2;
+        } else if (buffer[0] == 'm' && buffer[1] == 'r') {
+            anim->trans_mode = AnimationInfo::TRANS_MASK_RIGHT;
+            buffer += 2;
+        } else if (buffer[0] == 'a') {
             anim->trans_mode = AnimationInfo::TRANS_ALPHA;
             buffer++;
         } else if (buffer[0] == 'l') {

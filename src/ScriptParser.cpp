@@ -263,7 +263,11 @@ void ScriptParser::reset(bool isDestroy) {
     string_buffer_offset = 0;
 
     break_flag = false;
+#ifdef ONSCRIPTER_COMPATIBLE
     trans_mode = AnimationInfo::TRANS_TOPLEFT;
+#else
+    trans_mode = AnimationInfo::TRANS_NONE;
+#endif
 
     if (version_str) delete[] version_str;
     int __size = strlen(VERSION_STR1) + strlen(VERSION_STR2) + 3;

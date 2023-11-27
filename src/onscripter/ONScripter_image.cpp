@@ -92,11 +92,10 @@ SDL_Surface *ONScripter::loadImage(char *filename,
     return ret;
 }
 
-SDL_Surface *ONScripter::createRectangleSurface(
-    char *filename,
-    bool *has_alpha,
-    unsigned char *alpha,
-    const SDL_Point *load_size) {
+SDL_Surface *ONScripter::createRectangleSurface(char *filename,
+                                                bool *has_alpha,
+                                                unsigned char *alpha,
+                                                const SDL_Point *load_size) {
     int c = 1, w = 0, h = 0;
     bool decimal_flag = false;
     while (filename[c] != '\n' && filename[c] != 0x00) {
@@ -152,7 +151,7 @@ SDL_Surface *ONScripter::createRectangleSurface(
                                             fmt->Gmask,
                                             fmt->Bmask,
                                             fmt->Amask);
-    int n = colors.size();      
+    int n = colors.size();
     for (int i = 0; i < n; i++) {
         auto col = colors[i];
         SDL_Rect rect;
@@ -161,15 +160,14 @@ SDL_Surface *ONScripter::createRectangleSurface(
         rect.w = w * (i + 1) / n - rect.x;
         if (i == n - 1) rect.w = w - rect.x;
         rect.h = h;
-        SDL_FillRect(
-            tmp,
-            &rect,
-            SDL_MapRGBA(
-                tmp->format,
-                col.rgba[0],
-                col.rgba[1],
-                col.rgba[2],
-                col.rgba[3] == 255 ? (alpha ? *alpha : 0xff) : col.rgba[3]));
+        SDL_FillRect(tmp,
+                     &rect,
+                     SDL_MapRGBA(tmp->format,
+                                 col.rgba[0],
+                                 col.rgba[1],
+                                 col.rgba[2],
+                                 col.rgba[3] == 255 ? (alpha ? *alpha : 0xff)
+                                                    : col.rgba[3]));
     }
 
     if (has_alpha) {
@@ -1053,7 +1051,10 @@ void ONScripter::createBackground() {
             anim.setLoadSize(0, screen_height);
         }
         setupAnimationInfo(&anim);
-        bg_info.fill(clear_color.rgba[0], clear_color.rgba[1], clear_color.rgba[2], clear_color.rgba[3]);
+        bg_info.fill(clear_color.rgba[0],
+                     clear_color.rgba[1],
+                     clear_color.rgba[2],
+                     clear_color.rgba[3]);
         if (anim.image_surface) {
             SDL_Rect src_rect;
             src_rect.x = src_rect.y = 0;
@@ -1072,7 +1073,10 @@ void ONScripter::createBackground() {
                 src_rect.y = (anim.image_surface->h - screen_height) / 2;
                 src_rect.h = screen_height;
             }
-            SDL_UpperBlit(anim.image_surface, &src_rect, bg_info.image_surface, &dst_rect);
+            SDL_UpperBlit(anim.image_surface,
+                          &src_rect,
+                          bg_info.image_surface,
+                          &dst_rect);
             // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect);
         }
         return;

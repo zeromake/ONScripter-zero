@@ -34,17 +34,22 @@ class AnimationInfo {
    public:
     typedef Uint32 ONSBuf;
     enum {
-        TRANS_ALPHA = 1,
-        TRANS_TOPLEFT = 2,
-        TRANS_COPY = 3,
-        TRANS_STRING = 4,
-        TRANS_DIRECT = 5,
-        TRANS_PALLETTE = 6,
-        TRANS_TOPRIGHT = 7,
-        TRANS_MASK = 8,
+        TRANS_NONE = 0, // 什么都不做
+        TRANS_ALPHA = 1, // 如果是 bmp,jpeg 就做对左右对半做 mask，如果是 png 之类的带透明度的图片就什么都不做
+        TRANS_TOPLEFT = 2, // 拿左上的一个像素点作为 mask 的颜色，对图片做 mask
+        TRANS_COPY = 3, // 强制 alpha 值全部为 0xff
+        TRANS_STRING = 4, // 拿最前面的 RED 值作为 alpha 值
+        TRANS_DIRECT = 5, // 自定义 mask 颜色
+        TRANS_PALLETTE = 6, // 好像没有效果，虽然有写但是好像还没有实现
+        TRANS_TOPRIGHT = 7, // 拿右上的一个像素点作为 mask 的颜色，对图片做 mask
+        TRANS_MASK = 8, // 使用另一张图片做 mask
 #ifdef USE_BUILTIN_LAYER_EFFECTS
-        TRANS_LAYER = 9
+        TRANS_LAYER = 9, // 插件
 #endif
+        TRANS_MASK_TOP = 10, // 上下对半做 mask，上边为图，下边为 mask 图
+        TRANS_MASK_BOTTOM = 11, // 上下对半做 mask，上边为 mask 图，下边为图
+        TRANS_MASK_LEFT = 12, // 左右对半做 mask，左边为图，右边为 mask 图
+        TRANS_MASK_RIGHT = 13, // 左右对半做 mask，左边为 mask 图，右边为图
     };
 
     /* variables set from the image tag */
