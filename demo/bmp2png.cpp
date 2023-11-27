@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     int w, h, n;
     stbi_uc *pixels = stbi_load(input.c_str(), &w, &h, &n, 4);
     uint8_t *alphap = pixels+3;
-    if (filBuf.empty()) {
+    if (!filBuf.empty()) {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++,alphap += 4)
                 *alphap = filBuf.at(y * w + x);
