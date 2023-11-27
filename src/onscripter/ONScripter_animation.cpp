@@ -244,12 +244,6 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
         SDL_Point *load_size = anim->load_size;
         bool image_can_rescale = (*anim->file_name == '>' ||
                                   strstr((char *)anim->file_name, ".svg"));
-        if (has_rescale && image_can_rescale &&
-            (anim->pos.w > 0 || anim->pos.h > 0)) {
-            temp_size.x = utils::min(anim->pos.w, screen_width);
-            temp_size.y = utils::min(anim->pos.h, screen_height);
-            load_size = &temp_size;
-        }
         _surface1 = loadImage(anim->file_name,
                               &has_alpha,
                               &location,
@@ -259,7 +253,7 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
             load_size && ((load_size->x > 0 && _surface1->w == load_size->x) ||
                           (load_size->y > 0 && _surface1->h == load_size->y));
         // 通过新的大小重新 load 一次
-        if (image_can_rescale && has_rescale && !is_rescaled) {
+        if (image_can_rescale && has_rescale && !is_rescaled && !load_size) {
             int w, h;
             if ((w = _surface1->w * screen_ratio1 / screen_ratio2) == 0) w = 1;
             if ((h = _surface1->h * screen_ratio1 / screen_ratio2) == 0) h = 1;

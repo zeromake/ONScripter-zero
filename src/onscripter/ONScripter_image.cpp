@@ -236,14 +236,14 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
 
         script_h.cBR->getFile(filename.c_str(), buffer, location);
         SDL_RWops *src = SDL_RWFromMem(buffer, length);
-        int is_svg = !strncmp((char *)buffer, "<?xml", 5);
+        int is_svg = IMG_isSVG(src);
         int is_png = IMG_isPNG(src);
         int is_jpeg = IMG_isJPG(src);
         int is_not_alpha = is_jpeg || IMG_isBMP(src);
 
         SDL_Surface *tmp = NULL;
         if (is_svg && load_size) {
-            tmp = IMG_LoadSizedSVG_RW(src, load_size->x, load_size->y);
+            tmp = IMG_LoadSizedSVG_RW(src, load_size->x, 0);
         }
         if (tmp == NULL) {
             tmp = IMG_Load_RW(src, 0);
@@ -1074,7 +1074,11 @@ void ONScripter::refreshSprite(int sprite_no,
 
 void ONScripter::createBackground() {
     bg_info.num_of_cells = 1;
+#ifdef ONSCRIPTER_COMPATIBLE
     bg_info.trans_mode = AnimationInfo::TRANS_COPY;
+#else
+    bg_info.trans_mode = AnimationInfo::TRANS_NONE;
+#endif
     bg_info.pos.x = 0;
     bg_info.pos.y = 0;
     bg_info.allocImage(screen_width, screen_height, texture_format);
@@ -1089,13 +1093,13 @@ void ONScripter::createBackground() {
         AnimationInfo anim;
         setStr(&anim.image_name, bg_info.file_name);
         parseTaggedString(&anim);
+#ifdef ONSCRIPTER_COMPATIBLE
         anim.trans_mode = AnimationInfo::TRANS_COPY;
+#else
+        anim.trans_mode = AnimationInfo::TRANS_NONE;
+#endif
         // svg 适配
-        if (screen_width > screen_height) {
-            anim.setLoadSize(screen_width, 0);
-        } else {
-            anim.setLoadSize(0, screen_height);
-        }
+        anim.setLoadSize(screen_width, screen_height);
         setupAnimationInfo(&anim);
         bg_info.fill(clear_color.rgba[0],
                      clear_color.rgba[1],

@@ -225,7 +225,8 @@ target("onscripter")
         "USE_BUILTIN_LAYER_EFFECTS=1",
         "USE_BUILTIN_EFFECTS=1",
         "USE_PARALLEL=1",
-        "FMT_HEADER_ONLY=1"
+        "FMT_HEADER_ONLY=1",
+        "USE_IMAGE_CACHE=1"
     )
     if get_config("omp") then
         add_defines("USE_OMP_PARALLEL=1")
