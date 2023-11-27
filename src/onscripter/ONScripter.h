@@ -34,10 +34,7 @@
 #include "DirtyRect.h"
 #include "ScriptParser.h"
 #include "renderer/gles_renderer.h"
-
-#ifdef USE_IMAGE_CACHE
 #include "ons_cache.h"
-#endif
 
 #if defined(USE_SMPEG)
 #include <smpeg.h>
@@ -386,7 +383,7 @@ class ONScripter : public ScriptParser {
     bool screen_dirty_flag;
 
 #ifdef USE_IMAGE_CACHE
-    onscache::SurfaceCache surfaceCache;
+    std::unique_ptr<onscache::SurfaceCache> surfaceCache;
 #endif
     // variables relevant to button
     ButtonState current_button_state, last_mouse_state;
@@ -689,14 +686,6 @@ class ONScripter : public ScriptParser {
 
     unsigned char *resize_buffer;
     size_t resize_buffer_size;
-
-#ifdef USE_IMAGE_CACHE
-    std::shared_ptr<onscache::SurfaceBaseNode> loadImageCache(
-        char *filename,
-        bool *has_alpha = NULL,
-        int *location = NULL,
-        unsigned char *alpha = NULL);
-#endif
     SDL_Surface *loadImage(char *filename,
                            bool *has_alpha = NULL,
                            int *location = NULL,
