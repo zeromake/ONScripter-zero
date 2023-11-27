@@ -100,7 +100,9 @@ int ScriptParser::transmodeCommand() {
     if (current_mode != DEFINE_MODE)
         errorAndExit("transmode: not in the define section");
 
-    if (script_h.compareString("leftup"))
+    if (script_h.compareString("none"))
+        trans_mode = AnimationInfo::TRANS_NONE;
+    else if (script_h.compareString("leftup"))
         trans_mode = AnimationInfo::TRANS_TOPLEFT;
     else if (script_h.compareString("copy"))
         trans_mode = AnimationInfo::TRANS_COPY;
@@ -108,6 +110,14 @@ int ScriptParser::transmodeCommand() {
         trans_mode = AnimationInfo::TRANS_ALPHA;
     else if (script_h.compareString("righttup"))
         trans_mode = AnimationInfo::TRANS_TOPRIGHT;
+    else if (script_h.compareString("mark_top"))
+        trans_mode = AnimationInfo::TRANS_MASK_TOP;
+    else if (script_h.compareString("mark_bottom"))
+        trans_mode = AnimationInfo::TRANS_MASK_BOTTOM;
+    else if (script_h.compareString("mark_left"))
+        trans_mode = AnimationInfo::TRANS_MASK_LEFT;
+    else if (script_h.compareString("mark_right"))
+        trans_mode = AnimationInfo::TRANS_MASK_RIGHT;
     script_h.readLabel();
 
     return RET_CONTINUE;

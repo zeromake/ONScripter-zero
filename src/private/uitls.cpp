@@ -24,7 +24,6 @@ static BOOL MByteToWChar(LPCSTR lpcszStr, LPWSTR lpwszStr, DWORD dwSize) {
 
 namespace utils {
 
-
 std::chrono::steady_clock::time_point now() {
     return std::chrono::steady_clock::now();
 }
@@ -90,43 +89,42 @@ void printError(const char *format, ...) {
     va_end(ap);
 }
 
-    static unsigned char hexToDec(char ch) {
-        if ('0' <= ch && ch <= '9')
-            return ch - '0';
-        else if ('a' <= ch && ch <= 'f')
-            return ch - 'a' + 10;
-        else if ('A' <= ch && ch <= 'F')
-            return ch - 'A' + 10;
+static unsigned char hexToDec(char ch) {
+    if ('0' <= ch && ch <= '9')
+        return ch - '0';
+    else if ('a' <= ch && ch <= 'f')
+        return ch - 'a' + 10;
+    else if ('A' <= ch && ch <= 'F')
+        return ch - 'A' + 10;
+    return 0;
+}
+int readColor(const char *buf, uchar4 *color) {
+    int offset = 0;
+    while (buf[offset] == ' ' || buf[offset] == '\t') offset++;
+    if (buf[offset] != '#') {
         return 0;
     }
-    int readColor(const char *buf, uchar4 *color) {
-        int offset = 0;
-        while (buf[offset] == ' ' || buf[offset] == '\t') offset++;
-        if (buf[offset] != '#') {
-            return 0;
-        }
-        offset++;
-        (*color).rgba[3] = 255;
-        int size = 0;
-        char ch = buf[offset+size];
-        while (
-            ('0' <= ch && ch <= '9') ||
-            ('a' <= ch && ch <= 'f') ||
-            ('A' <= ch && ch <= 'F') ) {
-            size++;
-            ch = buf[offset+size];
-        }
-        bool is_repeat = size == 3 || size == 4;
-        int sep = is_repeat ? 1 : 2;
-        int start = offset;
-        int end = offset+size;
-        int i = start;
-        int color_offset = 0;
-        for (i = start; i < end; i += sep) {
-            (*color).rgba[color_offset] = hexToDec(buf[i]) << 4 | hexToDec(is_repeat ? buf[i] : buf[i+1]);
-            color_offset++;
-        }
-        offset += size;
-        return offset;
+    offset++;
+    (*color).rgba[3] = 255;
+    int size = 0;
+    char ch = buf[offset + size];
+    while (('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'f') ||
+           ('A' <= ch && ch <= 'F')) {
+        size++;
+        ch = buf[offset + size];
     }
+    bool is_repeat = size == 3 || size == 4;
+    int sep = is_repeat ? 1 : 2;
+    int start = offset;
+    int end = offset + size;
+    int i = start;
+    int color_offset = 0;
+    for (i = start; i < end; i += sep) {
+        (*color).rgba[color_offset] =
+            hexToDec(buf[i]) << 4 | hexToDec(is_repeat ? buf[i] : buf[i + 1]);
+        color_offset++;
+    }
+    offset += size;
+    return offset;
+}
 }  // namespace utils

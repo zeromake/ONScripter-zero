@@ -233,7 +233,11 @@ char *FuruLayer::message(const char *message, int &ret_int) {
                     for (int j = anim->num_of_cells - 1; j >= 0; --j)
                         anim->duration_list[j] = 0;
                     anim->loop_mode = 3;  // not animatable
+#ifdef ONSCRIPTER_COMPATIBLE
                     anim->trans_mode = AnimationInfo::TRANS_TOPLEFT;
+#else
+                    anim->trans_mode = AnimationInfo::TRANS_NONE;
+#endif
                     setStr(&anim->file_name, &buf[i][0]);
                     anim->setImage(anim->setupImageAlpha(img, NULL, has_alpha),
                                    ons.getTextureFormat());
@@ -265,7 +269,11 @@ char *FuruLayer::message(const char *message, int &ret_int) {
                     SDL_LockSurface(img);
                     firstpix = *((Uint32 *)img->pixels) & ~(img->format->Amask);
                     if (firstpix > 0) {
+#ifdef ONSCRIPTER_COMPATIBLE
                         anim->trans_mode = AnimationInfo::TRANS_TOPLEFT;
+#else
+                        anim->trans_mode = AnimationInfo::TRANS_NONE;
+#endif
                     } else {
                         // if first pix is black, this is an "additive" sprite
                         anim->trans_mode = AnimationInfo::TRANS_COPY;

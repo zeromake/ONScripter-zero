@@ -473,7 +473,7 @@ bool ScriptHandler::readColor(utils::uchar4 *color) {
     if (offset == 0) {
         return false;
     }
-    char *buf = current_script+offset;
+    char *buf = current_script + offset;
     next_script = checkComma(buf);
     return true;
 }

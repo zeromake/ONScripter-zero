@@ -57,8 +57,11 @@ AnimationInfo::AnimationInfo() {
     color_list = NULL;
     file_name = NULL;
     mask_file_name = NULL;
-
+#ifdef ONSCRIPTER_COMPATIBLE
     trans_mode = TRANS_TOPLEFT;
+#else
+    trans_mode = TRANS_NONE;
+#endif
     affine_flag = false;
 
     if (!is_inv_alpha_lut_initialized) {
@@ -167,7 +170,6 @@ void AnimationInfo::setImageName(const char *name) {
     image_name = new char[len + 1]{0};
     strcpy(image_name, name);
 }
-
 
 void AnimationInfo::setLoadSize(const int w, const int h) {
     if (load_size == NULL) {
@@ -1133,7 +1135,8 @@ void AnimationInfo::allocImage(int w, int h, Uint32 texture_format) {
 
 void AnimationInfo::copySurface(SDL_Surface *surface,
                                 SDL_Rect *src_rect,
-                                SDL_Rect *dst_rect, bool blended) {
+                                SDL_Rect *dst_rect,
+                                bool blended) {
     if (!image_surface || !surface) return;
 
     SDL_Rect _dst_rect = {0, 0};
@@ -1165,15 +1168,16 @@ void AnimationInfo::copySurface(SDL_Surface *surface,
     int i;
     SDL_PixelFormat *src_fmt = image_surface->format;
     SDL_PixelFormat *dst_fmt = image_surface->format;
-#define GET_PALETTE_COLOR(code, fmt, name) ((code & fmt->name##mask) >> fmt->name##shift) << fmt->name##loss;
+#define GET_PALETTE_COLOR(code, fmt, name) \
+    ((code & fmt->name##mask) >> fmt->name##shift) << fmt->name##loss;
     if (blended) {
         for (i = 0; i < _src_rect.h; i++) {
             ONSBuf *src = (ONSBuf *)((unsigned char *)surface->pixels +
-                            surface->pitch * (_src_rect.y + i)) +
-                    _src_rect.x;
+                                     surface->pitch * (_src_rect.y + i)) +
+                          _src_rect.x;
             ONSBuf *dst = (ONSBuf *)((unsigned char *)image_surface->pixels +
-                            image_surface->pitch * (_dst_rect.y + i)) +
-                    _dst_rect.x;
+                                     image_surface->pitch * (_dst_rect.y + i)) +
+                          _dst_rect.x;
             int n = _src_rect.w;
             for (int j = 0; j < n; j++) {
                 Uint8 A1 = GET_PALETTE_COLOR(src[j], src_fmt, A);
@@ -1197,21 +1201,21 @@ void AnimationInfo::copySurface(SDL_Surface *surface,
                 Uint8 G3 = G;
                 Uint8 B3 = B;
                 Uint32 rgba = (((R3 >> dst_fmt->Rloss) << dst_fmt->Rshift) |
-                            ((G3 >> dst_fmt->Gloss) << dst_fmt->Gshift) |
-                            ((B3 >> dst_fmt->Bloss) << dst_fmt->Bshift) |
-                            ((A3 >> dst_fmt->Aloss) << dst_fmt->Ashift));
+                               ((G3 >> dst_fmt->Gloss) << dst_fmt->Gshift) |
+                               ((B3 >> dst_fmt->Bloss) << dst_fmt->Bshift) |
+                               ((A3 >> dst_fmt->Aloss) << dst_fmt->Ashift));
                 dst[j] = rgba;
             }
         }
     } else {
         for (i = 0; i < _src_rect.h; i++)
             memcpy((ONSBuf *)((unsigned char *)image_surface->pixels +
-                            image_surface->pitch * (_dst_rect.y + i)) +
-                    _dst_rect.x,
-                (ONSBuf *)((unsigned char *)surface->pixels +
-                            surface->pitch * (_src_rect.y + i)) +
-                    _src_rect.x,
-                _src_rect.w * sizeof(ONSBuf));
+                              image_surface->pitch * (_dst_rect.y + i)) +
+                       _dst_rect.x,
+                   (ONSBuf *)((unsigned char *)surface->pixels +
+                              surface->pitch * (_src_rect.y + i)) +
+                       _src_rect.x,
+                   _src_rect.w * sizeof(ONSBuf));
     }
 
     SDL_UnlockSurface(image_surface);
@@ -1227,9 +1231,9 @@ void AnimationInfo::fill(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 
     SDL_PixelFormat *fmt = image_surface->format;
     Uint32 rgba = (((r >> fmt->Rloss) << fmt->Rshift) |
-                  ((g >> fmt->Gloss) << fmt->Gshift) |
-                  ((b >> fmt->Bloss) << fmt->Bshift) |
-                  ((a >> fmt->Aloss) << fmt->Ashift));
+                   ((g >> fmt->Gloss) << fmt->Gshift) |
+                   ((b >> fmt->Bloss) << fmt->Bshift) |
+                   ((a >> fmt->Aloss) << fmt->Ashift));
 
     int pitch = image_surface->pitch / sizeof(ONSBuf);
     for (int i = 0; i < image_surface->h; i++) {
@@ -1242,12 +1246,94 @@ void AnimationInfo::fill(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     SDL_mutexV(mutex);
 }
 
+enum class FOLD_MARK_DIRECTION { vertical = 0, horizontal = 1 };
+
+enum class FOLD_MARK_ORDER { main = 0, secondary = 1 };
+
+static SDL_Surface *foldMarkAlpha(SDL_Surface *surface,
+                                  int num_of_cells,
+                                  int *out_w,
+                                  int *out_h,
+                                  FOLD_MARK_DIRECTION direction,
+                                  FOLD_MARK_ORDER order) {
+    int w = surface->w;
+    int h = surface->h;
+    int cell_w = w / num_of_cells;
+    int fold_w = cell_w;
+    int fold_h = h;
+    int mark_offset = 0;
+    int skip_mark_offset = 0;
+    Uint32 *buffer = (Uint32 *)surface->pixels;
+    if (direction == FOLD_MARK_DIRECTION::vertical) {
+        fold_w = cell_w / 2;
+        skip_mark_offset = fold_w;
+        if (order == FOLD_MARK_ORDER::main) {
+            mark_offset = fold_w;
+        } else if (order == FOLD_MARK_ORDER::secondary) {
+            buffer += fold_w;
+            mark_offset = -fold_w;
+        }
+    } else if (direction == FOLD_MARK_DIRECTION::horizontal) {
+        fold_h = h / 2;
+        int fold_size = w * fold_h;
+        if (order == FOLD_MARK_ORDER::main) {
+            mark_offset = fold_size;
+        } else if (order == FOLD_MARK_ORDER::secondary) {
+            buffer += fold_size;
+            mark_offset = -fold_size;
+        }
+    }
+    int fold_num_of_cells_w = fold_w * num_of_cells;
+    if (out_w != NULL) {
+        *out_w = fold_num_of_cells_w;
+    }
+    if (out_h != NULL) {
+        *out_h = fold_h;
+    }
+
+    SDL_PixelFormat *fmt = surface->format;
+    SDL_Surface *surface2 = SDL_CreateRGBSurface(SDL_SWSURFACE,
+                                                 fold_num_of_cells_w,
+                                                 fold_h,
+                                                 fmt->BitsPerPixel,
+                                                 fmt->Rmask,
+                                                 fmt->Gmask,
+                                                 fmt->Bmask,
+                                                 fmt->Amask);
+    SDL_LockSurface(surface2);
+    Uint32 *buffer2 = (Uint32 *)surface2->pixels;
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    unsigned char *alphap = (unsigned char *)buffer2 + 3;
+#else
+    unsigned char *alphap = (unsigned char *)buffer2;
+#endif
+    for (int y = h; y != 0; y--) {
+        for (int c = num_of_cells; c != 0; c--) {
+            for (int x = fold_w; x != 0;
+                 x--, buffer++, buffer2++, alphap += 4) {
+                *buffer2 = *buffer;
+                *alphap = (*(buffer + mark_offset) & 0xff) ^ 0xff;
+            }
+            // 跳过 mark 区域
+            buffer += skip_mark_offset;
+        }
+        // 跳过无法整除后剩下的像素
+        buffer += surface->w - fold_num_of_cells_w;
+        // 输出是手动创建的不存在无法整除的情况
+    }
+    return surface2;
+}
+
 SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
                                             SDL_Surface *surface_m,
                                             bool has_alpha) {
     if (surface == NULL) return NULL;
-    // 有透明通道的图片不做这些内置处理
-    if (has_alpha) return surface;
+    if (trans_mode == TRANS_NONE) return surface;
+#ifndef ONSCRIPTER_COMPATIBLE
+    // layer 不做这些内置处理
+    if (trans_mode == TRANS_LAYER) return surface;
+#endif
 
     SDL_LockSurface(surface);
     Uint32 *buffer = (Uint32 *)surface->pixels;
@@ -1278,7 +1364,27 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
     ref_color &= 0xffffff;
 
     int i, j, c;
-    if (trans_mode == TRANS_ALPHA && !has_alpha) {
+    if ((trans_mode >= TRANS_MASK_TOP && trans_mode <= TRANS_MASK_RIGHT)) {
+        FOLD_MARK_DIRECTION direction = FOLD_MARK_DIRECTION::vertical;
+        FOLD_MARK_ORDER order = FOLD_MARK_ORDER::main;
+        switch (trans_mode) {
+            case TRANS_MASK_RIGHT:
+                order = FOLD_MARK_ORDER::secondary;
+                break;
+            case TRANS_MASK_TOP:
+                direction = FOLD_MARK_DIRECTION::horizontal;
+                break;
+            case TRANS_MASK_BOTTOM:
+                direction = FOLD_MARK_DIRECTION::horizontal;
+                order = FOLD_MARK_ORDER::secondary;
+                break;
+        }
+        SDL_Surface *surface2 = foldMarkAlpha(
+            surface, num_of_cells, &orig_pos.w, &orig_pos.h, direction, order);
+        SDL_UnlockSurface(surface);
+        SDL_FreeSurface(surface);
+        surface = surface2;
+    } else if ((trans_mode == TRANS_ALPHA && !has_alpha)) {
         const int w22 = w2 / 2;
         const int w3 = w22 * num_of_cells;
         orig_pos.w = w3;
