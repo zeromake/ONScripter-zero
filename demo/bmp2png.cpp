@@ -35,12 +35,14 @@ int main(int argc, char* argv[]) {
             for (int x = 0; x < w; x++,alphap += 4)
                 *alphap = filBuf.at(y * w + x);
         }
-    } else {
+    } else if (argc == 3){
         uint32_t *p = (uint32_t *)pixels;
         for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++,p++,alphap += 4)
-                if (*p == 0 || *p == 0xff)
+            for (int x = 0; x < w; x++,p++,alphap += 4) {
+                if (*p == 0xff000000)
                     *alphap = 0;
+            }
+                
         }
     }
     stbi_write_png(output.c_str(), w, h, 4, pixels, w * 4);
