@@ -128,14 +128,8 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename,
     }
 
     SDL_PixelFormat *fmt = image_surface->format;
-    SDL_Surface *tmp = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                            w,
-                                            h,
-                                            fmt->BitsPerPixel,
-                                            fmt->Rmask,
-                                            fmt->Gmask,
-                                            fmt->Bmask,
-                                            fmt->Amask);
+    SDL_Surface *tmp = SDL_CreateRGBSurfaceWithFormat(
+        SDL_SWSURFACE, w, h, fmt->BitsPerPixel, fmt->format);
     int n = colors.size();
     for (int i = 0; i < n; i++) {
         auto col = colors[i];
@@ -174,11 +168,13 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
         filename = filename.substr(0, pos);
         std::vector<std::string> items;
         utils::split(items, query, '&');
-        for (auto item: items) {
+        for (auto item : items) {
             size_t next = item.find('=');
             std::string k = item.substr(0, next);
-            size_t end = item.find('&', next+1);
-            std::string v = end == std::string::npos ? query.substr(next+1) : query.substr(next+1, end);
+            size_t end = item.find('&', next + 1);
+            std::string v = end == std::string::npos
+                                ? query.substr(next + 1)
+                                : query.substr(next + 1, end);
             if (k == "clip") {
                 std::vector<std::string> rect;
                 rect.reserve(4);
@@ -193,11 +189,11 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
         }
     }
     std::shared_ptr<onscache::SurfaceNode> node = nullptr;
-    #ifdef USE_IMAGE_CACHE
-        if (!load_size && surfaceCache->Cached(filename)) {
-            node = surfaceCache->Get(filename);
-        }
-    #endif
+#ifdef USE_IMAGE_CACHE
+    if (!load_size && surfaceCache->Cached(filename)) {
+        node = surfaceCache->Get(filename);
+    }
+#endif
     if (node == nullptr) {
         unsigned long length = script_h.cBR->getFileLength(filename.c_str());
         if (length == 0) {
@@ -210,10 +206,13 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
                 script_h.log_info[ScriptHandler::FILE_LOG], _filename, true);
         // utils::printInfo(" ... loading %s length %ld\n", filename, length );
 
-        mean_size_of_loaded_images += length * 6 / 5;  // reserve 20% larger size
+        mean_size_of_loaded_images +=
+            length * 6 / 5;  // reserve 20% larger size
         num_loaded_images++;
-        if (tmp_image_buf_length < mean_size_of_loaded_images / num_loaded_images) {
-            tmp_image_buf_length = mean_size_of_loaded_images / num_loaded_images;
+        if (tmp_image_buf_length <
+            mean_size_of_loaded_images / num_loaded_images) {
+            tmp_image_buf_length =
+                mean_size_of_loaded_images / num_loaded_images;
             if (tmp_image_buf) delete[] tmp_image_buf;
             tmp_image_buf = NULL;
         }
@@ -223,7 +222,8 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
             buffer = new unsigned char[length];
             if (buffer == NULL) {
                 utils::printError(
-                    "failed to load [%s] because file size [%lu] is too large.\n",
+                    "failed to load [%s] because file size [%lu] is too "
+                    "large.\n",
                     _filename,
                     length);
                 return NULL;
@@ -249,12 +249,14 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
             tmp = IMG_Load_RW(src, 0);
         }
         if (!tmp && is_jpeg) {
-            utils::printError(" *** force-loading a JPG image [%s]\n", _filename);
+            utils::printError(" *** force-loading a JPG image [%s]\n",
+                              _filename);
             tmp = IMG_LoadJPG_RW(src);
         }
 
         if (tmp && has_alpha) {
-            *has_alpha = (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
+            *has_alpha =
+                (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
         }
 
         SDL_RWclose(src);
@@ -262,39 +264,34 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *_filename,
         if (buffer != tmp_image_buf) delete[] buffer;
 
         if (!tmp)
-            utils::printError(
-                " *** can't load file [%s] %s ***\n", _filename, IMG_GetError());
+            utils::printError(" *** can't load file [%s] %s ***\n",
+                              _filename,
+                              IMG_GetError());
         node = std::make_shared<onscache::SurfaceNode>(tmp);
-        #ifdef USE_IMAGE_CACHE
+#ifdef USE_IMAGE_CACHE
         if (!load_size) {
             surfaceCache->Put(filename, node);
         }
-        #endif
+#endif
     }
     // 处理 clip
     SDL_Surface *temp = node->Get();
     if (!SDL_RectEmpty(&source_rect)) {
-        SDL_Surface *surface = SDL_CreateRGBSurface(
-            SDL_SWSURFACE,
-            source_rect.w,
-            source_rect.h,
-            temp->format->BitsPerPixel,
-            temp->format->Rmask,
-            temp->format->Gmask,
-            temp->format->Bmask,
-            temp->format->Amask);
+        SDL_Surface *surface =
+            SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
+                                           source_rect.w,
+                                           source_rect.h,
+                                           temp->format->BitsPerPixel,
+                                           temp->format->format);
         SDL_UpperBlit(temp, &source_rect, surface, NULL);
         return surface;
     }
-    SDL_Surface *surface = SDL_CreateRGBSurface(
-            SDL_SWSURFACE,
-            temp->w,
-            temp->h,
-            temp->format->BitsPerPixel,
-            temp->format->Rmask,
-            temp->format->Gmask,
-            temp->format->Bmask,
-            temp->format->Amask);
+    SDL_Surface *surface =
+        SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
+                                       temp->w,
+                                       temp->h,
+                                       temp->format->BitsPerPixel,
+                                       temp->format->format);
     SDL_UpperBlit(temp, NULL, surface, NULL);
     return surface;
 }

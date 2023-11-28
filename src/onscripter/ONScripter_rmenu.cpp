@@ -734,14 +734,8 @@ void ONScripter::buildDialog(bool yesno_flag,
                              const char *mes1,
                              const char *mes2) {
     SDL_PixelFormat *fmt = image_surface->format;
-    SDL_Surface *s = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                          DIALOG_W,
-                                          DIALOG_H,
-                                          fmt->BitsPerPixel,
-                                          fmt->Rmask,
-                                          fmt->Gmask,
-                                          fmt->Bmask,
-                                          fmt->Amask);
+    SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(
+        SDL_SWSURFACE, DIALOG_W, DIALOG_H, fmt->BitsPerPixel, fmt->format);
 
     SDL_Rect rect;
     unsigned char col = 255;
@@ -768,14 +762,12 @@ void ONScripter::buildDialog(bool yesno_flag,
 
     SDL_Surface *s2 = s;
     if (screen_ratio2 != screen_ratio1) {
-        s2 = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                  DIALOG_W * screen_ratio1 / screen_ratio2,
-                                  DIALOG_H * screen_ratio1 / screen_ratio2,
-                                  fmt->BitsPerPixel,
-                                  fmt->Rmask,
-                                  fmt->Gmask,
-                                  fmt->Bmask,
-                                  fmt->Amask);
+        s2 = SDL_CreateRGBSurfaceWithFormat(
+            SDL_SWSURFACE,
+            DIALOG_W * screen_ratio1 / screen_ratio2,
+            DIALOG_H * screen_ratio1 / screen_ratio2,
+            fmt->BitsPerPixel,
+            fmt->format);
         resizeSurface(s, s2);
         SDL_FreeSurface(s);
     }
@@ -812,14 +804,11 @@ void ONScripter::buildDialog(bool yesno_flag,
     }
 
     for (int i = 0; i < 2; i++) {
-        SDL_Surface *bs = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                               DIALOG_BUTTON_W * 2,
-                                               DIALOG_BUTTON_H,
-                                               fmt->BitsPerPixel,
-                                               fmt->Rmask,
-                                               fmt->Gmask,
-                                               fmt->Bmask,
-                                               fmt->Amask);
+        SDL_Surface *bs = SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
+                                                         DIALOG_BUTTON_W * 2,
+                                                         DIALOG_BUTTON_H,
+                                                         fmt->BitsPerPixel,
+                                                         fmt->format);
 
         for (int j = 0; j < 2; j++) {
             rect.x = DIALOG_BUTTON_W * j;
@@ -857,15 +846,12 @@ void ONScripter::buildDialog(bool yesno_flag,
 
         SDL_Surface *bs2 = bs;
         if (screen_ratio2 != screen_ratio1) {
-            bs2 = SDL_CreateRGBSurface(
+            bs2 = SDL_CreateRGBSurfaceWithFormat(
                 SDL_SWSURFACE,
                 DIALOG_BUTTON_W * 2 * screen_ratio1 / screen_ratio2,
                 DIALOG_BUTTON_H * screen_ratio1 / screen_ratio2,
                 fmt->BitsPerPixel,
-                fmt->Rmask,
-                fmt->Gmask,
-                fmt->Bmask,
-                fmt->Amask);
+                fmt->format);
             resizeSurface(bs, bs2);
             SDL_FreeSurface(bs);
         }

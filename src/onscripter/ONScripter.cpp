@@ -282,11 +282,19 @@ void ONScripter::initSDL() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     calcRenderRect();
-    texture_format = SDL_PIXELFORMAT_ARGB8888;
+    // 改为自动使用
+#ifdef __APPLE__
+    texture_format = SDL_PIXELFORMAT_BGRA32;
+#else
+    texture_format = SDL_PIXELFORMAT_RGBA32;
+#endif
     SDL_RendererInfo info;
     SDL_GetRendererInfo(renderer, &info);
-    if (info.texture_formats[0] == SDL_PIXELFORMAT_ABGR8888)
-        texture_format = SDL_PIXELFORMAT_ABGR8888;
+    if ((info.texture_formats[0] == SDL_PIXELFORMAT_BGRA32 ||
+         info.texture_formats[0] == SDL_PIXELFORMAT_RGBA32) &&
+        texture_format != info.texture_formats[0]) {
+        texture_format = info.texture_formats[0];
+    }
     max_texture_width = info.max_texture_width;
     max_texture_height = info.max_texture_height;
     SDL_RenderClear(renderer);

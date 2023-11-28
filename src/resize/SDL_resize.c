@@ -55,14 +55,11 @@ SDL_Surface *SDLSurfaceResizeWrap(SDL_Surface *src,
                                   const FilterTypes filter,
                                   const double blur) {
     SDL_PixelFormat *fmt = src->format;
-    SDL_Surface *dst = SDL_CreateRGBSurface(SDL_SWSURFACE,
+    SDL_Surface *dst = SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
                                             w,
                                             h,
                                             fmt->BitsPerPixel,
-                                            fmt->Rmask,
-                                            fmt->Gmask,
-                                            fmt->Bmask,
-                                            fmt->Amask);
+                                            fmt->format);
     if (dst == NULL) {
         return NULL;
     }
