@@ -104,7 +104,7 @@ int ONScripter::playSound(const char *filename,
 
     if (format & SOUND_MUSIC) {
 #if SDL_MIXER_MAJOR_VERSION >= 2
-        music_info = Mix_LoadMUS_RW(SDL_RWFromMem(buffer, length), 0);
+        music_info = Mix_LoadMUS_RW(SDL_RWFromMem(buffer, length), 1);
 #else
         music_info = Mix_LoadMUS_RW(SDL_RWFromMem(buffer, length));
 #endif
