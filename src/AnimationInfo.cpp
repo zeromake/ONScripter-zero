@@ -69,10 +69,6 @@ AnimationInfo::AnimationInfo() {
         for (int i = 1; i < 255; i++) inv_alpha_lut[i] = (Uint32)(0xffff / i);
         is_inv_alpha_lut_initialized = true;
     }
-    if (load_size != NULL) {
-        delete load_size;
-        load_size = NULL;
-    }
     reset();
 }
 
@@ -198,6 +194,10 @@ void AnimationInfo::remove() {
     deleteImageName();
     deleteSurface();
     removeTag();
+    if (load_size != NULL) {
+        delete load_size;
+        load_size = NULL;
+    }
 }
 
 void AnimationInfo::removeTag() {

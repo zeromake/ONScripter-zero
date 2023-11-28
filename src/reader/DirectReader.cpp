@@ -96,6 +96,7 @@ DirectReader::~DirectReader() {
     delete[] capital_name_tmp;
     delete[] read_buf;
     delete[] decomp_buffer;
+    delete[] archive_path;
 
     last_registered_compression_type = root_registered_compression_type.next;
     while (last_registered_compression_type) {
