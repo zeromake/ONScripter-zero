@@ -34,7 +34,9 @@ float duration(std::chrono::steady_clock::time_point prev) {
            1000.0f;
 }
 
-void split(std::vector<std::string> &output, std::string &input, const char sep) {
+void split(std::vector<std::string> &output,
+           std::string &input,
+           const char sep) {
     size_t prev = 0;
     while (true) {
         size_t pos = input.find(sep, prev);

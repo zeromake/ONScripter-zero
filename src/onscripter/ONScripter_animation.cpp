@@ -283,14 +283,8 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
             if ((w = src_s->w * screen_ratio1 / screen_ratio2) == 0) w = 1;
             if ((h = src_s->h * screen_ratio1 / screen_ratio2) == 0) h = 1;
             SDL_PixelFormat *fmt = image_surface->format;
-            surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                           w,
-                                           h,
-                                           fmt->BitsPerPixel,
-                                           fmt->Rmask,
-                                           fmt->Gmask,
-                                           fmt->Bmask,
-                                           fmt->Amask);
+            surface = SDL_CreateRGBSurfaceWithFormat(
+                SDL_SWSURFACE, w, h, fmt->BitsPerPixel, fmt->format);
             resizeSurface(src_s, surface);
             SDL_FreeSurface(src_s);
         }

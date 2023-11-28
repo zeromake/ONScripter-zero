@@ -1078,26 +1078,11 @@ void AnimationInfo::calcAffineMatrix() {
 SDL_Surface *AnimationInfo::allocSurface(int w, int h, Uint32 texture_format) {
     SDL_Surface *surface;
     if (texture_format == SDL_PIXELFORMAT_RGB565)
-        surface = SDL_CreateRGBSurface(
-            SDL_SWSURFACE, w, h, 16, 0xf800, 0x07e0, 0x001f, 0);
-    else if (texture_format == SDL_PIXELFORMAT_ABGR8888)
-        surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                       w,
-                                       h,
-                                       32,
-                                       0x000000ff,
-                                       0x0000ff00,
-                                       0x00ff0000,
-                                       0xff000000);
-    else  // texture_format == SDL_PIXELFORMAT_ARGB8888
-        surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                       w,
-                                       h,
-                                       32,
-                                       0x00ff0000,
-                                       0x0000ff00,
-                                       0x000000ff,
-                                       0xff000000);
+        surface = SDL_CreateRGBSurfaceWithFormat(
+            SDL_SWSURFACE, w, h, 16, texture_format);
+    else
+        surface = SDL_CreateRGBSurfaceWithFormat(
+            SDL_SWSURFACE, w, h, 32, texture_format);
 
     SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
 
@@ -1292,14 +1277,11 @@ static SDL_Surface *foldMarkAlpha(SDL_Surface *surface,
     }
 
     SDL_PixelFormat *fmt = surface->format;
-    SDL_Surface *surface2 = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                                 fold_num_of_cells_w,
-                                                 fold_h,
-                                                 fmt->BitsPerPixel,
-                                                 fmt->Rmask,
-                                                 fmt->Gmask,
-                                                 fmt->Bmask,
-                                                 fmt->Amask);
+    SDL_Surface *surface2 = SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
+                                                           fold_num_of_cells_w,
+                                                           fold_h,
+                                                           fmt->BitsPerPixel,
+                                                           fmt->format);
     SDL_LockSurface(surface2);
     Uint32 *buffer2 = (Uint32 *)surface2->pixels;
 
@@ -1389,14 +1371,8 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
         const int w3 = w22 * num_of_cells;
         orig_pos.w = w3;
         SDL_PixelFormat *fmt = surface->format;
-        SDL_Surface *surface2 = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                                     w3,
-                                                     h,
-                                                     fmt->BitsPerPixel,
-                                                     fmt->Rmask,
-                                                     fmt->Gmask,
-                                                     fmt->Bmask,
-                                                     fmt->Amask);
+        SDL_Surface *surface2 = SDL_CreateRGBSurfaceWithFormat(
+            SDL_SWSURFACE, w3, h, fmt->BitsPerPixel, fmt->format);
         SDL_LockSurface(surface2);
         Uint32 *buffer2 = (Uint32 *)surface2->pixels;
 
