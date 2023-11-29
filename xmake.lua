@@ -73,6 +73,7 @@ local deps = {
     "ghc_filesystem",
     "luajit",
     "stb",
+    "flecs"
 }
 local sdlConfigs = {
     bmp_compat = true
@@ -448,4 +449,10 @@ target("bmp2png")
     use_binary()
     add_files("demo/bmp2png.cpp")
     add_packages("stb")
+target_end()
+
+target("flecs_demo")
+    use_binary()
+    add_files("demo/flecs_demo.cpp")
+    add_packages("sdl2_image", "flecs")
 target_end()
