@@ -64,7 +64,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [ ] 抽象文件操作(文件读写，文件目录遍历，文件路径自动拼接，文件是否存在判断，目录创建)，以便于移植到各种平台下，考虑使用 `c++17` 的 `std::filesystem` 的通用方法，移动端平台可能需要手动编写。
 - [ ] 支持读取压缩包里的 ons 游戏，无需解压。
 - [ ] 代码里描述指令说明并生成文档, [onscripter-api](https://07th-mod.github.io/ponscripter-fork/api/), [NScrAPI](http://senzogawa.s90.xrea.com/reference/NScrAPI.html)。
-- [ ] 比较合并上游的 [onscripter](http://onscripter.osdn.jp/onscripter.html.en#package-source) 的 `20220816` 版本。
+- [ ] 比较合并上游的 [onscripter](http://onscripter.osdn.jp/onscripter.html.en#package-source) 的 `20220816` 版本 https://web.archive.org/web/20230205122538/https://onscripter.osdn.jp/onscripter-20220816.tar.gz。
 - [ ] surface 支持 gpu 着色器缩放(静态内置)
     - [ ] [Magpie's Effect](https://github.com/Blinue/Magpie/tree/main/src/Effects)
     - [ ] [FSR-GLES-Demo](https://github.com/elecro/FSR-GLES-Demo)
