@@ -181,24 +181,62 @@ unsigned char DirectReader::readChar(FILE *fp) {
     return key_table[ret];
 }
 
-unsigned short DirectReader::readShort(FILE *fp) {
+unsigned short DirectReader::readShortBE(FILE *fp) {
     unsigned short ret;
     unsigned char buf[2];
-
     fread(&buf, 1, 2, fp);
-    ret = key_table[buf[0]] << 8 | key_table[buf[1]];
+    for (int i = 0; i < 2; i++) buf[i] = key_table[buf[i]];
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    ret = buf[0] << 8 | buf[1];
+#else
+    memcpy(&ret, buf, 2);
+#endif
     return ret;
 }
 
-unsigned long DirectReader::readLong(FILE *fp) {
+unsigned long DirectReader::readLongBE(FILE *fp) {
     unsigned long ret;
     unsigned char buf[4];
-
     fread(&buf, 1, 4, fp);
-    ret = key_table[buf[0]];
-    ret = ret << 8 | key_table[buf[1]];
-    ret = ret << 8 | key_table[buf[2]];
-    ret = ret << 8 | key_table[buf[3]];
+    for (int i = 0; i < 4; i++) buf[i] = key_table[buf[i]];
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    ret = buf[0];
+    ret = ret << 8 | buf[1];
+    ret = ret << 8 | buf[2];
+    ret = ret << 8 | buf[3];
+#else
+    memcpy(&ret, buf, 4);
+#endif
+    return ret;
+}
+
+unsigned short DirectReader::readShortLE(FILE *fp) {
+    unsigned short ret;
+    unsigned char buf[2];
+    fread(&buf, 1, 2, fp);
+    for (int i = 0; i < 2; i++) buf[i] = key_table[buf[i]];
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    memcpy(&ret, buf, 2);
+#else
+    ret = buf[1] << 8 | buf[0];
+#endif
+    return ret;
+}
+
+unsigned long DirectReader::readLongLE(FILE *fp) {
+    unsigned long ret;
+    unsigned char buf[4];
+    fread(&buf, 1, 4, fp);
+    for (int i = 0; i < 4; i++) buf[i] = key_table[buf[i]];
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    memcpy(&ret, buf, 4);
+#else
+    ret = buf[3];
+    ret = ret << 8 | buf[2];
+    ret = ret << 8 | buf[1];
+    ret = ret << 8 | buf[0];
+#endif
     return ret;
 }
 
@@ -206,22 +244,52 @@ void DirectReader::writeChar(FILE *fp, unsigned char ch) {
     fwrite(&ch, 1, 1, fp);
 }
 
-void DirectReader::writeShort(FILE *fp, unsigned short ch) {
+void DirectReader::writeShortBE(FILE *fp, unsigned short ch) {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
     unsigned char buf[2];
-
     buf[0] = (ch >> 8) & 0xff;
     buf[1] = ch & 0xff;
     fwrite(&buf, 1, 2, fp);
+#else
+    fwrite(&ch, 1, 2, fp);
+#endif
 }
 
-void DirectReader::writeLong(FILE *fp, unsigned long ch) {
+void DirectReader::writeLongBE(FILE *fp, unsigned long ch) {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
     unsigned char buf[4];
-
     buf[0] = (unsigned char)((ch >> 24) & 0xff);
     buf[1] = (unsigned char)((ch >> 16) & 0xff);
     buf[2] = (unsigned char)((ch >> 8) & 0xff);
     buf[3] = (unsigned char)(ch & 0xff);
     fwrite(&buf, 1, 4, fp);
+#else
+    fwrite(&ch, 1, 4, fp);
+#endif
+}
+
+void DirectReader::writeShortLE(FILE *fp, unsigned short ch) {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    fwrite(&ch, 1, 2, fp);
+#else
+    unsigned char buf[2];
+    buf[1] = (ch >> 8) & 0xff;
+    buf[0] = ch & 0xff;
+    fwrite(&buf, 1, 2, fp);
+#endif
+}
+
+void DirectReader::writeLongLE(FILE *fp, unsigned long ch) {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    fwrite(&ch, 1, 4, fp);
+#else
+    unsigned char buf[4];
+    buf[3] = (unsigned char)((ch >> 24) & 0xff);
+    buf[2] = (unsigned char)((ch >> 16) & 0xff);
+    buf[1] = (unsigned char)((ch >> 8) & 0xff);
+    buf[0] = (unsigned char)(ch & 0xff);
+    fwrite(&buf, 1, 4, fp);
+#endif
 }
 
 unsigned short DirectReader::swapShort(unsigned short ch) {
@@ -426,7 +494,7 @@ size_t DirectReader::decodeNBZ(FILE *fp, size_t offset, unsigned char *buf) {
     int err, len, nunused;
 
     fseek(fp, offset, SEEK_SET);
-    original_length = count = readLong(fp);
+    original_length = count = readLongBE(fp);
 
     bfp = BZ2_bzReadOpen(&err, fp, 0, 0, NULL, 0);
     if (bfp == NULL || err != BZ_OK) return 0;
@@ -501,8 +569,8 @@ size_t DirectReader::decodeSPB(FILE *fp, size_t offset, unsigned char *buf) {
     getbit_len = getbit_count = 0;
 
     fseek(fp, offset, SEEK_SET);
-    size_t width = readShort(fp);
-    size_t height = readShort(fp);
+    size_t width = readShortBE(fp);
+    size_t height = readShortBE(fp);
 
     size_t width_pad = (4 - width * 3 % 4) % 4;
 
@@ -624,10 +692,10 @@ size_t DirectReader::getDecompressedFileLength(int type,
     fseek(fp, offset, SEEK_SET);
 
     if (type == NBZ_COMPRESSION) {
-        length = readLong(fp);
+        length = readLongBE(fp);
     } else if (type == SPB_COMPRESSION) {
-        size_t width = readShort(fp);
-        size_t height = readShort(fp);
+        size_t width = readShortBE(fp);
+        size_t height = readShortBE(fp);
         size_t width_pad = (4 - width * 3 % 4) % 4;
 
         length = (width * 3 + width_pad) * height + 54;
