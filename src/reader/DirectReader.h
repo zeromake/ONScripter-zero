@@ -95,11 +95,15 @@ class DirectReader : public BaseReader {
 
     FILE *fopen(const char *path, const char *mode);
     unsigned char readChar(FILE *fp);
-    unsigned short readShort(FILE *fp);
-    unsigned long readLong(FILE *fp);
+    unsigned short readShortLE(FILE *fp);
+    unsigned long readLongLE(FILE *fp);
+    unsigned short readShortBE(FILE *fp);
+    unsigned long readLongBE(FILE *fp);
     void writeChar(FILE *fp, unsigned char ch);
-    void writeShort(FILE *fp, unsigned short ch);
-    void writeLong(FILE *fp, unsigned long ch);
+    void writeShortLE(FILE *fp, unsigned short ch);
+    void writeLongLE(FILE *fp, unsigned long ch);
+    void writeShortBE(FILE *fp, unsigned short ch);
+    void writeLongBE(FILE *fp, unsigned long ch);
     static unsigned short swapShort(unsigned short ch);
     static unsigned long swapLong(unsigned long ch);
     size_t decodeNBZ(FILE *fp, size_t offset, unsigned char *buf);

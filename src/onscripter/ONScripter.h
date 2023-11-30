@@ -33,8 +33,8 @@
 #include "ButtonLink.h"
 #include "DirtyRect.h"
 #include "ScriptParser.h"
-#include "renderer/gles_renderer.h"
 #include "ons_cache.h"
+#include "renderer/gles_renderer.h"
 
 #if defined(USE_SMPEG)
 #include <smpeg.h>
