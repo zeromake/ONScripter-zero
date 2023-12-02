@@ -383,7 +383,7 @@ class ONScripter : public ScriptParser {
     bool screen_dirty_flag;
 
 #ifdef USE_IMAGE_CACHE
-    std::unique_ptr<onscache::SurfaceCache> surfaceCache;
+    std::unique_ptr<onscache::ImageBufferCache> imageBufferCache;
 #endif
     // variables relevant to button
     ButtonState current_button_state, last_mouse_state;
@@ -518,6 +518,8 @@ class ONScripter : public ScriptParser {
     int calcDurationToNextAnimation();
     void proceedAnimation(int current_time);
     void setupAnimationInfo(AnimationInfo *anim, _FontInfo *info = NULL);
+    SDL_Surface* loadAnimationImage(AnimationInfo *anim);
+    SDL_Surface* inlineLoadImage(AnimationInfo *anim, const char *file_name);
     void parseTaggedString(AnimationInfo *anim);
     void drawTaggedSurface(SDL_Surface *dst_surface,
                            AnimationInfo *anim,
@@ -686,16 +688,16 @@ class ONScripter : public ScriptParser {
 
     unsigned char *resize_buffer;
     size_t resize_buffer_size;
-    SDL_Surface *loadImage(char *filename,
+    SDL_Surface *loadImage(const char *filename,
                            bool *has_alpha = NULL,
                            int *location = NULL,
                            unsigned char *alpha = NULL,
                            const SDL_Point *load_size = NULL);
-    SDL_Surface *createRectangleSurface(char *filename,
+    SDL_Surface *createRectangleSurface(const char *filename,
                                         bool *has_alpha,
                                         unsigned char *alpha = NULL,
                                         const SDL_Point *load_size = NULL);
-    SDL_Surface *createSurfaceFromFile(char *filename,
+    SDL_Surface *createSurfaceFromFile(const char *filename,
                                        bool *has_alpha,
                                        int *location,
                                        const SDL_Point *load_size = NULL);

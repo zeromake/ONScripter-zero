@@ -10,26 +10,13 @@
 #include <optional>
 #include <string>
 #include <utility>
+#define USE_IMAGE_CACHE
 
 namespace onscache {
-typedef struct SurfaceNode {
-   public:
-    SurfaceNode(SDL_Surface *surface) : value(surface) {}
-    ~SurfaceNode() {
-        if (value) {
-            SDL_FreeSurface(value);
-            value = nullptr;
-        }
-    }
-    SDL_Surface *Get() { return value; }
-
-   private:
-    SDL_Surface *value;
-} SurfaceNode;
 typedef caches::fixed_sized_cache<std::string,
-                                  std::shared_ptr<onscache::SurfaceNode>,
+                                  std::shared_ptr<std::vector<uint8_t>>,
                                   caches::LRUCachePolicy>
-    SurfaceCache;
+    ImageBufferCache;
 }  // namespace onscache
 
 #endif
