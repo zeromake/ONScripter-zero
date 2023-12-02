@@ -374,7 +374,7 @@ void ONScripter::openAudio(int freq) {
 
 ONScripter::ONScripter() {
 #ifdef USE_IMAGE_CACHE
-    surfaceCache = std::make_unique<onscache::SurfaceCache>(256);
+    imageBufferCache = std::make_unique<onscache::ImageBufferCache>(64);
 #endif
     is_script_read = false;
 

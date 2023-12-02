@@ -72,8 +72,7 @@ local deps = {
     "brotli",
     "ghc_filesystem",
     "luajit",
-    "stb",
-    "flecs"
+    "stb"
 }
 local sdlConfigs = {
     bmp_compat = true
@@ -124,7 +123,7 @@ add_requires("sdl2_image", {system=false, configs=sdl2_image_config})
 
 set_rundir("$(projectdir)")
 
-local function use_binary() 
+local function use_binary()
     set_kind("binary")
     if is_plat("mingw") then
         add_ldflags("-static-libgcc", "-static-libstdc++")
@@ -226,8 +225,8 @@ target("onscripter")
         "USE_BUILTIN_LAYER_EFFECTS=1",
         "USE_BUILTIN_EFFECTS=1",
         "USE_PARALLEL=1",
-        "FMT_HEADER_ONLY=1"
-        -- "USE_IMAGE_CACHE=1"
+        "FMT_HEADER_ONLY=1",
+        "USE_IMAGE_CACHE=1"
     )
     if get_config("omp") then
         add_defines("USE_OMP_PARALLEL=1")
@@ -451,8 +450,8 @@ target("bmp2png")
     add_packages("stb")
 target_end()
 
-target("flecs_demo")
-    use_binary()
-    add_files("demo/flecs_demo.cpp")
-    add_packages("sdl2_image", "flecs")
-target_end()
+-- target("flecs_demo")
+--     use_binary()
+--     add_files("demo/flecs_demo.cpp")
+--     add_packages("sdl2_image", "flecs")
+-- target_end()
