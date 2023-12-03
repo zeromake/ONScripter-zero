@@ -26,6 +26,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复文本渲染有些游戏会做每行文本最后添加一个 / 符号，需要跳过该符号且跳过 processEOT 里的自动换行（3day）。
 - [x] 修复方法调用的参数没有消费被渲染为文本。
 - [x] 修复 getparam 的多余声明参数没有消费被渲染为文本。
+- [x] 修复 playSound 里的 SDL_RW 没有正确回收。
 - [ ] 自动播放会导致音频播放不完整。
 
 ## feture
@@ -56,6 +57,22 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 所有平台支持通过 ci 打包分发到 release。
 - [x] 不再对文本里的单字节符号英文做特殊处理，支持中英混合，支持变量插入。
 - [x] 强制对超过文本框的内容，做强制点击换页（有 bug 如果是和选项一起出现会导致点击换页事件抢掉选项事件注册）。
+- [x] lua 的 NSCOM 调用现在可以在 ns 脚本里传入 int, string 参数
+- [x] lua 的 NSSpLoad 支持传入位置 int 参数（可选），不用再调用一次 NSSpMove。
+- [x] lua 增加一个 NSReadFile，用来支持读取 csv 文件之类的纯文本。
+- [x] ns2 打包和解包工具支持 utf8 文件名打包（修复 unix 环境下无法解包带 gbk 的 nsa 文件），ons 引擎支持对该 ns2 的兼容读取，现在取文件会比较两次 gbk, utf8 的文件名。
+    - [x] ons 的内置 gbk 转码修正 utf8 到 gbk 不全的情况。
+- [x] ons 的 trans_mode 默认为 AnimationInfo::TRANS_NONE。
+- [x] ons trans_mode 添加 AnimationInfo::TRANS_MASK_{TOP,BOTTOM,LEFT,RIGHT} 用来替代 AnimationInfo::TRANS_ALPHA。
+    - [ ] 写了第一个版本渲染有问题，等待修复。
+- [x] ons 的 loadImage 做一个文件内容 lru 缓存，默认缓存 64 个图片内容。
+- [x] ons 的内建纯色矩阵支持透明色，示例：`>800,200,#ff00005a`。
+    - [x] 颜色支持 `#fff`, `#ffff`, `#ffffff`, `#ffffffff` 的类 css 变长写法（仅限在 sp 的 > 内建矩阵里有限）。
+- [x] bg 支持加载带有透明颜色的图片，配合 clear_color 可以设置默认底色。
+- [x] DirectReader 的多字节数字的读写方法改为 `readLongBE`, `readShortBE`, `writeLongBE`, `writeShortBE`
+- [x] DirectReader 的多字节数字添加新方法 `readLongLE`, `readShortLE`, `writeLongLE`, `writeShortLE`
+- [x] DirectReader 的多字节数字的读写方法会根据当前系统大小端进行自动优化（改为 memcpy）。
+- [x] DirectReader 各个地方的调用都正确的使用 `LE`, `BE` 的方法。
 - [ ] 文字渲染范围改为一个矩形坐标，不再使用横向纵向多少个字符的方式(设置依旧生效但是会转化为一个矩形坐标)。
 - [ ] 脚本全部切换到 utf-8 的处理，仅在读取时做 gbk,shift_jis 到 utf-8 转换。
 - [ ] 支持为字体设置多个 fallback 字体，并默认内置系统字体 fallback。
