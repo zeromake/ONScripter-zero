@@ -159,6 +159,12 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
     utils::split(images, file_name, '|');
     for (auto file_name: images) {
         size_t offset = file_name.find(':');
+        // 不是图片处理器直接加载到 surface 上。
+        if (std::string::npos == offset) {
+            if (surface != NULL) SDL_FreeSurface(surface);
+            surface = inlineLoadImage(anim, file_name.c_str());
+            continue;
+        }
         std::string expr = std::move(file_name.substr(0, offset));
         offset += 1;
         std::stringstream stream;
@@ -166,14 +172,9 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
         if (expr == "composite") {
             size_t next = offset;
             size_t count = 0;
-            while ((isdigit(file_name.at(next)) || file_name.at(next) == ' ') && count < 4) {
-                if (file_name.at(next) == ' ') {
-                    count++;
-                }
-                next++;
-            }
-            // 定义了大小
-            if (count == 4) {
+            char nextC = stream.peek();
+            // 定义了画布大小，创建一个新的画布
+            if (isdigit(nextC)) {
                 SDL_Point size;
                 stream >> size.x >> size.y;
                 if (surface != NULL) SDL_FreeSurface(surface);
@@ -185,17 +186,62 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
                 );
             }
             while (!stream.eof()) {
-                SDL_Rect dst_rect;
+                SDL_Rect dst_rect{0};
+                SDL_Rect src_rect{0};
                 std::string child_name;
-                stream >> dst_rect.x >> dst_rect.y;
                 stream >> child_name;
                 SDL_Surface* child_surface = inlineLoadImage(anim, child_name.c_str());
                 dst_rect.w = child_surface->w;
                 dst_rect.h = child_surface->h;
+                int index = 0;
+                // 跳过空格
+                stream.seekg(stream.tellg()+std::streampos(1));
+                nextC = stream.peek();
+                while (isdigit(nextC)) {
+                    switch (index) {
+                    case 0:
+                        stream >> dst_rect.x;
+                        break;
+                    case 1:
+                        stream >> dst_rect.y;
+                        break;
+                    case 2:
+                        stream >> src_rect.x;
+                        break;
+                    case 3:
+                        stream >> src_rect.y;
+                        break;
+                    case 4:
+                        stream >> src_rect.w;
+                        break;
+                    case 5:
+                        stream >> src_rect.h;
+                        break;
+                    default:
+                        break;
+                    }
+                    index++;
+                    if (stream.eof()) break;
+                    stream.seekg(stream.tellg()+std::streampos(1));
+                    nextC = stream.peek();
+                }
+                if ((src_rect.x || src_rect.y) && (src_rect.w == 0 || src_rect.h == 0)) {
+                    src_rect.w = child_surface->w - src_rect.x;
+                    src_rect.h = child_surface->h - src_rect.y;
+                }
+                if (!SDL_RectEmpty(&src_rect)) {
+                    dst_rect.w = src_rect.w;
+                    dst_rect.h = src_rect.h;
+                }
+                // 第一个作为画布
                 if (surface == NULL) {
                     surface = child_surface;
                 } else {
-                    SDL_UpperBlit(child_surface, NULL, surface, &dst_rect);
+                    // 绘制到画布上
+                    SDL_UpperBlit(child_surface,
+                                  SDL_RectEmpty(&src_rect) ? NULL : &src_rect,
+                                  surface,
+                                  &dst_rect);
                     SDL_FreeSurface(child_surface);
                 }
             }
@@ -206,6 +252,9 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
                 std::string child_name;
                 stream >> child_name;
                 surface = inlineLoadImage(anim, child_name.c_str());
+            } else if (!isdigit(stream.peek())) {
+                std::string child_name;
+                stream >> child_name;
             }
             int alpha = 255;
             stream >> alpha;
@@ -245,6 +294,10 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
                 std::string child_name;
                 stream >> child_name;
                 surface = inlineLoadImage(anim, child_name.c_str());
+            } else if (!isdigit(stream.peek())) {
+                // 跳过该指令的图片
+                std::string child_name;
+                stream >> child_name;
             }
             SDL_Rect src_rect;
             stream >> src_rect.x >> src_rect.y >> src_rect.w >> src_rect.h;
