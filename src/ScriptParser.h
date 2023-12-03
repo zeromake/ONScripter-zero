@@ -301,7 +301,9 @@ class ScriptParser {
     char *save_dir_envdata;
 
     void deleteNestInfo();
-    void setStr(char **dst, const char *src, int num = -1);
+    inline void setStr(char **dst, const char *src, int num = -1) {
+        utils::setStr(dst, src, num);
+    }
 
     void readToken();
 

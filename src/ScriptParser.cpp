@@ -769,22 +769,6 @@ void ScriptParser::deleteNestInfo() {
     last_nest_info = &root_nest_info;
 }
 
-void ScriptParser::setStr(char **dst, const char *src, int num) {
-    if (*dst) delete[] *dst;
-    *dst = NULL;
-
-    if (src) {
-        if (num >= 0) {
-            *dst = new char[num + 1]{0};
-            memcpy(*dst, src, num);
-            (*dst)[num] = '\0';
-        } else {
-            *dst = new char[strlen(src) + 1]{0};
-            strcpy(*dst, src);
-        }
-    }
-}
-
 void ScriptParser::setCurrentLabel(const char *label) {
     current_label_info = script_h.lookupLabel(label);
     current_line = script_h.getLineByAddress(current_label_info.start_address);

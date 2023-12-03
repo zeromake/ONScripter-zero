@@ -856,9 +856,16 @@ int NSSpLoad(lua_State *state) {
 
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
+    int x = lh->ons->getWidth() + 1, y = 0;
+    if (lua_isnumber(state, 3)) {
+        x = luaL_checkinteger(state, 3);
+    }
+    if (lua_isnumber(state, 4)) {
+        y = luaL_checkinteger(state, 4);
+    }
 
     CMD_BUF_SNPRINTF(
-        cmd_buf, "_lsp %d, \"%s\", %d, 0", no, str, lh->ons->getWidth() + 1);
+        cmd_buf, "_lsp %d, \"%s\", %d, %d", no, str, x, y);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -873,7 +880,7 @@ int NSSpMove(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     int x = luaL_checkinteger(state, 2);
     int y = luaL_checkinteger(state, 3);
-    int alpha = luaL_checkinteger(state, 4);
+    int alpha = lua_isnumber(state, 4) ? luaL_checkinteger(state, 4) : 255;
 
     CMD_BUF_SNPRINTF(cmd_buf, "_amsp %d, %d, %d, %d", no, x, y, alpha);
     lh->sh->enterExternalScript(cmd_buf);
@@ -947,6 +954,24 @@ static int NSCurrentDir(lua_State *state) {
     return 1;
 }
 
+static int NSReadFile(lua_State *state) {
+    lua_getglobal(state, ONS_LUA_HANDLER_PTR);
+    LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
+    const char *str = luaL_checkstring(state, 1);
+    unsigned long length = lh->sh->cBR->getFileLength(str);
+    if (length == 0) {
+        utils::printInfo("cannot open %s\n", str);
+        return 0;
+    }
+    std::vector<unsigned char> buffer;
+    buffer.resize(length+1);
+    int location;
+    lh->sh->cBR->getFile(str, buffer.data(), &location);
+    buffer[length] = 0;
+    lua_pushstring(state, (char *)buffer.data());
+    return 1;
+}
+
 #define LUA_FUNC_LUT(s) \
     { #s, s }
 #define LUA_FUNC_LUT_DUMMY(s) \
@@ -1010,6 +1035,7 @@ static const struct luaL_Reg lua_lut[] = {LUA_FUNC_LUT(NSCurrentDir),
                                           LUA_FUNC_LUT(NSSp2Visible),
                                           LUA_FUNC_LUT(NSTimer),
                                           LUA_FUNC_LUT(NSUpdate),
+                                          LUA_FUNC_LUT(NSReadFile),
                                           {NULL, NULL}};
 
 static int nsutf_from_ansi(lua_State *state) {
@@ -1188,6 +1214,22 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
         buf = new char[strlen(p) + 1]{0};
         memcpy(buf, p, strlen(p) + 1);
         lua_pushstring(state, buf);
+    } else {
+        // 自动读取变量
+        sh->nextParam();
+        while (sh->current_variable.type != ScriptHandler::VAR_NONE) {
+            if (sh->current_variable.type == ScriptHandler::VAR_INT) {
+                lua_pushinteger(state, sh->current_variable_data.num);
+                num_argument_value++;
+            } else if (sh->current_variable.type == ScriptHandler::VAR_STR) {
+                lua_pushstring(state, sh->current_variable_data.str);
+                num_argument_value++;
+            }
+            if (!(sh->getEndStatus() & ScriptHandler::END_COMMA)) {
+                break;
+            }
+            sh->nextParam();
+        }
     }
 
     if (lua_pcall(state, num_argument_value, num_return_value, 0) != 0) {

@@ -126,6 +126,7 @@ class ScriptHandler {
     void readVariable(bool reread_flag = false);
     void skipAnyVariable();
     bool readColor(utils::uchar4 *color);
+    void nextParam();
 
     // function for string access
     inline char *getStringBuffer() { return string_buffer; };
@@ -262,6 +263,7 @@ class ScriptHandler {
     int global_variable_border;
 
     BaseReader *cBR;
+    struct VariableData current_variable_data;
 
    private:
     enum {
