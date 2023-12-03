@@ -73,6 +73,12 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] DirectReader 的多字节数字添加新方法 `readLongLE`, `readShortLE`, `writeLongLE`, `writeShortLE`
 - [x] DirectReader 的多字节数字的读写方法会根据当前系统大小端进行自动优化（改为 memcpy）。
 - [x] DirectReader 各个地方的调用都正确的使用 `LE`, `BE` 的方法。
+- [x] 为 sp 添加新的图片处理器语法 `@expr:param1 param2 param3……|expr:param1 param2 param3……`。
+    - [x] `composite` 参考 renpy 的 `Composite`，混合多张图片，示例 `@composite:xxx.png[ dest.x dest.y][ src.x src.y src.w src.h]……`
+    - [x] `alpha`，对图片做 alpha 效果，示例 `@alpha:xxx.png 128` 或者 `@xxx.png|alpha:128`
+    - [x] `crop`，对图片做矩形切割，示例 `@crop:xxx.png 0 0 48 48` 或者 `@xxx.png|crop:0 0 48 48` （来自管道时不能再由 crop 加载图片）
+    - [x] 所有表达式支持管道式操作，前一个会的结果被作为后一个的输入
+    - [ ] 需要重新处理 std::stringstream 对下一个输出的类型的判断方式，否则会导致 `1.png` 这个当作数字。
 - [ ] 文字渲染范围改为一个矩形坐标，不再使用横向纵向多少个字符的方式(设置依旧生效但是会转化为一个矩形坐标)。
 - [ ] 脚本全部切换到 utf-8 的处理，仅在读取时做 gbk,shift_jis 到 utf-8 转换。
 - [ ] 支持为字体设置多个 fallback 字体，并默认内置系统字体 fallback。
