@@ -143,4 +143,19 @@ int readColor(const char *buf, uchar4 *color) {
     offset += size;
     return offset;
 }
+
+void setStr(char **dst, const char *src, int num) {
+    if (*dst) delete[] *dst;
+    *dst = NULL;
+    if (src) {
+        if (num >= 0) {
+            *dst = new char[num + 1]{0};
+            memcpy(*dst, src, num);
+            (*dst)[num] = '\0';
+        } else {
+            *dst = new char[strlen(src) + 1]{0};
+            strcpy(*dst, src);
+        }
+    }
+}
 }  // namespace utils

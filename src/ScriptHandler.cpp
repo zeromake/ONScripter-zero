@@ -76,6 +76,7 @@ ScriptHandler::~ScriptHandler() {
 }
 
 void ScriptHandler::reset() {
+    current_variable_data.reset(true);
     for (int i = 0; i < variable_range; i++) variable_data[i].reset(true);
 
     if (extended_variable_data) delete[] extended_variable_data;
@@ -476,6 +477,23 @@ bool ScriptHandler::readColor(utils::uchar4 *color) {
     char *buf = current_script + offset;
     next_script = checkComma(buf);
     return true;
+}
+
+void ScriptHandler::nextParam() {
+    end_status = END_NONE;
+    current_variable.type = VAR_NONE;
+    current_script = next_script;
+    SKIP_SPACE(current_script);
+    if (*current_script == '%' || *current_script == '$') {
+        readVariable();
+        current_variable_data = getVariableData(current_variable.var_no);
+    } else if (*current_script >= '0' && *current_script <= '9') {
+        current_variable_data.num = readInt();
+        current_variable.type = VAR_INT;
+    } else {
+        utils::setStr(&current_variable_data.str, readStr(), -1);
+        current_variable.type = VAR_STR;
+    }
 }
 
 void ScriptHandler::skipToken() {

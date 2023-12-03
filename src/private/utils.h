@@ -45,6 +45,7 @@ int readColor(const char *buf, uchar4 *color);
 void split(std::vector<std::string> &output,
            std::string &input,
            const char sep);
+void setStr(char **dst, const char *src, int num);
 
 template <typename T>
 T(min)
