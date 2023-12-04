@@ -78,7 +78,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
     - [x] `alpha`，对图片做 alpha 效果，示例 `@alpha:xxx.png 128` 或者 `@xxx.png|alpha:128`
     - [x] `crop`，对图片做矩形切割，示例 `@crop:xxx.png 0 0 48 48` 或者 `@xxx.png|crop:0 0 48 48` （来自管道时不能再由 crop 加载图片）
     - [x] 所有表达式支持管道式操作，前一个会的结果被作为后一个的输入
-    - [ ] 需要重新处理 std::stringstream 对下一个输出的类型的判断方式，否则会导致 `1.png` 这个当作数字。
+    - [x] 需要重新处理 std::stringstream 对下一个输出的类型的判断方式，否则会导致 `1.png` 这个当作数字。
 - [ ] 文字渲染范围改为一个矩形坐标，不再使用横向纵向多少个字符的方式(设置依旧生效但是会转化为一个矩形坐标)。
 - [ ] 脚本全部切换到 utf-8 的处理，仅在读取时做 gbk,shift_jis 到 utf-8 转换。
 - [ ] 支持为字体设置多个 fallback 字体，并默认内置系统字体 fallback。

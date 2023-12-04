@@ -24,6 +24,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace utils {
 
@@ -46,6 +47,7 @@ void split(std::vector<std::string> &output,
            std::string &input,
            const char sep);
 void setStr(char **dst, const char *src, int num);
+bool streamIsDigits(std::stringstream &ss);
 
 template <typename T>
 T(min)

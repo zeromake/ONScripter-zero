@@ -72,7 +72,8 @@ local deps = {
     "brotli",
     "ghc_filesystem",
     "luajit",
-    "stb"
+    "stb",
+    "fmt"
 }
 local sdlConfigs = {
     bmp_compat = true
@@ -165,7 +166,8 @@ target("onscripter")
         "brotli",
         "ghc_filesystem",
         "luajit",
-        "stb"
+        "stb",
+        "fmt"
     )
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
