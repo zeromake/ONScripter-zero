@@ -158,4 +158,12 @@ void setStr(char **dst, const char *src, int num) {
         }
     }
 }
+
+bool streamIsDigits(std::stringstream &ss) {
+    std::string next;
+    std::streampos prev_pos = ss.tellg();
+    ss >> next;
+    ss.seekg(prev_pos);
+    return next.find_first_not_of("0123456789") == std::string::npos;
+}
 }  // namespace utils

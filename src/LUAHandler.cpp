@@ -21,6 +21,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#include <fmt/args.h>
+#include <fmt/format.h>
 
 #include "LUAHandler.h"
 
@@ -854,18 +856,15 @@ int NSSpLoad(lua_State *state) {
     lua_getglobal(state, ONS_LUA_HANDLER_PTR);
     LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
 
+    int alpha = 255;
     int no = luaL_checkinteger(state, 1);
     const char *str = luaL_checkstring(state, 2);
     int x = lh->ons->getWidth() + 1, y = 0;
-    if (lua_isnumber(state, 3)) {
-        x = luaL_checkinteger(state, 3);
-    }
-    if (lua_isnumber(state, 4)) {
-        y = luaL_checkinteger(state, 4);
-    }
-
+    if (!lua_isnoneornil(state, 3)) x = luaL_checkinteger(state, 3);
+    if (!lua_isnoneornil(state, 4)) y = luaL_checkinteger(state, 4);
+    if (!lua_isnoneornil(state, 5)) alpha = luaL_checkinteger(state, 5);
     CMD_BUF_SNPRINTF(
-        cmd_buf, "_lsp %d, \"%s\", %d, %d", no, str, x, y);
+        cmd_buf, "_lsp %d, \"%s\", %d, %d, %d", no, str, x, y, alpha);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
@@ -880,8 +879,7 @@ int NSSpMove(lua_State *state) {
     int no = luaL_checkinteger(state, 1);
     int x = luaL_checkinteger(state, 2);
     int y = luaL_checkinteger(state, 3);
-    int alpha = lua_isnumber(state, 4) ? luaL_checkinteger(state, 4) : 255;
-
+    int alpha = !lua_isnoneornil(state, 4) ? luaL_checkinteger(state, 4) : 255;
     CMD_BUF_SNPRINTF(cmd_buf, "_amsp %d, %d, %d, %d", no, x, y, alpha);
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
@@ -972,6 +970,33 @@ static int NSReadFile(lua_State *state) {
     return 1;
 }
 
+inline std::string inline_fmt_format(lua_State *state) {
+    const char* format = luaL_checkstring(state, 1);
+    auto args = fmt::dynamic_format_arg_store<fmt::format_context>();
+    int i = 2;
+    while (!lua_isnoneornil(state, i)) {
+        if (lua_isnumber(state, i)) {
+            int v = luaL_checkinteger(state, i);
+            args.push_back(std::move(v));
+        } else if (lua_isstring(state, i)) {
+            std::string v = luaL_checkstring(state, i);
+            args.push_back(std::move(v));
+        }
+        i++;
+    }
+    return std::move(fmt::vformat(format, args));
+}
+
+static int NSCall(lua_State *state) {
+    lua_getglobal(state, ONS_LUA_HANDLER_PTR);
+    LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
+    std::string result = inline_fmt_format(state);
+    strcpy(cmd_buf, result.c_str());
+    lh->sh->enterExternalScript(cmd_buf);
+    lh->ons->runScript();
+    lh->sh->leaveExternalScript();
+}
+
 #define LUA_FUNC_LUT(s) \
     { #s, s }
 #define LUA_FUNC_LUT_DUMMY(s) \
@@ -1036,6 +1061,7 @@ static const struct luaL_Reg lua_lut[] = {LUA_FUNC_LUT(NSCurrentDir),
                                           LUA_FUNC_LUT(NSTimer),
                                           LUA_FUNC_LUT(NSUpdate),
                                           LUA_FUNC_LUT(NSReadFile),
+                                          LUA_FUNC_LUT(NSCall),
                                           {NULL, NULL}};
 
 static int nsutf_from_ansi(lua_State *state) {
@@ -1072,6 +1098,24 @@ static int nsutf_to_ansi(lua_State *state) {
     return 1;
 }
 
+static int fmt_format(lua_State *state) {
+    std::string result = inline_fmt_format(state);
+    lua_pushstring(state, result.c_str());
+    return 1;
+}
+
+static int fmt_print(lua_State *state) {
+    std::string result = inline_fmt_format(state);
+    fmt::print(result);
+    return 0;
+}
+
+static int fmt_println(lua_State *state) {
+    std::string result = inline_fmt_format(state);
+    fmt::println(result);
+    return 0;
+}
+
 static const struct luaL_Reg module_nsutf[] = {
     LUA_FUNC_LUT(nsutf_from_ansi), LUA_FUNC_LUT(nsutf_to_ansi), {NULL, NULL}};
 
@@ -1079,6 +1123,12 @@ static const struct luaL_Reg module_dpshadow[] = {
     LUA_FUNC_LUT_DUMMY(dpshadow_make),
     LUA_FUNC_LUT_DUMMY(dpshadow_merge),
     {NULL, NULL}};
+static const struct luaL_Reg module_fmt[] = {
+    {"format", fmt_format},
+    {"print", fmt_print},
+    {"println", fmt_println},
+    {NULL, NULL}
+};
 
 // LUAHandler::LUAHandler(ONScripter *ons)
 LUAHandler::LUAHandler() {
@@ -1102,13 +1152,16 @@ LUAHandler::~LUAHandler() {
 #if LUA_VERSION_NUM >= 502
 extern "C" int luaopen_nsutf(lua_State *state) {
     luaL_newlib(state, module_nsutf);
-
     return 1;
 }
 
 extern "C" int luaopen_dpshadow(lua_State *state) {
     luaL_newlib(state, module_dpshadow);
+    return 1;
+}
 
+extern "C" int luaopen_fmt(lua_State *state) {
+    luaL_newlib(state, module_fmt);
     return 1;
 }
 #endif
@@ -1130,6 +1183,7 @@ void LUAHandler::init(ONScripter *ons,
     luaL_setfuncs(state, module_nsutf, 0);
     luaL_requiref(state, "nsutf", luaopen_nsutf, 1);
     luaL_requiref(state, "dpshadow", luaopen_dpshadow, 1);
+    luaL_requiref(state, "fmt", luaopen_fmt, 1);
 #else
     lua_pushvalue(state, LUA_GLOBALSINDEX);
     luaL_register(state, NULL, lua_lut);
@@ -1137,6 +1191,7 @@ void LUAHandler::init(ONScripter *ons,
     luaL_register(state, NULL, module_dpshadow);
     luaL_register(state, "nsutf", module_nsutf);
     luaL_register(state, "dpshadow", module_dpshadow);
+    luaL_register(state, "fmt", module_fmt);
 #endif
 
     lua_pushlightuserdata(state, this);
