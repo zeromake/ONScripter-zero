@@ -149,7 +149,7 @@ SDL_Surface *ONScripter::inlineLoadImage(AnimationInfo *anim,
 SDL_Surface *ONScripter::loadAnimationImage(AnimationInfo *anim) {
     std::string file_name = anim->file_name;
     SDL_Surface *surface = NULL;
-    if (file_name.at(0) != '@') {
+    if (file_name.size() == 0 || file_name.at(0) != '@') {
         return inlineLoadImage(anim, file_name.c_str());
     }
     file_name = file_name.substr(1);
