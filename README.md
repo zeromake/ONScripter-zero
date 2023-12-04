@@ -64,7 +64,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
     - [x] ons 的内置 gbk 转码修正 utf8 到 gbk 不全的情况。
 - [x] ons 的 trans_mode 默认为 AnimationInfo::TRANS_NONE。
 - [x] ons trans_mode 添加 AnimationInfo::TRANS_MASK_{TOP,BOTTOM,LEFT,RIGHT} 用来替代 AnimationInfo::TRANS_ALPHA。
-    - [ ] 写了第一个版本渲染有问题，等待修复。
+    - [x] 写了第一个版本渲染有问题，等待修复。
 - [x] ons 的 loadImage 做一个文件内容 lru 缓存，默认缓存 64 个图片内容。
 - [x] ons 的内建纯色矩阵支持透明色，示例：`>800,200,#ff00005a`。
     - [x] 颜色支持 `#fff`, `#ffff`, `#ffffff`, `#ffffffff` 的类 css 变长写法（仅限在 sp 的 > 内建矩阵里有限）。
