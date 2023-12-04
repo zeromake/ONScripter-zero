@@ -21,10 +21,10 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#include "LUAHandler.h"
+
 #include <fmt/args.h>
 #include <fmt/format.h>
-
-#include "LUAHandler.h"
 
 #include "ONScripter.h"
 #include "ScriptHandler.h"
@@ -962,7 +962,7 @@ static int NSReadFile(lua_State *state) {
         return 0;
     }
     std::vector<unsigned char> buffer;
-    buffer.resize(length+1);
+    buffer.resize(length + 1);
     int location;
     lh->sh->cBR->getFile(str, buffer.data(), &location);
     buffer[length] = 0;
@@ -971,7 +971,7 @@ static int NSReadFile(lua_State *state) {
 }
 
 inline std::string inline_fmt_format(lua_State *state) {
-    const char* format = luaL_checkstring(state, 1);
+    const char *format = luaL_checkstring(state, 1);
     auto args = fmt::dynamic_format_arg_store<fmt::format_context>();
     int i = 2;
     while (!lua_isnoneornil(state, i)) {
@@ -1123,12 +1123,10 @@ static const struct luaL_Reg module_dpshadow[] = {
     LUA_FUNC_LUT_DUMMY(dpshadow_make),
     LUA_FUNC_LUT_DUMMY(dpshadow_merge),
     {NULL, NULL}};
-static const struct luaL_Reg module_fmt[] = {
-    {"format", fmt_format},
-    {"print", fmt_print},
-    {"println", fmt_println},
-    {NULL, NULL}
-};
+static const struct luaL_Reg module_fmt[] = {{"format", fmt_format},
+                                             {"print", fmt_print},
+                                             {"println", fmt_println},
+                                             {NULL, NULL}};
 
 // LUAHandler::LUAHandler(ONScripter *ons)
 LUAHandler::LUAHandler() {

@@ -1301,8 +1301,7 @@ static SDL_Surface *foldMarkAlpha(SDL_Surface *surface,
             buffer += skip_mark_offset;
         }
         // 跳过无法整除后剩下的像素
-        buffer += surface->w - fold_num_of_cells_w;
-        // 输出是手动创建的不存在无法整除的情况
+        buffer += surface->w - fold_num_of_cells_w * 2;
     }
     return surface2;
 }
@@ -1311,6 +1310,13 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
                                             SDL_Surface *surface_m,
                                             bool has_alpha) {
     if (surface == NULL) return NULL;
+
+    int w = surface->w;
+    int h = surface->h;
+    int w2 = w / num_of_cells;
+    orig_pos.w = w;
+    orig_pos.h = h;
+
     if (trans_mode == TRANS_NONE) return surface;
 #ifndef ONSCRIPTER_COMPATIBLE
     // layer 不做这些内置处理
@@ -1320,12 +1326,6 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
     SDL_LockSurface(surface);
     Uint32 *buffer = (Uint32 *)surface->pixels;
     SDL_PixelFormat *fmt = surface->format;
-
-    int w = surface->w;
-    int h = surface->h;
-    int w2 = w / num_of_cells;
-    orig_pos.w = w;
-    orig_pos.h = h;
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
     unsigned char *alphap = (unsigned char *)buffer + 3;
@@ -1346,7 +1346,8 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
     ref_color &= 0xffffff;
 
     int i, j, c;
-    if ((trans_mode >= TRANS_MASK_TOP && trans_mode <= TRANS_MASK_RIGHT)) {
+    if ((trans_mode >= TRANS_MASK_TOP && trans_mode <= TRANS_MASK_RIGHT) ||
+        (trans_mode == TRANS_ALPHA && !has_alpha)) {
         FOLD_MARK_DIRECTION direction = FOLD_MARK_DIRECTION::vertical;
         FOLD_MARK_ORDER order = FOLD_MARK_ORDER::main;
         switch (trans_mode) {
@@ -1363,38 +1364,6 @@ SDL_Surface *AnimationInfo::setupImageAlpha(SDL_Surface *surface,
         }
         SDL_Surface *surface2 = foldMarkAlpha(
             surface, num_of_cells, &orig_pos.w, &orig_pos.h, direction, order);
-        SDL_UnlockSurface(surface);
-        SDL_FreeSurface(surface);
-        surface = surface2;
-    } else if ((trans_mode == TRANS_ALPHA && !has_alpha)) {
-        const int w22 = w2 / 2;
-        const int w3 = w22 * num_of_cells;
-        orig_pos.w = w3;
-        SDL_PixelFormat *fmt = surface->format;
-        SDL_Surface *surface2 = SDL_CreateRGBSurfaceWithFormat(
-            SDL_SWSURFACE, w3, h, fmt->BitsPerPixel, fmt->format);
-        SDL_LockSurface(surface2);
-        Uint32 *buffer2 = (Uint32 *)surface2->pixels;
-
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-        alphap = (unsigned char *)buffer2 + 3;
-#else
-        alphap = (unsigned char *)buffer2;
-#endif
-
-        for (i = h; i != 0; i--) {
-            for (c = num_of_cells; c != 0; c--) {
-                for (j = w22; j != 0; j--, buffer++, alphap += 4) {
-                    *buffer2++ = *buffer;
-                    *alphap = (*(buffer + w22) & 0xff) ^ 0xff;
-                }
-                buffer += (w2 - w22);
-            }
-            buffer += surface->w - w2 * num_of_cells;
-            buffer2 += surface2->w - w22 * num_of_cells;
-            alphap += (surface2->w - w22 * num_of_cells) * 4;
-        }
-
         SDL_UnlockSurface(surface);
         SDL_FreeSurface(surface);
         surface = surface2;
