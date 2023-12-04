@@ -23,6 +23,7 @@
  */
 
 #include <SDL2_rotozoom.h>
+
 #include <sstream>
 
 #include "ONScripter.h"
@@ -129,26 +130,23 @@ void ONScripter::proceedAnimation(int current_time) {
     }
 }
 
-SDL_Surface* ONScripter::inlineLoadImage(
-    AnimationInfo *anim,
-    const char* file_name
-) {
+SDL_Surface *ONScripter::inlineLoadImage(AnimationInfo *anim,
+                                         const char *file_name) {
     bool has_alpha;
     int location;
     SDL_Surface *_surface1 = nullptr;
     SDL_Surface *_surface2 = nullptr;
-    _surface1 = loadImage(file_name,
-                            &has_alpha,
-                            &location,
-                            &anim->default_alpha);
+    _surface1 =
+        loadImage(file_name, &has_alpha, &location, &anim->default_alpha);
     if (anim->trans_mode == AnimationInfo::TRANS_MASK)
         _surface2 = loadImage(anim->mask_file_name);
-    SDL_Surface *alpha_surface = anim->setupImageAlpha(_surface1, _surface2, has_alpha);
+    SDL_Surface *alpha_surface =
+        anim->setupImageAlpha(_surface1, _surface2, has_alpha);
     if (_surface2) SDL_FreeSurface(_surface2);
     return alpha_surface;
 }
 
-SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
+SDL_Surface *ONScripter::loadAnimationImage(AnimationInfo *anim) {
     std::string file_name = anim->file_name;
     SDL_Surface *surface = NULL;
     if (file_name.at(0) != '@') {
@@ -157,7 +155,7 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
     file_name = file_name.substr(1);
     std::vector<std::string> images;
     utils::split(images, file_name, '|');
-    for (auto file_name: images) {
+    for (auto file_name : images) {
         size_t offset = file_name.find(':');
         // 不是图片处理器直接加载到 surface 上。
         if (std::string::npos == offset) {
@@ -177,47 +175,49 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
                 if (surface != NULL) SDL_FreeSurface(surface);
                 surface = SDL_CreateRGBSurfaceWithFormat(
                     SDL_SWSURFACE,
-                    size.x, size.y,
+                    size.x,
+                    size.y,
                     image_surface->format->BitsPerPixel,
-                    image_surface->format->format
-                );
+                    image_surface->format->format);
             }
             while (!stream.eof()) {
                 SDL_Rect dst_rect{0};
                 SDL_Rect src_rect{0};
                 std::string child_name;
                 stream >> child_name;
-                SDL_Surface* child_surface = inlineLoadImage(anim, child_name.c_str());
+                SDL_Surface *child_surface =
+                    inlineLoadImage(anim, child_name.c_str());
                 dst_rect.w = child_surface->w;
                 dst_rect.h = child_surface->h;
                 int index = 0;
                 while (utils::streamIsDigits(stream)) {
                     switch (index) {
-                    case 0:
-                        stream >> dst_rect.x;
-                        break;
-                    case 1:
-                        stream >> dst_rect.y;
-                        break;
-                    case 2:
-                        stream >> src_rect.x;
-                        break;
-                    case 3:
-                        stream >> src_rect.y;
-                        break;
-                    case 4:
-                        stream >> src_rect.w;
-                        break;
-                    case 5:
-                        stream >> src_rect.h;
-                        break;
-                    default:
-                        break;
+                        case 0:
+                            stream >> dst_rect.x;
+                            break;
+                        case 1:
+                            stream >> dst_rect.y;
+                            break;
+                        case 2:
+                            stream >> src_rect.x;
+                            break;
+                        case 3:
+                            stream >> src_rect.y;
+                            break;
+                        case 4:
+                            stream >> src_rect.w;
+                            break;
+                        case 5:
+                            stream >> src_rect.h;
+                            break;
+                        default:
+                            break;
                     }
                     index++;
                     if (stream.eof()) break;
                 }
-                if ((src_rect.x || src_rect.y) && (src_rect.w == 0 || src_rect.h == 0)) {
+                if ((src_rect.x || src_rect.y) &&
+                    (src_rect.w == 0 || src_rect.h == 0)) {
                     src_rect.w = child_surface->w - src_rect.x;
                     src_rect.h = child_surface->h - src_rect.y;
                 }
@@ -253,25 +253,27 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
             if (alpha >= 255) {
                 continue;
             }
-            SDL_Surface* child_surface = SDL_CreateRGBSurfaceWithFormat(
+            SDL_Surface *child_surface = SDL_CreateRGBSurfaceWithFormat(
                 SDL_SWSURFACE,
-                surface->w, surface->h,
+                surface->w,
+                surface->h,
                 image_surface->format->BitsPerPixel,
-                image_surface->format->format
-            );
+                image_surface->format->format);
             SDL_LockSurface(surface);
             SDL_LockSurface(child_surface);
-            Uint32 *src = (Uint32*)surface->pixels;
-            Uint32 *dst = (Uint32*)child_surface->pixels;
+            Uint32 *src = (Uint32 *)surface->pixels;
+            Uint32 *dst = (Uint32 *)child_surface->pixels;
             size_t size = surface->w * surface->h;
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
             unsigned char *src_alphap = (unsigned char *)surface->pixels + 3;
-            unsigned char *dst_alphap = (unsigned char *)child_surface->pixels + 3;
+            unsigned char *dst_alphap =
+                (unsigned char *)child_surface->pixels + 3;
 #else
             unsigned char *src_alphap = (unsigned char *)surface->pixels;
             unsigned char *dst_alphap = (unsigned char *)child_surface->pixels;
 #endif
-            for (size_t i = 0; i < size; i++, src++, dst++, src_alphap += 4, dst_alphap += 4) {
+            for (size_t i = 0; i < size;
+                 i++, src++, dst++, src_alphap += 4, dst_alphap += 4) {
                 *dst = *src;
                 if (*src_alphap) {
                     *dst_alphap = (((int)*src_alphap) * alpha) / 255;
@@ -293,12 +295,12 @@ SDL_Surface* ONScripter::loadAnimationImage(AnimationInfo *anim) {
             }
             SDL_Rect src_rect;
             stream >> src_rect.x >> src_rect.y >> src_rect.w >> src_rect.h;
-            SDL_Surface* child_surface = SDL_CreateRGBSurfaceWithFormat(
+            SDL_Surface *child_surface = SDL_CreateRGBSurfaceWithFormat(
                 SDL_SWSURFACE,
-                src_rect.w, src_rect.h,
+                src_rect.w,
+                src_rect.h,
                 image_surface->format->BitsPerPixel,
-                image_surface->format->format
-            );
+                image_surface->format->format);
             SDL_UpperBlit(surface, &src_rect, child_surface, NULL);
             SDL_FreeSurface(surface);
             surface = child_surface;
@@ -414,7 +416,7 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
     }
 #endif
     else {
-        SDL_Surface* surface = loadAnimationImage(anim);
+        SDL_Surface *surface = loadAnimationImage(anim);
         if (surface && screen_ratio1 != screen_ratio2) {
             SDL_Surface *src_s = surface;
             int w, h;

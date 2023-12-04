@@ -199,22 +199,19 @@ SDL_Surface *ONScripter::createSurfaceFromFile(const char *_filename,
         tmp = IMG_Load_RW(src, 0);
     }
     if (!tmp && is_jpeg) {
-        utils::printError(" *** force-loading a JPG image [%s]\n",
-                            _filename);
+        utils::printError(" *** force-loading a JPG image [%s]\n", _filename);
         tmp = IMG_LoadJPG_RW(src);
     }
 
     if (tmp && has_alpha) {
-        *has_alpha =
-            (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
+        *has_alpha = (!is_not_alpha && tmp->format->Amask) || is_png || is_svg;
     }
 
     SDL_RWclose(src);
 
     if (!tmp)
-        utils::printError(" *** can't load file [%s] %s ***\n",
-                            _filename,
-                            IMG_GetError());
+        utils::printError(
+            " *** can't load file [%s] %s ***\n", _filename, IMG_GetError());
     return tmp;
 }
 
