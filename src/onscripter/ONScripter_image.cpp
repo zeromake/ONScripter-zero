@@ -993,7 +993,7 @@ void ONScripter::createBackground() {
 #ifdef ONSCRIPTER_COMPATIBLE
     bg_info.trans_mode = AnimationInfo::TRANS_COPY;
 #else
-    bg_info.trans_mode = trans_mode;
+    bg_info.trans_mode = AnimationInfo::TRANS_NONE;
 #endif
     bg_info.pos.x = 0;
     bg_info.pos.y = 0;
@@ -1011,6 +1011,8 @@ void ONScripter::createBackground() {
         parseTaggedString(&anim);
 #ifdef ONSCRIPTER_COMPATIBLE
         anim.trans_mode = AnimationInfo::TRANS_COPY;
+#else
+        anim.trans_mode = AnimationInfo::TRANS_NONE;
 #endif
         // svg 适配
         anim.setLoadSize(screen_width, screen_height);
