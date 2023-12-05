@@ -484,9 +484,15 @@ void ScriptHandler::nextParam() {
     current_variable.type = VAR_NONE;
     current_script = next_script;
     SKIP_SPACE(current_script);
+    current_variable_data.reset(true);
     if (*current_script == '%' || *current_script == '$') {
         readVariable();
-        current_variable_data = getVariableData(current_variable.var_no);
+        auto variable_data = getVariableData(current_variable.var_no);
+        if (current_variable.type == VAR_STR) {
+            utils::setStr(&current_variable_data.str, variable_data.str, -1);
+        } else {
+            current_variable_data.num = variable_data.num;
+        }
     } else if (*current_script >= '0' && *current_script <= '9') {
         current_variable_data.num = readInt();
         current_variable.type = VAR_INT;
