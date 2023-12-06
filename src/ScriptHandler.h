@@ -33,6 +33,7 @@
 
 #include "BaseReader.h"
 #include "private/utils.h"
+#include "resize/scale_manager.hpp"
 
 #define IS_TWO_BYTE(x)                             \
     (((unsigned char)(x) > (unsigned char)0x80) && \
@@ -255,15 +256,14 @@ class ScriptHandler {
 
     int screen_width;
     int screen_height;
-    int screen_ratio1;
-    int screen_ratio2;
     bool init_screen_ratio;
-    int user_ratio;
     int variable_range;
     int global_variable_border;
 
     BaseReader *cBR;
     struct VariableData current_variable_data;
+    std::shared_ptr<onscripter::ScaleManager> screen_scale;
+    std::shared_ptr<onscripter::ScaleManager> user_scale;
 
    private:
     enum {

@@ -61,9 +61,6 @@ ScriptParser::ScriptParser() {
     srand(time(NULL));
     rand();
 
-    screen_ratio1 = 1;
-    screen_ratio2 = 1;
-
     archive_path = NULL;
     save_dir = NULL;
     version_str = NULL;
@@ -83,8 +80,6 @@ ScriptParser::ScriptParser() {
     file_io_buf_len = 0;
     save_data_len = 0;
     page_list = NULL;
-    user_ratio1 = 1;
-    user_ratio2 = 1;
 
     /* ---------------------------------------- */
     /* Sound related variables */
@@ -97,6 +92,9 @@ ScriptParser::ScriptParser() {
     start_kinsoku = end_kinsoku = NULL;
     num_start_kinsoku = num_end_kinsoku = 0;
     setKinsoku(DEFAULT_START_KINSOKU, DEFAULT_END_KINSOKU, false);
+
+    screen_scale = std::make_shared<onscripter::ScaleManager>();
+    user_scale = std::make_shared<onscripter::ScaleManager>();
 }
 
 ScriptParser::~ScriptParser() {
@@ -112,20 +110,6 @@ ScriptParser::~ScriptParser() {
     if (sprintf_buf) delete[] sprintf_buf;
 
     if (save_dir_envdata) delete[] save_dir_envdata;
-}
-
-const int ScriptParser::calcUserRatio(const int v) {
-    if (user_ratio1 == user_ratio2) {
-        return v;
-    }
-    return v * user_ratio1 / user_ratio2;
-}
-
-const int ScriptParser::calcUnUserRatio(const int v) {
-    if (user_ratio1 == user_ratio2) {
-        return v;
-    }
-    return v * user_ratio2 / user_ratio1;
 }
 
 const ons_font::FontConfig *ScriptParser::getFontConfig(
@@ -397,8 +381,7 @@ void ScriptParser::reset(bool isDestroy) {
 
 int ScriptParser::openScript() {
     if (init_screen_ratio) {
-        script_h.screen_ratio1 = screen_ratio1;
-        script_h.screen_ratio2 = screen_ratio2;
+        *script_h.screen_scale = screen_scale;
         script_h.init_screen_ratio = init_screen_ratio;
     }
     script_h.cBR =
@@ -414,16 +397,15 @@ int ScriptParser::openScript() {
     screen_width = script_h.screen_width;
     screen_height = script_h.screen_height;
     if (!init_screen_ratio) {
-        setRescale(script_h.screen_ratio1, script_h.screen_ratio2);
+        *script_h.screen_scale = screen_scale;
     }
     return 0;
 }
 
 void ScriptParser::setRescale(int scale1, int scale2) {
-    if (scale1 > 0 && scale2 > 0) {
+    if (scale1 > 0 && scale2 > 0 && scale1 != scale2) {
         init_screen_ratio = true;
-        screen_ratio1 = scale1;
-        screen_ratio2 = scale2;
+        screen_scale->Update(scale1, scale2);
     }
 }
 

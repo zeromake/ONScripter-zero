@@ -104,11 +104,11 @@ void _FontInfo::saveToPrev(bool use_ruby_offset) {
 
 int _FontInfo::getToPrev(int index) { return old_xy[index]; }
 
-void *_FontInfo::openFont(char *_font_file,
-                          int ratio1,
-                          int ratio2,
-                          generate_path_function f,
-                          const ons_font::FontConfig *fontConfig) {
+void *_FontInfo::openFont(
+    char *_font_file,
+    const std::shared_ptr<onscripter::ScaleManager> &screen_scale,
+    generate_path_function f,
+    const ons_font::FontConfig *fontConfig) {
     char font_file[4096] = {0};
     if (f != nullptr) {
         f(_font_file, font_file, false);
@@ -139,35 +139,34 @@ void *_FontInfo::openFont(char *_font_file,
         }
         if (fp == NULL) return NULL;
         fp->close(fp);
+        int scale_font_size = screen_scale->Scale(font_size);
 #if defined(PSP)
         fc->next->rw_ops = SDL_RWFromFile(font_file, "r");
-        fc->next->font[0] = TTF_OpenFontRW(
-            fc->next->rw_ops, SDL_TRUE, font_size * ratio1 / ratio2);
+        fc->next->font[0] =
+            TTF_OpenFontRW(fc->next->rw_ops, SDL_TRUE, scale_font_size);
 #if (SDL_TTF_MAJOR_VERSION >= 2) && (SDL_TTF_MINOR_VERSION >= 0) && \
     (SDL_TTF_PATCHLEVEL >= 10)
-        fc->next->font[1] = TTF_OpenFontRW(
-            fc->next->rw_ops, SDL_TRUE, font_size * ratio1 / ratio2);
+        fc->next->font[1] =
+            TTF_OpenFontRW(fc->next->rw_ops, SDL_TRUE, scale_font_size);
         TTF_SetFontOutline(fc->next->font[1], fontConfig->outline_size);
 #endif
         fc->next->power_resume_number = psp_power_resume_number;
         strcpy(fc->next->name, font_file);
 #else
         if (useFile)
-            fc->next->font[0] =
-                TTF_OpenFont(font_file, font_size * ratio1 / ratio2);
+            fc->next->font[0] = TTF_OpenFont(font_file, scale_font_size);
         else
             fc->next->font[0] =
                 TTF_OpenFontRW(SDL_RWFromConstMem(font_cache, font_cache_size),
                                1,
-                               font_size * ratio1 / ratio2);
+                               scale_font_size);
         if (useFile)
-            fc->next->font[1] =
-                TTF_OpenFont(font_file, font_size * ratio1 / ratio2);
+            fc->next->font[1] = TTF_OpenFont(font_file, scale_font_size);
         else
             fc->next->font[1] =
                 TTF_OpenFontRW(SDL_RWFromConstMem(font_cache, font_cache_size),
                                1,
-                               font_size * ratio1 / ratio2);
+                               scale_font_size);
         if (fc->next->font[1] == nullptr) {
             utils::printError("Open font failed: %s\n", TTF_GetError());
         }
@@ -371,7 +370,9 @@ void _FontInfo::rollback(int mode) {
     }
 }
 
-SDL_Rect _FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2) {
+SDL_Rect _FontInfo::calcUpdatedArea(
+    int start_xy[2],
+    const std::shared_ptr<onscripter::ScaleManager> &screen_scale) {
     SDL_Rect rect;
     if (tateyoko_mode == YOKO_MODE) {
         if (start_xy[1] == xy[1]) {

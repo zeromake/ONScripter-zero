@@ -25,9 +25,9 @@
 #include "ONScripter.h"
 #include "private/utils.h"
 
-#define EFFECT_STRIPE_WIDTH (16 * screen_ratio1 / screen_ratio2)
-#define EFFECT_STRIPE_CURTAIN_WIDTH (24 * screen_ratio1 / screen_ratio2)
-#define EFFECT_QUAKE_AMP (12 * screen_ratio1 / screen_ratio2)
+#define EFFECT_STRIPE_WIDTH (screen_scale->Scale(16))
+#define EFFECT_STRIPE_CURTAIN_WIDTH (screen_scale->Scale(24))
+#define EFFECT_QUAKE_AMP (screen_scale->Scale(12))
 
 void ONScripter::updateEffectDst() {
     update_effect_dst = true;

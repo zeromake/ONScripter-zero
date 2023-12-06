@@ -287,8 +287,6 @@ class ScriptParser {
     /* Global definitions */
     bool init_screen_ratio;
     bool init_force_ratio;
-    int screen_ratio1, screen_ratio2;
-    int user_ratio1, user_ratio2;
     int screen_width, screen_height;
     int screen_device_width, screen_device_height;
     int device_width, device_height;
@@ -299,6 +297,8 @@ class ScriptParser {
     char *version_str;
     int underline_value;
     char *save_dir_envdata;
+    std::shared_ptr<onscripter::ScaleManager> screen_scale;
+    std::shared_ptr<onscripter::ScaleManager> user_scale;
 
     void deleteNestInfo();
     inline void setStr(char **dst, const char *src, int num = -1) {
@@ -308,8 +308,14 @@ class ScriptParser {
     void readToken();
 
     const int calcFontSize(const int v, ons_font::FONT_TYPE type);
-    const int calcUserRatio(const int v);
-    const int calcUnUserRatio(const int v);
+    inline int calcUserRatio(const int v) { return user_scale->Scale(v); };
+    inline int calcUnUserRatio(const int v) { return user_scale->UnScale(v); };
+    inline int calcRatio(const int v) {
+        return screen_scale->Scale(user_scale->Scale(v));
+    };
+    inline int calcUnRatio(const int v) {
+        return user_scale->UnScale(screen_scale->UnScale(v));
+    };
     const ons_font::FontConfig *getFontConfig(const ons_font::FONT_TYPE types);
 
     /* ---------------------------------------- */

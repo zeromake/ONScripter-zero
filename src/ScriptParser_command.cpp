@@ -234,11 +234,9 @@ int ScriptParser::sinCommand() {
 }
 
 int ScriptParser::shadedistanceCommand() {
-    shade_distance[0] =
-        calcUserRatio(script_h.readInt() * screen_ratio1 / screen_ratio2);
+    shade_distance[0] = calcRatio(script_h.readInt());
     if (shade_distance[0] == 0) shade_distance[0] = 1;
-    shade_distance[1] =
-        calcUserRatio(script_h.readInt() * screen_ratio1 / screen_ratio2);
+    shade_distance[1] = calcRatio(script_h.readInt());
     if (shade_distance[1] == 0) shade_distance[1] = 1;
 
     return RET_CONTINUE;

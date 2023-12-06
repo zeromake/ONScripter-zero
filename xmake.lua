@@ -16,10 +16,10 @@ option("simd")
     set_description('开启 simd 优化')
 option_end()
 
-option("simd_knl")
+option("simd_sse")
     set_default(false)
     set_showmenu(true)
-    set_description('强制使用 -march=knl 选项')
+    set_description('强制使用 sse 选项')
 option_end()
 
 option("omp")
@@ -211,8 +211,8 @@ target("onscripter")
     if get_config('simd') then
         add_defines("USE_SIMD=1")
         if is_arch("x86", "x64", "i386", "x86_64") then
-            if get_config("simd_knl") then
-                add_cxflags("-march=knl")
+            if get_config("simd_sse") then
+                add_vectorexts("sse", "sse2", "sse3", "ssse3", "sse4.2")
             else
                 add_vectorexts("avx2")
             end
@@ -244,7 +244,7 @@ target("onscripter")
         "src/language/*.cpp",
         "src/private/*.cpp"
     )
-    add_files("src/resize/*.c")
+    add_files("src/resize/*.cpp")
     remove_files("src/AVIWrapper.cpp")
     after_build(function (target)
         if target:is_plat("android") then

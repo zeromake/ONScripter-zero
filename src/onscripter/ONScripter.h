@@ -518,8 +518,8 @@ class ONScripter : public ScriptParser {
     int calcDurationToNextAnimation();
     void proceedAnimation(int current_time);
     void setupAnimationInfo(AnimationInfo *anim, _FontInfo *info = NULL);
-    SDL_Surface* loadAnimationImage(AnimationInfo *anim);
-    SDL_Surface* inlineLoadImage(AnimationInfo *anim, const char *file_name);
+    SDL_Surface *loadAnimationImage(AnimationInfo *anim);
+    SDL_Surface *inlineLoadImage(AnimationInfo *anim, const char *file_name);
     void parseTaggedString(AnimationInfo *anim);
     void drawTaggedSurface(SDL_Surface *dst_surface,
                            AnimationInfo *anim,

@@ -120,8 +120,8 @@ void ONScripter::proceedAnimation(int current_time) {
         if (anim->proceedAnimation(current_time)) {
             SDL_Rect dst_rect = anim->pos;
             if (!anim->abs_flag) {
-                dst_rect.x += sentence_font.x() * screen_ratio1 / screen_ratio2;
-                dst_rect.y += sentence_font.y() * screen_ratio1 / screen_ratio2;
+                dst_rect.x += screen_scale->Scale(sentence_font.x());
+                dst_rect.y += screen_scale->Scale(sentence_font.y());
             }
             flushDirect(
                 dst_rect,
@@ -361,8 +361,7 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
 
         if (f_info.ttf_font[0] == NULL) {
             f_info.openFont(font_file,
-                            screen_ratio1,
-                            screen_ratio2,
+                            screen_scale,
                             generateFPath(),
                             getFontConfig(f_info.types));
         }
@@ -380,7 +379,7 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
 
             int xy[2] = {0, 0};
             f_info.setXY(f_info.num_xy[0] - 1, f_info.num_xy[1] - 1);
-            pos = f_info.calcUpdatedArea(xy, screen_ratio1, screen_ratio2);
+            pos = f_info.calcUpdatedArea(xy, screen_scale);
 
             f_info.rollback();
         }
@@ -391,7 +390,7 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
 
         anim->orig_pos.w = pos.w;
         anim->orig_pos.h = pos.h;
-        anim->scalePosWH(screen_ratio1, screen_ratio2);
+        anim->scalePosWH(screen_scale);
         anim->allocImage(
             anim->pos.w * anim->num_of_cells, anim->pos.h, texture_format);
         anim->fill(0, 0, 0, 0);
@@ -417,11 +416,11 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
 #endif
     else {
         SDL_Surface *surface = loadAnimationImage(anim);
-        if (surface && screen_ratio1 != screen_ratio2) {
+        if (surface && screen_scale->Has()) {
             SDL_Surface *src_s = surface;
             int w, h;
-            if ((w = src_s->w * screen_ratio1 / screen_ratio2) == 0) w = 1;
-            if ((h = src_s->h * screen_ratio1 / screen_ratio2) == 0) h = 1;
+            if ((w = screen_scale->Scale(src_s->w)) == 0) w = 1;
+            if ((h = screen_scale->Scale(src_s->h)) == 0) h = 1;
             SDL_PixelFormat *fmt = image_surface->format;
             surface = SDL_CreateRGBSurfaceWithFormat(
                 SDL_SWSURFACE, w, h, fmt->BitsPerPixel, fmt->format);
@@ -625,8 +624,8 @@ void ONScripter::drawTaggedSurface(SDL_Surface *dst_surface,
 #endif
     SDL_Rect poly_rect = anim->pos;
     if (!anim->abs_flag) {
-        poly_rect.x += sentence_font.x() * screen_ratio1 / screen_ratio2;
-        poly_rect.y += sentence_font.y() * screen_ratio1 / screen_ratio2;
+        poly_rect.x += screen_scale->Scale(sentence_font.x());
+        poly_rect.y += screen_scale->Scale(sentence_font.y());
     }
 
     if (!anim->affine_flag)
@@ -654,8 +653,8 @@ void ONScripter::stopAnimation(int click) {
     SDL_Rect dst_rect = cursor_info[no].pos;
 
     if (!cursor_info[no].abs_flag) {
-        dst_rect.x += sentence_font.x() * screen_ratio1 / screen_ratio2;
-        dst_rect.y += sentence_font.y() * screen_ratio1 / screen_ratio2;
+        dst_rect.x += screen_scale->Scale(sentence_font.x());
+        dst_rect.y += screen_scale->Scale(sentence_font.y());
     }
 
     flushDirect(dst_rect, refreshMode());
@@ -675,7 +674,7 @@ void ONScripter::loadCursor(
     }
     ai->orig_pos.x = x;
     ai->orig_pos.y = y;
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
 
     parseTaggedString(ai);
     setupAnimationInfo(ai);

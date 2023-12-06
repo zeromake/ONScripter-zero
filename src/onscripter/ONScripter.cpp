@@ -212,19 +212,15 @@ void ONScripter::initSDL() {
     if (!init_screen_ratio && scaleToWindow &&
         screen_height != screen_device_height) {
         setRescale(screen_device_height, screen_height);
-        script_h.screen_ratio1 = screen_device_height;
-        script_h.screen_ratio2 = screen_height;
+        script_h.screen_scale->Update(screen_device_height, screen_height);
         screen_height = screen_device_height;
-        screen_width =
-            screen_width * script_h.screen_ratio1 / script_h.screen_ratio2;
+        screen_width = script_h.screen_scale->Scale(screen_width);
     }
 
-    if (script_h.screen_ratio1 > 0 && script_h.screen_ratio2 > 0) {
-        screen_ratio1 = script_h.screen_ratio1;
-        screen_ratio2 = script_h.screen_ratio2;
+    if (script_h.screen_scale->Has()) {
+        *screen_scale = script_h.screen_scale;
     } else {
-        screen_ratio1 = 1;
-        screen_ratio2 = 1;
+        screen_scale->Update(1, 1);
     }
     screen_scale_ratio1 = (float)screen_width / (float)screen_device_width;
     screen_scale_ratio2 = (float)screen_height / (float)screen_device_height;
@@ -305,7 +301,7 @@ void ONScripter::initSDL() {
                      info.name,
                      screen_width,
                      screen_height,
-                     ((float)screen_ratio1 / screen_ratio2),
+                     screen_scale->Ratio(),
                      screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
 
@@ -527,8 +523,7 @@ int ONScripter::init() {
     screenshot_surface = NULL;
     screenshot_w = screen_width;
     screenshot_h = screen_height;
-    user_ratio1 = script_h.user_ratio;
-    user_ratio2 = 1;
+    *user_scale = script_h.user_scale;
 
     texture = SDL_CreateTexture(renderer,
                                 texture_format,
@@ -676,11 +671,9 @@ int ONScripter::init() {
     }
 
     auto ff = generateFPath();
-    if (sentence_font.openFont(font_file,
-                               screen_ratio1,
-                               screen_ratio2,
-                               ff,
-                               getFontConfig(sentence_font.types)) == NULL) {
+    if (sentence_font.openFont(
+            font_file, screen_scale, ff, getFontConfig(sentence_font.types)) ==
+        NULL) {
         utils::printError(
             "can't open font file(%s): %s\n", strerror(errno), font_file);
         return -1;
@@ -843,8 +836,8 @@ void ONScripter::resetSentenceFont() {
     sentence_font_info.orig_pos.y = 0;
     sentence_font_info.orig_pos.w = script_h.screen_width + 1;
     sentence_font_info.orig_pos.h = script_h.screen_height + 1;
-    sentence_font_info.scalePosXY(screen_ratio1, screen_ratio2);
-    sentence_font_info.scalePosWH(screen_ratio1, screen_ratio2);
+    sentence_font_info.scalePosXY(screen_scale);
+    sentence_font_info.scalePosWH(screen_scale);
 
     sentence_font.saveToPrev(false);
 }
@@ -1377,7 +1370,7 @@ ButtonLink *ONScripter::getSelectableSentence(char *buffer,
     setStr(&ai->file_name, buffer);
     ai->orig_pos.x = info->x();
     ai->orig_pos.y = info->y();
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
     ai->visible = true;
 
     setupAnimationInfo(ai, info);
@@ -1446,7 +1439,7 @@ void ONScripter::decodeExbtnControl(const char *ctl_str,
             if (*ctl_str != ',') continue;
             ctl_str++;  // skip ','
             ai->orig_pos.y = calcUserRatio(getNumberFromBuffer(&ctl_str));
-            ai->scalePosXY(screen_ratio1, screen_ratio2);
+            ai->scalePosXY(screen_scale);
             dirty_rect.add(rect);
             ai->visible = true;
             dirty_rect.add(ai->pos);

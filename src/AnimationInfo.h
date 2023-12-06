@@ -28,6 +28,8 @@
 #include <SDL.h>
 #include <string.h>
 
+#include "resize/scale_manager.hpp"
+
 typedef unsigned char uchar3[3];
 
 class AnimationInfo {
@@ -120,13 +122,13 @@ class AnimationInfo {
 
     AnimationInfo &operator=(const AnimationInfo &anim);
 
-    void scalePosXY(int screen_ratio1, int screen_ratio2) {
-        pos.x = orig_pos.x * screen_ratio1 / screen_ratio2;
-        pos.y = orig_pos.y * screen_ratio1 / screen_ratio2;
+    void scalePosXY(const std::shared_ptr<onscripter::ScaleManager> &scale) {
+        pos.x = scale->Scale(orig_pos.x);
+        pos.y = scale->Scale(orig_pos.y);
     };
-    void scalePosWH(int screen_ratio1, int screen_ratio2) {
-        pos.w = orig_pos.w * screen_ratio1 / screen_ratio2;
-        pos.h = orig_pos.h * screen_ratio1 / screen_ratio2;
+    void scalePosWH(const std::shared_ptr<onscripter::ScaleManager> &scale) {
+        pos.w = scale->Scale(orig_pos.w);
+        pos.h = scale->Scale(orig_pos.h);
     };
 
     void reset();

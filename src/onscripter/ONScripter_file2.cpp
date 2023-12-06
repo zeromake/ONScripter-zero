@@ -84,8 +84,8 @@ int ONScripter::loadSaveFile2(int file_version) {
     ai->orig_pos.y = readInt();
     ai->orig_pos.w = readInt() + 1 - ai->orig_pos.x;
     ai->orig_pos.h = readInt() + 1 - ai->orig_pos.y;
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
-    ai->scalePosWH(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
+    ai->scalePosWH(screen_scale);
     readStr(&ai->image_name);
     if (!sentence_font.is_transparent && ai->image_name) {
         parseTaggedString(ai);
@@ -104,8 +104,8 @@ int ONScripter::loadSaveFile2(int file_version) {
     cursor_info[1].orig_pos.x = readInt();
     cursor_info[0].orig_pos.y = readInt();
     cursor_info[1].orig_pos.y = readInt();
-    cursor_info[0].scalePosXY(screen_ratio1, screen_ratio2);
-    cursor_info[1].scalePosXY(screen_ratio1, screen_ratio2);
+    cursor_info[0].scalePosXY(screen_scale);
+    cursor_info[1].scalePosXY(screen_scale);
 
     // load background surface
     bg_info.remove();
@@ -123,8 +123,7 @@ int ONScripter::loadSaveFile2(int file_version) {
 
     for (i = 0; i < 3; i++) tachi_info[i].orig_pos.x = readInt();
     for (i = 0; i < 3; i++) tachi_info[i].orig_pos.y = readInt();
-    for (i = 0; i < 3; i++)
-        tachi_info[i].scalePosXY(screen_ratio1, screen_ratio2);
+    for (i = 0; i < 3; i++) tachi_info[i].scalePosXY(screen_scale);
 
     readInt();  // 0
     readInt();  // 0
@@ -150,7 +149,7 @@ int ONScripter::loadSaveFile2(int file_version) {
         }
         ai->orig_pos.x = readInt();
         ai->orig_pos.y = readInt();
-        ai->scalePosXY(screen_ratio1, screen_ratio2);
+        ai->scalePosXY(screen_scale);
         if (readInt() == 1)
             ai->visible = true;
         else
@@ -279,7 +278,7 @@ int ONScripter::loadSaveFile2(int file_version) {
             ai->orig_pos.h = readInt();
             ai->max_param = readInt();
 
-            ai->scalePosXY(screen_ratio1, screen_ratio2);
+            ai->scalePosXY(screen_scale);
 
             for (j = 0; j < 3; j++) ai->color[2 - j] = readChar();
             readChar();  // 0x00
@@ -287,7 +286,7 @@ int ONScripter::loadSaveFile2(int file_version) {
             int w = ai->max_width * ai->param / ai->max_param;
             if (ai->max_width > 0 && w > 0) ai->orig_pos.w = w;
 
-            ai->scalePosWH(screen_ratio1, screen_ratio2);
+            ai->scalePosWH(screen_scale);
             ai->allocImage(ai->pos.w, ai->pos.h, texture_format);
             ai->fill(ai->color[0], ai->color[1], ai->color[2], 0xff);
         } else {
@@ -312,7 +311,7 @@ int ONScripter::loadSaveFile2(int file_version) {
             ai->param = j;
             ai->orig_pos.x = readInt();
             ai->orig_pos.y = readInt();
-            ai->scalePosXY(screen_ratio1, screen_ratio2);
+            ai->scalePosXY(screen_scale);
             ai->font_size_xy[0] = readInt();
             ai->font_size_xy[1] = readInt();
             ai->font_pitch[0] = ai->font_size_xy[0];
@@ -390,7 +389,7 @@ int ONScripter::loadSaveFile2(int file_version) {
             }
             ai->orig_pos.x = readInt();
             ai->orig_pos.y = readInt();
-            ai->scalePosXY(screen_ratio1, screen_ratio2);
+            ai->scalePosXY(screen_scale);
             ai->scale_x = readInt();
             ai->scale_y = readInt();
             ai->rot = readInt();

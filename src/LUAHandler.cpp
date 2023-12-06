@@ -367,10 +367,9 @@ int NSGetMouse(lua_State *state) {
         lua_pushinteger(state, -1);
         lua_pushinteger(state, -1);
     } else {
-        lua_pushinteger(state, bs.x * lh->screen_ratio2 / lh->screen_ratio1);
-        lua_pushinteger(state, bs.y * lh->screen_ratio2 / lh->screen_ratio1);
+        lua_pushinteger(state, lh->screen_scale->UnScale(bs.x));
+        lua_pushinteger(state, lh->screen_scale->UnScale(bs.y));
     }
-
     return 2;
 }
 
@@ -1135,9 +1134,7 @@ LUAHandler::LUAHandler() {
     is_animatable = false;
     duration_time = 15;
     next_time = 0;
-
-    screen_ratio1 = 1;
-    screen_ratio2 = 1;
+    screen_scale = std::make_shared<onscripter::ScaleManager>();
     error_str[0] = 0;
 
     for (unsigned int i = 0; i < MAX_CALLBACK; i++) callback_state[i] = false;
@@ -1164,10 +1161,10 @@ extern "C" int luaopen_fmt(lua_State *state) {
 }
 #endif
 
-void LUAHandler::init(ONScripter *ons,
-                      ScriptHandler *sh,
-                      int screen_ratio1,
-                      int screen_ratio2) {
+void LUAHandler::init(
+    ONScripter *ons,
+    ScriptHandler *sh,
+    const std::shared_ptr<onscripter::ScaleManager> &screen_scale) {
     this->ons = ons;
     this->sh = sh;
 
@@ -1194,6 +1191,7 @@ void LUAHandler::init(ONScripter *ons,
 
     lua_pushlightuserdata(state, this);
     lua_setglobal(state, ONS_LUA_HANDLER_PTR);
+    *this->screen_scale = screen_scale;
 }
 
 void LUAHandler::loadInitScript() {
