@@ -193,10 +193,10 @@ void ONScripter::executeSystemMenu() {
 
     menu_font.num_xy[0] = rmenu_link_width;
     menu_font.num_xy[1] = rmenu_link_num;
-    menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[0] = (screen_scale->UnScale(screen_width) -
                            menu_font.num_xy[0] * menu_font.pitch_xy[0]) /
                           2;
-    menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[1] = (screen_scale->UnScale(screen_height) -
                            menu_font.num_xy[1] * menu_font.pitch_xy[1]) /
                           2;
     menu_font.setXY((menu_font.num_xy[0] - rmenu_link_width) / 2,
@@ -305,10 +305,10 @@ bool ONScripter::executeSystemLoad() {
 
     menu_font.num_xy[0] = (strlen(save_item_name) + 1) / 2 + 2 + 13;
     menu_font.num_xy[1] = num_save_file + 2;
-    menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[0] = (screen_scale->UnScale(screen_width) -
                            menu_font.num_xy[0] * menu_font.pitch_xy[0]) /
                           2;
-    menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[1] = (screen_scale->UnScale(screen_height) -
                            menu_font.num_xy[1] * menu_font.pitch_xy[1]) /
                           2;
     menu_font.setXY((menu_font.num_xy[0] - strlen(load_menu_name) / 2) / 2, 0);
@@ -427,10 +427,10 @@ void ONScripter::executeSystemSave() {
 
     menu_font.num_xy[0] = (strlen(save_item_name) + 1) / 2 + 2 + 13;
     menu_font.num_xy[1] = num_save_file + 2;
-    menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[0] = (screen_scale->UnScale(screen_width) -
                            menu_font.num_xy[0] * menu_font.pitch_xy[0]) /
                           2;
-    menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[1] = (screen_scale->UnScale(screen_height) -
                            menu_font.num_xy[1] * menu_font.pitch_xy[1]) /
                           2;
     menu_font.setXY((menu_font.num_xy[0] - strlen(save_menu_name) / 2) / 2, 0);
@@ -536,10 +536,10 @@ bool ONScripter::executeSystemYesNo(int caller, int file_no) {
 
     menu_font.num_xy[0] = strlen(name) / 2;
     menu_font.num_xy[1] = 3;
-    menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[0] = (screen_scale->UnScale(screen_width) -
                            menu_font.num_xy[0] * menu_font.pitch_xy[0]) /
                           2;
-    menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1 -
+    menu_font.top_xy[1] = (screen_scale->UnScale(screen_height) -
                            menu_font.num_xy[1] * menu_font.pitch_xy[1]) /
                           2;
     menu_font.setXY(0, 0);
@@ -761,13 +761,12 @@ void ONScripter::buildDialog(bool yesno_flag,
     SDL_FillRect(s, &rect, SDL_MapRGBA(s->format, col, col, col, 0xff));
 
     SDL_Surface *s2 = s;
-    if (screen_ratio2 != screen_ratio1) {
-        s2 = SDL_CreateRGBSurfaceWithFormat(
-            SDL_SWSURFACE,
-            DIALOG_W * screen_ratio1 / screen_ratio2,
-            DIALOG_H * screen_ratio1 / screen_ratio2,
-            fmt->BitsPerPixel,
-            fmt->format);
+    if (screen_scale->Has()) {
+        s2 = SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
+                                            screen_scale->Scale(DIALOG_W),
+                                            screen_scale->Scale(DIALOG_H),
+                                            fmt->BitsPerPixel,
+                                            fmt->format);
         resizeSurface(s, s2);
         SDL_FreeSurface(s);
     }
@@ -845,11 +844,11 @@ void ONScripter::buildDialog(bool yesno_flag,
         }
 
         SDL_Surface *bs2 = bs;
-        if (screen_ratio2 != screen_ratio1) {
+        if (screen_scale->Has()) {
             bs2 = SDL_CreateRGBSurfaceWithFormat(
                 SDL_SWSURFACE,
-                DIALOG_BUTTON_W * 2 * screen_ratio1 / screen_ratio2,
-                DIALOG_BUTTON_H * screen_ratio1 / screen_ratio2,
+                screen_scale->Scale(DIALOG_BUTTON_W * 2),
+                screen_scale->Scale(DIALOG_BUTTON_H),
                 fmt->BitsPerPixel,
                 fmt->format);
             resizeSurface(bs, bs2);
@@ -880,17 +879,16 @@ void ONScripter::buildDialog(bool yesno_flag,
         btn->anim[0]->setImage(bs2, texture_format);
         btn->show_flag = 1;
 
-        btn->anim[0]->pos.x = dialog_info.pos.x +
-                              (DIALOG_W - 3 - (DIALOG_BUTTON_W + 8) * (2 - i)) *
-                                  screen_ratio1 / screen_ratio2;
+        btn->anim[0]->pos.x =
+            dialog_info.pos.x +
+            screen_scale->Scale(DIALOG_W - 3 - (DIALOG_BUTTON_W + 8) * (2 - i));
         btn->anim[0]->pos.y =
             dialog_info.pos.y +
-            (DIALOG_H - 3 - (DIALOG_FOOTER + DIALOG_BUTTON_H) / 2) *
-                screen_ratio1 / screen_ratio2;
+            (DIALOG_H - 3 -
+             screen_scale->Scale(DIALOG_FOOTER + DIALOG_BUTTON_H) / 2);
 
         btn->anim[0]->visible = true;
         btn->select_rect = btn->image_rect = btn->anim[0]->pos;
-
         root_button_link.insert(btn);
     }
 }

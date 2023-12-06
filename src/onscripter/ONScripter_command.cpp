@@ -353,7 +353,7 @@ int ONScripter::strspCommand() {
     setStr(&ai->file_name, script_h.readStr());
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
 
     _FontInfo fi;
     fi.types = ons_font::ANIM_FONT;
@@ -675,15 +675,15 @@ void ONScripter::setwindowCore() {
         ai->orig_pos.y = calcUserRatio(script_h.readInt());
         ai->orig_pos.w = calcUserRatio(script_h.readInt()) - ai->orig_pos.x + 1;
         ai->orig_pos.h = calcUserRatio(script_h.readInt()) - ai->orig_pos.y + 1;
-        ai->scalePosXY(screen_ratio1, screen_ratio2);
-        ai->scalePosWH(screen_ratio1, screen_ratio2);
+        ai->scalePosXY(screen_scale);
+        ai->scalePosWH(screen_scale);
     } else {
         ai->setImageName(buf);
         parseTaggedString(ai);
         setupAnimationInfo(ai);
         ai->orig_pos.x = calcUserRatio(script_h.readInt());
         ai->orig_pos.y = calcUserRatio(script_h.readInt());
-        ai->scalePosXY(screen_ratio1, screen_ratio2);
+        ai->scalePosXY(screen_scale);
 
         sentence_font.is_transparent = false;
         sentence_font.window_color[0] = sentence_font.window_color[1] =
@@ -1169,7 +1169,7 @@ int ONScripter::prnumCommand() {
     ai->param = script_h.readInt();
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
     ai->font_size_xy[0] =
         calcUserRatio(calcFontSize(script_h.readInt(), ons_font::ANIM_FONT));
     ai->font_size_xy[1] =
@@ -1298,7 +1298,7 @@ int ONScripter::mspCommand() {
 
     ai->orig_pos.x += calcUserRatio(script_h.readInt());
     ai->orig_pos.y += calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
     if (msp2_flag) {
         ai->scale_x += calcUserRatio(script_h.readInt());
         ai->scale_y += calcUserRatio(script_h.readInt());
@@ -1512,8 +1512,8 @@ int ONScripter::movieCommand() {
 }
 
 int ONScripter::movemousecursorCommand() {
-    int x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    int y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    int x = calcRatio(script_h.readInt());
+    int y = calcRatio(script_h.readInt());
     x = x * screen_device_width / screen_width;
     y = y * screen_device_width / screen_width;
 
@@ -1596,7 +1596,7 @@ int ONScripter::lsp2Command() {
 
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
     ai->scale_x = script_h.readInt();
     ai->scale_y = script_h.readInt();
     ai->rot = script_h.readInt();
@@ -1631,7 +1631,7 @@ int ONScripter::lspCommand() {
     ai->setImageName(buf);
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
 
     if (script_h.getEndStatus() & ScriptHandler::END_COMMA)
         ai->trans = script_h.readInt();
@@ -1715,7 +1715,7 @@ int ONScripter::logspCommand() {
 
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
 
     ai->trans_mode = AnimationInfo::TRANS_STRING;
     if (logsp2_flag) {
@@ -1839,12 +1839,11 @@ int ONScripter::ldCommand() {
         if (ai->image_surface) {
             ai->visible = true;
             ai->orig_pos.x =
-                screen_width * (no + 1) * screen_ratio2 / (4 * screen_ratio1) -
+                screen_scale->UnScale(screen_width * (no + 1)) / 4 -
                 ai->orig_pos.w / 2;
-            ai->orig_pos.y = underline_value - ai->image_surface->h *
-                                                   screen_ratio2 /
-                                                   screen_ratio1;
-            ai->scalePosXY(screen_ratio1, screen_ratio2);
+            ai->orig_pos.y =
+                underline_value - screen_scale->UnScale(ai->image_surface->h);
+            ai->scalePosXY(screen_scale);
             dirty_rect.add(ai->pos);
         }
     }
@@ -2124,10 +2123,12 @@ int ONScripter::gettagCommand() {
         errorAndExit("gettag: not in a subroutine, i.e. pretextgosub");
 
     char *buf = pretext_buf;
+    const char zenkakko_buf[] = "��";
 
     if (buf[0] == '[')
         buf++;
-    else if (zenkakko_flag && buf[0] == "��"[0] && buf[1] == "��"[1])
+    else if (zenkakko_flag && buf[0] == zenkakko_buf[0] &&
+             buf[1] == zenkakko_buf[1])
         buf += 2;
     else
         buf = NULL;
@@ -2149,8 +2150,8 @@ int ONScripter::gettagCommand() {
             if (buf) {
                 const char *buf_start = buf;
                 while (*buf != '/' && *buf != 0 && *buf != ']' &&
-                       (!zenkakko_flag || buf[0] != "��"[0] ||
-                        buf[1] != "��"[1])) {
+                       (!zenkakko_flag || buf[0] != zenkakko_buf[0] ||
+                        buf[1] != zenkakko_buf[1])) {
                     if (IS_TWO_BYTE(*buf))
                         buf += 2;
                     else
@@ -2178,8 +2179,8 @@ int ONScripter::gettagCommand() {
 
     if (pretext_buf[0] == ']')
         pretext_buf++;
-    else if (zenkakko_flag && pretext_buf[0] == "��"[0] &&
-             pretext_buf[1] == "��"[1])
+    else if (zenkakko_flag && pretext_buf[0] == zenkakko_buf[0] &&
+             pretext_buf[1] == zenkakko_buf[1])
         pretext_buf += 2;
 
     return RET_CONTINUE;
@@ -2237,9 +2238,9 @@ int ONScripter::getsevolCommand() {
 
 int ONScripter::getscreenshotCommand() {
     int w = calcUserRatio(script_h.readInt());
-    if (disable_rescale_flag) w = w * screen_ratio1 / screen_ratio2;
+    if (disable_rescale_flag) w = screen_scale->Scale(w);
     int h = calcUserRatio(script_h.readInt());
-    if (disable_rescale_flag) h = h * screen_ratio1 / screen_ratio2;
+    if (disable_rescale_flag) h = screen_scale->Scale(h);
     if (w == 0) w = 1;
     if (h == 0) h = 1;
 
@@ -2395,13 +2396,11 @@ int ONScripter::getmp3volCommand() {
 int ONScripter::getmouseposCommand() {
     script_h.readInt();
     script_h.setInt(&script_h.current_variable,
-                    calcUnUserRatio(current_button_state.x * screen_ratio2 /
-                                    screen_ratio1));
+                    calcUnRatio(current_button_state.x));
 
     script_h.readInt();
     script_h.setInt(&script_h.current_variable,
-                    calcUnUserRatio(current_button_state.y * screen_ratio2 /
-                                    screen_ratio1));
+                    calcUnRatio(current_button_state.y));
     return RET_CONTINUE;
 }
 
@@ -2867,8 +2866,8 @@ int ONScripter::drawsp3Command() {
     int sprite_no = script_h.readInt();
     int cell_no = script_h.readInt();
     int alpha = script_h.readInt();
-    int x = script_h.readInt() * screen_ratio1 / screen_ratio2;
-    int y = script_h.readInt() * screen_ratio1 / screen_ratio2;
+    int x = calcRatio(script_h.readInt());
+    int y = calcRatio(script_h.readInt());
 
     AnimationInfo *ai = &sprite_info[sprite_no];
     int old_cell_no = ai->current_cell;
@@ -2902,7 +2901,7 @@ int ONScripter::drawsp2Command() {
     AnimationInfo *ai = &sprite_info[sprite_no];
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
     ai->scale_x = script_h.readInt();
     ai->scale_y = script_h.readInt();
     ai->rot = script_h.readInt();
@@ -2919,8 +2918,8 @@ int ONScripter::drawspCommand() {
     int sprite_no = script_h.readInt();
     int cell_no = script_h.readInt();
     int alpha = script_h.readInt();
-    int x = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    int y = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    int x = calcRatio(script_h.readInt());
+    int y = calcRatio(script_h.readInt());
 
     AnimationInfo *ai = &sprite_info[sprite_no];
     int old_cell_no = ai->current_cell;
@@ -2970,7 +2969,7 @@ int ONScripter::drawbg2Command() {
     AnimationInfo bi = bg_info;
     bi.orig_pos.x = calcUserRatio(script_h.readInt());
     bi.orig_pos.y = calcUserRatio(script_h.readInt());
-    bi.scalePosXY(screen_ratio1, screen_ratio2);
+    bi.scalePosXY(screen_scale);
     bi.scale_x = script_h.readInt();
     bi.scale_y = script_h.readInt();
     bi.rot = script_h.readInt();
@@ -3021,7 +3020,7 @@ int ONScripter::defineresetCommand() {
         readVariables(script_h.global_variable_border, script_h.variable_range);
 
 #ifdef USE_LUA
-    lua_handler.init(this, &script_h, screen_ratio1, screen_ratio2);
+    lua_handler.init(this, &script_h, screen_scale);
 #endif
 
     current_mode = DEFINE_MODE;
@@ -3067,7 +3066,7 @@ int ONScripter::cspCommand() {
             if (si[i].image_name) {
                 si[i].orig_pos.x = -1000;
                 si[i].orig_pos.y = -1000;
-                si[i].scalePosXY(screen_ratio1, screen_ratio2);
+                si[i].scalePosXY(screen_scale);
             }
             if (!csp2_flag) root_button_link.removeSprite(i);
             si[i].remove();
@@ -3488,20 +3487,14 @@ int ONScripter::btnCommand() {
     ButtonLink *button = new ButtonLink();
 
     button->no = script_h.readInt();
-    button->image_rect.x =
-        calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    button->image_rect.y =
-        calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    button->image_rect.w =
-        calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    button->image_rect.h =
-        calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    button->image_rect.x = calcRatio(script_h.readInt());
+    button->image_rect.y = calcRatio(script_h.readInt());
+    button->image_rect.w = calcRatio(script_h.readInt());
+    button->image_rect.h = calcRatio(script_h.readInt());
     button->select_rect = button->image_rect;
 
-    src_rect.x =
-        calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    src_rect.y =
-        calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    src_rect.x = calcRatio(script_h.readInt());
+    src_rect.y = calcRatio(script_h.readInt());
     if (btndef_info.image_surface &&
         src_rect.x + button->image_rect.w > btndef_info.image_surface->w) {
         button->image_rect.w = btndef_info.image_surface->w - src_rect.x;
@@ -3592,14 +3585,14 @@ int ONScripter::bltCommand() {
     Sint16 dx, dy, sx, sy;
     Sint16 dw, dh, sw, sh;
 
-    dx = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    dy = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    dw = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    dh = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    sx = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    sy = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    sw = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
-    sh = calcUserRatio(script_h.readInt()) * screen_ratio1 / screen_ratio2;
+    dx = calcRatio(script_h.readInt());
+    dy = calcRatio(script_h.readInt());
+    dw = calcRatio(script_h.readInt());
+    dh = calcRatio(script_h.readInt());
+    sx = calcRatio(script_h.readInt());
+    sy = calcRatio(script_h.readInt());
+    sw = calcRatio(script_h.readInt());
+    sh = calcRatio(script_h.readInt());
 
     if (btndef_info.image_surface == NULL) return RET_CONTINUE;
     if (dw == 0 || dh == 0 || sw == 0 || sh == 0) return RET_CONTINUE;
@@ -3748,7 +3741,7 @@ int ONScripter::barCommand() {
     ai->orig_pos.h = calcUserRatio(script_h.readInt());
     ai->max_param = script_h.readInt();
 
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
 
     const char *buf = script_h.readStr();
     readColor(&ai->color, buf);
@@ -3757,7 +3750,7 @@ int ONScripter::barCommand() {
     if (ai->max_param != 0) w = ai->max_width * ai->param / ai->max_param;
     if (ai->max_width > 0 && w > 0) ai->orig_pos.w = w;
 
-    ai->scalePosWH(screen_ratio1, screen_ratio2);
+    ai->scalePosWH(screen_scale);
     ai->allocImage(ai->pos.w, ai->pos.h, texture_format);
     ai->fill(ai->color[0], ai->color[1], ai->color[2], 0xff);
     dirty_rect.add(ai->pos);
@@ -3810,7 +3803,7 @@ int ONScripter::amspCommand() {
 
     ai->orig_pos.x = calcUserRatio(script_h.readInt());
     ai->orig_pos.y = calcUserRatio(script_h.readInt());
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->scalePosXY(screen_scale);
     if (amsp2_flag) {
         ai->scale_x = script_h.readInt();
         ai->scale_y = script_h.readInt();
@@ -4053,18 +4046,18 @@ void ONScripter::NSDSp2Command(int texnum,
     if (texnum < 0 || texnum >= MAX_TEXTURE_NUM) return;
 
     AnimationInfo *ai = &texture_info[texnum];
-    ai->orig_pos.x = dcx;
-    ai->orig_pos.y = dcy;
-    ai->scalePosXY(screen_ratio1, screen_ratio2);
+    ai->orig_pos.x = calcUserRatio(dcx);
+    ai->orig_pos.y = calcUserRatio(dcy);
+    ai->scalePosXY(screen_scale);
     ai->scale_x = xs;
     ai->scale_y = ys;
     ai->rot = rot;
     ai->trans = alpha;
 
-    ai->affine_pos.x = sx * screen_ratio1 / screen_ratio2;
-    ai->affine_pos.y = sy * screen_ratio1 / screen_ratio2;
-    ai->affine_pos.w = w * screen_ratio1 / screen_ratio2;
-    ai->affine_pos.h = h * screen_ratio1 / screen_ratio2;
+    ai->affine_pos.x = screen_scale->Scale(calcUserRatio(sx));
+    ai->affine_pos.y = screen_scale->Scale(calcUserRatio(sy));
+    ai->affine_pos.w = screen_scale->Scale(calcUserRatio(w));
+    ai->affine_pos.h = screen_scale->Scale(calcUserRatio(h));
     ai->calcAffineMatrix();
     ai->affine_flag = true;
 }
@@ -4094,7 +4087,7 @@ void ONScripter::NSDSetSpriteCommand(int spnum, int texnum, const char *tag) {
         else
             ais->orig_pos.x -= ait->orig_pos.w / 2;
         ais->orig_pos.y = ait->orig_pos.y - ait->orig_pos.h / 2;
-        ais->scalePosXY(screen_ratio1, screen_ratio2);
+        ais->scalePosXY(screen_scale);
         ais->affine_flag = false;
     }
 }
@@ -4845,7 +4838,7 @@ int ONScripter::sprintfCommand() {
         } else if (variable.type == ScriptHandler::VAR_INT) {
             value = (uintptr_t)script_h.getVariableData(variable.var_no).num;
         }
-        // TODO va_list 每种编译器可能完全不同
+        // TODO va_list 每种编译器可能完全不�?
         memcpy(al.pa + offset, &value, ptr_size);
         offset += ptr_size;
     }

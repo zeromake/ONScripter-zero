@@ -60,7 +60,8 @@ ScriptHandler::ScriptHandler() {
     screen_height = 480;
     variable_range = 0;
     global_variable_border = 0;
-    user_ratio = 1;
+    screen_scale = std::make_shared<onscripter::ScaleManager>();
+    user_scale = std::make_shared<onscripter::ScaleManager>();
 }
 
 ScriptHandler::~ScriptHandler() {
@@ -1336,8 +1337,7 @@ void ScriptHandler::readConfiguration() {
                 while (*buf >= '0' && *buf <= '9')
                     _screen_ratio = _screen_ratio * 10 + *buf++ - '0';
                 if (_screen_ratio > 0 && !init_screen_ratio) {
-                    screen_ratio1 = _screen_ratio;
-                    screen_ratio2 = 1.0f;
+                    screen_scale->Update(_screen_ratio, 1);
                 }
                 if (*buf == 'x' || *buf == 'X') {
                     buf++;
@@ -1380,7 +1380,7 @@ void ScriptHandler::readConfiguration() {
             while (*buf >= '0' && *buf <= '9')
                 _user_ratio = _user_ratio * 10 + *buf++ - '0';
             if (_user_ratio > 0) {
-                user_ratio = _user_ratio;
+                user_scale->Update(_user_ratio, 1);
             }
         } else if (*buf != ',') {
             break;
@@ -1390,13 +1390,13 @@ void ScriptHandler::readConfiguration() {
         if (!config_flag && *buf != ',') break;
         if (*buf == ',') buf++;
     }
-    if (screen_ratio1 > 0 && screen_ratio2 > 0) {
-        screen_width = screen_width * screen_ratio1 / screen_ratio2;
-        screen_height = screen_height * screen_ratio1 / screen_ratio2;
+    if (screen_scale->Has()) {
+        screen_width = screen_scale->Scale(screen_width);
+        screen_height = screen_scale->Scale(screen_height);
     }
-    if (user_ratio > 0) {
-        screen_width *= user_ratio;
-        screen_height *= user_ratio;
+    if (user_scale->Has()) {
+        screen_width = user_scale->Scale(screen_width);
+        screen_height = user_scale->Scale(screen_height);
     }
 }
 

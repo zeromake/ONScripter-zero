@@ -25,6 +25,9 @@
 #define __LUA_HANDLER_H__
 
 #include <lua.hpp>
+#include <memory>
+
+#include "resize/scale_manager.hpp"
 
 class ONScripter;
 class ScriptHandler;
@@ -50,8 +53,7 @@ class LUAHandler {
 
     void init(ONScripter *ons,
               ScriptHandler *sh,
-              int screen_ratio1,
-              int screen_ratio2);
+              const std::shared_ptr<onscripter::ScaleManager> &screen_scale);
     void loadInitScript();
     void addCallback(const char *label);
 
@@ -67,7 +69,7 @@ class LUAHandler {
     ONScripter *ons;
     lua_State *state;
     ScriptHandler *sh;
-    int screen_ratio1, screen_ratio2;
+    std::shared_ptr<onscripter::ScaleManager> screen_scale;
 
     char error_str[256];
 

@@ -41,8 +41,9 @@ extern Coding2UTF16 *coding2utf16;
 #define IS_TRANSLATION_REQUIRED(x) \
     (*(x) == (char)0x81 && *((x) + 1) >= 0x41 && *((x) + 1) <= 0x44)
 
-int calcFontSizeRatio(int v, int screen_ratio1, int screen_ratio2) {
-    return v * screen_ratio1 / screen_ratio2;
+int calcFontSizeRatio(
+    int v, const std::shared_ptr<onscripter::ScaleManager> &screen_scale) {
+    return screen_scale->Scale(v);
 }
 
 void ONScripter::shiftHalfPixelX(SDL_Surface *surface) {
@@ -138,8 +139,7 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface,
     dst_rect.y = xy[1];
 
     dst_rect.y -= (TTF_FontHeight((TTF_Font *)info->ttf_font[0]) -
-                   calcFontSizeRatio(
-                       info->font_size_xy[1], screen_ratio1, screen_ratio2)) /
+                   calcFontSizeRatio(info->font_size_xy[1], screen_scale)) /
                   2;
 
     if (rotate_flag) dst_rect.x += miny - minx;
@@ -220,9 +220,7 @@ int ONScripter::drawChar(char *text,
     auto fontConfig = getFontConfig(info->types);
     auto ff = generateFPath();
     if (info->ttf_font[0] == NULL) {
-        if (info->openFont(
-                font_file, screen_ratio1, screen_ratio2, ff, fontConfig) ==
-            NULL) {
+        if (info->openFont(font_file, screen_scale, ff, fontConfig) == NULL) {
             utils::printError(
                 "can't open font file(%s): %s\n", strerror(errno), font_file);
             quit();
@@ -245,8 +243,8 @@ int ONScripter::drawChar(char *text,
         text_rect->w = screen_width;
         text_rect->h = screen_height;
     }
-    text_rect->w = text_rect->w * screen_ratio2 / screen_ratio1;
-    text_rect->h = text_rect->h * screen_ratio2 / screen_ratio1;
+    text_rect->w = screen_scale->UnScale(text_rect->w);
+    text_rect->h = screen_scale->UnScale(text_rect->h);
     bool useAutoOffset = true;
     if (fontConfig && fontConfig->offset_x > 0 || fontConfig->offset_y > 0) {
         text_rect->w -= fontConfig->offset_x;
@@ -277,8 +275,8 @@ int ONScripter::drawChar(char *text,
 
     for (int i = 0; i < 2; i++) {
         int xy[2];
-        xy[0] = calcFontSizeRatio(info->x(), screen_ratio1, screen_ratio2);
-        xy[1] = calcFontSizeRatio(info->y(), screen_ratio1, screen_ratio2);
+        xy[0] = calcFontSizeRatio(info->x(), screen_scale);
+        xy[1] = calcFontSizeRatio(info->y(), screen_scale);
 
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
@@ -296,7 +294,7 @@ int ONScripter::drawChar(char *text,
         memcpy(&old_dst_rect, &dst_rect, sizeof(SDL_Rect));
         if (fontConfig->render_outline) {
             int outline_size =
-                fontConfig->outline_size * screen_ratio1 / screen_ratio2;
+                calcFontSizeRatio(fontConfig->outline_size, screen_scale);
             dst_rect.w += outline_size * 2;
             dst_rect.h += outline_size * 2;
             dst_rect.y -= outline_size;
@@ -317,8 +315,8 @@ int ONScripter::drawChar(char *text,
             flushDirect(dst_rect, REFRESH_NONE_MODE);
         }
 
-        int charWidth = old_dst_rect.w * screen_ratio2 / screen_ratio1;
-        int charHeigth = old_dst_rect.h * screen_ratio2 / screen_ratio1;
+        int charWidth = screen_scale->UnScale(old_dst_rect.w);
+        int charHeigth = screen_scale->UnScale(old_dst_rect.h);
         if (IS_TWO_BYTE(text[0])) {
             info->advanceCharInHankaku(2, charWidth, charHeigth);
             break;
@@ -439,14 +437,13 @@ void ONScripter::drawString(const char *str,
 
     /* ---------------------------------------- */
     /* Calculate the area of selection */
-    SDL_Rect clipped_rect =
-        info->calcUpdatedArea(start_xy, screen_ratio1, screen_ratio2);
+    SDL_Rect clipped_rect = info->calcUpdatedArea(start_xy, screen_scale);
 
     SDL_Rect scaled_clipped_rect;
-    scaled_clipped_rect.x = clipped_rect.x * screen_ratio1 / screen_ratio2;
-    scaled_clipped_rect.y = clipped_rect.y * screen_ratio1 / screen_ratio2;
-    scaled_clipped_rect.w = clipped_rect.w * screen_ratio1 / screen_ratio2;
-    scaled_clipped_rect.h = clipped_rect.h * screen_ratio1 / screen_ratio2;
+    scaled_clipped_rect.x = screen_scale->Scale(clipped_rect.x);
+    scaled_clipped_rect.y = screen_scale->Scale(clipped_rect.y);
+    scaled_clipped_rect.w = screen_scale->Scale(clipped_rect.w);
+    scaled_clipped_rect.h = screen_scale->Scale(clipped_rect.h);
 
     if (info->is_shadow) {
         if (fontConfig->render_outline)

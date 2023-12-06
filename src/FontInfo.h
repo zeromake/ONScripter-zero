@@ -32,6 +32,7 @@
 
 #include "BaseReader.h"
 #include "FontConfig.h"
+#include "resize/scale_manager.hpp"
 
 typedef std::function<int(const char *, char *, bool)> generate_path_function;
 
@@ -89,11 +90,11 @@ class _FontInfo {
     void savePoint();
     void rollback(int mode = 3);
     void copyPosition(_FontInfo *font);
-    void *openFont(char *font_file,
-                   int ratio1,
-                   int ratio2,
-                   generate_path_function f = nullptr,
-                   const ons_font::FontConfig *fontConfig = nullptr);
+    void *openFont(
+        char *font_file,
+        const std::shared_ptr<onscripter::ScaleManager> &screen_scale,
+        generate_path_function f = nullptr,
+        const ons_font::FontConfig *fontConfig = nullptr);
     void setTateyokoMode(int tateyoko_mode);
     int getTateyokoMode();
     int getRemainingLine();
@@ -112,7 +113,9 @@ class _FontInfo {
     void addLineOffset(int margin);
     void setRubyOnFlag(bool flag);
 
-    SDL_Rect calcUpdatedArea(int start_xy[2], int ratio1, int ratio2);
+    SDL_Rect calcUpdatedArea(
+        int start_xy[2],
+        const std::shared_ptr<onscripter::ScaleManager> &screen_scale);
     void addShadeArea(SDL_Rect &rect, int dx, int dy, int dw, int dh);
     int initRuby(_FontInfo &body_info, int body_count, int ruby_count);
 };
