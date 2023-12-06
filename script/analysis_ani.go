@@ -7,7 +7,7 @@ import (
 	"github.com/zeromake/pkg/binaryutil"
 )
 
-func main() {
+func main1() {
 	input, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)

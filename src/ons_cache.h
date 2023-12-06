@@ -10,7 +10,6 @@
 #include <optional>
 #include <string>
 #include <utility>
-#define USE_IMAGE_CACHE
 
 namespace onscache {
 typedef caches::fixed_sized_cache<std::string,

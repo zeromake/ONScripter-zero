@@ -41,7 +41,7 @@ void split(std::vector<std::string> &output,
     while (true) {
         size_t pos = input.find(sep, prev);
         if (pos != std::string::npos) {
-            output.push_back(std::move(input.substr(prev, pos)));
+            output.push_back(std::move(input.substr(prev, pos - prev)));
             prev = pos + 1;
             continue;
         }
