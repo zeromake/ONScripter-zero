@@ -994,6 +994,7 @@ static int NSCall(lua_State *state) {
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
     lh->sh->leaveExternalScript();
+    return 0;
 }
 
 #define LUA_FUNC_LUT(s) \
@@ -1115,6 +1116,50 @@ static int fmt_println(lua_State *state) {
     return 0;
 }
 
+static int string_split(lua_State* state) {
+    const char* input = luaL_checkstring(state, 1);
+    size_t sep_len = 0;
+    const char* sep = luaL_checklstring(state, 2, &sep_len);
+    size_t prev = 0;
+    lua_newtable(state);
+    size_t i = 0;
+    while (true) {
+        i++;
+        const char* next = strstr(input, sep);
+        if (next) {
+            lua_pushlstring(state, input, next - input);
+            lua_rawseti(state, -2, i);
+            next += sep_len;
+            input = next;
+            continue;
+        }
+        lua_pushstring(state, input);
+        lua_rawseti(state, -2, i);
+        break;
+    }
+    return 1;
+}
+
+static int string_startswith(lua_State* state) {
+    size_t cmp1_len = 0;
+    const char* cmp1 = luaL_checklstring(state, 1, &cmp1_len);
+    size_t cmp2_len = 0;
+    const char* cmp2 = luaL_checklstring(state, 2, &cmp2_len);
+    bool ok = !strncmp(cmp1, cmp2, cmp2_len);
+    lua_pushboolean(state, ok);
+    return 1;
+}
+
+static int string_endswith(lua_State* state) {
+    size_t cmp1_len = 0;
+    const char* cmp1 = luaL_checklstring(state, 1, &cmp1_len);
+    size_t cmp2_len = 0;
+    const char* cmp2 = luaL_checklstring(state, 2, &cmp2_len);
+    bool ok = !strncmp(cmp1+cmp1_len-cmp2_len, cmp2, cmp2_len);
+    lua_pushboolean(state, ok);
+    return 1;
+}
+
 static const struct luaL_Reg module_nsutf[] = {
     LUA_FUNC_LUT(nsutf_from_ansi), LUA_FUNC_LUT(nsutf_to_ansi), {NULL, NULL}};
 
@@ -1187,6 +1232,14 @@ void LUAHandler::init(
     luaL_register(state, "nsutf", module_nsutf);
     luaL_register(state, "dpshadow", module_dpshadow);
     luaL_register(state, "fmt", module_fmt);
+
+    lua_getglobal(state, "string");
+    lua_pushcfunction(state, string_split);
+    lua_setfield(state, -2, "split");
+    lua_pushcfunction(state, string_startswith);
+    lua_setfield(state, -2, "startswith");
+    lua_pushcfunction(state, string_endswith);
+    lua_setfield(state, -2, "endswith");
 #endif
 
     lua_pushlightuserdata(state, this);
