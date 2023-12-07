@@ -72,7 +72,6 @@ local deps = {
     "brotli",
     "ghc_filesystem",
     -- "luajit",
-    "ravi",
     "stb",
     "fmt"
 }
@@ -94,6 +93,11 @@ add_requireconfs("sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
 add_requireconfs("**.freetype", {system=false})
+local raviConfigs = {}
+if is_plat("iphoneos") then
+    raviConfigs.jit = false
+end
+add_requires("ravi", {system=false, configs=raviConfigs})
 add_requires("freetype", {
     system=false,
     configs={
