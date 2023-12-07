@@ -3037,7 +3037,7 @@ int ONScripter::cspCommand() {
         csp2_flag = true;
     }
 
-    std::vector<int> nos;
+    onscripter::Vector<int> nos;
     int first_no = script_h.readInt();
     bool isAll = first_no == -1;
     nos.push_back(first_no);
@@ -3073,7 +3073,7 @@ int ONScripter::cspCommand() {
         }
     else if (nos.size() > 0) {
         auto it = nos.begin();
-        std::function<void(int no)> sp_remove =
+        onscripter::Function<void(int no)> sp_remove =
             [&num, &csp2_flag, &si, this](int no) {
                 if (no >= 0 && no < num) {
                     if (si[no].visible) {
@@ -3097,9 +3097,8 @@ int ONScripter::cspCommand() {
                 sp_remove(no);
             }
         }
-        for (; it != nos.end(); it++) {
-            int no = *it;
-            sp_remove(no);
+        for (auto &it : nos) {
+            sp_remove(it);
         }
         sp_remove = nullptr;
     }
@@ -4816,7 +4815,7 @@ int ONScripter::sprintfCommand() {
         sprintf_buf[0] = '\0';
     }
 #ifdef _WIN32
-    std::vector<ScriptHandler::VariableInfo> args;
+    onscripter::Vector<ScriptHandler::VariableInfo> args;
     while (script_h.getEndStatus() & ScriptHandler::END_COMMA) {
         script_h.readVariable();
         args.push_back(script_h.current_variable);
@@ -4844,7 +4843,7 @@ int ONScripter::sprintfCommand() {
     }
     vsnprintf(sprintf_buf, sprintf_buf_size, format, al.al);
 #else
-    std::vector<void *> args;
+    onscripter::Vector<void *> args;
     while (script_h.getEndStatus() & ScriptHandler::END_COMMA) {
         script_h.readVariable();
         void *value = nullptr;

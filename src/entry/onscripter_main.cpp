@@ -101,7 +101,7 @@ void optionVersion() {
     utils::printInfo(
         "This is free software; see the source for copying conditions.\n");
     int count = SDL_GetNumRenderDrivers();
-    std::string renderDrivers = "";
+    onscripter::String renderDrivers = "";
     SDL_RendererInfo info;
     for (int i = 0; i < count; i++) {
         SDL_GetRenderDriverInfo(i, &info);
@@ -111,7 +111,7 @@ void optionVersion() {
     utils::printInfo("\nSuppert:\n");
     utils::printInfo("  Render => %s\n", renderDrivers.c_str());
     count = SDL_GetNumAudioDrivers();
-    std::string audioDrivers = "";
+    onscripter::String audioDrivers = "";
     for (int i = 0; i < count; i++) {
         auto audioDriverName = SDL_GetAudioDriver(i);
         audioDrivers += audioDriverName;
@@ -366,14 +366,14 @@ void android_sigaction(int signal, siginfo_t *info, void *reserved) {
     // utils::printInfo("sigaction: %d", signal);
     // JNIEnv * jniEnv = NULL;
     // gJvm->AttachCurrentThread(&jniEnv, NULL);
-    // if (!jniEnv) {  
+    // if (!jniEnv) {
     //     return;
     // }
     // utils::printInfo("onNativeCrashed");
     // jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaOnNativeCrashed);
     // utils::printInfo("onNativeCrashed done");
     old_handlers[signal].sa_sigaction(signal, info, reserved);
-} 
+}
 
 void InitCrashReport(){
     utils::printInfo("InitCrashReport");

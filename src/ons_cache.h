@@ -2,6 +2,7 @@
 #define __ONS_CACHE_H__
 #include <SDL.h>
 
+#include <infra/Config.hpp>
 #include <infra/cache.hpp>
 #include <infra/lru_cache_policy.hpp>
 #include <list>
@@ -12,9 +13,10 @@
 #include <utility>
 
 namespace onscache {
-typedef caches::fixed_sized_cache<std::string,
-                                  std::shared_ptr<std::vector<uint8_t>>,
-                                  caches::LRUCachePolicy>
+typedef caches::fixed_sized_cache<
+    onscripter::String,
+    onscripter::SharedPtr<onscripter::Vector<uint8_t>>,
+    caches::LRUCachePolicy>
     ImageBufferCache;
 }  // namespace onscache
 

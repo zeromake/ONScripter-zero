@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <infra/Config.hpp>
 #include <string>
 
 #include "BaseReader.h"
@@ -262,8 +263,8 @@ class ScriptHandler {
 
     BaseReader *cBR;
     struct VariableData current_variable_data;
-    std::shared_ptr<onscripter::ScaleManager> screen_scale;
-    std::shared_ptr<onscripter::ScaleManager> user_scale;
+    onscripter::SharedPtr<onscripter::ScaleManager> screen_scale;
+    onscripter::SharedPtr<onscripter::ScaleManager> user_scale;
 
    private:
     enum {

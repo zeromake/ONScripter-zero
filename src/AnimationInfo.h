@@ -122,11 +122,13 @@ class AnimationInfo {
 
     AnimationInfo &operator=(const AnimationInfo &anim);
 
-    void scalePosXY(const std::shared_ptr<onscripter::ScaleManager> &scale) {
+    void scalePosXY(
+        const onscripter::SharedPtr<onscripter::ScaleManager> &scale) {
         pos.x = scale->Scale(orig_pos.x);
         pos.y = scale->Scale(orig_pos.y);
     };
-    void scalePosWH(const std::shared_ptr<onscripter::ScaleManager> &scale) {
+    void scalePosWH(
+        const onscripter::SharedPtr<onscripter::ScaleManager> &scale) {
         pos.w = scale->Scale(orig_pos.w);
         pos.h = scale->Scale(orig_pos.h);
     };

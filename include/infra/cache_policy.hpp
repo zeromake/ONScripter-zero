@@ -7,17 +7,15 @@
 
 #include <unordered_set>
 
-namespace caches
-{
+namespace caches {
 
 /**
  * \brief Cache policy abstract base class
  * \tparam Key Type of a key a policy works with
  */
 template <typename Key>
-class ICachePolicy
-{
-  public:
+class ICachePolicy {
+   public:
     virtual ~ICachePolicy() = default;
 
     /**
@@ -46,44 +44,35 @@ class ICachePolicy
 
 /**
  * \brief Basic no caching policy class
- * \details Preserve any key provided. Erase procedure can get rid of any added keys
- * without specific rules: a replacement candidate will be the first element in the
- * underlying container. As unordered container can be used in the implementation
- * there are no warranties that the first/last added key will be erased
- * \tparam Key Type of a key a policy works with
+ * \details Preserve any key provided. Erase procedure can get rid of any added
+ * keys without specific rules: a replacement candidate will be the first
+ * element in the underlying container. As unordered container can be used in
+ * the implementation there are no warranties that the first/last added key will
+ * be erased \tparam Key Type of a key a policy works with
  */
 template <typename Key>
-class NoCachePolicy : public ICachePolicy<Key>
-{
-  public:
+class NoCachePolicy : public ICachePolicy<Key> {
+   public:
     NoCachePolicy() = default;
     ~NoCachePolicy() noexcept override = default;
 
-    void Insert(const Key &key) override
-    {
-        key_storage.emplace(key);
-    }
+    void Insert(const Key &key) override { key_storage.emplace(key); }
 
-    void Touch(const Key &key) noexcept override
-    {
+    void Touch(const Key &key) noexcept override {
         // do not do anything
         (void)key;
     }
 
-    void Erase(const Key &key) noexcept override
-    {
-        key_storage.erase(key);
-    }
+    void Erase(const Key &key) noexcept override { key_storage.erase(key); }
 
     // return a key of a displacement candidate
-    const Key &ReplCandidate() const noexcept override
-    {
+    const Key &ReplCandidate() const noexcept override {
         return *key_storage.cbegin();
     }
 
-  private:
+   private:
     std::unordered_set<Key> key_storage;
 };
-} // namespace caches
+}  // namespace caches
 
-#endif // CACHE_POLICY_HPP
+#endif  // CACHE_POLICY_HPP

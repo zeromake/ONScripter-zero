@@ -22,6 +22,7 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 #include <chrono>
+#include <infra/Config.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -43,8 +44,8 @@ void printInfo(const char *format, ...);
 void printError(const char *format, ...);
 
 int readColor(const char *buf, uchar4 *color);
-void split(std::vector<std::string> &output,
-           std::string &input,
+void split(onscripter::Vector<onscripter::String> &output,
+           onscripter::String &input,
            const char sep);
 void setStr(char **dst, const char *src, int num);
 bool streamIsDigits(std::stringstream &ss);

@@ -24,6 +24,7 @@
 #if !defined(__LUA_HANDLER_H__) && defined(USE_LUA)
 #define __LUA_HANDLER_H__
 
+#include <infra/Config.hpp>
 #include <lua.hpp>
 #include <memory>
 
@@ -51,9 +52,10 @@ class LUAHandler {
     LUAHandler();
     ~LUAHandler();
 
-    void init(ONScripter *ons,
-              ScriptHandler *sh,
-              const std::shared_ptr<onscripter::ScaleManager> &screen_scale);
+    void init(
+        ONScripter *ons,
+        ScriptHandler *sh,
+        const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale);
     void loadInitScript();
     void addCallback(const char *label);
 
@@ -69,7 +71,7 @@ class LUAHandler {
     ONScripter *ons;
     lua_State *state;
     ScriptHandler *sh;
-    std::shared_ptr<onscripter::ScaleManager> screen_scale;
+    onscripter::SharedPtr<onscripter::ScaleManager> screen_scale;
 
     char error_str[256];
 

@@ -60,8 +60,8 @@ ScriptHandler::ScriptHandler() {
     screen_height = 480;
     variable_range = 0;
     global_variable_border = 0;
-    screen_scale = std::make_shared<onscripter::ScaleManager>();
-    user_scale = std::make_shared<onscripter::ScaleManager>();
+    screen_scale = onscripter::MakeShared<onscripter::ScaleManager>();
+    user_scale = onscripter::MakeShared<onscripter::ScaleManager>();
 }
 
 ScriptHandler::~ScriptHandler() {
@@ -1100,7 +1100,7 @@ int ScriptHandler::readScript(char *path) {
         estimated_buffer_length = ftell(fp) + 1;
     }
 
-    std::vector<std::string> unencrypt;
+    onscripter::Vector<onscripter::String> unencrypt;
     std::fs::path root_dir;
     if (archive_path && *archive_path) {
         root_dir = archive_path;

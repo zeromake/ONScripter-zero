@@ -34,13 +34,13 @@ float duration(std::chrono::steady_clock::time_point prev) {
            1000.0f;
 }
 
-void split(std::vector<std::string> &output,
-           std::string &input,
+void split(onscripter::Vector<onscripter::String> &output,
+           onscripter::String &input,
            const char sep) {
     size_t prev = 0;
     while (true) {
         size_t pos = input.find(sep, prev);
-        if (pos != std::string::npos) {
+        if (pos != onscripter::String::npos) {
             output.push_back(std::move(input.substr(prev, pos - prev)));
             prev = pos + 1;
             continue;
@@ -160,10 +160,10 @@ void setStr(char **dst, const char *src, int num) {
 }
 
 bool streamIsDigits(std::stringstream &ss) {
-    std::string next;
+    onscripter::String next;
     std::streampos prev_pos = ss.tellg();
     ss >> next;
     ss.seekg(prev_pos);
-    return next.find_first_not_of("0123456789") == std::string::npos;
+    return next.find_first_not_of("0123456789") == onscripter::String::npos;
 }
 }  // namespace utils

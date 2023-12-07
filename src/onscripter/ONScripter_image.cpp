@@ -108,7 +108,7 @@ SDL_Surface *ONScripter::createRectangleSurface(const char *filename,
 
     while (filename[c] == ' ' || filename[c] == '\t') c++;
     int c2 = c;
-    std::vector<utils::uchar4> colors;
+    onscripter::Vector<utils::uchar4> colors;
     while (filename[c] == '#') {
         utils::uchar4 col{0};
         int nn = utils::readColor(filename + c, &col);
@@ -160,8 +160,8 @@ SDL_Surface *ONScripter::createSurfaceFromFile(const char *_filename,
                                                bool *has_alpha,
                                                int *location,
                                                const SDL_Point *load_size) {
-    std::string filename = _filename;
-    std::shared_ptr<std::vector<uint8_t>> buffer = nullptr;
+    onscripter::String filename = _filename;
+    onscripter::SharedPtr<onscripter::Vector<uint8_t>> buffer = nullptr;
 #ifdef USE_IMAGE_CACHE
     if (!load_size && imageBufferCache->Cached(filename)) {
         buffer = imageBufferCache->Get(filename);
@@ -176,7 +176,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(const char *_filename,
         if (filelog_flag)
             script_h.findAndAddLog(
                 script_h.log_info[ScriptHandler::FILE_LOG], _filename, true);
-        buffer = std::make_shared<std::vector<uint8_t>>();
+        buffer = onscripter::MakeShared<onscripter::Vector<uint8_t>>();
         buffer->resize(length);
         script_h.cBR->getFile(filename.c_str(), buffer->data(), location);
 #ifdef USE_IMAGE_CACHE
