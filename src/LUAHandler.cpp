@@ -1232,6 +1232,10 @@ void LUAHandler::init(
     luaL_register(state, "nsutf", module_nsutf);
     luaL_register(state, "dpshadow", module_dpshadow);
     luaL_register(state, "fmt", module_fmt);
+#endif
+
+    lua_pushlightuserdata(state, this);
+    lua_setglobal(state, ONS_LUA_HANDLER_PTR);
 
     lua_getglobal(state, "string");
     lua_pushcfunction(state, string_split);
@@ -1240,10 +1244,6 @@ void LUAHandler::init(
     lua_setfield(state, -2, "startswith");
     lua_pushcfunction(state, string_endswith);
     lua_setfield(state, -2, "endswith");
-#endif
-
-    lua_pushlightuserdata(state, this);
-    lua_setglobal(state, ONS_LUA_HANDLER_PTR);
     *this->screen_scale = screen_scale;
 }
 
