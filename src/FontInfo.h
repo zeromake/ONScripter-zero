@@ -28,13 +28,15 @@
 #include <SDL.h>
 
 #include <functional>
+#include <infra/Config.hpp>
 #include <map>
 
 #include "BaseReader.h"
 #include "FontConfig.h"
 #include "resize/scale_manager.hpp"
 
-typedef std::function<int(const char *, char *, bool)> generate_path_function;
+typedef onscripter::Function<int(const char *, char *, bool)>
+    generate_path_function;
 
 typedef unsigned char uchar3[3];
 
@@ -92,7 +94,7 @@ class _FontInfo {
     void copyPosition(_FontInfo *font);
     void *openFont(
         char *font_file,
-        const std::shared_ptr<onscripter::ScaleManager> &screen_scale,
+        const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale,
         generate_path_function f = nullptr,
         const ons_font::FontConfig *fontConfig = nullptr);
     void setTateyokoMode(int tateyoko_mode);
@@ -115,7 +117,7 @@ class _FontInfo {
 
     SDL_Rect calcUpdatedArea(
         int start_xy[2],
-        const std::shared_ptr<onscripter::ScaleManager> &screen_scale);
+        const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale);
     void addShadeArea(SDL_Rect &rect, int dx, int dy, int dw, int dh);
     int initRuby(_FontInfo &body_info, int body_count, int ruby_count);
 };

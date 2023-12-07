@@ -64,7 +64,8 @@
 #define BUTTON_STATE_SNPRINTF(buf, ...) snprintf(buf, 16, __VA_ARGS__)
 #define WM_WDIT_STRING_SIZE 256
 
-typedef std::function<int(const char *, char *, bool)> generate_path_function;
+typedef onscripter::Function<int(const char *, char *, bool)>
+    generate_path_function;
 
 class ONScripter : public ScriptParser {
    public:
@@ -383,7 +384,7 @@ class ONScripter : public ScriptParser {
     bool screen_dirty_flag;
 
 #ifdef USE_IMAGE_CACHE
-    std::unique_ptr<onscache::ImageBufferCache> imageBufferCache;
+    onscripter::UniquePtr<onscache::ImageBufferCache> imageBufferCache;
 #endif
     // variables relevant to button
     ButtonState current_button_state, last_mouse_state;

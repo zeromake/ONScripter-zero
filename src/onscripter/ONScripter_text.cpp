@@ -42,7 +42,8 @@ extern Coding2UTF16 *coding2utf16;
     (*(x) == (char)0x81 && *((x) + 1) >= 0x41 && *((x) + 1) <= 0x44)
 
 int calcFontSizeRatio(
-    int v, const std::shared_ptr<onscripter::ScaleManager> &screen_scale) {
+    int v,
+    const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale) {
     return screen_scale->Scale(v);
 }
 
@@ -231,7 +232,8 @@ int ONScripter::drawChar(char *text,
     else
         info->openFont(font_file, screen_ratio1, screen_ratio2, ff, fontConfig);
 #endif
-    std::unique_ptr<SDL_Rect> text_rect = std::make_unique<SDL_Rect>();
+    onscripter::UniquePtr<SDL_Rect> text_rect =
+        onscripter::MakeUnique<SDL_Rect>();
     if (surface) {
         text_rect->x = 0;
         text_rect->y = 0;

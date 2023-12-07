@@ -93,8 +93,8 @@ ScriptParser::ScriptParser() {
     num_start_kinsoku = num_end_kinsoku = 0;
     setKinsoku(DEFAULT_START_KINSOKU, DEFAULT_END_KINSOKU, false);
 
-    screen_scale = std::make_shared<onscripter::ScaleManager>();
-    user_scale = std::make_shared<onscripter::ScaleManager>();
+    screen_scale = onscripter::MakeShared<onscripter::ScaleManager>();
+    user_scale = onscripter::MakeShared<onscripter::ScaleManager>();
 }
 
 ScriptParser::~ScriptParser() {

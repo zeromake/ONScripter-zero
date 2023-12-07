@@ -106,7 +106,7 @@ int _FontInfo::getToPrev(int index) { return old_xy[index]; }
 
 void *_FontInfo::openFont(
     char *_font_file,
-    const std::shared_ptr<onscripter::ScaleManager> &screen_scale,
+    const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale,
     generate_path_function f,
     const ons_font::FontConfig *fontConfig) {
     char font_file[4096] = {0};
@@ -372,7 +372,7 @@ void _FontInfo::rollback(int mode) {
 
 SDL_Rect _FontInfo::calcUpdatedArea(
     int start_xy[2],
-    const std::shared_ptr<onscripter::ScaleManager> &screen_scale) {
+    const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale) {
     SDL_Rect rect;
     if (tateyoko_mode == YOKO_MODE) {
         if (start_xy[1] == xy[1]) {

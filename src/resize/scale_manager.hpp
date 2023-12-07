@@ -1,5 +1,6 @@
 #pragma once
 
+#include <infra/Config.hpp>
 #include <memory>
 
 namespace onscripter {
@@ -13,7 +14,7 @@ class ScaleManager {
     void Update(const int scale1, const int scale2);
     float Ratio();
     void operator=(const ScaleManager &s);
-    void operator=(const std::shared_ptr<ScaleManager> &s);
+    void operator=(const onscripter::SharedPtr<ScaleManager> &s);
 
    private:
     int _scale1;

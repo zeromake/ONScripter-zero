@@ -960,7 +960,7 @@ static int NSReadFile(lua_State *state) {
         utils::printInfo("cannot open %s\n", str);
         return 0;
     }
-    std::vector<unsigned char> buffer;
+    onscripter::Vector<unsigned char> buffer;
     buffer.resize(length + 1);
     int location;
     lh->sh->cBR->getFile(str, buffer.data(), &location);
@@ -969,7 +969,7 @@ static int NSReadFile(lua_State *state) {
     return 1;
 }
 
-inline std::string inline_fmt_format(lua_State *state) {
+inline onscripter::String inline_fmt_format(lua_State *state) {
     const char *format = luaL_checkstring(state, 1);
     auto args = fmt::dynamic_format_arg_store<fmt::format_context>();
     int i = 2;
@@ -978,7 +978,7 @@ inline std::string inline_fmt_format(lua_State *state) {
             int v = luaL_checkinteger(state, i);
             args.push_back(std::move(v));
         } else if (lua_isstring(state, i)) {
-            std::string v = luaL_checkstring(state, i);
+            onscripter::String v = luaL_checkstring(state, i);
             args.push_back(std::move(v));
         }
         i++;
@@ -989,7 +989,7 @@ inline std::string inline_fmt_format(lua_State *state) {
 static int NSCall(lua_State *state) {
     lua_getglobal(state, ONS_LUA_HANDLER_PTR);
     LUAHandler *lh = (LUAHandler *)lua_topointer(state, -1);
-    std::string result = inline_fmt_format(state);
+    onscripter::String result = inline_fmt_format(state);
     strcpy(cmd_buf, result.c_str());
     lh->sh->enterExternalScript(cmd_buf);
     lh->ons->runScript();
@@ -1099,33 +1099,33 @@ static int nsutf_to_ansi(lua_State *state) {
 }
 
 static int fmt_format(lua_State *state) {
-    std::string result = inline_fmt_format(state);
+    onscripter::String result = inline_fmt_format(state);
     lua_pushstring(state, result.c_str());
     return 1;
 }
 
 static int fmt_print(lua_State *state) {
-    std::string result = inline_fmt_format(state);
+    onscripter::String result = inline_fmt_format(state);
     fmt::print(result);
     return 0;
 }
 
 static int fmt_println(lua_State *state) {
-    std::string result = inline_fmt_format(state);
+    onscripter::String result = inline_fmt_format(state);
     fmt::println(result);
     return 0;
 }
 
-static int string_split(lua_State* state) {
-    const char* input = luaL_checkstring(state, 1);
+static int string_split(lua_State *state) {
+    const char *input = luaL_checkstring(state, 1);
     size_t sep_len = 0;
-    const char* sep = luaL_checklstring(state, 2, &sep_len);
+    const char *sep = luaL_checklstring(state, 2, &sep_len);
     size_t prev = 0;
     lua_newtable(state);
     size_t i = 0;
     while (true) {
         i++;
-        const char* next = strstr(input, sep);
+        const char *next = strstr(input, sep);
         if (next) {
             lua_pushlstring(state, input, next - input);
             lua_rawseti(state, -2, i);
@@ -1140,22 +1140,22 @@ static int string_split(lua_State* state) {
     return 1;
 }
 
-static int string_startswith(lua_State* state) {
+static int string_startswith(lua_State *state) {
     size_t cmp1_len = 0;
-    const char* cmp1 = luaL_checklstring(state, 1, &cmp1_len);
+    const char *cmp1 = luaL_checklstring(state, 1, &cmp1_len);
     size_t cmp2_len = 0;
-    const char* cmp2 = luaL_checklstring(state, 2, &cmp2_len);
+    const char *cmp2 = luaL_checklstring(state, 2, &cmp2_len);
     bool ok = !strncmp(cmp1, cmp2, cmp2_len);
     lua_pushboolean(state, ok);
     return 1;
 }
 
-static int string_endswith(lua_State* state) {
+static int string_endswith(lua_State *state) {
     size_t cmp1_len = 0;
-    const char* cmp1 = luaL_checklstring(state, 1, &cmp1_len);
+    const char *cmp1 = luaL_checklstring(state, 1, &cmp1_len);
     size_t cmp2_len = 0;
-    const char* cmp2 = luaL_checklstring(state, 2, &cmp2_len);
-    bool ok = !strncmp(cmp1+cmp1_len-cmp2_len, cmp2, cmp2_len);
+    const char *cmp2 = luaL_checklstring(state, 2, &cmp2_len);
+    bool ok = !strncmp(cmp1 + cmp1_len - cmp2_len, cmp2, cmp2_len);
     lua_pushboolean(state, ok);
     return 1;
 }
@@ -1179,7 +1179,7 @@ LUAHandler::LUAHandler() {
     is_animatable = false;
     duration_time = 15;
     next_time = 0;
-    screen_scale = std::make_shared<onscripter::ScaleManager>();
+    screen_scale = onscripter::MakeShared<onscripter::ScaleManager>();
     error_str[0] = 0;
 
     for (unsigned int i = 0; i < MAX_CALLBACK; i++) callback_state[i] = false;
@@ -1209,7 +1209,7 @@ extern "C" int luaopen_fmt(lua_State *state) {
 void LUAHandler::init(
     ONScripter *ons,
     ScriptHandler *sh,
-    const std::shared_ptr<onscripter::ScaleManager> &screen_scale) {
+    const onscripter::SharedPtr<onscripter::ScaleManager> &screen_scale) {
     this->ons = ons;
     this->sh = sh;
 

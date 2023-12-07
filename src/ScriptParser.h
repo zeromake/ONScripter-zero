@@ -297,8 +297,8 @@ class ScriptParser {
     char *version_str;
     int underline_value;
     char *save_dir_envdata;
-    std::shared_ptr<onscripter::ScaleManager> screen_scale;
-    std::shared_ptr<onscripter::ScaleManager> user_scale;
+    onscripter::SharedPtr<onscripter::ScaleManager> screen_scale;
+    onscripter::SharedPtr<onscripter::ScaleManager> user_scale;
 
     void deleteNestInfo();
     inline void setStr(char **dst, const char *src, int num = -1) {

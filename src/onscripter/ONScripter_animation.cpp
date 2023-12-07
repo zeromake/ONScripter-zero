@@ -147,23 +147,23 @@ SDL_Surface *ONScripter::inlineLoadImage(AnimationInfo *anim,
 }
 
 SDL_Surface *ONScripter::loadAnimationImage(AnimationInfo *anim) {
-    std::string file_name = anim->file_name;
+    onscripter::String file_name = anim->file_name;
     SDL_Surface *surface = NULL;
     if (file_name.size() == 0 || file_name.at(0) != '@') {
         return inlineLoadImage(anim, file_name.c_str());
     }
     file_name = file_name.substr(1);
-    std::vector<std::string> images;
+    onscripter::Vector<onscripter::String> images;
     utils::split(images, file_name, '|');
     for (auto file_name : images) {
         size_t offset = file_name.find(':');
         // 不是图片处理器直接加载到 surface 上。
-        if (std::string::npos == offset) {
+        if (onscripter::String::npos == offset) {
             if (surface != NULL) SDL_FreeSurface(surface);
             surface = inlineLoadImage(anim, file_name.c_str());
             continue;
         }
-        std::string expr = std::move(file_name.substr(0, offset));
+        onscripter::String expr = std::move(file_name.substr(0, offset));
         offset += 1;
         std::stringstream stream;
         stream.str(std::move(file_name.substr(offset)));
@@ -183,7 +183,7 @@ SDL_Surface *ONScripter::loadAnimationImage(AnimationInfo *anim) {
             while (!stream.eof()) {
                 SDL_Rect dst_rect{0};
                 SDL_Rect src_rect{0};
-                std::string child_name;
+                onscripter::String child_name;
                 stream >> child_name;
                 SDL_Surface *child_surface =
                     inlineLoadImage(anim, child_name.c_str());
@@ -241,11 +241,11 @@ SDL_Surface *ONScripter::loadAnimationImage(AnimationInfo *anim) {
             anim->orig_pos.h = surface->h;
         } else if (expr == "alpha") {
             if (surface == NULL) {
-                std::string child_name;
+                onscripter::String child_name;
                 stream >> child_name;
                 surface = inlineLoadImage(anim, child_name.c_str());
             } else if (!utils::streamIsDigits(stream)) {
-                std::string child_name;
+                onscripter::String child_name;
                 stream >> child_name;
             }
             int alpha = 255;
@@ -285,12 +285,12 @@ SDL_Surface *ONScripter::loadAnimationImage(AnimationInfo *anim) {
             surface = child_surface;
         } else if (expr == "crop") {
             if (surface == NULL) {
-                std::string child_name;
+                onscripter::String child_name;
                 stream >> child_name;
                 surface = inlineLoadImage(anim, child_name.c_str());
             } else if (!utils::streamIsDigits(stream)) {
                 // 跳过该指令的图片
-                std::string child_name;
+                onscripter::String child_name;
                 stream >> child_name;
             }
             SDL_Rect src_rect;

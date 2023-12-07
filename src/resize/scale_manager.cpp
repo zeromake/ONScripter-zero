@@ -23,7 +23,7 @@ void ScaleManager::operator=(const ScaleManager &s) {
     this->_scale1 = s._scale1;
     this->_scale2 = s._scale2;
 }
-void ScaleManager::operator=(const std::shared_ptr<ScaleManager> &s) {
+void ScaleManager::operator=(const onscripter::SharedPtr<ScaleManager> &s) {
     this->_scale1 = s->_scale1;
     this->_scale2 = s->_scale2;
 }
