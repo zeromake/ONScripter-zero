@@ -71,7 +71,8 @@ local deps = {
     "sdl2_mixer",
     "brotli",
     "ghc_filesystem",
-    "luajit",
+    -- "luajit",
+    "ravi",
     "stb",
     "fmt"
 }
@@ -165,7 +166,8 @@ target("onscripter")
         "sdl2_mixer",
         "brotli",
         "ghc_filesystem",
-        "luajit",
+        -- "luajit",
+        "ravi",
         "stb",
         "fmt"
     )
