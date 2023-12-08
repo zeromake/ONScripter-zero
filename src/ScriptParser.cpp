@@ -24,8 +24,6 @@
 
 #include "ScriptParser.h"
 
-#include <infra/filesystem.hpp>
-
 #include "private/utils.h"
 #ifdef USE_BUILTIN_LAYER_EFFECTS
 #include "builtin_layer.h"
@@ -507,13 +505,13 @@ int ScriptParser::saveFileIOBuf(const char *filename,
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
     // check dir
-    std::fs::path pp(filename);
+    onscripter::fs::path pp(filename);
     auto parent_path = pp.parent_path().string();
     if (parent_path.length() > 0) {
         char dir[STRING_BUFFER_LENGTH] = {0};
         fpath(parent_path.c_str(), dir, use_save_dir);
-        if (!std::fs::exists(std::fs::status(dir))) {
-            std::fs::create_directory(dir);
+        if (!onscripter::fs::exists(onscripter::fs::status(dir))) {
+            onscripter::fs::create_directory(dir);
         }
     }
 

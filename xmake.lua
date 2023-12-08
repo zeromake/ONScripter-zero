@@ -93,11 +93,15 @@ add_requireconfs("sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
 add_requireconfs("**.freetype", {system=false})
-local raviConfigs = {}
-if is_plat("iphoneos") then
-    raviConfigs.jit = false
+if not is_plat("iphoneos") then
+    local raviConfigs = {}
+    if is_plat("iphoneos") then
+        raviConfigs.jit = false
+    end
+    add_requires("ravi", {system=false, configs=raviConfigs})
+else
+    add_requires("luajit", {system=false})
 end
-add_requires("ravi", {system=false, configs=raviConfigs})
 add_requires("freetype", {
     system=false,
     configs={
@@ -142,6 +146,7 @@ end
 
 target("onscripter")
     -- add_defines("ONS_RESIZE_SURFACE_IMPLEMENT=2")
+    set_pcxxheader("src/config.hpp")
     if is_plat("android") then
         set_kind("shared")
     elseif is_plat("iphoneos") then
@@ -170,11 +175,14 @@ target("onscripter")
         "sdl2_mixer",
         "brotli",
         "ghc_filesystem",
-        -- "luajit",
-        "ravi",
         "stb",
         "fmt"
     )
+    if not is_plat("iphoneos") then
+        add_packages("ravi")
+    else
+        add_packages("luajit")
+    end
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
     if not is_plat("windows", "mingw") then

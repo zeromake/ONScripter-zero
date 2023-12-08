@@ -24,7 +24,6 @@
 
 #include "ScriptHandler.h"
 
-#include <infra/filesystem.hpp>
 #include <vector>
 
 #include "coding2utf16.h"
@@ -160,19 +159,19 @@ int ScriptHandler::fpath(const char *path, char *result, bool use_save_dir) {
     const char *prefix_dir =
         (use_save_dir && save_dir) ? save_dir : archive_path;
     const int prefix_dir_size = strlen(prefix_dir);
-    if (std::fs::path(path).is_absolute() || path[0] == '.') {
+    if (onscripter::fs::path(path).is_absolute() || path[0] == '.') {
         strcpy(result, path);
     } else if (strncmp(path, prefix_dir, prefix_dir_size) != 0) {
-        strcpy(result, (std::fs::path(prefix_dir) / path).string().c_str());
+        strcpy(result, (onscripter::fs::path(prefix_dir) / path).string().c_str());
     }
     char *buf = result;
     while (*buf != '\0') {
         if ((*buf == '/' || *buf == '\\') &&
-            *buf != std::fs::path::preferred_separator)
-            *buf = std::fs::path::preferred_separator;
+            *buf != onscripter::fs::path::preferred_separator)
+            *buf = onscripter::fs::path::preferred_separator;
         buf++;
     }
-    strcpy(result, std::fs::absolute(result).string().c_str());
+    strcpy(result, onscripter::fs::absolute(result).string().c_str());
     return 0;
 }
 
@@ -1100,7 +1099,7 @@ int ScriptHandler::readScript(char *path) {
     }
 
     onscripter::Vector<onscripter::String> unencrypt;
-    std::fs::path root_dir;
+    onscripter::fs::path root_dir;
     if (archive_path && *archive_path) {
         root_dir = archive_path;
     } else {
@@ -1110,7 +1109,7 @@ int ScriptHandler::readScript(char *path) {
         fclose(fp);
         estimated_buffer_length = 1;
 
-        for (auto f : std::fs::directory_iterator(root_dir)) {
+        for (auto f : onscripter::fs::directory_iterator(root_dir)) {
             auto _fp = f.path();
             if (f.is_regular_file() && _fp.extension() == ".txt") {
                 auto str = _fp.filename().string();

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ONSCRIPTER_CONFIG_CONFIG_H
-#define ONSCRIPTER_CONFIG_CONFIG_H
+#ifndef ONSCRIPTER_CONFIG_H
+#define ONSCRIPTER_CONFIG_H
 
 #include <array>
 #include <functional>
@@ -14,6 +14,11 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#ifdef INFRA_FORCE_GHC_FS
+#include <ghc/filesystem.hpp>
+#else
+#include <filesystem>
+#endif
 
 namespace onscripter {
 template <typename T>
@@ -91,16 +96,20 @@ inline UniquePtr<T> MakeUnique(Args&&... args) {
 
 struct Defer {
     std::function<void(void)> action;
-    Defer(const std::function<void(void)>& act): action(act) {};
-    Defer(const std::function<void(void)>&& act): action(std::move(act)) {};
+    Defer(const std::function<void(void)>& act);
+    Defer(const std::function<void(void)>&& act);
     Defer(const Defer& act) = delete;
     Defer& operator=(const Defer& act) = delete;
     Defer(Defer&& act) = delete;
     Defer& operator=(Defer&& act) = delete;
-    ~Defer() {
-        action();
-    };
+    ~Defer();
 };
+
+#ifdef INFRA_FORCE_GHC_FS
+namespace fs = ghc::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
 
 };  // namespace onscripter
 

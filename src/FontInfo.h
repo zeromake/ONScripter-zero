@@ -27,10 +27,6 @@
 
 #include <SDL.h>
 
-#include <functional>
-#include <infra/Config.hpp>
-#include <map>
-
 #include "BaseReader.h"
 #include "FontConfig.h"
 #include "resize/scale_manager.hpp"

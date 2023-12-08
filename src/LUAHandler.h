@@ -24,9 +24,7 @@
 #if !defined(__LUA_HANDLER_H__) && defined(USE_LUA)
 #define __LUA_HANDLER_H__
 
-#include <infra/Config.hpp>
 #include <lua.hpp>
-#include <memory>
 
 #include "resize/scale_manager.hpp"
 

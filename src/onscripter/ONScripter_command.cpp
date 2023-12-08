@@ -29,7 +29,6 @@
 #elif defined(WIN32)
 #include <direct.h>
 #endif
-#include <infra/filesystem.hpp>
 #include <vector>
 
 #include "private/utils.h"
@@ -960,9 +959,9 @@ int ONScripter::savescreenshotCommand() {
     const char *buf = script_h.readStr();
     char capital_name[STRING_BUFFER_LENGTH] = {0};
     script_h.fpath(buf, capital_name);
-    auto dir = std::fs::path(capital_name).parent_path().string();
-    if (dir.length() > 0 && !std::fs::exists(std::fs::status(dir))) {
-        std::fs::create_directory(dir);
+    auto dir = onscripter::fs::path(capital_name).parent_path().string();
+    if (dir.length() > 0 && !onscripter::fs::exists(onscripter::fs::status(dir))) {
+        onscripter::fs::create_directory(dir);
     }
     SDL_RWops *rwops = SDL_RWFromFile(capital_name, "wb");
     if (rwops == nullptr || SDL_SaveBMP_RW(surface, rwops, 1) != 0)
