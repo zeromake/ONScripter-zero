@@ -149,8 +149,8 @@ int ONScripter::playSound(const char *filename,
             utils::printError("can't open temporaly MIDI file %s\n",
                               TMP_MUSIC_FILE);
         } else {
+            defer([&fp]{fclose(fp);});
             fwrite(buffer, 1, length, fp);
-            fclose(fp);
             ext_music_play_once_flag = !loop_flag;
             if (playMIDI(loop_flag) == 0) {
                 delete[] buffer;

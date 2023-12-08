@@ -689,9 +689,8 @@ void ScriptHandler::saveKidokuData() {
         utils::printError("can't write kidoku.dat\n");
         return;
     }
-
+    defer([&fp]{fclose(fp);});
     fwrite(kidoku_buffer, 1, script_buffer_length / 8, fp);
-    fclose(fp);
 }
 
 void ScriptHandler::loadKidokuData() {
@@ -702,8 +701,8 @@ void ScriptHandler::loadKidokuData() {
     memset(kidoku_buffer, 0, script_buffer_length / 8 + 1);
 
     if ((fp = fopen("kidoku.dat", "rb", true)) != NULL) {
+        defer([&fp]{fclose(fp);});
         fread(kidoku_buffer, 1, script_buffer_length / 8, fp);
-        fclose(fp);
     }
 }
 

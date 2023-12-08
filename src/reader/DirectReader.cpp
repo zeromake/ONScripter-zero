@@ -401,6 +401,7 @@ size_t DirectReader::getFile(const char *file_name,
     FILE *fp = getFileHandle(file_name, compression_type, &len);
 
     if (fp) {
+        defer([&fp]{fclose(fp);});
         if (compression_type & NBZ_COMPRESSION)
             return decodeNBZ(fp, 0, buffer);
         else if (compression_type & SPB_COMPRESSION)
@@ -417,7 +418,6 @@ size_t DirectReader::getFile(const char *file_name,
             fread(buffer, 1, c, fp);
             buffer += c;
         }
-        fclose(fp);
         if (location) *location = ARCHIVE_TYPE_NONE;
     }
 

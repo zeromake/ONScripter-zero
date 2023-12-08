@@ -457,6 +457,7 @@ ONSCRIPTER_MAIN_EXTREN int main(int argc, char *argv[]) {
     } else
         fp = fopen(argfilename, "r");
     if (fp) {
+        defer([&fp]{fclose(fp);});
         char **args = new char *[16];
         int argn = 0;
         args[argn] = new char[64]{0};
