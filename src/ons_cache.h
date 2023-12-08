@@ -2,15 +2,9 @@
 #define __ONS_CACHE_H__
 #include <SDL.h>
 
-#include <infra/Config.hpp>
+#include <config.hpp>
 #include <infra/cache.hpp>
 #include <infra/lru_cache_policy.hpp>
-#include <list>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
 
 namespace onscache {
 typedef caches::fixed_sized_cache<

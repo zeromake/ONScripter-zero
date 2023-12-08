@@ -318,14 +318,14 @@ bool _FontInfo::isLineEmpty() {
 void _FontInfo::advanceCharInHankaku(int offset, int width, int height) {
     if (width > 0) {
         int offsetWidth = width - (offset * pitch_xy[0] / 2);
-        positionOffset.width = std::max(offsetWidth, positionOffset.width);
+        positionOffset.width = (std::max)(offsetWidth, positionOffset.width);
         if (tateyoko_mode == YOKO_MODE) {
             positionOffset.all_width += offsetWidth;
         }
     }
     if (height > 0) {
         int offsetHeight = height - pitch_xy[1];
-        positionOffset.height = std::max(offsetHeight, positionOffset.height);
+        positionOffset.height = (std::max)(offsetHeight, positionOffset.height);
         if (tateyoko_mode == TATE_MODE) {
             positionOffset.all_height += offsetHeight;
         }

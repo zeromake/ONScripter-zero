@@ -1,6 +1,6 @@
 #pragma once
 
-#include <infra/Config.hpp>
+#include <config.hpp>
 #include <memory>
 
 namespace onscripter {

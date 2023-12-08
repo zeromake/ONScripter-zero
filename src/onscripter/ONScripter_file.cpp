@@ -23,7 +23,6 @@
  */
 
 #include <chrono>
-#include <infra/filesystem.hpp>
 
 #include "ONScripter.h"
 #include "private/utils.h"
@@ -175,11 +174,11 @@ void ONScripter::searchSaveFile(SaveFileInfo &save_file_info, int no) {
     save_file_info.hour = buf.st_mtime.hour;
     save_file_info.minute = buf.st_mtime.minute;
 #else
-    if (!std::fs::exists(file_name)) {
+    if (!onscripter::fs::exists(file_name)) {
         save_file_info.valid = false;
         return;
     }
-    auto ftime = std::fs::last_write_time(file_name);
+    auto ftime = onscripter::fs::last_write_time(file_name);
     std::time_t tt = to_time_t(ftime);
     struct tm *ptm = localtime(&tt);
 

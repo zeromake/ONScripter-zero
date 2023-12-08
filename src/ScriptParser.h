@@ -31,8 +31,6 @@
 #include <string.h>
 #include <time.h>
 
-#include <map>
-
 #include "AnimationInfo.h"
 #include "DirectReader.h"
 #include "FontInfo.h"
@@ -512,7 +510,7 @@ class ScriptParser {
     } root_rmenu_link;
     unsigned int rmenu_link_num, rmenu_link_width;
 
-    std::map<int, char *> rmenu_calls;
+    onscripter::SmallUnorderedMap<int, char *> rmenu_calls;
     unsigned int rmenu_call_no = 1000;
 
     void deleteRMenuLink();

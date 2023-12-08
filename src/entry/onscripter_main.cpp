@@ -24,8 +24,6 @@
 
 #include <stdlib.h>
 
-#include <infra/filesystem.hpp>
-
 #include "ONScripter.h"
 #include "gbk2utf16.h"
 #include "private/utils.h"
@@ -277,7 +275,7 @@ void parseOption(int argc, char *argv[]) {
                        !strcmp(argv[0] + 1, "-root")) {
                 argc--;
                 argv++;
-                auto root = std::fs::absolute(argv[0]).string();
+                auto root = onscripter::fs::absolute(argv[0]).string();
                 ons.setArchivePath(root.data());
             } else if (!strcmp(argv[0] + 1, "-fullscreen")) {
                 ons.setFullscreenMode();
@@ -344,8 +342,8 @@ void parseOption(int argc, char *argv[]) {
                 utils::printInfo(" unknown option %s\n", argv[0]);
             }
         } else {
-            auto rootPath = std::fs::absolute(argv[0]);
-            if (std::fs::is_directory(rootPath)) {
+            auto rootPath = onscripter::fs::absolute(argv[0]);
+            if (onscripter::fs::is_directory(rootPath)) {
                 auto root = rootPath.string();
                 ons.setArchivePath(root.data());
             } else {

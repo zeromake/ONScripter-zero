@@ -22,7 +22,6 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 #include <chrono>
-#include <infra/Config.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
