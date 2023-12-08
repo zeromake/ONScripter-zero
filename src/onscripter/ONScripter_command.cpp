@@ -2336,6 +2336,7 @@ int ONScripter::getregCommand() {
         utils::printError("Cannot open file [%s]\n", registry_file);
         return RET_CONTINUE;
     }
+    defer([&fp]{fclose(fp);});
 
     char reg_buf[256], reg_buf2[256];
     bool found_flag = false;
@@ -2376,7 +2377,6 @@ int ONScripter::getregCommand() {
     }
 
     if (!found_flag) utils::printError("  The key is not found.\n");
-    fclose(fp);
 
     return RET_CONTINUE;
 }
@@ -2676,6 +2676,7 @@ int ONScripter::exec_dllCommand() {
             "Cannot open file [%s] while reading %s\n", dll_file, dll_name);
         return RET_CONTINUE;
     }
+    defer([&fp]{fclose(fp);});
 
     char dll_buf[256], dll_buf2[256];
     bool found_flag = false;
@@ -2720,7 +2721,6 @@ int ONScripter::exec_dllCommand() {
 
     if (!found_flag)
         utils::printError("  The DLL is not found in %s.\n", dll_file);
-    fclose(fp);
 
     return RET_CONTINUE;
 }

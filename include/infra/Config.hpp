@@ -81,6 +81,27 @@ template <typename T, typename... Args>
 inline UniquePtr<T> MakeUnique(Args&&... args) {
     return std::make_unique<T, Args...>(std::forward<Args>(args)...);
 }
+
+#define var_defer__(x) defer__ ## x
+#define var_defer_(x) var_defer__(x)
+#define defer(ops) onscripter::Defer var_defer_(__COUNTER__)(ops)
+#define ref_defer(ops) onscripter::Defer var_defer_(__COUNTER__)([&]{ ops; }) // Capture all by ref
+#define val_defer(ops) onscripter::Defer var_defer_(__COUNTER__)([=]{ ops; }) // Capture all by val
+#define none_defer(ops) onscripter::Defer var_defer_(__COUNTER__)([]{ ops; }) // Capture nothing
+
+struct Defer {
+    std::function<void(void)> action;
+    Defer(const std::function<void(void)>& act): action(act) {};
+    Defer(const std::function<void(void)>&& act): action(std::move(act)) {};
+    Defer(const Defer& act) = delete;
+    Defer& operator=(const Defer& act) = delete;
+    Defer(Defer&& act) = delete;
+    Defer& operator=(Defer&& act) = delete;
+    ~Defer() {
+        action();
+    };
+};
+
 };  // namespace onscripter
 
 #endif

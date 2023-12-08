@@ -172,3 +172,4 @@ adb install ./app/build/outputs/apk/debug/app-debug.apk
 - [gb2312码表](https://uic.io/zh/charset/show/gb2312/)
 - [gb18030码表](https://uic.io/zh/charset/show/gb18030/)
 - [SDL2_Tutorials](https://lazyfoo.net/tutorials/SDL/index.php)
+- [C++开源库列表](https://www.cnblogs.com/chendeqiang/p/12861712.html)

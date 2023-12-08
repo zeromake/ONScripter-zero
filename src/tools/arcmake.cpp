@@ -35,6 +35,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <infra/Config.hpp>
+
 #define NSA 1
 
 #include "coding2utf16.h"
@@ -86,13 +88,13 @@ int processFile(reader::ArchiveInfo *ai,
         fprintf(stderr, "can't open file %s, skipping\n", fullpath);
         return -1;
     }
+    defer([&fp]{fclose(fp);});
     fseek(fp, 0, SEEK_END);
     fi->length = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     magic[0] = 0;
     int len = fread(magic, 1, 4, fp);
     magic[len] = 0;
-    fclose(fp);
 
     if ((strstr(fi->name, ".nbz") != NULL) ||
         (strstr(fi->name, ".NBZ") != NULL))

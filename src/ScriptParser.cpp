@@ -519,6 +519,7 @@ int ScriptParser::saveFileIOBuf(const char *filename,
 
     FILE *fp;
     if ((fp = fopen(filename, "wb", use_save_dir)) == NULL) return -1;
+    defer([&fp]{fclose(fp);});
 
     size_t ret = fwrite(file_io_buf + offset, 1, file_io_buf_ptr - offset, fp);
 
@@ -528,8 +529,6 @@ int ScriptParser::saveFileIOBuf(const char *filename,
         fputc('"', fp);
         fputc('*', fp);
     }
-
-    fclose(fp);
 
     if (ret != file_io_buf_ptr - offset) return -2;
 
@@ -542,6 +541,7 @@ size_t ScriptParser::loadFileIOBuf(const char *filename) {
 
     FILE *fp;
     if ((fp = fopen(filename, "rb", use_save_dir)) == NULL) return 0;
+    defer([&fp]{fclose(fp);});
 
     fseek(fp, 0, SEEK_END);
     size_t len = ftell(fp);
@@ -550,7 +550,6 @@ size_t ScriptParser::loadFileIOBuf(const char *filename) {
 
     fseek(fp, 0, SEEK_SET);
     size_t ret = fread(file_io_buf, 1, len, fp);
-    fclose(fp);
 
     return ret;
 }
@@ -840,6 +839,7 @@ void ScriptParser::createKeyTable(const char *key_exe) {
         utils::printError("createKeyTable: can't open EXE file %s\n", key_exe);
         return;
     }
+    defer([&fp]{fclose(fp);});
 
     key_table = new unsigned char[256];
 
@@ -862,7 +862,6 @@ void ScriptParser::createKeyTable(const char *key_exe) {
         ring_buffer[ring_last] = ch;
         ring_last = (ring_last + 1) % 256;
     }
-    fclose(fp);
 
     if (ch == EOF) errorAndExit("createKeyTable: can't find a key table.");
 
