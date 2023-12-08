@@ -730,47 +730,58 @@ void ONScripter::executeSystemLookback() {
     }
 }
 
-void ONScripter::buildDialog(bool yesno_flag,
+void ONScripter::buildDialog(int flags,
                              const char *mes1,
                              const char *mes2) {
     SDL_PixelFormat *fmt = image_surface->format;
     SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(
-        SDL_SWSURFACE, DIALOG_W, DIALOG_H, fmt->BitsPerPixel, fmt->format);
+        SDL_SWSURFACE,
+        screen_scale->Scale(DIALOG_W),
+        screen_scale->Scale(DIALOG_H),
+        fmt->BitsPerPixel,
+        fmt->format
+    );
 
-    SDL_Rect rect;
+    // 背景
+    SDL_Rect rect{0};
+    SDL_Rect origin_rect{0};
     unsigned char col = 255;
     SDL_FillRect(s, NULL, SDL_MapRGBA(s->format, col, col, col, 0xff));
 
+
+    // 内容框外边框
     rect.x = 2;
     rect.y = DIALOG_HEADER;
     rect.w = DIALOG_W - 4;
     rect.h = DIALOG_H - rect.y - 2;
+    origin_rect = rect;
+    screen_scale->ScaleRect(rect);
     col = 105;
     SDL_FillRect(s, &rect, SDL_MapRGBA(s->format, col, col, col, 0xff));
 
+    // 内容框内边框
+    rect = origin_rect;
     rect.x++;
     rect.y++;
     rect.w -= 2;
     rect.h -= 2;
+    origin_rect = rect;
+    screen_scale->ScaleRect(rect);
     col = 255;
     SDL_FillRect(s, &rect, SDL_MapRGBA(s->format, col, col, col, 0xff));
 
+    // 内容背景
+    rect = origin_rect;
     rect.h = DIALOG_FOOTER;
     rect.y = DIALOG_H - 3 - rect.h;
+    origin_rect = rect;
+    screen_scale->ScaleRect(rect);
     col = 240;
     SDL_FillRect(s, &rect, SDL_MapRGBA(s->format, col, col, col, 0xff));
 
     SDL_Surface *s2 = s;
-    if (screen_scale->Has()) {
-        s2 = SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
-                                            screen_scale->Scale(DIALOG_W),
-                                            screen_scale->Scale(DIALOG_H),
-                                            fmt->BitsPerPixel,
-                                            fmt->format);
-        resizeSurface(s, s2);
-        SDL_FreeSurface(s);
-    }
 
+    // 绘制标题
     uchar3 col3 = {0, 0, 0};
     dialog_font.top_xy[0] = 7;
     dialog_font.top_xy[1] = DIALOG_HEADER + 5;
@@ -779,6 +790,7 @@ void ONScripter::buildDialog(bool yesno_flag,
     dialog_font.clear();
     drawString(mes1, col3, &dialog_font, false, s2, NULL, NULL);
 
+    // 绘制内容
     dialog_font.top_xy[0] = 5;
     dialog_font.top_xy[1] = (DIALOG_HEADER - dialog_font.font_size_xy[1]) / 2;
     dialog_font.setLineArea(strlen(mes2) / 2 + 1);
@@ -789,12 +801,13 @@ void ONScripter::buildDialog(bool yesno_flag,
     dialog_info.num_of_cells = 1;
     dialog_info.setImage(s2, texture_format);
 
+    // 设置弹框居中
     dialog_info.pos.x = (screen_width - dialog_info.pos.w) / 2;
     dialog_info.pos.y = (screen_height - dialog_info.pos.h) / 2;
 
     // buttons
     const char *mes[2];
-    if (yesno_flag) {
+    if (flags & 1) {
         mes[0] = MESSAGE_YES;
         mes[1] = MESSAGE_NO;
     } else {
@@ -802,41 +815,58 @@ void ONScripter::buildDialog(bool yesno_flag,
         mes[1] = MESSAGE_CANCEL;
     }
 
-    for (int i = 0; i < 2; i++) {
+    int button_end = flags & 2 ? 0 : 2;
+
+    // 绘制两个按钮
+    for (int i = 0; i < button_end; i++) {
+        // 创建长度为两倍的 button
         SDL_Surface *bs = SDL_CreateRGBSurfaceWithFormat(SDL_SWSURFACE,
-                                                         DIALOG_BUTTON_W * 2,
-                                                         DIALOG_BUTTON_H,
+                                                         screen_scale->Scale(DIALOG_BUTTON_W * 2),
+                                                         screen_scale->Scale(DIALOG_BUTTON_H),
                                                          fmt->BitsPerPixel,
                                                          fmt->format);
 
+        // 绘制一个按钮两次，只有背景不同
         for (int j = 0; j < 2; j++) {
             rect.x = DIALOG_BUTTON_W * j;
             rect.y = 0;
             rect.w = DIALOG_BUTTON_W;
             rect.h = DIALOG_BUTTON_H;
+            origin_rect = rect;
+            screen_scale->ScaleRect(rect);
 
             col = 105;
             SDL_FillRect(
                 bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
 
+            rect = origin_rect;
             rect.w--;
             rect.h--;
+            origin_rect = rect;
+            screen_scale->ScaleRect(rect);
             col = 255;
             SDL_FillRect(
                 bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
 
+
+            rect = origin_rect;
             rect.x++;
             rect.y++;
             rect.w--;
             rect.h--;
+            origin_rect = rect;
+            screen_scale->ScaleRect(rect);
             col = 227;
             SDL_FillRect(
                 bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
 
+            rect = origin_rect;
             rect.x++;
             rect.y++;
             rect.w -= 2;
             rect.h -= 2;
+            origin_rect = rect;
+            screen_scale->ScaleRect(rect);
             col = 240;
             if (j == 1) col = 214;
             SDL_FillRect(
@@ -844,17 +874,8 @@ void ONScripter::buildDialog(bool yesno_flag,
         }
 
         SDL_Surface *bs2 = bs;
-        if (screen_scale->Has()) {
-            bs2 = SDL_CreateRGBSurfaceWithFormat(
-                SDL_SWSURFACE,
-                screen_scale->Scale(DIALOG_BUTTON_W * 2),
-                screen_scale->Scale(DIALOG_BUTTON_H),
-                fmt->BitsPerPixel,
-                fmt->format);
-            resizeSurface(bs, bs2);
-            SDL_FreeSurface(bs);
-        }
 
+        // 绘制两次文字
         for (int j = 0; j < 2; j++) {
             rect.x = DIALOG_BUTTON_W * j + 2;
             rect.y = 2;
@@ -884,8 +905,7 @@ void ONScripter::buildDialog(bool yesno_flag,
             screen_scale->Scale(DIALOG_W - 3 - (DIALOG_BUTTON_W + 8) * (2 - i));
         btn->anim[0]->pos.y =
             dialog_info.pos.y +
-            (DIALOG_H - 3 -
-             screen_scale->Scale(DIALOG_FOOTER + DIALOG_BUTTON_H) / 2);
+            screen_scale->Scale(DIALOG_H - 3 - (DIALOG_FOOTER + DIALOG_BUTTON_H) / 2);
 
         btn->anim[0]->visible = true;
         btn->select_rect = btn->image_rect = btn->anim[0]->pos;

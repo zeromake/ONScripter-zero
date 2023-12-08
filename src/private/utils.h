@@ -25,6 +25,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <config.hpp>
 
 namespace utils {
 

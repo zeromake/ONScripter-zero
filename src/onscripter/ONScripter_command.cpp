@@ -46,40 +46,56 @@ extern "C" void smpegCallback();
 
 int ONScripter::yesnoboxCommand() {
     bool yesno_flag = true;
+    bool mesbox_flag = false;
     if (script_h.isName("okcancelbox")) yesno_flag = false;
+    if (script_h.isName("mesbox")) mesbox_flag = true;
 
-    script_h.readInt();
-    script_h.pushVariable();
+    if (!mesbox_flag) {
+        script_h.readInt();
+        script_h.pushVariable();
+    }
 
     script_h.readStr();
     const char *mes1 = script_h.saveStringBuffer();
     const char *mes2 = script_h.readStr();
     ButtonLink *tmp_button_link = root_button_link.next;
     root_button_link.next = NULL;
-    buildDialog(yesno_flag, mes1, mes2);
+    int flags = 0;
+    if (yesno_flag) {
+        flags |= 1;
+    }
+    if (mesbox_flag) {
+        flags |= 2;
+    }
+
+    buildDialog(flags, mes1, mes2);
 
     show_dialog_flag = true;
     dirty_rect.add(dialog_info.pos);
     flush(refreshMode());
-
-    while (1) {
+    if (mesbox_flag) {
         event_mode = WAIT_BUTTON_MODE;
         waitEvent(-1);
-
-        if (current_button_state.button == -1 ||
-            current_button_state.button == 2) {
-            script_h.setInt(&script_h.pushed_variable, 0);
-            break;
-        } else if (current_button_state.button == 1) {
-            script_h.setInt(&script_h.pushed_variable, 1);
-            break;
+    } else {
+        while (1) {
+            event_mode = WAIT_BUTTON_MODE;
+            waitEvent(-1);
+            if (current_button_state.button == -1 ||
+                current_button_state.button == 2) {
+                script_h.setInt(&script_h.pushed_variable, 0);
+                break;
+            } else if (current_button_state.button == 1) {
+                script_h.setInt(&script_h.pushed_variable, 1);
+                break;
+            }
         }
     }
-
     show_dialog_flag = false;
-    delete root_button_link.next->next;
-    delete root_button_link.next;
-    root_button_link.next = tmp_button_link;
+    if (!mesbox_flag) {
+        delete root_button_link.next->next;
+        delete root_button_link.next;
+        root_button_link.next = tmp_button_link;
+    }
     dirty_rect.add(dialog_info.pos);
     flush(refreshMode());
 
