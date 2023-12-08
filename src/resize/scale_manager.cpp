@@ -6,6 +6,14 @@ namespace onscripter {
 
 ScaleManager::ScaleManager(const int scale1, const int scale2)
     : _scale1(scale1), _scale2(scale2) {}
+
+void ScaleManager::ScaleRect(SDL_Rect &rect) {
+    if (!Has()) return;
+    rect.x = Scale(rect.x);
+    rect.y = Scale(rect.y);
+    rect.w = Scale(rect.w);
+    rect.h = Scale(rect.h);
+}
 int ScaleManager::Scale(const int value) {
     if (!Has()) return value;
     return MATH_RAND_INT((float)value * _scale1 / _scale2);

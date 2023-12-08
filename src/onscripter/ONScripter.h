@@ -757,7 +757,7 @@ class ONScripter : public ScriptParser {
     bool executeSystemYesNo(int caller, int file_no = 0);
     void setupLookbackButton();
     void executeSystemLookback();
-    void buildDialog(bool yesno_flag, const char *mes1, const char *mes2);
+    void buildDialog(int flags, const char *mes1, const char *mes2);
 
     // ----------------------------------------
     // variables and methods relevant to sound

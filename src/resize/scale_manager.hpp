@@ -2,12 +2,14 @@
 
 #include <config.hpp>
 #include <memory>
+#include <SDL.h>
 
 namespace onscripter {
 class ScaleManager {
    public:
     ScaleManager(const int scale1 = 1, const int scale2 = 1);
     ~ScaleManager(){};
+    void ScaleRect(SDL_Rect &rect);
     int Scale(const int value);
     int UnScale(const int value);
     bool Has();
