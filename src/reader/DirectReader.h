@@ -58,8 +58,8 @@ class DirectReader : public BaseReader {
     char *file_full_path;
     char *file_sub_path;
     size_t file_path_len;
-    char *capital_name;
-    char *capital_name_tmp;
+    // char *capital_name;
+    // char *capital_name_tmp;
 
     char *archive_path;
     unsigned char key_table[256];

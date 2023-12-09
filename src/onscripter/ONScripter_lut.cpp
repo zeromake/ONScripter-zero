@@ -355,6 +355,8 @@ static ONScripter::FuncLUT func_lut[] = {
     {"cell", &ONScripter::cellCommand},
     {"caption", &ONScripter::captionCommand},
     {"clear_color", &ONScripter::clear_colorCommand},
+    {"cache", &ONScripter::cacheCommand},
+    {"wait_cache", &ONScripter::wait_cacheCommand},
 
     {"btrans", &ONScripter::transbtnCommand},
     {"btnwait2", &ONScripter::btnwaitCommand},

@@ -56,9 +56,8 @@ DirectReader::DirectReader(const char *path, const unsigned char *key_table) {
     file_full_path = NULL;
     file_sub_path = NULL;
     file_path_len = 0;
-
-    capital_name = new char[MAX_FILE_NAME_LENGTH * 2 + 1]{0};
-    capital_name_tmp = new char[MAX_FILE_NAME_LENGTH * 3 + 1]{0};
+    char capital_name[FILE_NAME_BUFFER_LEN];
+    char capital_name_tmp[FILE_NAME_BUFFER_LEN];
 
     if (path) {
         archive_path = new char[strlen(path) + 1]{0};
@@ -91,9 +90,6 @@ DirectReader::DirectReader(const char *path, const unsigned char *key_table) {
 DirectReader::~DirectReader() {
     if (file_full_path) delete[] file_full_path;
     if (file_sub_path) delete[] file_sub_path;
-
-    delete[] capital_name;
-    delete[] capital_name_tmp;
     delete[] read_buf;
     delete[] decomp_buffer;
     delete[] archive_path;
@@ -319,6 +315,7 @@ int DirectReader::getRegisteredCompressionType(const char *file_name) {
     const char *ext_buf = file_name + strlen(file_name);
     while (*ext_buf != '.' && ext_buf != file_name) ext_buf--;
     ext_buf++;
+    char capital_name[FILE_NAME_BUFFER_LEN];
 
     strcpy(capital_name, ext_buf);
     for (unsigned int i = 0; i < strlen(ext_buf) + 1; i++)
@@ -347,6 +344,8 @@ FILE *DirectReader::getFileHandle(const char *file_name,
                                   size_t *length) {
     FILE *fp;
     unsigned int i;
+    char capital_name[FILE_NAME_BUFFER_LEN];
+    char capital_name_tmp[FILE_NAME_BUFFER_LEN];
 
     compression_type = NO_COMPRESSION;
     size_t len = strlen(file_name);

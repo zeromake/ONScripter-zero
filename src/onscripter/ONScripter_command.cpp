@@ -4852,7 +4852,7 @@ int ONScripter::sprintfCommand() {
         } else if (variable.type == ScriptHandler::VAR_INT) {
             value = (uintptr_t)script_h.getVariableData(variable.var_no).num;
         }
-        // TODO va_list 每种编译器可能完全不�?
+        // TODO va_list 每种编译器可能完全不同?
         memcpy(al.pa + offset, &value, ptr_size);
         offset += ptr_size;
     }
@@ -4894,5 +4894,45 @@ int ONScripter::consumeSeFadetime() {
 
 int ONScripter::clear_colorCommand() {
     script_h.readColor(&clear_color);
+    return RET_CONTINUE;
+}
+
+typedef struct CacheImage {
+    ONScripter* ons;
+    char file_name[2048];
+} CacheImage;
+
+static int cacheThread(void *args) {
+    auto data = (CacheImage*)(args);
+    defer([&data]{delete data;});
+    AnimationInfo ai;
+    ai.setImageName(data->file_name);
+    data->ons->parseTaggedString(&ai);
+    data->ons->setupAnimationInfo(&ai);
+    data->ons->cache_wg.Done();
+    return 0;
+}
+
+int ONScripter::cacheCommand() {
+    // 自动读取变量
+    script_h.nextParam();
+    while (script_h.current_variable.type != ScriptHandler::VAR_NONE) {
+        if (script_h.current_variable.type == ScriptHandler::VAR_STR) {
+            cache_wg.Add();
+            auto args = new CacheImage{this};
+            strcpy(args->file_name, script_h.current_variable_data.str);
+            SDL_CreateThread(cacheThread, "", args);
+        } else {
+            break;
+        }
+        if (!(script_h.getEndStatus() & ScriptHandler::END_COMMA)) {
+            break;
+        }
+        script_h.nextParam();
+    }
+    return RET_CONTINUE;
+}
+int ONScripter::wait_cacheCommand() {
+    cache_wg.Wait();
     return RET_CONTINUE;
 }

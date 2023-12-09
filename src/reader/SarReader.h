@@ -25,6 +25,7 @@
 #define __SAR_READER_H__
 
 #include "DirectReader.h"
+#include <mutex>
 
 class SarReader : public DirectReader {
    public:
@@ -63,6 +64,7 @@ class SarReader : public DirectReader {
     ArchiveInfo archive_info;
     ArchiveInfo *root_archive_info, *last_archive_info;
     int num_of_sar_archives;
+    std::mutex mutex;
 
     void readArchive(ArchiveInfo *ai,
                      int archive_type = ARCHIVE_TYPE_SAR,

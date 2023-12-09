@@ -37,6 +37,10 @@
 #define SEEK_END 2
 #endif
 
+#ifndef FILE_NAME_BUFFER_LEN
+#define FILE_NAME_BUFFER_LEN 4096
+#endif
+
 #define DEFAULT_DELIMITER '/'
 #define REPLACE_DELIMITER '\\'
 

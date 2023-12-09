@@ -369,6 +369,7 @@ void ONScripter::openAudio(int freq) {
 ONScripter::ONScripter() {
 #ifdef USE_IMAGE_CACHE
     imageBufferCache = onscripter::MakeUnique<onscache::ImageBufferCache>(64);
+    imageSurfaceCache = onscripter::MakeUnique<onscache::ImageSurfaceCache>(64);
 #endif
     is_script_read = false;
 

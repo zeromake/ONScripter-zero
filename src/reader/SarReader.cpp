@@ -426,6 +426,7 @@ int SarReader::getNumFiles() {
 
 int SarReader::getIndexFromFile(ArchiveInfo *ai, const char *file_name) {
     unsigned int i, len;
+    char capital_name[FILE_NAME_BUFFER_LEN];
 
     len = strlen(file_name);
     if (len > MAX_FILE_NAME_LENGTH) len = MAX_FILE_NAME_LENGTH;
@@ -494,9 +495,11 @@ size_t SarReader::getFileSubByIndex(ArchiveInfo *ai,
     } else if (type == SPB_COMPRESSION) {
         return decodeSPB(ai->file_handle, ai->fi_list[i].offset, buf);
     }
-
+    // 需要保护多线程
+    mutex.lock();
     fseek(ai->file_handle, ai->fi_list[i].offset, SEEK_SET);
     size_t ret = fread(buf, 1, ai->fi_list[i].length, ai->file_handle);
+    mutex.unlock();
     if (key_table_flag)
         for (size_t j = 0; j < ret; j++) buf[j] = key_table[buf[j]];
     return ret;

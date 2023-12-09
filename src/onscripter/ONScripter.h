@@ -35,6 +35,7 @@
 #include "ScriptParser.h"
 #include "ons_cache.h"
 #include "renderer/gles_renderer.h"
+#include "private/waitgroup.hpp"
 
 #if defined(USE_SMPEG)
 #include <smpeg.h>
@@ -340,6 +341,8 @@ class ONScripter : public ScriptParser {
                        int rot,
                        int alpha);
     void NSDSetSpriteCommand(int spnum, int texnum, const char *tag);
+    int cacheCommand();
+    int wait_cacheCommand();
 
     void stopSMPEG();
     void updateEffectDst();
@@ -385,6 +388,7 @@ class ONScripter : public ScriptParser {
 
 #ifdef USE_IMAGE_CACHE
     onscripter::UniquePtr<onscache::ImageBufferCache> imageBufferCache;
+    onscripter::UniquePtr<onscache::ImageSurfaceCache> imageSurfaceCache;
 #endif
     // variables relevant to button
     ButtonState current_button_state, last_mouse_state;
@@ -467,8 +471,11 @@ class ONScripter : public ScriptParser {
     AnimationInfo *getSpriteInfo(int no) { return &sprite_info[no]; };
     AnimationInfo *getSprite2Info(int no) { return &sprite2_info[no]; };
     Uint32 getTextureFormat() { return texture_format; };
+    void parseTaggedString(AnimationInfo *anim);
+    void setupAnimationInfo(AnimationInfo *anim, _FontInfo *info = NULL);
     bool prev_chunk_skip[ONS_MIX_CHANNELS + ONS_MIX_EXTRA_CHANNELS];
     int force_render_ratio1, force_render_ratio2;
+    WaitGroup cache_wg;
 
    private:
     int parseLine();
@@ -518,10 +525,8 @@ class ONScripter : public ScriptParser {
 
     int calcDurationToNextAnimation();
     void proceedAnimation(int current_time);
-    void setupAnimationInfo(AnimationInfo *anim, _FontInfo *info = NULL);
     SDL_Surface *loadAnimationImage(AnimationInfo *anim);
     SDL_Surface *inlineLoadImage(AnimationInfo *anim, const char *file_name);
-    void parseTaggedString(AnimationInfo *anim);
     void drawTaggedSurface(SDL_Surface *dst_surface,
                            AnimationInfo *anim,
                            SDL_Rect &clip);

@@ -258,7 +258,7 @@ target("onscripter")
         "src/language/*.cpp",
         "src/private/*.cpp"
     )
-    add_files("src/resize/*.cpp")
+    add_files("src/resize/*.c", "src/resize/*.cpp")
     remove_files("src/AVIWrapper.cpp")
     after_build(function (target)
         if target:is_plat("android") then
