@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <infra/filesystem.hpp>
 #include <string>
 #include <vector>
 
@@ -33,7 +32,7 @@ bool endsWith(const std::string &str, const std::string suffix) {
 }
 
 std::string normalPath(const std::string p) {
-    std::fs::path path(p);
+    onscripter::fs::path path(p);
     return path.string();
 }
 
@@ -116,14 +115,14 @@ int processFile(NsaReader::ArchiveInfo *ai,
     return 0;
 }
 
-int file_iterator(std::fs::path dirPath, std::vector<std::string> &files) {
+int file_iterator(onscripter::fs::path dirPath, onscripter::Vector<onscripter::String> &files) {
     int code = 0;
-    for (auto &itr : std::fs::directory_iterator(dirPath)) {
+    for (auto &itr : onscripter::fs::directory_iterator(dirPath)) {
         if (!startsWith(itr.path().string(), "..") &&
             startsWith(itr.path().string(), ".")) {
             continue;
         }
-        if (std::fs::is_directory(itr.status())) {
+        if (onscripter::fs::is_directory(itr.status())) {
             code = file_iterator(itr.path(), files);
             if (code != 0) {
                 return code;
@@ -137,7 +136,6 @@ int file_iterator(std::fs::path dirPath, std::vector<std::string> &files) {
 
 // https://github.com/playmer/onscripter-en/blob/22135bb2ac543cfad5b9e6b6b5820cb219a48ca3/tools/arcmake.cpp
 int main(int argc, char *argv[]) {
-    coding2utf16->init();
     argc--;  // skip command name
     argv++;
     unsigned int nsa_offset = 0;
@@ -168,16 +166,15 @@ int main(int argc, char *argv[]) {
         argc--;
         argv++;
     }
-    std::error_code ec;
-    std::string basePath = argv[0];
+    onscripter::String basePath = argv[0];
 
-    std::fs::path dirPath(basePath);
+    onscripter::fs::path dirPath(basePath);
 
-    if (!std::fs::exists(dirPath)) {
+    if (!onscripter::fs::exists(dirPath)) {
         fprintf(stderr, "can't find dir %s.\n", basePath.c_str());
         exit(-1);
     }
-    std::string output = argv[1];
+    onscripter::String output = argv[1];
     if (archive_type == 0) {
         if (endsWith(output, ".ns2")) {
             nsa_offset = 1;
@@ -198,7 +195,7 @@ int main(int argc, char *argv[]) {
         cSR.openForCreate(output.c_str(), archive_type, nsa_offset);
     sAI->flags = archive_flags;
 
-    std::vector<std::string> files;
+    onscripter::Vector<onscripter::String> files;
     int code = file_iterator(dirPath, files);
     if (code != 0) {
         fprintf(stderr, "file iter error.\n");

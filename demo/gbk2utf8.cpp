@@ -15,7 +15,7 @@
 // https://uic.io/en/charset/show/shift_jis/
 
 static auto cd = iconv_open("UTF-8", "GBK");
-auto coding2utf16 = new GBK2UTF16();
+Coding2UTF16 coding2utf16 = new GBK2UTF16();
 
 void gb_to_utf8(char* src, char* dst, size_t len) {
     int ret = 0;

@@ -308,8 +308,6 @@ void ONScripter::initSDL() {
     screen_rect.x = screen_rect.y = 0;
     screen_rect.w = screen_width;
     screen_rect.h = screen_height;
-
-    coding2utf16->init();
     if (!isnan(sharpness)) {
         float input_size[2] = {(float)screen_width, (float)screen_height};
         float output_size[2] = {(float)render_view_rect.w,

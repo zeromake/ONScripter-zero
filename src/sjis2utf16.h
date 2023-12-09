@@ -26,10 +26,18 @@
 
 class SJIS2UTF16 : public Coding2UTF16 {
    public:
-    void init() final;
+    SJIS2UTF16() {init();};
     void init_static_string();
     uint16_t conv2UTF16(uint16_t) const final;
     uint16_t convUTF162Coding(uint16_t) const final;
+   private:
+    void init();
+    static onscripter::Vector<uint16_t> sjis_2_utf16;
+    static onscripter::Vector<unsigned short> utf16_2_sjis_00;
+    static onscripter::Vector<unsigned short> utf16_2_sjis_1e;
+    static onscripter::Vector<unsigned short> utf16_2_sjis_20;
+    static onscripter::Vector<unsigned short> utf16_2_sjis_f9;
+    static onscripter::Vector<unsigned short> utf16_2_sjis_ff;
 };
 
 #endif

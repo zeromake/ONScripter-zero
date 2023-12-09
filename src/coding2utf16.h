@@ -23,6 +23,7 @@
 #define __CODING2UTF16_H__
 
 #include <stdint.h>
+#include <config.hpp>
 
 class Coding2UTF16 {
    public:
@@ -45,7 +46,6 @@ class Coding2UTF16 {
     static char MESSAGE_NO[8];
     static char MESSAGE_OK[8];
     static char MESSAGE_CANCEL[12];
-    virtual void init() = 0;
     virtual uint16_t conv2UTF16(uint16_t) const = 0;
     virtual uint16_t convUTF162Coding(uint16_t) const = 0;
     int convUTF16ToUTF8(unsigned char *, uint16_t) const;

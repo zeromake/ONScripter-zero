@@ -26,9 +26,6 @@
 static const uint16_t CODINGLEFT = 0x8140, CODINGRIGHT = 0xfefe;
 static const uint16_t UTF16_CONINGLIFT = 0x00a4, UTF16_CODINGRIGHT = 0xffe5;
 
-static unsigned short *utf16_2_gbk_4e;
-
-static uint16_t *gbk_2_utf16 = nullptr;
 static uint16_t gbk_2_utf16_org[][2] = {{0x8140, 0x4e02},
                                         {0x8141, 0x4e04},
                                         {0x8142, 0x4e05},
@@ -23971,7 +23968,11 @@ static uint16_t gbk_2_utf16_org[][2] = {{0x8140, 0x4e02},
                                         {0xfefe, 0xe4c5},
                                         {0, 0}};
 
+onscripter::Vector<uint16_t> GBK2UTF16::gbk_2_utf16;
+onscripter::Vector<unsigned short> GBK2UTF16::utf16_2_gbk_4e;
+
 void GBK2UTF16::init() {
+    if (!gbk_2_utf16.empty()) return;
     // strcpy(space, "　");
     // strcpy(minus, "－");
     // strcpy(bracket,"【】");
@@ -23993,8 +23994,8 @@ void GBK2UTF16::init() {
     // strcpy(MESSAGE_CANCEL, "取消");
     init_static_string();
 
-    gbk_2_utf16 = new uint16_t[CODINGRIGHT - CODINGLEFT + 1];
-    utf16_2_gbk_4e = new uint16_t[UTF16_CODINGRIGHT - UTF16_CONINGLIFT + 1];
+    gbk_2_utf16.resize(CODINGRIGHT - CODINGLEFT + 1);
+    utf16_2_gbk_4e.resize(UTF16_CODINGRIGHT - UTF16_CONINGLIFT + 1);
 
     int i = 0;
 
@@ -24009,11 +24010,13 @@ void GBK2UTF16::init() {
 }
 
 uint16_t GBK2UTF16::conv2UTF16(uint16_t in) const {
-    return gbk_2_utf16[in - CODINGLEFT];
+    if (in >= CODINGLEFT && in <= CODINGRIGHT)
+        return gbk_2_utf16[in - CODINGLEFT];
+    return 0xa1f5;
 }
 
 uint16_t GBK2UTF16::convUTF162Coding(uint16_t in) const {
     if (in >= UTF16_CONINGLIFT && in <= UTF16_CODINGRIGHT)
         return utf16_2_gbk_4e[in - UTF16_CONINGLIFT];
-    return 0x0000;
+    return 0x25a1;
 }
