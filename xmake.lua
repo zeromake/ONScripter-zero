@@ -352,6 +352,7 @@ target("nsaenc")
     use_binary()
     add_packages("bzip2", "jpeg")
     add_files(
+        "src/config.cpp",
         "src/charset/*.c",
         "src/tools/nsaenc.cpp",
         "src/coding2utf16.cpp",
@@ -369,6 +370,7 @@ target("nsadec")
     use_binary()
     add_packages("bzip2")
     add_files(
+        "src/config.cpp",
         "src/charset/*.c",
         "src/tools/nsadec.cpp",
         "src/coding2utf16.cpp",
@@ -385,6 +387,7 @@ target("arcmake")
     use_binary()
     add_packages("bzip2", "jpeg")
     add_files(
+        "src/config.cpp",
         "src/tools/arcmake.cpp",
         "src/coding2utf16.cpp",
         "src/gbk2utf16.cpp",

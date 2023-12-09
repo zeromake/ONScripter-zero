@@ -24,13 +24,6 @@
 #include <string.h>
 
 static const uint16_t CODINGLEFT = 0x8140, CODINGRIGHT = 0xfcfc;
-static uint16_t *sjis_2_utf16;
-
-static unsigned short *utf16_2_sjis_00;
-static unsigned short *utf16_2_sjis_1e;
-static unsigned short *utf16_2_sjis_20;
-static unsigned short *utf16_2_sjis_f9;
-static unsigned short *utf16_2_sjis_ff;
 
 static uint16_t sjis_2_utf16_org[][2] = {{0x8140, 0x3000},
                                          {0x8141, 0x3001},
@@ -11409,7 +11402,15 @@ static uint16_t sjis_2_utf16_org[][2] = {{0x8140, 0x3000},
                                          {0xfcfc, 0xffff},
                                          {0, 0}};
 
+onscripter::Vector<uint16_t> SJIS2UTF16::sjis_2_utf16;
+onscripter::Vector<unsigned short> SJIS2UTF16::utf16_2_sjis_00;
+onscripter::Vector<unsigned short> SJIS2UTF16::utf16_2_sjis_1e;
+onscripter::Vector<unsigned short> SJIS2UTF16::utf16_2_sjis_20;
+onscripter::Vector<unsigned short> SJIS2UTF16::utf16_2_sjis_f9;
+onscripter::Vector<unsigned short> SJIS2UTF16::utf16_2_sjis_ff;
+
 void SJIS2UTF16::init() {
+    if (!sjis_2_utf16.empty()) return;
     // strcpy(space,"　");
     // strcpy(minus,"－");
     // strcpy(bracket,"【】");
@@ -11433,13 +11434,13 @@ void SJIS2UTF16::init() {
 
     int i = 0;
 
-    sjis_2_utf16 = new unsigned short[0xfcfc - 0x8140 + 1];
+    sjis_2_utf16.resize(0xfcfc - 0x8140 + 1);
 
-    utf16_2_sjis_00 = new unsigned short[0x0500];
-    utf16_2_sjis_1e = new unsigned short[0x0200];
-    utf16_2_sjis_20 = new unsigned short[0x8000];
-    utf16_2_sjis_f9 = new unsigned short[0x0200];
-    utf16_2_sjis_ff = new unsigned short[0x0100];
+    utf16_2_sjis_00.resize(0x0500);
+    utf16_2_sjis_1e.resize(0x0200);
+    utf16_2_sjis_20.resize(0x8000);
+    utf16_2_sjis_f9.resize(0x0200);
+    utf16_2_sjis_ff.resize(0x0100);
 
     while (sjis_2_utf16_org[i][0]) {
         unsigned short sjis = sjis_2_utf16_org[i][0];
