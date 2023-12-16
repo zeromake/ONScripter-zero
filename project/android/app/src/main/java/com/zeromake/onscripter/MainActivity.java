@@ -329,6 +329,8 @@ public class MainActivity extends Activity implements
             extras.putStringArray(ONScripter.ARGS_KEY, new String[]{
                     "-r",
                     selectedItem.path,
+                    "--scale-mode",
+                    "1",
                     "--scale-window",
                     "--fontcache",
 //                    "--font-config",
