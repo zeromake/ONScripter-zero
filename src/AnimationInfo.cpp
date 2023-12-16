@@ -149,6 +149,7 @@ void AnimationInfo::reset() {
     mat[0][1] = 0;
     mat[1][0] = 0;
     mat[1][1] = 1024;
+    has_scale = nullptr;
 
 #ifdef USE_BUILTIN_LAYER_EFFECTS
     layer_no = -1;
@@ -518,7 +519,6 @@ inline void rainAddBlend32(const Uint32 *src_buffer,
 void AnimationInfo::blendOnSurface(
     SDL_Surface *dst_surface, int dst_x, int dst_y, SDL_Rect &clip, int alpha) {
     if (image_surface == NULL) return;
-
     SDL_Rect dst_rect, src_rect;
     dst_rect.x = dst_x;
     dst_rect.y = dst_y;
@@ -526,140 +526,22 @@ void AnimationInfo::blendOnSurface(
     dst_rect.h = pos.h;
     if (doClipping(&dst_rect, &clip, &src_rect)) return;
     if (alpha == 0) return;
-
-    /* ---------------------------------------- */
-
-    SDL_mutexP(mutex);
-    SDL_LockSurface(dst_surface);
-    SDL_LockSurface(image_surface);
-
-    alpha &= 0xff;
-    int pitch = image_surface->pitch / sizeof(ONSBuf);
-
-    struct Blender {
-        ONSBuf *const stsrc_buffer, *const stdst_buffer;
-        const int alpha, dst_rect_w, dst_rect_h, pitch, dst_surface_w,
-            blendmode;
-
-        void operator()(const int i) const {
-            const ONSBuf *src_buffer = stsrc_buffer + (pitch)*i;
-            ONSBuf *dst_buffer = stdst_buffer + (dst_surface_w)*i;
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-            unsigned char *alphap = (unsigned char *)src_buffer + 3;
-#else
-            unsigned char *alphap = (unsigned char *)src_buffer;
-#endif  // SDL_BYTEORDER == SDL_LIL_ENDIAN
-#ifdef USE_BUILTIN_LAYER_EFFECTS
-            if (blendmode == AnimationInfo::BLEND_ADD) {
-#ifdef USE_SIMD
-                rainAddBlend32(src_buffer, dst_buffer, dst_rect_w);
-#else
-                for (int j = dst_rect_w; j != 0;
-                     j--, src_buffer++, dst_buffer++) {
-                    if (*src_buffer != AMASK)
-                        rainAddBlendPixel32(src_buffer, dst_buffer);
-                }
-#endif  // USE_SIMD
-            } else
-#endif
-#ifdef USE_SIMD
-            {
-                using namespace simd;
-#ifdef USE_SIMD_X86_AVX2
-                ivec256 zero = ivec256::zero();
-                uint8x32 mask = uint8x32::set8(3, 7, 11, 15, 19, 23, 27, 31);
-                uint8x32 amask =
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-                    uint8x32::set(0, 0, 0, 0xFF);
-#else
-                    uint8x32::set(0xFF, 0, 0, 0);
-#endif
-                ivec128 zerol = zero.lo();
-                uint8x16 maskl = mask.lo();
-                uint8x16 amaskl = amask.lo();
-#else
-                ivec128 zerol = ivec128::zero();
-                uint8x16 maskl = uint8x16::set4(3, 7, 11, 15);
-                uint8x16 amaskl =
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-                    uint8x16::set(0, 0, 0, 0xFF);
-#else
-                    uint8x16::set(0xFF, 0, 0, 0);
-#endif
-#endif
-                int remain = dst_rect_w;
-                while (remain > 0) {
-                    if (*alphap == 0) {
-                        --remain;
-                        ++src_buffer;
-                        ++dst_buffer;
-                        alphap += 4;
-                    } else if ((*alphap == 255) && (alpha == 255)) {
-                        *dst_buffer = *src_buffer;
-                        --remain;
-                        ++src_buffer;
-                        ++dst_buffer;
-                        alphap += 4;
-                    }
-#ifdef USE_SIMD_X86_AVX2
-                    else if (remain >= 8) {
-                        blend8Pixel32(src_buffer,
-                                      dst_buffer,
-                                      uint16x16(alpha),
-                                      mask,
-                                      zero,
-                                      amask);
-                        remain -= 8;
-                        src_buffer += 8;
-                        dst_buffer += 8;
-                        alphap += 32;
-                    }
-#endif
-                    else if (remain >= 4) {
-                        blend4Pixel32(src_buffer,
-                                      dst_buffer,
-                                      uint16x8(alpha),
-                                      maskl,
-                                      zerol,
-                                      amaskl);
-                        remain -= 4;
-                        src_buffer += 4;
-                        dst_buffer += 4;
-                        alphap += 16;
-                    } else {
-                        BLEND_PIXEL();
-                        --remain;
-                        ++src_buffer;
-                        ++dst_buffer;
-                    }
-                }
-            }
-#else
-            for (int j = dst_rect_w; j != 0; j--, src_buffer++, dst_buffer++) {
-                BLEND_PIXEL();
-            }
-#endif
-        }
-    } blender = {(ONSBuf *)image_surface->pixels + pitch * src_rect.y +
-                     image_surface->w * current_cell / num_of_cells +
-                     src_rect.x,
-                 (ONSBuf *)dst_surface->pixels + dst_surface->w * dst_rect.y +
-                     dst_rect.x,
-                 alpha,
-                 dst_rect.w,
-                 dst_rect.h,
-                 pitch,
-                 dst_surface->w,
-                 blending_mode};
-#if defined(USE_PARALLEL) || defined(USE_OMP_PARALLEL)
-    parallel::For(0, dst_rect.h, 1, blender, dst_rect.h * dst_rect.w);
-#else
-    for (int i = 0; i < dst_rect.h; i++) blender(i);
-#endif
-
-    SDL_UnlockSurface(image_surface);
-    SDL_UnlockSurface(dst_surface);
-    SDL_mutexV(mutex);
+    if (has_scale) {
+        has_scale->UnScaleRect(src_rect);
+    }
+    if (blending_mode == AnimationInfo::BLEND_NORMAL) {
+        SDL_SetSurfaceBlendMode(image_surface, SDL_BLENDMODE_BLEND);
+    } else if (blending_mode == AnimationInfo::BLEND_ADD) {
+        SDL_SetSurfaceBlendMode(image_surface, SDL_BLENDMODE_ADD);
+    } else if (blending_mode == AnimationInfo::BLEND_SUB) {
+        SDL_SetSurfaceBlendMode(image_surface, SDL_BLENDMODE_NONE);
+    }
+    if (has_scale) {
+        SDL_UpperBlitScaled(image_surface, &src_rect, dst_surface, &dst_rect);
+    } else {
+        SDL_UpperBlit(image_surface, &src_rect, dst_surface, &dst_rect);
+    }
+    return;
 }
 
 void AnimationInfo::blendOnSurface2(

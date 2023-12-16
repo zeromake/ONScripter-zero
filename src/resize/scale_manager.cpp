@@ -14,6 +14,14 @@ void ScaleManager::ScaleRect(SDL_Rect &rect) {
     rect.w = Scale(rect.w);
     rect.h = Scale(rect.h);
 }
+
+void ScaleManager::UnScaleRect(SDL_Rect &rect) {
+    if (!Has()) return;
+    rect.x = UnScale(rect.x);
+    rect.y = UnScale(rect.y);
+    rect.w = UnScale(rect.w);
+    rect.h = UnScale(rect.h);
+}
 int ScaleManager::Scale(const int value) {
     if (!Has()) return value;
     return MATH_RAND_INT((float)value * _scale1 / _scale2);

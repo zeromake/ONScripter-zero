@@ -96,6 +96,7 @@ class ONScripter : public ScriptParser {
     void setWindowMode();
     void setVsyncOff();
     void setScaleToWindow();
+    void setScaleMode(int mode);
     void setFontCache();
     void setDebugLevel(int debug);
     void enableButtonShortCut();
@@ -385,6 +386,7 @@ class ONScripter : public ScriptParser {
     bool scaleToWindow;
     bool cacheFont;
     bool screen_dirty_flag;
+    int scaleMode = 0;
 
 #ifdef USE_IMAGE_CACHE
     onscripter::UniquePtr<onscache::ImageBufferCache> imageBufferCache;

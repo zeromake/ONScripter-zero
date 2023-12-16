@@ -322,6 +322,7 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
 
     anim->deleteSurface();
     anim->abs_flag = true;
+    anim->has_scale = nullptr;
 
 #ifdef USE_BUILTIN_LAYER_EFFECTS
     if (anim->trans_mode != AnimationInfo::TRANS_LAYER)
@@ -415,34 +416,26 @@ void ONScripter::setupAnimationInfo(AnimationInfo *anim, _FontInfo *info) {
     }
 #endif
     else {
-        SDL_Surface *surface = NULL;
-#ifdef USE_IMAGE_CACHE
-        if (screen_scale->Has()) {
-            if (imageSurfaceCache->Cached(anim->file_name)) {
-                auto cached = imageSurfaceCache->Get(anim->file_name);
-                surface = cached->CreateSurface();
-            }
-        }
-#endif
-        if (surface == NULL) {
-            surface = loadAnimationImage(anim);
-            if (surface && screen_scale->Has()) {
-                SDL_Surface *src_s = surface;
-                int w, h;
-                if ((w = screen_scale->Scale(src_s->w)) == 0) w = 1;
-                if ((h = screen_scale->Scale(src_s->h)) == 0) h = 1;
-                SDL_PixelFormat *fmt = image_surface->format;
-                surface = SDL_CreateRGBSurfaceWithFormat(
-                    SDL_SWSURFACE, w, h, fmt->BitsPerPixel, fmt->format);
-                resizeSurface(src_s, surface);
-                SDL_FreeSurface(src_s);
-#ifdef USE_IMAGE_CACHE
-                if (anim->file_name)
-                    imageSurfaceCache->Put(anim->file_name, std::move(onscripter::MakeShared<onscache::SurfaceNode>(surface)));
-#endif
-            }
+        SDL_Surface *surface = loadAnimationImage(anim);
+        bool use_scale = false;
+        if (surface != NULL && screen_scale->Has() && (anim->affine_flag || scaleMode == 0)) {
+            SDL_Surface *src_s = surface;
+            int w, h;
+            if ((w = screen_scale->Scale(src_s->w)) == 0) w = 1;
+            if ((h = screen_scale->Scale(src_s->h)) == 0) h = 1;
+            SDL_PixelFormat *fmt = image_surface->format;
+            surface = SDL_CreateRGBSurfaceWithFormat(
+                SDL_SWSURFACE, w, h, fmt->BitsPerPixel, fmt->format);
+            resizeSurface(src_s, surface);
+            SDL_FreeSurface(src_s);
+            use_scale = true;
         }
         anim->setImage(surface, texture_format);
+        if (surface && screen_scale->Has() && !use_scale) {
+            anim->has_scale = screen_scale;
+            anim->pos.w = screen_scale->Scale(anim->pos.w);
+            anim->pos.h = screen_scale->Scale(anim->pos.h);
+        }
     }
 }
 

@@ -326,6 +326,11 @@ void parseOption(int argc, char *argv[]) {
                 // 强制缩放渲染到窗口大小，与 rescale 选项同时用时 rescale
                 // 生效，scale-window 失效
                 ons.setScaleToWindow();
+            } else if (!strcmp(argv[0] + 1, "-scale-mode")) {
+                argc--;
+                argv++;
+                int scale_mode = atoi(argv[0]);
+                ons.setScaleMode(scale_mode);
             } else if (!strcmp(argv[0] + 1, "-font-config")) {
                 argc--;
                 argv++;

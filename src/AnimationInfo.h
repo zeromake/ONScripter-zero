@@ -116,6 +116,8 @@ class AnimationInfo {
     int max_param;  // used by bar
     int max_width;  // used by bar
 
+    onscripter::SharedPtr<onscripter::ScaleManager> has_scale = nullptr;
+
     AnimationInfo();
     AnimationInfo(const AnimationInfo &anim);
     ~AnimationInfo();

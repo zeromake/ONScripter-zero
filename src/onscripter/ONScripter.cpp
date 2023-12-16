@@ -468,6 +468,7 @@ void ONScripter::setSharpness(float sharpness) {
 void ONScripter::setVsyncOff() { vsync = false; }
 
 void ONScripter::setScaleToWindow() { scaleToWindow = true; }
+void ONScripter::setScaleMode(int mode){ scaleMode = mode; }
 
 void ONScripter::setFontCache() { cacheFont = true; }
 

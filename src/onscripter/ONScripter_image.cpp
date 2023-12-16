@@ -1015,7 +1015,7 @@ void ONScripter::createBackground() {
         anim.trans_mode = AnimationInfo::TRANS_NONE;
 #endif
         // svg 适配
-        anim.setLoadSize(screen_width, screen_height);
+        // anim.setLoadSize(screen_width, screen_height);
         setupAnimationInfo(&anim);
         bg_info.fill(clear_color.rgba[0],
                      clear_color.rgba[1],
@@ -1026,24 +1026,35 @@ void ONScripter::createBackground() {
             src_rect.x = src_rect.y = 0;
             src_rect.w = anim.image_surface->w;
             src_rect.h = anim.image_surface->h;
-            SDL_Rect dst_rect = {0, 0};
-            if (screen_width >= anim.image_surface->w) {
-                dst_rect.x = (screen_width - anim.image_surface->w) / 2;
+            if (screen_scale->Has() && scaleMode == 1) {
+                screen_scale->ScaleRect(src_rect);
+            }
+            SDL_Rect dst_rect = {0, 0, screen_width, screen_height};
+            if (screen_width >= src_rect.w) {
+                dst_rect.x = (screen_width - src_rect.w) / 2;
             } else {
-                src_rect.x = (anim.image_surface->w - screen_width) / 2;
+                src_rect.x = (src_rect.w - screen_width) / 2;
                 src_rect.w = screen_width;
             }
-            if (screen_height >= anim.image_surface->h) {
-                dst_rect.y = (screen_height - anim.image_surface->h) / 2;
+            if (screen_height >= src_rect.h) {
+                dst_rect.y = (screen_height - src_rect.h) / 2;
             } else {
-                src_rect.y = (anim.image_surface->h - screen_height) / 2;
+                src_rect.y = (src_rect.h - screen_height) / 2;
                 src_rect.h = screen_height;
             }
-            SDL_UpperBlit(anim.image_surface,
+            if (screen_scale->Has() && scaleMode == 1) {
+                screen_scale->UnScaleRect(src_rect);
+                SDL_UpperBlitScaled(anim.image_surface,
                           &src_rect,
                           bg_info.image_surface,
                           &dst_rect);
-            // bg_info.copySurface(anim.image_surface, &src_rect, &dst_rect);
+            } else {
+                SDL_UpperBlit(anim.image_surface,
+                          &src_rect,
+                          bg_info.image_surface,
+                          &dst_rect);
+            }
+
         }
         return;
     }
