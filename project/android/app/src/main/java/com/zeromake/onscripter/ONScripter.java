@@ -18,10 +18,10 @@ public class ONScripter extends SDLActivity {
     private String[]  arguments;
     private String rootPath = null;
 
-    @Override
-    protected boolean initWindowStyle() {
-        return false;
-    }
+    // @Override
+    // protected boolean initWindowStyle() {
+    //     return false;
+    // }
 
     @Override
     protected String[] getLibraries() {
