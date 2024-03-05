@@ -27,6 +27,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复方法调用的参数没有消费被渲染为文本。
 - [x] 修复 getparam 的多余声明参数没有消费被渲染为文本。
 - [x] 修复 playSound 里的 SDL_RW 没有正确回收。
+- [x] 修复多层 for 的 break 无法正确的消费 next 命令
 - [ ] 自动播放会导致音频播放不完整。
 
 ## feture
@@ -79,6 +80,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
     - [x] `crop`，对图片做矩形切割，示例 `@crop:xxx.png 0 0 48 48` 或者 `@xxx.png|crop:0 0 48 48` （来自管道时不能再由 crop 加载图片）
     - [x] 所有表达式支持管道式操作，前一个会的结果被作为后一个的输入
     - [x] 需要重新处理 std::stringstream 对下一个输出的类型的判断方式，否则会导致 `1.png` 这个当作数字。
+- [x] 为 for 添加 `continue` 指令支持（什么也不用做直接把 next 做一个 continue 别名即可）。
 - [ ] 文字渲染范围改为一个矩形坐标，不再使用横向纵向多少个字符的方式(设置依旧生效但是会转化为一个矩形坐标)。
 - [ ] 脚本全部切换到 utf-8 的处理，仅在读取时做 gbk,shift_jis 到 utf-8 转换。
 - [ ] 支持为字体设置多个 fallback 字体，并默认内置系统字体 fallback。
