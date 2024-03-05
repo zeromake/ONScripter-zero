@@ -17,11 +17,11 @@ int32_t charset_ucs4_to_utf16(const uint32_t ch, uint8_t *out, bool be) {
     } else {
         uint32_t swap_ch = ch - 0x0010000;
         if (be) {
-            static_write_u16_be(p, (swap_ch >> 10) + 0xd800);
-            static_write_u16_be(p, (swap_ch & 0x3ff) + 0xdc00);
+            static_write_u16_be(p, ((swap_ch >> 10) + 0xd800));
+            static_write_u16_be(p, ((swap_ch & 0x3ff) + 0xdc00));
         } else {
-            static_write_u16_le(p, (swap_ch >> 10) + 0xd800);
-            static_write_u16_le(p, (swap_ch & 0x3ff) + 0xdc00);
+            static_write_u16_le(p, ((swap_ch >> 10) + 0xd800));
+            static_write_u16_le(p, ((swap_ch & 0x3ff) + 0xdc00));
         }
     }
     return p - out;
