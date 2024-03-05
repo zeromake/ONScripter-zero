@@ -71,7 +71,7 @@ local deps = {
     "sdl2_mixer",
     "brotli",
     "ghc_filesystem",
-    -- "luajit",
+    "luajit",
     "stb",
     "fmt"
 }
@@ -93,15 +93,6 @@ add_requireconfs("sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
 add_requireconfs("**.freetype", {system=false})
-if not is_plat("iphoneos") then
-    local raviConfigs = {}
-    if is_plat("iphoneos") then
-        raviConfigs.jit = false
-    end
-    add_requires("ravi", {system=false, configs=raviConfigs})
-else
-    add_requires("luajit", {system=false})
-end
 add_requires("freetype", {
     system=false,
     configs={
@@ -176,13 +167,9 @@ target("onscripter")
         "brotli",
         "ghc_filesystem",
         "stb",
-        "fmt"
+        "fmt",
+        "luajit"
     )
-    if not is_plat("iphoneos") then
-        add_packages("ravi")
-    else
-        add_packages("luajit")
-    end
     add_defines("ONSCRIPTER_EXTEND_INIT=1")
     add_files("src/entry/onscripter_main.cpp")
     if not is_plat("windows", "mingw") then
