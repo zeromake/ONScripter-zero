@@ -556,6 +556,7 @@ int ScriptParser::nextCommand() {
     if (!last_nest_info->previous || last_nest_info->nest_mode != NestInfo::FOR)
         errorAndExit("next: not in for loop\n");
 
+    bool isContinue = script_h.isName("continue");
     int val;
     if (!break_flag) {
         val = script_h.getVariableData(last_nest_info->var_no).num;
@@ -567,11 +568,15 @@ int ScriptParser::nextCommand() {
 
     if (break_flag || (last_nest_info->step > 0 && val > last_nest_info->to) ||
         (last_nest_info->step < 0 && val < last_nest_info->to)) {
-        break_flag = 0;
-        last_nest_info = last_nest_info->previous;
-
-        delete last_nest_info->next;
-        last_nest_info->next = NULL;
+        if (isContinue) {
+            // 跳出到 next 去销毁
+            break_flag = 1;
+        } else {
+            break_flag = 0;
+            last_nest_info = last_nest_info->previous;
+            delete last_nest_info->next;
+            last_nest_info->next = NULL;
+        }
     } else {
         script_h.setCurrent(last_nest_info->next_script);
         current_label_info =
