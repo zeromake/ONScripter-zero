@@ -1,8 +1,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define static_write_u16_be(out, ch) *out++ = (ch >> 8 & 0xffff);*out++ = (ch & 0xffff)
-#define static_write_u16_le(out, ch) *out++ = (ch & 0xffff);*out++ = (ch >> 8 & 0xffff)
+#define static_write_u16_be(out, ch) *out++ = (uint8_t)(ch >> 8 & 0xffff);*out++ = (uint8_t)(ch & 0xffff)
+#define static_write_u16_le(out, ch) *out++ = (uint8_t)(ch & 0xffff);*out++ = (uint8_t)(ch >> 8 & 0xffff)
 #define static_read_u16_be(in) in[0] | in[1] << 8
 #define static_read_u16_le(in) in[0] << 8 | in[1]
 
