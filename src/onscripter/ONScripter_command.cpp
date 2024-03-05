@@ -1809,7 +1809,7 @@ int ONScripter::loadgameCommand() {
         line_enter_status = 0;
         page_enter_status = 0;
         string_buffer_offset = 0;
-        break_flag = false;
+        break_flag = 0;
 
         flushEvent();
 
@@ -4880,6 +4880,45 @@ int ONScripter::sprintfCommand() {
         sprintf_buf, sprintf_buf_size, format, args.size(), args.data());
 #endif
     setStr(&script_h.getVariableData(out_variable.var_no).str, sprintf_buf);
+    args.clear();
+    return RET_CONTINUE;
+}
+
+int ONScripter::logiCommand() {
+    script_h.readVariable();
+    const char *format = script_h.readStr();
+    auto out_variable = script_h.current_variable;
+    const int sprintf_buf_size = 4096;
+    if (!sprintf_buf) {
+        sprintf_buf = new char[sprintf_buf_size]{0};
+    } else {
+        sprintf_buf[0] = '\0';
+    }
+    onscripter::Vector<void *> args;
+    while (script_h.getEndStatus() & ScriptHandler::END_COMMA) {
+        script_h.readVariable();
+        void *value = nullptr;
+        if (script_h.current_variable.type == ScriptHandler::VAR_STR) {
+            value =
+                script_h.getVariableData(script_h.current_variable.var_no).str;
+        } else if (script_h.current_variable.type == ScriptHandler::VAR_INT) {
+            value = (void *)(intptr_t)(script_h
+                                           .getVariableData(
+                                               script_h.current_variable.var_no)
+                                           .num);
+        } else {
+            utils::printError("sprintf only support string,int\n");
+            return RET_CONTINUE;
+        }
+        args.push_back(value);
+    }
+    ons_sprintf(
+        sprintf_buf, sprintf_buf_size, format, args.size(), args.data());
+    const std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S");
+    utils::printInfo("[%s]\t%s\n", ss.str().c_str(), sprintf_buf);
     args.clear();
     return RET_CONTINUE;
 }

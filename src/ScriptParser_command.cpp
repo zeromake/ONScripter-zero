@@ -567,7 +567,7 @@ int ScriptParser::nextCommand() {
 
     if (break_flag || (last_nest_info->step > 0 && val > last_nest_info->to) ||
         (last_nest_info->step < 0 && val < last_nest_info->to)) {
-        break_flag = false;
+        break_flag = 0;
         last_nest_info = last_nest_info->previous;
 
         delete last_nest_info->next;
@@ -1207,9 +1207,9 @@ int ScriptParser::forCommand() {
 
     if ((last_nest_info->step > 0 && from > last_nest_info->to) ||
         (last_nest_info->step < 0 && from < last_nest_info->to))
-        break_flag = true;
+        break_flag = 1;
     else
-        break_flag = false;
+        break_flag = 0;
 
     /* ---------------------------------------- */
     /* Step forward callee's label info */
@@ -1433,7 +1433,7 @@ int ScriptParser::breakCommand() {
 
         setCurrentLabel(script_h.readStr() + 1);
     } else {
-        break_flag = true;
+        break_flag = 1;
     }
 
     return RET_CONTINUE;

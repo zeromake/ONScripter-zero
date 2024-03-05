@@ -394,7 +394,7 @@ bool ONScripter::executeSystemLoad() {
             line_enter_status = 0;
             page_enter_status = 0;
             string_buffer_offset = 0;
-            break_flag = false;
+            break_flag = 0;
 
             flushEvent();
 

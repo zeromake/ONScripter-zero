@@ -318,6 +318,7 @@ class ONScripter : public ScriptParser {
 
     int sefadetimeCommand();
     int sprintfCommand();
+    int logiCommand();
     int checkspCommand();
     int clear_colorCommand();
 
