@@ -1318,8 +1318,8 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
         buf = new char[strlen(p) + 1]{0};
         memcpy(buf, p, strlen(p) + 1);
         lua_pushstring(state, buf);
-    } else {
-        // 自动读取变量
+    } else if (false) {
+        // Todo 自动读取变量，之前有旧版实现已经是在 lua 再调用其他 lua 的 c 实现来读取参数不能默认开启，等加一个开关在 ns 脚本里手动开启
         sh->nextParam();
         while (sh->current_variable.type != ScriptHandler::VAR_NONE) {
             if (sh->current_variable.type == ScriptHandler::VAR_INT) {

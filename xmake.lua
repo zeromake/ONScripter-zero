@@ -45,6 +45,7 @@ if is_plat("windows") then
     add_defines("XMD_H=1")
     add_cxflags("/utf-8")
     add_cxflags("/UNICODE")
+    add_cxflags("/EHsc")
 
     if get_config("omp") then
         add_cxflags("/openmp")
