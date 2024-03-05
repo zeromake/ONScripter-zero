@@ -150,6 +150,7 @@ static ONScripter::FuncLUT func_lut[] = {
     {"nsa", &ONScripter::nsaCommand},
     {"notif", &ONScripter::ifCommand},
     {"next", &ONScripter::nextCommand},
+    {"continue", &ONScripter::nextCommand},
     {"nsa", &ONScripter::arcCommand},
     {"ns3", &ONScripter::nsaCommand},
     {"ns2", &ONScripter::nsaCommand},
@@ -408,6 +409,7 @@ static ONScripter::FuncLUT func_lut[] = {
     {"elif", &ONScripter::ifCommand},
     {"sefadetime", &ONScripter::sefadetimeCommand},
     {"sprintf", &ONScripter::sprintfCommand},
+    {"logi", &ONScripter::logiCommand},
     {"checksp", &ONScripter::checkspCommand},
 
     {"", NULL},

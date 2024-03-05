@@ -1058,7 +1058,14 @@ executeLabelTop:
             readToken();
             continue;
         }
-        if (break_flag && !script_h.isName("next")) {
+        // 双重 for 的外层无法 break 消耗了内层的 next，外层的 next 无法消费导致报错
+        if (break_flag > 0 && (!script_h.isName("next") || break_flag > 1)) {
+            if (script_h.isName("next") && break_flag > 1) {
+                break_flag--;
+            }
+            if (script_h.isName("for")) {
+                break_flag++;
+            }
             if (script_h.getStringBuffer()[string_buffer_offset] == '\n')
                 current_line++;
 

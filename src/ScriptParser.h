@@ -348,7 +348,7 @@ class ScriptParser {
 
     /* ---------------------------------------- */
     /* For loop related variables */
-    bool break_flag;
+    int break_flag;
 
     /* ---------------------------------------- */
     /* Transmode related variables */

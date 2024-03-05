@@ -244,7 +244,7 @@ void ScriptParser::reset(bool isDestroy) {
     windowchip_sprite_no = -1;
     string_buffer_offset = 0;
 
-    break_flag = false;
+    break_flag = 0;
 #ifdef ONSCRIPTER_COMPATIBLE
     trans_mode = AnimationInfo::TRANS_TOPLEFT;
 #else
