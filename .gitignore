@@ -23,3 +23,5 @@ CMakeLists.txt
 *.xcodeproj
 CMakeFiles
 CMakeScripts
+
+games
