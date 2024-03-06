@@ -1307,6 +1307,8 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
     int num_argument_value = 0;
     int num_return_value = 0;
     char *buf = NULL;
+    char* skip_params = NULL;
+    int skip_end_status = 0;
     if (strcmp(cmd2, "NSCALL_animation") == 0)
         num_return_value = 1;
     else if (strcmp(cmd2, "NSCALL_load") == 0) {
@@ -1318,8 +1320,10 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
         buf = new char[strlen(p) + 1]{0};
         memcpy(buf, p, strlen(p) + 1);
         lua_pushstring(state, buf);
-    } else if (false) {
-        // Todo 自动读取变量，之前有旧版实现已经是在 lua 再调用其他 lua 的 c 实现来读取参数不能默认开启，等加一个开关在 ns 脚本里手动开启
+    } else {
+        // Todo 自动读取变量，之前有旧版实现已经是在 lua 再调用其他 lua 的 c 实现来读取参数不能默认开启，等加一个开关在 ns 脚本里手动开启，直接消费参数
+        sh->pushCurrent(sh->getNext());
+        int endStatus = sh->getEndStatus();
         sh->nextParam();
         while (sh->current_variable.type != ScriptHandler::VAR_NONE) {
             if (sh->current_variable.type == ScriptHandler::VAR_INT) {
@@ -1334,7 +1338,18 @@ int LUAHandler::callFunction(bool is_callback, const char *cmd, void *data) {
             }
             sh->nextParam();
         }
+        skip_params = sh->getNext();
+        skip_end_status = sh->getEndStatus();
+        sh->popCurrent();
+        sh->setEndStatus(endStatus);
     }
+    // 记得跳过剩余参数
+    defer([&]{
+        if (skip_params) {
+            sh->setCurrent(skip_params);
+            sh->setEndStatus(skip_end_status);
+        }
+    });
 
     if (lua_pcall(state, num_argument_value, num_return_value, 0) != 0) {
         strcpy(error_str, lua_tostring(state, -1));
