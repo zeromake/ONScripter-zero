@@ -1,6 +1,6 @@
 #include "utf8.h"
 
-int32_t charset_ucs4_to_utf8(const uint32_t ch, uint8_t *out) {
+int32_t charset_ucs4_to_utf8(const uint32_t ch, uint8_t* out) {
     int32_t n = 0;
     if (ch <= 0x0000007f) {
         n = 1;
@@ -18,7 +18,7 @@ int32_t charset_ucs4_to_utf8(const uint32_t ch, uint8_t *out) {
     if (!out || n == 0) {
         return n;
     }
-    uint8_t *p = out;
+    uint8_t* p = out;
     switch (n) {
         case 1:
             *p++ = ch;
@@ -57,8 +57,8 @@ int32_t charset_ucs4_to_utf8(const uint32_t ch, uint8_t *out) {
     return n;
 }
 
-int32_t charset_utf8_to_ucs4(const uint8_t *input, uint32_t *ch) {
-    const uint8_t *p = input;
+int32_t charset_utf8_to_ucs4(const uint8_t* input, uint32_t* ch) {
+    const uint8_t* p = input;
     int32_t n = 0;
     if (!(*p & 0x80)) {
         n = 1;
@@ -107,4 +107,90 @@ int32_t charset_utf8_to_ucs4(const uint8_t *input, uint32_t *ch) {
             break;
     }
     return n;
+}
+
+conversion_result convert_utf8_to_ucs4(const uint8_t* sourceStart,
+                                       const uint8_t* sourceEnd,
+                                       uint32_t* targetStart,
+                                       const uint32_t* targetEnd,
+                                       int32_t* count) {
+    if (sourceEnd == NULL) {
+        sourceEnd = sourceStart;
+        while (sourceEnd != NULL) sourceEnd++;
+    }
+    if (targetEnd == NULL && targetStart != NULL) {
+        targetEnd = targetStart;
+        while (targetEnd != NULL) targetEnd++;
+    }
+    conversion_result result = CONVERSION_OK;
+    const uint8_t* source = sourceStart;
+    uint32_t* target = targetStart;
+    int32_t resultCount = 0;
+    while (source < sourceEnd) {
+        int32_t n = charset_utf8_to_ucs4(source, target);
+        if (n == 0) {
+            result = SOURCE_ILLEGAL;
+            break;
+        }
+        resultCount++;
+        source += n;
+        if (target != NULL) {
+            target++;
+            if (target > targetEnd) {
+                result = TARGET_EXHAUSTED;
+                break;
+            }
+        }
+        if (source > sourceEnd) {
+            result = SOURCE_EXHAUSTED;
+            break;
+        }
+    }
+    if (count) {
+        *count = resultCount;
+    }
+    return result;
+}
+
+conversion_result convert_ucs4_to_utf8(const uint32_t* sourceStart,
+                                       const uint32_t* sourceEnd,
+                                       uint8_t* targetStart,
+                                       const uint8_t* targetEnd,
+                                       int32_t* count) {
+    if (sourceEnd == NULL) {
+        sourceEnd = sourceStart;
+        while (sourceEnd != NULL) sourceEnd++;
+    }
+    if (targetEnd == NULL && targetStart != NULL) {
+        targetEnd = targetStart;
+        while (targetEnd != NULL) targetEnd++;
+    }
+    conversion_result result = CONVERSION_OK;
+    const uint32_t* source = sourceStart;
+    uint8_t* target = targetStart;
+    int32_t resultCount = 0;
+    while (source < sourceEnd) {
+        int32_t n = charset_ucs4_to_utf8(*source, target);
+        if (n <= 0) {
+            result = SOURCE_ILLEGAL;
+            break;
+        }
+        resultCount++;
+        source++;
+        if (target != NULL) {
+            target += n;
+            if (target > targetEnd) {
+                result = TARGET_EXHAUSTED;
+                break;
+            }
+        }
+        if (source > sourceEnd) {
+            result = SOURCE_EXHAUSTED;
+            break;
+        }
+    }
+    if (count) {
+        *count = resultCount;
+    }
+    return result;
 }
