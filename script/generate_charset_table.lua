@@ -55,7 +55,7 @@ local function generate_table(name, input, output)
             local byte_end = line:find(" ", byte_start)-1
             local ucs4_hex = tonumber("0x"..line:sub(ucs4_start, ucs4_end))
             local charset_hex = tonumber("0x"..line:sub(byte_start, byte_end):gsub("\\x", ""))
-            if ucs4_hex ~= charset_hex or ucs4_hex >= 0x80 then
+            if ucs4_hex >= 0x80 and charset_hex >= 0x80 then
                 if ucs4_map[ucs4_hex] == nil then
                     ucs4_map[ucs4_hex] = charset_hex
                     table.insert(ucs4_keys, ucs4_hex)
