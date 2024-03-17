@@ -34,6 +34,16 @@ option("c++_shared")
     set_description('安卓编译把 libc++_shared.so 拷贝到 app 里')
 option_end()
 
+option("test")
+    set_default(false)
+    set_showmenu(true)
+    set_description('开启测试')
+option_end()
+
+if get_config("test") then
+includes("tests/xmake.lua")
+end
+
 add_defines(
     "ONS_ZERO_VERSION=\""..VERSION.."\"",
     "ONS_JH_VERSION=\"0.8.0\"",
