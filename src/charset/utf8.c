@@ -118,7 +118,7 @@ int32_t charset_utf8_to_ucs4(const uint8_t* input, uint32_t* ch) {
     return n;
 }
 
-conversion_result convert_utf8_to_ucs4(const uint8_t* sourceStart,
+int32_t convert_utf8_to_ucs4(const uint8_t* sourceStart,
                                        const uint8_t* sourceEnd,
                                        uint32_t* targetStart,
                                        const uint32_t* targetEnd,
