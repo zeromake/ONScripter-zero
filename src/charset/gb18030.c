@@ -3,7 +3,7 @@
 
 int32_t charset_ucs4_to_gb18030(const uint32_t ch, uint8_t* out) {
     int n = 0;
-    if (ch <= 0x7f) {
+    if (ch < 0x80) {
         if (out) *out = (uint8_t)ch;
         return 1;
     }
@@ -43,17 +43,16 @@ int32_t charset_ucs4_to_gb18030(const uint32_t ch, uint8_t* out) {
 int32_t charset_gb18030_to_ucs4(const uint8_t* input, uint32_t* ch) {
     uint8_t first_ch = input[0];
     uint8_t second_ch = input[1];
-    if (first_ch <= 0x7f) {
+    if (first_ch < 0x80) {
         if (ch) *ch = (uint32_t)first_ch;
         return 1;
     }
     int32_t n = 0;
-    if (first_ch >= 0x81 && first_ch <= 0xFE) {
-        if ((second_ch >= 0x40 && second_ch <= 0x7e) ||
-            (second_ch >= 0x80 && second_ch <= 0xfe)) {
-            n = 2;
-        } else if (second_ch >= 0x30 && second_ch <= 0x39) {
+    if (first_ch >= 0x81 && first_ch < 0xFF) {
+        if (second_ch >= 0x30 && second_ch < 0x3a) {
             n = 4;
+        } else {
+            n = 2;
         }
     }
     if (n == 0) return n;
@@ -156,59 +155,3 @@ int32_t convert_utf8_to_gb18030(const uint8_t* sourceStart,
     }
     return count;
 }
-
-
-
-/*
-int32_t charset_ucs4_to_gb18030(const uint32_t ch, uint8_t* out) {
-    int32_t n = 0;
-    if (ch <= 0x7f) {
-        n = 1;
-        if (out) *out = (uint8_t)ch;
-    } else if (ch & 0x0000ff00) {
-        n = 2;
-        if (out) {
-            out[0] = (ch >> 8) & 0xff;
-            out[1] = ch & 0xff;
-        }
-    } else if (ch & 0x7fffffff) {
-        n = 4;
-        if (out) {
-            out[0] = (ch >> 24) & 0xff;
-            out[1] = (ch >> 16) & 0xff;
-            out[2] = (ch >> 8) & 0xff;
-            out[3] = ch & 0xff;
-        }
-    }
-    return n;
-}
-
-int32_t charset_gb18030_to_ucs4(const uint8_t* input, uint32_t* ch) {
-    uint8_t first_ch = input[0];
-    if (first_ch <= 0x7f) {
-        if (ch) *ch = (uint32_t)first_ch;
-        return 1;
-    }
-    uint32_t result = 0;
-    int32_t n = 0;
-    if (first_ch >= 0x81 && first_ch <= 0xfe) {
-        result = (uint32_t)first_ch;
-        uint8_t second_ch = input[1];
-        if ((second_ch >= 0x40 && second_ch <= 0x7e) || (second_ch >= 0x80 && second_ch <= 0xfe)) {
-            result = (result << 8) | second_ch;
-            n = 2;
-        } else if (second_ch >= 0x30 && second_ch <= 0x39) {
-            result = ((result & 0x7f) << 8) | second_ch;
-            uint8_t c = input[2];
-			result = (result << 8) | c;
-            c = input[3];
-			result = (result << 8) | c;
-            n = 4;
-        }
-    }
-    if (n && ch) {
-        *ch = result;
-    }
-    return n;
-}
-*/

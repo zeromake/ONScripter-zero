@@ -8,6 +8,44 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
+typedef enum {
+    BOM_BE = 1,
+} charset_flag;
+
+/* 从 RET_SHIFT_ILSEQ RET_TOOFEW 解出 n 的值 */
+#define DECODE_SHIFT_ILSEQ(r)  ((int32_t)(RET_SHIFT_ILSEQ(0) - (r)) / 2)
+#define DECODE_TOOFEW(r)       ((int32_t)(RET_TOOFEW(0) - (r)) / 2)
+/* 是否为 RET_SHIFT_ILSEQ code */
+#define IS_SHIFT_ILSEQ(r) (int32_t)(-1-r) % 2 == (int32_t)(-1-RET_ILSEQ) % 2
+
+/* mbtowc 读取了 n 个字符后，出现无法转换 */
+#define RET_SHIFT_ILSEQ(n)  (-1-2*(n))
+/* mbtowc 无法转换（未在该编码支持范围内，可以尝试其它编码）*/
+#define RET_ILSEQ           RET_SHIFT_ILSEQ(0)
+/* mbtowc 输入 buffer 不够长，n 为已使用的数量 */
+#define RET_TOOFEW(n)       (-2-2*(n))
+/* 给 RET_SHIFT_ILSEQ,RET_TOOFEW 做最大值，或者作为编码转换的最大字符串长度 */
+#define RET_COUNT_MAX       ((INT_MAX / 2) - 1)
+
+/* wctomb 无法转换（未在该编码支持范围内，可以尝试其它编码）*/
+#define RET_ILUNI           -1
+/* wctomb 输出 buffer 不够长 */
+#define RET_TOOSMALL        -2
+
+typedef struct
+{
+    uint32_t istate; // 输入额外参数/结果
+    uint32_t ostate; // 输出额外参数/结果
+    uint32_t iflags; // 输入选项
+    uint32_t oflags; // 输出选项
+    int32_t transliterate; // 无法转换字符，替换为备用字符。
+    int32_t discard_ilseq; // 丢弃无法转换的字符。
+    int32_t (*mbtowc)(charset* conv, uint32_t* pwc, const uint8_t* cpmb, size_t mb_n); // 输入字符串转为 ucs4
+    int32_t (*wctomb)(charset* conv, uint8_t* pmb, const uint32_t cwc, size_t mb_n); // ucs4 转为字符串输出
+} charset;
+
+int32_t charset_ucs4_to_utf32(const uint32_t ch, uint8_t* out, bool be);
+int32_t charset_utf32_to_ucs4(const uint8_t* input, uint32_t* ch, bool be);
 int32_t charset_ucs4_to_utf8(const uint32_t ch, uint8_t* out);
 int32_t charset_utf8_to_ucs4(const uint8_t* input, uint32_t* ch);
 int32_t charset_utf16_to_ucs4(const uint8_t* input, uint32_t* ch, bool be);

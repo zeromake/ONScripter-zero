@@ -9,19 +9,46 @@
 #define static_read_u16_be(in) in[0] | in[1] << 8
 #define static_read_u16_le(in) in[0] << 8 | in[1]
 
+#define static_write_u32_be(out, ch)      \
+    *out++ = (uint8_t)(ch >> 24 & 0xffff); \
+    *out++ = (uint8_t)(ch >> 16 & 0xffff); \
+    *out++ = (uint8_t)(ch >> 8 & 0xffff); \
+    *out++ = (uint8_t)(ch & 0xffff)
+#define static_write_u32_le(out, ch) \
+    *out++ = (uint8_t)(ch & 0xffff); \
+    *out++ = (uint8_t)(ch >> 8 & 0xffff); \
+    *out++ = (uint8_t)(ch >> 16 & 0xffff); \
+    *out++ = (uint8_t)(ch >> 24 & 0xffff)
+#define static_read_u32_be(in) in[0] | in[1] << 8 | in[2] << 16 | in[3] << 24
+#define static_read_u32_le(in) in[0] << 24 | in[1] << 16 | in[2] << 8 | in[3]
+
+
+int32_t charset_ucs4_to_utf32(const uint32_t ch, uint8_t* out, bool be) {
+    if (be) {
+        static_write_u32_be(out, ch);
+    } else {
+        static_write_u32_le(out, ch);
+    }
+    return 4;
+}
+int32_t charset_utf32_to_ucs4(const uint8_t* input, uint32_t* ch, bool be) {
+    *ch = be ? static_read_u32_be(input) : static_read_u32_le(input);
+    return 4;
+}
+
 int32_t charset_ucs4_to_utf8(const uint32_t ch, uint8_t* out) {
     int32_t n = 0;
-    if (ch <= 0x0000007f) {
+    if (ch < 0x80) {
         n = 1;
-    } else if (ch <= 0x000007ff) {
+    } else if (ch < 0x00000800) {
         n = 2;
-    } else if (ch <= 0x0000ffff) {
+    } else if (ch < 0x00010000) {
         n = 3;
-    } else if (ch <= 0x001fffff) {
+    } else if (ch < 0x00200000) {
         n = 4;
-    } else if (ch <= 0x03ffffff) {
+    } else if (ch < 0x04000000) {
         n = 5;
-    } else if (ch <= 0x7fffffff) {
+    } else if (ch < 0x80000000) {
         n = 6;
     }
     if (!out || n == 0) {
@@ -190,7 +217,7 @@ int32_t convert_ucs4_to_utf8(const uint32_t* sourceStart,
 
 int32_t charset_ucs4_to_utf16(const uint32_t ch, uint8_t* out, bool be) {
     uint8_t* p = out;
-    if (ch <= 0x0000ffff) {
+    if (ch < 0x00010000) {
         if (be) {
             static_write_u16_be(p, ch);
         } else {
@@ -219,9 +246,9 @@ int32_t charset_utf16_to_ucs4(const uint8_t* input, uint32_t* ch, bool be) {
     const uint8_t* p = input;
     uint32_t c = be ? static_read_u16_be(input) : static_read_u16_le(input);
     p += 2;
-    if (c >= 0xd800 && c <= 0xdbff) {
+    if (c >= 0xd800 && c < 0xDC00) {
         uint32_t c2 = be ? static_read_u16_be(p) : static_read_u16_le(p);
-        if (c2 >= 0xdc00 && c2 <= 0xdfff) {
+        if (c2 >= 0xdc00 && c2 < 0xE000) {
             c = ((c - 0xd800) << 10) + (c2 - 0xdc00) + 0x0010000;
             p += 2;
         }
