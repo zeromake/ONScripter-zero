@@ -1,4 +1,5 @@
 import("lib.detect.find_tool")
+import("core.base.bytes")
 
 local charset_list = {
     ['gb18030_2022'] = 'https://raw.githubusercontent.com/unicode-org/icu/main/icu4c/source/data/mappings/gb18030-2022.ucm',
@@ -10,43 +11,56 @@ local function ucs4_tostring(ch)
     if ch == 0x2028 or ch == 0x2029 then
         ch = 0xFFFD
     end
-    local n = 0;
-    local out = ""
+    local n = 0
+    -- 创建一个 7 长度的 byte 数组
+    local out_bytes = bytes(7, 0)
     if ch <= 0x0000007f then
-        out = string.char(ch);
+        out_bytes[1] = ch
+        n = 1
     elseif ch <= 0x000007ff then
-        out = string.char(((ch >> 6) & 0x1f) | 0xc0)..string.char(((ch & 0x3f) | 0x80))
+        out_bytes[1] = ((ch >> 6) & 0x1f) | 0xc0
+        out_bytes[2] = (ch & 0x3f) | 0x80
+        n = 2
     elseif ch <= 0x0000ffff then
-        out = string.char(((ch >> 12) & 0x0f) | 0xe0)..string.char(((ch >> 6) & 0x3f) | 0x80)..string.char((ch & 0x3f) | 0x80)
+        out_bytes[1] = ((ch >> 12) & 0x0f) | 0xe0
+        out_bytes[2] = ((ch >> 6) & 0x3f) | 0x80
+        out_bytes[3] = (ch & 0x3f) | 0x80
+        n = 3
     elseif ch <= 0x001fffff then
-        out = string.char(((ch >> 18) & 0x07) | 0xf0)..
-        string.char(((ch >> 12) & 0x3f) | 0x80)..
-        string.char(((ch >> 6) & 0x3f) | 0x80)..
-        string.char((ch & 0x3f) | 0x80)
+        out_bytes[1] = ((ch >> 18) & 0x07) | 0xf0
+        out_bytes[2] = ((ch >> 12) & 0x3f) | 0x80
+        out_bytes[3] = ((ch >> 6) & 0x3f) | 0x80
+        out_bytes[4] = (ch & 0x3f) | 0x80
+        n = 4
     elseif ch <= 0x03ffffff then
-        out = string.char(((ch >> 24) & 0x03) | 0xf8)..
-        string.char(((ch >> 18) & 0x3f) | 0x80)..
-        string.char(((ch >> 12) & 0x3f) | 0x80)..
-        string.char(((ch >> 6) & 0x3f) | 0x80)..
-        string.char((ch & 0x3f) | 0x80)
+        out_bytes[1] = ((ch >> 24) & 0x03) | 0xf8
+        out_bytes[2] = ((ch >> 18) & 0x3f) | 0x80
+        out_bytes[3] = ((ch >> 12) & 0x3f) | 0x80
+        out_bytes[4] = ((ch >> 6) & 0x3f) | 0x80
+        out_bytes[5] = (ch & 0x3f) | 0x80
+        n = 5
     elseif ch <= 0x7fffffff then
-        out = string.char(((ch >> 30) & 0x01) | 0xfc)..
-        string.char(((ch >> 24) & 0x3f) | 0x80)..
-        string.char(((ch >> 18) & 0x3f) | 0x80)..
-        string.char(((ch >> 12) & 0x3f) | 0x80)..
-        string.char(((ch >> 6) & 0x3f) | 0x80)..
-        string.char((ch & 0x3f) | 0x80)
+        out_bytes[1] = ((ch >> 30) & 0x01) | 0xfc
+        out_bytes[2] = ((ch >> 24) & 0x3f) | 0x80
+        out_bytes[3] = ((ch >> 18) & 0x3f) | 0x80
+        out_bytes[4] = ((ch >> 12) & 0x3f) | 0x80
+        out_bytes[5] = ((ch >> 6) & 0x3f) | 0x80
+        out_bytes[6] = (ch & 0x3f) | 0x80
+        n = 6
     end
-    return out
+    return out_bytes:str(1, n)
 end
 
 local function generate_table(name, input, output)
     local outputFile = io.open(output, 'wb')
+    local outputDuplicateFile = io.open(output..".txt", 'wb')
     outputFile:write('#include <stdint.h>\n\n')
     local ucs4_keys = {}
     local charset_keys = {}
     local ucs4_map = {}
     local charset_map = {}
+    local charset_duplicate = {}
+    local ucs4_duplicate = {}
     for line in io.lines(input) do
         if line:startswith("<U") then
             local ucs4_start = 3
@@ -59,10 +73,22 @@ local function generate_table(name, input, output)
                 if ucs4_map[ucs4_hex] == nil then
                     ucs4_map[ucs4_hex] = charset_hex
                     table.insert(ucs4_keys, ucs4_hex)
+                else
+                    if ucs4_duplicate[ucs4_hex] == nil then
+                        ucs4_duplicate[ucs4_hex] = {}
+                    end
+                    ucs4_duplicate[ucs4_hex][charset_hex] = 0
+                    ucs4_duplicate[ucs4_hex][ucs4_map[ucs4_hex]] = 1
                 end
                 if charset_map[charset_hex] == nil then
                     charset_map[charset_hex] = ucs4_hex
                     table.insert(charset_keys, charset_hex)
+                else
+                    if charset_duplicate[charset_hex] == nil then
+                        charset_duplicate[charset_hex] = {}
+                    end
+                    charset_duplicate[charset_hex][ucs4_hex] = 0
+                    charset_duplicate[charset_hex][charset_map[charset_hex]] = 1
                 end
             end
         end
@@ -137,7 +163,24 @@ local function generate_table(name, input, output)
         outputFile:writef('    {0x%08X, 0x%08X, %d},\n', item[1], item[2], item[3])
     end
     outputFile:write('};\n')
+    outputDuplicateFile:writef('# charset %s_to_ucs4 duplicate\n', name)
+    for k, v in pairs(charset_duplicate) do
+        outputDuplicateFile:writef('%d ', k)
+        for kk, vv in pairs(v) do
+            outputDuplicateFile:writef('%d ', kk)
+        end
+        outputDuplicateFile:write('\n');
+    end
+    outputDuplicateFile:writef('# charset ucs4_to_%s duplicate\n', name)
+    for k, v in pairs(ucs4_duplicate) do
+        outputDuplicateFile:writef('%d ', k)
+        for kk, vv in pairs(v) do
+            outputDuplicateFile:writef('%d ', kk)
+        end
+        outputDuplicateFile:write('\n');
+    end
     outputFile:close()
+    outputDuplicateFile:close()
 end
 
 function main()
