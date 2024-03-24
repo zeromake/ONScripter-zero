@@ -6,6 +6,26 @@ local charset_list = {
     ['shift_jis'] = 'https://raw.githubusercontent.com/unicode-org/icu/main/icu4c/source/data/mappings/ibm-943_P15A-2003.ucm',
 }
 
+local function charset_tostring(ch)
+    -- 创建一个 5 长度的 byte 数组
+    local out_bytes = bytes(5, 0)
+    if ch <= 0x0000007f then
+        out_bytes[1] = ch
+        n = 1
+    elseif ch <= 0x0000ffff then
+        out_bytes[1] = (ch >> 8) & 0xff
+        out_bytes[2] = ch & 0xff
+        n = 2
+    else
+        out_bytes[1] = (ch >> 24) & 0xff
+        out_bytes[2] = (ch >> 16) & 0xff
+        out_bytes[3] = (ch >> 8) & 0xff
+        out_bytes[4] = ch & 0xff
+        n = 4
+    end
+    return out_bytes:str(1, n)
+end
+
 local function ucs4_tostring(ch)
     -- 0x2028 0x2029 vscode 会认为是代码里有不正确的换行
     if ch == 0x2028 or ch == 0x2029 then
@@ -51,6 +71,18 @@ local function ucs4_tostring(ch)
     return out_bytes:str(1, n)
 end
 
+local function table_unique(t)
+    local check = {};
+    local n = {};
+    for _, value in ipairs(t) do
+        if not check[value] then
+            table.insert(n, value)
+            check[value] = 1
+        end
+    end
+    return n
+end
+
 local function generate_table(name, input, output)
     local outputFile = io.open(output, 'wb')
     local outputDuplicateFile = io.open(output..".txt", 'wb')
@@ -59,40 +91,34 @@ local function generate_table(name, input, output)
     local charset_keys = {}
     local ucs4_map = {}
     local charset_map = {}
-    local charset_duplicate = {}
-    local ucs4_duplicate = {}
+    local priority_charset_duplicate = {}
+    local priority_ucs4_duplicate = {}
     for line in io.lines(input) do
         if line:startswith("<U") then
             local ucs4_start = 3
             local ucs4_end = line:find(">", ucs4_start)-1
             local byte_start = line:find("\\", ucs4_end)
             local byte_end = line:find(" ", byte_start)-1
+            local priority_start = line:find("|", byte_end)+1
+            local priority = tonumber(line:sub(priority_start))
             local ucs4_hex = tonumber("0x"..line:sub(ucs4_start, ucs4_end))
             local charset_hex = tonumber("0x"..line:sub(byte_start, byte_end):gsub("\\x", ""))
             if ucs4_hex >= 0x80 and charset_hex >= 0x80 then
-                if ucs4_map[ucs4_hex] == nil then
+                if ucs4_map[ucs4_hex] == nil or priority_ucs4_duplicate[ucs4_hex] < priority then
                     ucs4_map[ucs4_hex] = charset_hex
                     table.insert(ucs4_keys, ucs4_hex)
-                else
-                    if ucs4_duplicate[ucs4_hex] == nil then
-                        ucs4_duplicate[ucs4_hex] = {}
-                    end
-                    ucs4_duplicate[ucs4_hex][charset_hex] = 0
-                    ucs4_duplicate[ucs4_hex][ucs4_map[ucs4_hex]] = 1
+                    priority_ucs4_duplicate[ucs4_hex] = priority
                 end
-                if charset_map[charset_hex] == nil then
+                if charset_map[charset_hex] == nil or priority_charset_duplicate[charset_hex] < priority then
                     charset_map[charset_hex] = ucs4_hex
                     table.insert(charset_keys, charset_hex)
-                else
-                    if charset_duplicate[charset_hex] == nil then
-                        charset_duplicate[charset_hex] = {}
-                    end
-                    charset_duplicate[charset_hex][ucs4_hex] = 0
-                    charset_duplicate[charset_hex][charset_map[charset_hex]] = 1
+                    priority_charset_duplicate[charset_hex] = priority
                 end
             end
         end
     end
+    ucs4_keys = table_unique(ucs4_keys)
+    charset_keys = table_unique(charset_keys)
     table.sort(ucs4_keys)
     table.sort(charset_keys)
     outputFile:writef('static uint32_t g_charset_ucs4_to_%s_table_data[] = {\n', name)
@@ -163,24 +189,44 @@ local function generate_table(name, input, output)
         outputFile:writef('    {0x%08X, 0x%08X, %d},\n', item[1], item[2], item[3])
     end
     outputFile:write('};\n')
-    outputDuplicateFile:writef('# charset %s_to_ucs4 duplicate\n', name)
-    for k, v in pairs(charset_duplicate) do
-        outputDuplicateFile:writef('%d ', k)
-        for kk, vv in pairs(v) do
-            outputDuplicateFile:writef('%d ', kk)
-        end
-        outputDuplicateFile:write('\n');
-    end
-    outputDuplicateFile:writef('# charset ucs4_to_%s duplicate\n', name)
-    for k, v in pairs(ucs4_duplicate) do
-        outputDuplicateFile:writef('%d ', k)
-        for kk, vv in pairs(v) do
-            outputDuplicateFile:writef('%d ', kk)
-        end
-        outputDuplicateFile:write('\n');
-    end
     outputFile:close()
-    outputDuplicateFile:close()
+    -- outputDuplicateFile:writef('# charset %s_to_ucs4 duplicate\n', name)
+    -- for k, v in pairs(charset_duplicate) do
+    --     outputDuplicateFile:writef('0x%X ', k)
+    --     for kk, vv in pairs(v) do
+    --         outputDuplicateFile:writef('0x%X ', kk)
+    --     end
+    --     outputDuplicateFile:write('\n');
+    -- end
+    -- outputDuplicateFile:writef('# charset ucs4_to_%s duplicate\n', name)
+    -- for k, v in pairs(ucs4_duplicate) do
+    --     outputDuplicateFile:writef('0x%X ', k)
+    --     for kk, vv in pairs(v) do
+    --         outputDuplicateFile:writef('%X ', kk)
+    --     end
+    --     outputDuplicateFile:write('\n');
+    -- end
+    -- outputDuplicateFile:close()
+    -- local outputDuplicateFile1 = io.open(output..".input.txt", 'wb')
+    -- outputDuplicateFile1:writef('# charset %s_to_ucs4 duplicate\n', name)
+    -- for k, v in pairs(charset_duplicate) do
+    --     outputDuplicateFile1:write(charset_tostring(k))
+    --     -- for kk, vv in pairs(v) do
+    --     --     outputDuplicateFile1:writef('%d ', kk)
+    --     -- end
+    --     outputDuplicateFile1:write('\n');
+    -- end
+    -- outputDuplicateFile1:close()
+    -- local outputDuplicateFile2 = io.open(output..".output.txt", 'wb')
+    -- outputDuplicateFile2:writef('# charset ucs4_to_%s duplicate\n', name)
+    -- for k, v in pairs(ucs4_duplicate) do
+    --     outputDuplicateFile2:writef(ucs4_tostring(k))
+    --     -- for kk, vv in pairs(v) do
+    --     --     outputDuplicateFile2:writef('%d ', kk)
+    --     -- end
+    --     outputDuplicateFile2:write('\n');
+    -- end
+    -- outputDuplicateFile2:close()
 end
 
 function main()
