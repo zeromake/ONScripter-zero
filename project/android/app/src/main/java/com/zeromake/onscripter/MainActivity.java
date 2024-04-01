@@ -230,7 +230,7 @@ public class MainActivity extends Activity implements
             loadCurrentDirectory();
             return;
         } else if (Globals.CurrentDirectoryPathForLauncher == null || Globals.CurrentDirectoryPathForLauncher.equals("")) {
-            this.mDirBrowserCurDirPath = "/";
+            this.mDirBrowserCurDirPath = "/mnt";
         } else {
             this.mDirBrowserCurDirPath = Globals.CurrentDirectoryPathForLauncher;
         }
