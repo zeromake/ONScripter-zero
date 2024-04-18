@@ -245,6 +245,11 @@ void dumpBacktrace(std::ostream &os, void **buffer, size_t max) {
 #endif
 
 void parseOption(int argc, char *argv[]) {
+    auto rootPath = onscripter::fs::absolute(".");
+    if (onscripter::fs::is_directory(rootPath)) {
+        auto root = rootPath.string();
+        ons.setArchivePath(root.data());
+    }
     while (argc > 0) {
         if (argv[0][0] == '-') {
             if (!strcmp(argv[0] + 1, "h") || !strcmp(argv[0] + 1, "-help")) {
