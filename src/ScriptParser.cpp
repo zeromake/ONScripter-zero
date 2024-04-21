@@ -395,7 +395,7 @@ int ScriptParser::openScript() {
     screen_width = script_h.screen_width;
     screen_height = script_h.screen_height;
     if (!init_screen_ratio) {
-        *script_h.screen_scale = screen_scale;
+        *screen_scale = script_h.screen_scale;
     }
     return 0;
 }
