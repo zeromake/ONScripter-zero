@@ -179,7 +179,7 @@ class ScriptParser {
     int addCommand();
     int elseCommand();
     void setRescale(int scale1, int scale2);
-    void setFontConfig(const char *buf);
+    int setFontConfig(const char *buf);
 
    protected:
     struct UserFuncLUT {

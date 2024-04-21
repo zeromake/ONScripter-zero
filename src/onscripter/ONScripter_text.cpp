@@ -118,7 +118,11 @@ void ONScripter::drawGlyph(SDL_Surface *dst_surface,
         (TTF_Font *)info->ttf_font[0], unicode, fcol, bcol);
     const ons_font::FontConfig *cfg = getFontConfig(info->types);
     SDL_Color scolor = {
-        cfg->outline_color[0], cfg->outline_color[1], cfg->outline_color[2]};
+        cfg->outline_color.rgba[0],
+        cfg->outline_color.rgba[1],
+        cfg->outline_color.rgba[2],
+        cfg->outline_color.rgba[3],
+    };
     SDL_Surface *tmp_surface_s = tmp_surface;
     if (info->is_shadow && fontConfig->render_outline) {
         tmp_surface_s = TTF_RenderGlyph_Shaded(

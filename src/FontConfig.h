@@ -1,9 +1,9 @@
 
 #ifndef __FONT_CONFIG_H__
 #define __FONT_CONFIG_H__
+#include "private/utils.h"
 
 namespace ons_font {
-typedef unsigned char uchar3[3];
 enum FONT_TYPE {
     GLOBAL_FONT,
     SENTENCE_FONT,
@@ -15,14 +15,15 @@ enum FONT_TYPE {
 struct FontConfig {
     int size;
     float size_ratio;
-    uchar3 color;
+    utils::uchar4 color;
     bool render_outline;
     int outline_size;
-    uchar3 outline_color;
+    utils::uchar4 outline_color;
     int offset_x;
     int offset_y;
 };
 const FontConfig* DEFAULT_FONT_CONFIG();
+const int readFontConfig(const char *buf, ons_font::FontConfig *cfg);
 }  // namespace ons_font
 
 #endif

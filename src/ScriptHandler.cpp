@@ -73,6 +73,12 @@ ScriptHandler::~ScriptHandler() {
     delete[] str_string_buffer;
     delete[] saved_string_buffer;
     if (variable_data) delete[] variable_data;
+    for (int i = 0; i < 6; i++) {
+        if (font_configs[i] != nullptr) {
+            delete font_configs[i];
+            font_configs[i] = nullptr;
+        }
+    }
 }
 
 void ScriptHandler::reset() {
@@ -1269,6 +1275,26 @@ int ScriptHandler::readScriptSub(FILE *fp, char **buf, int encrypt_mode) {
     return 0;
 }
 
+int ScriptHandler::setFontConfig(const char *buf) {
+    // printf("setFontConfig: %s\n", buf);
+    ons_font::FONT_TYPE types = ons_font::GLOBAL_FONT;
+    int offset = 0;
+    if (buf[offset] >= '0' && buf[offset] <= '9') {
+        types = ons_font::FONT_TYPE(buf[offset] - '0');
+    }
+    offset++;
+    if (buf[offset] != ':') {
+        return 0;
+    }
+    offset++;
+    ons_font::FontConfig *cfg = nullptr;
+    if (font_configs[types] == nullptr) {
+        font_configs[types] = new ons_font::FontConfig;
+    }
+    cfg = font_configs[types];
+    return ons_font::readFontConfig(buf, cfg);
+}
+
 void ScriptHandler::readConfiguration() {
     variable_range = 4096;
     global_variable_border = 200;
@@ -1371,6 +1397,9 @@ void ScriptHandler::readConfiguration() {
             buf++;
             SKIP_SPACE(buf);
             while (*buf >= '0' && *buf <= '9') buf++;
+        } else if (*buf == 'f' || *buf == 'F') {
+            buf++;
+            buf += setFontConfig(buf);
         } else if (!strncmp(buf, "ratio", 5)) {
             int _user_ratio = 0;
             buf += 5;
