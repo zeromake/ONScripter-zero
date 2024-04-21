@@ -122,7 +122,7 @@ const ons_font::FontConfig *ScriptParser::getFontConfig(
     return ons_font::DEFAULT_FONT_CONFIG();
 }
 
-void ScriptParser::setFontConfig(const char *buf) {
+int ScriptParser::setFontConfig(const char *buf) {
     ons_font::FONT_TYPE types = ons_font::GLOBAL_FONT;
     int offset = 0;
     if (buf[offset] >= '0' && buf[offset] <= '9') {
@@ -130,7 +130,7 @@ void ScriptParser::setFontConfig(const char *buf) {
     }
     offset++;
     if (buf[offset] != ':') {
-        return;
+        return 0;
     }
     offset++;
     ons_font::FontConfig *cfg = nullptr;
@@ -138,56 +138,7 @@ void ScriptParser::setFontConfig(const char *buf) {
         font_configs[types] = new ons_font::FontConfig;
     }
     cfg = font_configs[types];
-    auto default_config = ons_font::DEFAULT_FONT_CONFIG();
-    memcpy(cfg, default_config, sizeof(ons_font::FontConfig));
-    int start = offset;
-    int field = 0;
-    char buff[256];
-    while (1) {
-        if (buf[offset] == ',' || buf[offset] == '\0') {
-            int size = offset - start;
-            if (size > 0) {
-                memcpy(buff, buf + start, size);
-                buff[size] = '\0';
-            } else {
-                buff[0] = '\0';
-            }
-            start = offset + 1;
-            if (buff[0] != '\0') {
-                switch (field) {
-                    case 0:
-                        cfg->size = atoi(buff);
-                        break;
-                    case 1:
-                        cfg->size_ratio = atof(buff);
-                        break;
-                    case 2:
-                        readColor(&cfg->color, buff);
-                        break;
-                    case 3:
-                        cfg->render_outline = buff[0] != '0' && buff[0] != 'f';
-                        break;
-                    case 4:
-                        cfg->outline_size = atoi(buff);
-                        break;
-                    case 5:
-                        readColor(&cfg->outline_color, buff);
-                        break;
-                    case 6:
-                        cfg->offset_x = atoi(buff);
-                        break;
-                    case 7:
-                        cfg->offset_y = atoi(buff);
-                        break;
-                }
-            }
-            field++;
-        }
-        if (buf[offset] == '\0') {
-            break;
-        }
-        offset++;
-    }
+    return ons_font::readFontConfig(buf, cfg);
 }
 
 const int ScriptParser::calcFontSize(const int v, ons_font::FONT_TYPE types) {
@@ -396,6 +347,12 @@ int ScriptParser::openScript() {
     screen_height = script_h.screen_height;
     if (!init_screen_ratio) {
         *screen_scale = script_h.screen_scale;
+    }
+    for (int i = 0; i < 6; i++) {
+        if (script_h.font_configs[i] != nullptr && font_configs[i] == nullptr) {
+            font_configs[i] = new ons_font::FontConfig{0};
+            memcpy(font_configs[i], script_h.font_configs[i], sizeof(ons_font::FontConfig));
+        }
     }
     return 0;
 }

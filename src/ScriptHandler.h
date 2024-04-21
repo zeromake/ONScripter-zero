@@ -31,6 +31,7 @@
 
 #include <string>
 
+#include "FontConfig.h"
 #include "BaseReader.h"
 #include "private/utils.h"
 #include "resize/scale_manager.hpp"
@@ -264,6 +265,7 @@ class ScriptHandler {
     struct VariableData current_variable_data;
     onscripter::SharedPtr<onscripter::ScaleManager> screen_scale;
     onscripter::SharedPtr<onscripter::ScaleManager> user_scale;
+    ons_font::FontConfig *font_configs[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
    private:
     enum {
@@ -322,6 +324,7 @@ class ScriptHandler {
     int readScriptSub(FILE *fp, char **buf, int encrypt_mode);
     void readConfiguration();
     int labelScript();
+    int setFontConfig(const char *buf);
 
     int findLabel(const char *label);
 
