@@ -66,7 +66,11 @@ public class Settings {
                 treeSet.add(str.replace("${SDCARD}", "/sdcard"));
                 treeSet.add(str.replace("${SDCARD}", "/sdcard/sd"));
                 treeSet.add(str.replace("${SDCARD}", "/storage/sdcard"));
+                treeSet.add(str.replace("${SDCARD}", "/storage/sdcard0"));
+                treeSet.add(str.replace("${SDCARD}", "/storage/sdcard1"));
                 treeSet.add(str.replace("${SDCARD}", "/storage/emulated/0"));
+                treeSet.add(str.replace("${SDCARD}", "/storage/emulated/legacy"));
+                treeSet.add(str.replace("${SDCARD}", "/storage/usb0"));
                 String str2 = System.getenv("EXTERNAL_STORAGE");
                 if (str2 != null) {
                     treeSet.add(str.replace("${SDCARD}", str2));
