@@ -92,8 +92,9 @@ jobs:
           CERT_TEXT: ${{ secrets.CERT_TEXT }}
           VERSION: ${{ github.ref_name }}
         run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
           cd project/android
-          echo "org.gradle.java.home=${JAVA_HOME_11_X64}" >> gradle.properties
+          echo "org.gradle.java.home=${JAVA_HOME_17_X64}" >> gradle.properties
           echo "versionName=${VERSION}" >> local.properties
           echo "$CERT_TEXT" > cert.txt
           cat cert.txt | base64 -d > cert.tar.xz
@@ -111,6 +112,7 @@ jobs:
       - name: build-apk
         run: |
           export JAVA_HOME=$JAVA_HOME_17_X64
+          echo $JAVA_HOME
           cd project/android
           ./gradlew assembleRelease
           cp ./app/build/outputs/apk/release/app-release.apk ../../dist/onscripter-release.apk
