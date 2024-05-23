@@ -46,10 +46,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class MainActivity extends Activity implements
-        OnPermissionCallback,
-        DialogInterface.OnClickListener,
-        AdapterView.OnItemClickListener,
-        View.OnClickListener{
+    OnPermissionCallback,
+    DialogInterface.OnClickListener,
+    AdapterView.OnItemClickListener,
+    View.OnClickListener {
     private ImageView background;
     private ImageView btnSettings;
     private ImageView cover;
@@ -77,12 +77,12 @@ public class MainActivity extends Activity implements
         ONSVariable.dh = displayMetrics.heightPixels;
         int phoneType = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getPhoneType();
         double doubleValue = new BigDecimal(
-                ONSVariable.dw / ONSVariable.dh
+            ONSVariable.dw / ONSVariable.dh
         ).setScale(
-                2,
-                RoundingMode.HALF_UP
+            2,
+            RoundingMode.HALF_UP
         ).doubleValue();
-        if ((float)ONSVariable.dw / (float)ONSVariable.dh == 1.5d || doubleValue == 1.33d) {
+        if ((float) ONSVariable.dw / (float) ONSVariable.dh == 1.5d || doubleValue == 1.33d) {
             setContentView(R.layout.activity_ft);
         } else if (phoneType == 0) {
             setContentView(R.layout.activity_pad);
@@ -102,7 +102,7 @@ public class MainActivity extends Activity implements
         this.items.setOnPlayClickListener(this);
     }
 
-    private<T extends View> T bindView(int i) {
+    private <T extends View> T bindView(int i) {
         return findViewById(i);
     }
 
@@ -118,18 +118,19 @@ public class MainActivity extends Activity implements
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 XXPermissions.with(this).permission(
-                        Permission.MANAGE_EXTERNAL_STORAGE
+                    Permission.MANAGE_EXTERNAL_STORAGE
                 ).request(this);
             }
         } else {
             XXPermissions.with(this).permission(
-                    Permission.READ_MEDIA_IMAGES,
-                    Permission.READ_MEDIA_VIDEO,
-                    Permission.READ_MEDIA_AUDIO
+                Permission.READ_MEDIA_IMAGES,
+                Permission.READ_MEDIA_VIDEO,
+                Permission.READ_MEDIA_AUDIO
 //                    Permission.WRITE_EXTERNAL_STORAGE
             ).request(this);
         }
     }
+
     @Override
     public void onGranted(List<String> permissions, boolean all) {
         // Toast.makeText(MainActivity.this, "权限申请成功", Toast.LENGTH_SHORT).show();
@@ -152,16 +153,16 @@ public class MainActivity extends Activity implements
             int width = size.x;
             int height = size.y;
             settingPopupWindow = new PopupWindow(
-                    linearLayout,
-                    width/4,
-                    height/3,
-                    true
+                linearLayout,
+                width / 4,
+                height / 3,
+                true
             );
             settingPopupWindow.setAnimationStyle(R.style.Animation_ConfigPanelAnimation);
             settingPopupWindow.setTouchable(true);
             settingPopupWindow.setOutsideTouchable(true);
             settingPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup));
-            settingPopupWindow.showAtLocation(this.background, Gravity.END|Gravity.BOTTOM, width / 14, height / 24);
+            settingPopupWindow.showAtLocation(this.background, Gravity.END | Gravity.BOTTOM, width / 14, height / 24);
             View popupButton = linearLayout.findViewById(R.id.popup_path);
             popupButton.setOnClickListener(view -> this.chooseDir());
         }
@@ -173,7 +174,7 @@ public class MainActivity extends Activity implements
         strArr[strArr.length - 1] = getString(R.string.Other) + "...";
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setInverseBackgroundForced(true);
-        builder.setTitle(getString(R.string.Launch_ChooseDirectory));
+        builder.setTitle(getString(R.string.Launch_AutoChooseDirectory));
         builder.setItems(strArr, this);
         builder.setNegativeButton(getString(R.string.Cancel), null);
         builder.setCancelable(true);
@@ -218,6 +219,20 @@ public class MainActivity extends Activity implements
         }
     }
 
+    private void onOther() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.Launch_OtherChooseDirectory));
+        this.mDirBrowserDirFileArray = new File[Globals.FallbackDirectoryValidPathArray.length];
+        for (int index = 0; index < Globals.FallbackDirectoryValidPathArray.length; index++) {
+            this.mDirBrowserDirFileArray[index] = new File(Globals.FallbackDirectoryValidPathArray[index]);
+        }
+        builder.setItems(Globals.FallbackDirectoryValidPathArray, this);
+        builder.setNegativeButton(getString(R.string.Cancel), null);
+        builder.setCancelable(true);
+        this.mDirBrowserDialog = builder.create();
+        this.mDirBrowserDialog.show();
+    }
+
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
         if (dialogInterface == this.mDirBrowserDialog) {
@@ -229,15 +244,9 @@ public class MainActivity extends Activity implements
             Settings.SaveGlobals(this);
             loadCurrentDirectory();
             return;
-        } else if (Globals.CurrentDirectoryPathForLauncher == null || Globals.CurrentDirectoryPathForLauncher.equals("")) {
-            File f = new File("/storage");
-            if (f.exists() && f.isDirectory() && f.canRead()) {
-                this.mDirBrowserCurDirPath = "/storage";
-            } else {
-                this.mDirBrowserCurDirPath = "/mnt";
-            }
         } else {
-            this.mDirBrowserCurDirPath = Globals.CurrentDirectoryPathForLauncher;
+            this.onOther();
+            return;
         }
         File file = new File(this.mDirBrowserCurDirPath);
         File parentFile = file.getParentFile();
@@ -249,7 +258,7 @@ public class MainActivity extends Activity implements
             try (Stream<Path> stream = Files.list(Paths.get(this.mDirBrowserCurDirPath))) {
                 stream.forEach(path -> {
                     if (Files.isDirectory(path)
-                            && Files.isReadable(path)) {
+                        && Files.isReadable(path)) {
                         dirs.add(new File(path.toAbsolutePath().toString()));
                     }
                 });
@@ -316,11 +325,11 @@ public class MainActivity extends Activity implements
     }
 
     private void updateCover(String cover, boolean b) {
-        ImageLoader.getInstance().displayImage("file:/"+cover, this.cover, Settings.getDisplayImageOptions());
+        ImageLoader.getInstance().displayImage("file:/" + cover, this.cover, Settings.getDisplayImageOptions());
     }
 
     private void updateBackground(String background) {
-        ImageLoader.getInstance().displayImage("file:/"+background, this.background, Settings.getDisplayImageOptions());
+        ImageLoader.getInstance().displayImage("file:/" + background, this.background, Settings.getDisplayImageOptions());
     }
 
     @Override
@@ -332,14 +341,14 @@ public class MainActivity extends Activity implements
             // types(0:全局文字,1:普通文字, 2:精灵文字, 3: 菜单文字, 4: 弹窗文字, 5: ruby 文字),字体大小,字体大小倍率,字体颜色,是否描边,描边宽度,描边颜色,文字换行距离边距,文字换列距离边距
             // 大部分游戏只有 1, 2 生效，后面的文字都是用精灵文字去做的，还有不少弹框是用图片做的。
             extras.putStringArray(ONScripter.ARGS_KEY, new String[]{
-                    "-r",
-                    selectedItem.path,
-                    "--scale-window",
-                    "--fontcache",
+                "-r",
+                selectedItem.path,
+                "--scale-window",
+                "--fontcache",
 //                    "--font-config",
 //                    "1:,1.2",
-                    // "--sharpness",
-                    // "1.0",
+                // "--sharpness",
+                // "1.0",
             });
             intent.putExtras(extras);
             startActivity(intent);

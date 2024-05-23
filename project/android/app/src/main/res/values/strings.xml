@@ -8,7 +8,8 @@
     <string name="alt_icon">图标</string>
     <string name="alt_play">运行</string>
     <string name="alt_settings">设置</string>
-    <string name="Launch_ChooseDirectory">选择目录</string>
+    <string name="Launch_OtherChooseDirectory">选择其它目录</string>
+    <string name="Launch_AutoChooseDirectory">自动扫描目录</string>
     <string name="Launch_SetDirectory">设置目录</string>
     <string name="Launch_CouldNotOpenDirectory">无法打开目录</string>
     <string name="Other">其它</string>

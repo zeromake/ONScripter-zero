@@ -50,27 +50,20 @@ public class Settings {
         Globals.CurrentDirectoryPath = null;
         ArrayList<String> arrayList = new ArrayList<>();
         TreeSet<String> treeSet = new TreeSet<>();
+        TreeSet<String> validDirectory = new TreeSet<>();
         for (String str : Globals.CURRENT_DIRECTORY_PATH_TEMPLATE_ARRAY) {
             if (!str.contains("${SDCARD}")) {
                 treeSet.add(str);
             } else {
                 treeSet.add(str.replace("${SDCARD}", Environment.getExternalStorageDirectory().getAbsolutePath()));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/ext_card"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/flash"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/sdcard"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/sdcard/external_sd"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/sdcard-ext"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/storage/sdcard"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/udisk"));
-                treeSet.add(str.replace("${SDCARD}", "/mnt/usbdisk"));
-                treeSet.add(str.replace("${SDCARD}", "/sdcard"));
-                treeSet.add(str.replace("${SDCARD}", "/sdcard/sd"));
-                treeSet.add(str.replace("${SDCARD}", "/storage/sdcard"));
-                treeSet.add(str.replace("${SDCARD}", "/storage/sdcard0"));
-                treeSet.add(str.replace("${SDCARD}", "/storage/sdcard1"));
-                treeSet.add(str.replace("${SDCARD}", "/storage/emulated/0"));
-                treeSet.add(str.replace("${SDCARD}", "/storage/emulated/legacy"));
-                treeSet.add(str.replace("${SDCARD}", "/storage/usb0"));
+                validDirectory.add(Environment.getExternalStorageDirectory().getAbsolutePath());
+                for (String inlineSd: Globals.FallbackDirectoryPathArray) {
+                    File inlineSdF = new File(inlineSd);
+                    if (inlineSdF.exists() && inlineSdF.isDirectory() && inlineSdF.canRead()) {
+                        treeSet.add(str.replace("${SDCARD}", inlineSd));
+                        validDirectory.add(inlineSd);
+                    }
+                }
                 String str2 = System.getenv("EXTERNAL_STORAGE");
                 if (str2 != null) {
                     treeSet.add(str.replace("${SDCARD}", str2));
@@ -116,8 +109,9 @@ public class Settings {
                 }
             }
         }
-        Globals.CurrentDirectoryPathArray = (String[]) treeSet.toArray(new String[0]);
-        Globals.CurrentDirectoryValidPathArray = (String[]) arrayList.toArray(new String[0]);
+        Globals.CurrentDirectoryPathArray = treeSet.toArray(new String[0]);
+        Globals.CurrentDirectoryValidPathArray = arrayList.toArray(new String[0]);
+        Globals.FallbackDirectoryValidPathArray = validDirectory.toArray(new String[0]);
     }
 
     public static DisplayImageOptions getDisplayImageOptions() {
