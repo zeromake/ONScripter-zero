@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Environment;
@@ -19,9 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -182,7 +179,7 @@ public class MainActivity extends Activity implements
     }
 
     public void loadCurrentDirectory() {
-        if (Globals.CurrentDirectoryPathForLauncher == null || Globals.CurrentDirectoryPathForLauncher.equals("")) {
+        if (Globals.CurrentDirectoryPathForLauncher == null || Globals.CurrentDirectoryPathForLauncher.isEmpty()) {
             return;
         }
         try {
@@ -315,7 +312,7 @@ public class MainActivity extends Activity implements
             updateBackground(game.background);
         }
         if (game.cover != null) {
-            updateCover(game.cover, game.background == null);
+            updateCover(game.cover);
         } else {
             this.cover.setImageDrawable(getResources().getDrawable(R.drawable.dbkg_und));
             if (game.background == null) {
@@ -324,7 +321,7 @@ public class MainActivity extends Activity implements
         }
     }
 
-    private void updateCover(String cover, boolean b) {
+    private void updateCover(String cover) {
         ImageLoader.getInstance().displayImage("file:/" + cover, this.cover, Settings.getDisplayImageOptions());
     }
 
