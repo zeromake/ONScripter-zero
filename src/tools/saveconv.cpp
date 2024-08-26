@@ -14,9 +14,9 @@ int main(int argc, char *argv[]) {
         auto in = std::fopen(arg.c_str(), "rb");
         std::string argout = arg + ".s";
         auto out = std::fopen(argout.c_str(), "wb");
-        std::fseek(in, 0, SEEK_END);
-        size_t count = std::ftell(in);
-        std::fseek(in, 0, SEEK_SET);
+        ons_fseek64(in, 0, SEEK_END);
+        size_t count = ons_ftell64(in);
+        ons_fseek64(in, 0, SEEK_SET);
         char *buff = new char[count]{0};
         std::fread(buff, 1, count, in);
         char *curr = buff;

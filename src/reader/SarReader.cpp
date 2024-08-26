@@ -33,7 +33,9 @@ extern int psp_power_resume_number;
 #endif
 
 #ifdef _WIN32
+#ifndef strcasecmp
 #define strcasecmp stricmp
+#endif
 #else
 #include <strings.h>
 #endif
@@ -143,7 +145,7 @@ void SarReader::readArchive(ArchiveInfo *ai,
 
         // now go back to the beginning and read the file info
         cur_offset = ai->base_offset;
-        fseek(ai->file_handle, 4 + offset, SEEK_SET);
+        ons_fseek64(ai->file_handle, 4 + offset, SEEK_SET);
         for (i = 0; i < ai->num_of_files; i++) {
             unsigned int count = 0;
             // skip the beginning double-quote
@@ -231,7 +233,7 @@ int SarReader::writeHeaderSub(ArchiveInfo *ai,
                               int nsa_offset) {
     unsigned int i, j;
 
-    fseek(fp, 0L, SEEK_SET);
+    ons_fseek64(fp, 0L, SEEK_SET);
     for (int k = 0; k < nsa_offset; k++) {
         if (k == 0) {
             fputc(ai->flags, fp);
@@ -298,11 +300,11 @@ size_t SarReader::putFileSub(ArchiveInfo *ai,
     ai->fi_list[no].length = length;
     ai->fi_list[no].original_length = original_length;
 
-    fseek(fp, offset, SEEK_SET);
+    ons_fseek64(fp, offset, SEEK_SET);
     if (modified_flag) {
         if (ai->fi_list[no].compression_type == NBZ_COMPRESSION) {
             writeLongBE(fp, ai->fi_list[no].original_length);
-            fseek(ai->file_handle, ai->fi_list[no].offset + 2, SEEK_SET);
+            ons_fseek64(ai->file_handle, ai->fi_list[no].offset + 2, SEEK_SET);
             if (readChar(ai->file_handle) != 'B' ||
                 readChar(ai->file_handle) !=
                     'Z') {  // in case the original is not compressed in NBZ
@@ -314,7 +316,7 @@ size_t SarReader::putFileSub(ArchiveInfo *ai,
             ai->fi_list[no].compression_type = NO_COMPRESSION;
         }
     } else {
-        fseek(ai->file_handle, ai->fi_list[no].offset, SEEK_SET);
+        ons_fseek64(ai->file_handle, ai->fi_list[no].offset, SEEK_SET);
         fread(buffer, 1, ai->fi_list[no].length, ai->file_handle);
     }
 
@@ -358,7 +360,7 @@ size_t SarReader::addFile(ArchiveInfo *ai,
                           int no,
                           size_t offset,
                           unsigned char *buffer) {
-    fseek(newfp, 0L, SEEK_SET);
+    ons_fseek64(newfp, 0L, SEEK_SET);
     if (fread(buffer, 1, ai->fi_list[no].length, newfp) !=
         ai->fi_list[no].length) {
         if (ferror(newfp))
@@ -373,7 +375,7 @@ size_t SarReader::addFile(ArchiveInfo *ai,
             ai->fi_list[no].original_length = getDecompressedFileLength(
                 ai->fi_list[no].compression_type, newfp, 0);
         }
-        fseek(ai->file_handle, offset, SEEK_SET);
+        ons_fseek64(ai->file_handle, offset, SEEK_SET);
         writeLongBE(ai->file_handle, ai->fi_list[no].original_length);
         if (!is_nbz) {
             // in case the original is not compressed in NBZ
@@ -385,7 +387,7 @@ size_t SarReader::addFile(ArchiveInfo *ai,
     }
 
     size_t len = ai->fi_list[no].length, c;
-    fseek(ai->file_handle, offset, SEEK_SET);
+    ons_fseek64(ai->file_handle, offset, SEEK_SET);
     while (len > 0) {
         if (len > WRITE_LENGTH)
             c = WRITE_LENGTH;
@@ -495,7 +497,7 @@ size_t SarReader::getFileSubByIndex(ArchiveInfo *ai,
         return decodeSPB(ai->file_handle, ai->fi_list[i].offset, buf);
     }
 
-    fseek(ai->file_handle, ai->fi_list[i].offset, SEEK_SET);
+    ons_fseek64(ai->file_handle, ai->fi_list[i].offset, SEEK_SET);
     size_t ret = fread(buf, 1, ai->fi_list[i].length, ai->file_handle);
     if (key_table_flag)
         for (size_t j = 0; j < ret; j++) buf[j] = key_table[buf[j]];

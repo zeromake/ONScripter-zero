@@ -1100,8 +1100,8 @@ int ScriptHandler::readScript(char *path) {
 
     size_t estimated_buffer_length;
     if (encrypt_mode != 0) {
-        fseek(fp, 0, SEEK_END);
-        estimated_buffer_length = ftell(fp) + 1;
+        ons_fseek64(fp, 0, SEEK_END);
+        estimated_buffer_length = ons_ftell64(fp) + 1;
     }
 
     onscripter::Vector<onscripter::String> unencrypt;
@@ -1154,7 +1154,7 @@ int ScriptHandler::readScript(char *path) {
 
     tmp_script_buf = new unsigned char[TMP_SCRIPT_BUF_LEN];
     if (encrypt_mode > 0) {
-        fseek(fp, 0, SEEK_SET);
+        ons_fseek64(fp, 0, SEEK_SET);
         readScriptSub(fp, &p_script_buffer, encrypt_mode);
         fclose(fp);
     } else {
@@ -1174,10 +1174,10 @@ int ScriptHandler::readScript(char *path) {
 unsigned long getfilesize(FILE *file_ptr) {
     unsigned long posCur = 0;
     unsigned long posEnd = 0;
-    posCur = ftell(file_ptr);
-    fseek(file_ptr, 0L, SEEK_END);
-    posEnd = ftell(file_ptr);
-    fseek(file_ptr, posCur, SEEK_SET);
+    posCur = ons_ftell64(file_ptr);
+    ons_fseek64(file_ptr, 0L, SEEK_END);
+    posEnd = ons_ftell64(file_ptr);
+    ons_fseek64(file_ptr, posCur, SEEK_SET);
     return posEnd;
 }
 

@@ -5,6 +5,15 @@
 #include <cstring>
 #include <string>
 
+
+#ifdef _WIN32
+#define ons_fseek64 _fseeki64
+#define ons_ftell64 _ftelli64
+#else
+#define ons_fseek64 fseeko
+#define ons_ftell64 ftello
+#endif
+
 static const size_t BUFF_LENGHT = 4096;
 static const uint8_t DEFAULT_MARK = 0x84;
 static const uint8_t magic[5] = {0x79, 0x57, 0x0d, 0x80, 0x04};
@@ -61,10 +70,10 @@ bool endswith(const std::string &str, const std::string &end) {
 unsigned long getfilesize(std::FILE *file_ptr) {
     unsigned long posCur = 0;
     unsigned long posEnd = 0;
-    posCur = std::ftell(file_ptr);
-    std::fseek(file_ptr, 0L, SEEK_END);
-    posEnd = std::ftell(file_ptr);
-    std::fseek(file_ptr, posCur, SEEK_SET);
+    posCur = ons_ftell64(file_ptr);
+    ons_fseek64(file_ptr, 0L, SEEK_END);
+    posEnd = ons_ftell64(file_ptr);
+    ons_fseek64(file_ptr, posCur, SEEK_SET);
     return posEnd;
 }
 
@@ -150,7 +159,7 @@ int main(int argc, char *argv[]) {
     int32_t key = 0;
     int32_t tmp = 0;
     if (mode == 17) {
-        std::fseek(pFile, 0x91C, 0);
+        ons_fseek64(pFile, 0x91C, 0);
         std::fread(&key, 4, 1, pFile);
     }
     char *buffer = new char[BUFF_LENGHT]{0};

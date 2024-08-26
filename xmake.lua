@@ -329,6 +329,9 @@ target("sardec")
     use_binary()
     add_packages("bzip2")
     add_files(
+        "src/charset/*.c",
+        "src/private/uitls.cpp",
+        "src/config.cpp",
         "src/coding2utf16.cpp",
         "src/tools/sardec.cpp",
         "src/reader/SarReader.cpp",
@@ -374,6 +377,8 @@ target("arcmake")
     use_binary()
     add_packages("bzip2", "jpeg")
     add_files(
+        "src/charset/*.c",
+        "src/private/uitls.cpp",
         "src/config.cpp",
         "src/tools/arcmake.cpp",
         "src/coding2utf16.cpp",
@@ -413,13 +418,13 @@ target("arcmake")
 --         "src/resize_image.cpp",
 --         "src/language/*.cpp"
 --     )
-target("resize")
-    add_packages("sdl2", "sdl2_image")
-    use_binary()
-    add_files("demo/resize.cpp")
-    add_files("src/resize/*.c")
-    add_includedirs("src")
-target_end()
+-- target("resize")
+--     add_packages("sdl2", "sdl2_image")
+--     use_binary()
+--     add_files("demo/resize.cpp")
+--     add_files("src/resize/*.c")
+--     add_includedirs("src")
+-- target_end()
 
 -- add_requires("benchmark")
 
@@ -437,24 +442,24 @@ target_end()
 --     elseif is_arch("arm.*") then
 --         add_vectorexts("neon")
 --     end
-target("gbk2utf8")
-    use_binary()
-    add_syslinks("iconv")
-    add_files(
-        "src/charset/*.c",
-        "demo/gbk2utf8.cpp",
-        "src/coding2utf16.cpp",
-        "src/gbk2utf16.cpp",
-        "src/language/*.cpp"
-    )
-    add_includedirs("src")
-target_end()
+-- target("gbk2utf8")
+--     use_binary()
+--     add_syslinks("iconv")
+--     add_files(
+--         "src/charset/*.c",
+--         "demo/gbk2utf8.cpp",
+--         "src/coding2utf16.cpp",
+--         "src/gbk2utf16.cpp",
+--         "src/language/*.cpp"
+--     )
+--     add_includedirs("src")
+-- target_end()
 
-target("bmp2png")
-    use_binary()
-    add_files("demo/bmp2png.cpp")
-    add_packages("stb")
-target_end()
+-- target("bmp2png")
+--     use_binary()
+--     add_files("demo/bmp2png.cpp")
+--     add_packages("stb")
+-- target_end()
 
 -- target("flecs_demo")
 --     use_binary()

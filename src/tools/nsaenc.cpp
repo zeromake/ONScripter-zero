@@ -67,9 +67,9 @@ int processFile(NsaReader::ArchiveInfo *ai,
         fprintf(stderr, "can't open file %s, skipping\n", fullpath.c_str());
         return -1;
     }
-    std::fseek(fp, 0, SEEK_END);
-    fi->length = std::ftell(fp);
-    std::fseek(fp, 0, SEEK_SET);
+    ons_fseek64(fp, 0, SEEK_END);
+    fi->length = ons_ftell64(fp);
+    ons_fseek64(fp, 0, SEEK_SET);
     magic[0] = 0;
     int len = std::fread(magic, 1, 4, fp);
     magic[len] = 0;
@@ -201,6 +201,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "file iter error.\n");
         exit(-1);
     }
+    std::sort(files.begin(), files.end());
     sAI->num_of_files = 0;
     sAI->base_offset = init_base_offset;
     unsigned long offset = 0;

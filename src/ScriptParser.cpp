@@ -498,12 +498,12 @@ size_t ScriptParser::loadFileIOBuf(const char *filename) {
     if ((fp = fopen(filename, "rb", use_save_dir)) == NULL) return 0;
     defer([&fp]{fclose(fp);});
 
-    fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
+    ons_fseek64(fp, 0, SEEK_END);
+    size_t len = ons_ftell64(fp);
     file_io_buf_ptr = len;
     allocFileIOBuf();
 
-    fseek(fp, 0, SEEK_SET);
+    ons_fseek64(fp, 0, SEEK_SET);
     size_t ret = fread(file_io_buf, 1, len, fp);
 
     return ret;

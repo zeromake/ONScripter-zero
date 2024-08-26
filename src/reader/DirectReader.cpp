@@ -375,8 +375,8 @@ FILE *DirectReader::getFileHandle(const char *file_name,
             compression_type == SPB_COMPRESSION) {
             *length = getDecompressedFileLength(compression_type, fp, 0);
         } else {
-            fseek(fp, 0, SEEK_END);
-            *length = ftell(fp);
+            ons_fseek64(fp, 0, SEEK_END);
+            *length = ons_ftell64(fp);
         }
     }
 
@@ -407,7 +407,7 @@ size_t DirectReader::getFile(const char *file_name,
         else if (compression_type & SPB_COMPRESSION)
             return decodeSPB(fp, 0, buffer);
 
-        fseek(fp, 0, SEEK_SET);
+        ons_fseek64(fp, 0, SEEK_SET);
         total = len;
         while (len > 0) {
             if (len > READ_LENGTH)
@@ -493,7 +493,7 @@ size_t DirectReader::decodeNBZ(FILE *fp, size_t offset, unsigned char *buf) {
     void *unused;
     int err, len, nunused;
 
-    fseek(fp, offset, SEEK_SET);
+    ons_fseek64(fp, offset, SEEK_SET);
     original_length = count = readLongBE(fp);
 
     bfp = BZ2_bzReadOpen(&err, fp, 0, 0, NULL, 0);
@@ -568,7 +568,7 @@ size_t DirectReader::decodeSPB(FILE *fp, size_t offset, unsigned char *buf) {
     getbit_mask = 0;
     getbit_len = getbit_count = 0;
 
-    fseek(fp, offset, SEEK_SET);
+    ons_fseek64(fp, offset, SEEK_SET);
     size_t width = readShortBE(fp);
     size_t height = readShortBE(fp);
 
@@ -660,7 +660,7 @@ size_t DirectReader::decodeLZSS(struct ArchiveInfo *ai,
     getbit_mask = 0;
     getbit_len = getbit_count = 0;
 
-    fseek(ai->file_handle, ai->fi_list[no].offset, SEEK_SET);
+    ons_fseek64(ai->file_handle, ai->fi_list[no].offset, SEEK_SET);
     memset(decomp_buffer, 0, N - F);
     r = N - F;
 
@@ -689,7 +689,7 @@ size_t DirectReader::getDecompressedFileLength(int type,
                                                FILE *fp,
                                                size_t offset) {
     size_t length = 0;
-    fseek(fp, offset, SEEK_SET);
+    ons_fseek64(fp, offset, SEEK_SET);
 
     if (type == NBZ_COMPRESSION) {
         length = readLongBE(fp);
