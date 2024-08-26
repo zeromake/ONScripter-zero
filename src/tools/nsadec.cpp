@@ -47,6 +47,8 @@ inline int mkdir(const char *pathname, int unused) { return _mkdir(pathname); }
 #endif
 
 extern int errno;
+
+
 Coding2UTF16 *coding2utf16 = new GBK2UTF16();
 int main(int argc, char **argv) {
     NsaReader cNR;

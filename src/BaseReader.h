@@ -26,6 +26,14 @@
 #define __BASE_READER_H__
 
 #include <stdio.h>
+#ifdef _WIN32
+#define ons_fseek64 _fseeki64
+#define ons_ftell64 _ftelli64
+#else
+#define ons_fseek64 fseeko
+#define ons_ftell64 ftello
+#endif
+
 // #ifdef ANDROID
 // extern "C" FILE *fopen_ons(const char *str, const char *mode);
 // #define fopen fopen_ons

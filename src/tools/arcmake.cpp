@@ -35,7 +35,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <infra/Config.hpp>
+#include <config.hpp>
 
 #define NSA 1
 
@@ -89,9 +89,9 @@ int processFile(reader::ArchiveInfo *ai,
         return -1;
     }
     defer([&fp]{fclose(fp);});
-    fseek(fp, 0, SEEK_END);
-    fi->length = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    ons_fseek64(fp, 0, SEEK_END);
+    fi->length = ons_ftell64(fp);
+    ons_fseek64(fp, 0, SEEK_SET);
     magic[0] = 0;
     int len = fread(magic, 1, 4, fp);
     magic[len] = 0;
