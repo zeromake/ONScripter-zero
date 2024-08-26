@@ -92,19 +92,18 @@ end
 
 add_requireconfs("sdl2", {system=false, configs=sdlConfigs})
 add_requireconfs("**.sdl2", {system=false, configs=sdlConfigs})
-add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
+-- add_requireconfs("**.harfbuzz", {system=false, configs={freetype=true}})
 add_requireconfs("**.freetype", {system=false})
 add_requires("freetype", {
     system=false,
     configs={
-        harfbuzz=true,
         zlib=true,
         bzip2=true,
         brotli=true,
         png=true
     }
 })
-add_requires("sdl2_ttf", {system=false,configs={harfbuzz=true}})
+add_requires("sdl2_ttf", {system=false})
 local sdl2_image_config = {
     webp=true
 }
