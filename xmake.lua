@@ -34,6 +34,11 @@ option("c++_shared")
     set_description('安卓编译把 libc++_shared.so 拷贝到 app 里')
 option_end()
 
+option("android_16k")
+    set_default(false)
+    set_showmenu(true)
+option_end()
+
 add_defines(
     "ONS_ZERO_VERSION=\""..VERSION.."\"",
     "ONS_JH_VERSION=\"0.8.0\"",
@@ -86,6 +91,12 @@ if is_plat("android") then
 end
 
 local dep_opt = {system=false}
+if is_plat("android") and get_config("android_16k") then
+    dep_opt["configs"] = {}
+    dep_opt["configs"]["cxflags"] = {"-Wl,-z,max-page-size=16384"}
+    sdlConfigs["cxflags"] = {"-Wl,-z,max-page-size=16384"}
+    add_cxflags("-Wl,-z,max-page-size=16384")
+end
 for _, dep_name in ipairs(deps) do
     add_requires(dep_name, dep_opt)
 end
