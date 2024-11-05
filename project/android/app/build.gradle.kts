@@ -3,7 +3,6 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-//    id("org.jetbrains.kotlin.android")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -16,10 +15,10 @@ if (keystorePropertiesFile.exists()) {
 val localPropertiesFile = rootProject.file("local.properties")
 var localVersionName: String? = null
 if (localPropertiesFile.exists()) {
-    var localProperties: Properties = Properties()
-    localProperties!!.load(FileInputStream(localPropertiesFile))
-    localProperties?.let {
-        var versionName: String? = it["versionName"] as String?
+    val localProperties = Properties()
+    localProperties.load(FileInputStream(localPropertiesFile))
+    localProperties.let { it ->
+        val versionName: String? = it["versionName"] as String?
         versionName?.let {
             localVersionName = it
         }
@@ -28,11 +27,10 @@ if (localPropertiesFile.exists()) {
 
 android {
     namespace = "com.zeromake.onscripter"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.zeromake.onscripter"
         minSdk = 16
-        targetSdk = 33
         versionCode = 1
         versionName = "1.0.0"
         localVersionName?.let {
