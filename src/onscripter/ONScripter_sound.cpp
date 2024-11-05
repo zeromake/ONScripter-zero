@@ -199,9 +199,6 @@ int ONScripter::playWave(Mix_Chunk *chunk,
     if (!chunk) return -1;
 
     auto prevChunk = wave_sample[channel];
-    if (prevChunk) {
-        prev_chunk_skip[channel] = true;
-    }
     Mix_Pause(channel);
     if (prevChunk) {
         Mix_FreeChunk(prevChunk);

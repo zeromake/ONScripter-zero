@@ -2,6 +2,7 @@ add_rules("mode.debug", "mode.release")
 
 add_includedirs("src")
 set_languages("c++17")
+set_rundir("$(projectdir)")
 
 local VERSION = os.getenv("VERSION") or "0.9.10-development"
 if VERSION:startswith("v") then
@@ -133,7 +134,6 @@ else
 end
 add_requires("sdl2_image", {system=false, configs=sdl2_image_config})
 
-set_rundir("$(projectdir)")
 
 local function use_binary()
     set_kind("binary")

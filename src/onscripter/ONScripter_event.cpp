@@ -345,20 +345,18 @@ void ONScripter::flushEventSub(SDL_Event &event) {
         playMIDI(midi_play_loop_flag);
     } else if (event.type == ONS_CHUNK_EVENT) {  // for processing btntim2 and
                                                  // automode correctly
-        if (wave_sample[event.user.code]) {
+        int ch = event.user.code;
+        if (wave_sample[ch] != NULL) {
             // 由于用户的手动点击播放音频现在是下一个，但是事件是却是上一个音频发起的
-            auto chunk = wave_sample[event.user.code];
-            auto prevChunkSkip = prev_chunk_skip[event.user.code];
-            if (!prevChunkSkip) {
+            auto chunk = wave_sample[ch];
+            if (Mix_Playing(ch) == 0) {
                 Mix_FreeChunk(chunk);
-                wave_sample[event.user.code] = NULL;
-                if (event.user.code == MIX_LOOPBGM_CHANNEL0 &&
+                wave_sample[ch] = NULL;
+                if (ch == MIX_LOOPBGM_CHANNEL0 &&
                     loop_bgm_name[1] && wave_sample[MIX_LOOPBGM_CHANNEL1])
                     Mix_PlayChannel(MIX_LOOPBGM_CHANNEL1,
                                     wave_sample[MIX_LOOPBGM_CHANNEL1],
                                     -1);
-            } else {
-                prev_chunk_skip[event.user.code] = false;
             }
         }
     }

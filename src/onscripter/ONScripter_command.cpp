@@ -2813,7 +2813,6 @@ int ONScripter::dwavestopCommand() {
         Mix_Pause(ch);
         Mix_FreeChunk(wave_sample[ch]);
         wave_sample[ch] = NULL;
-        prev_chunk_skip[ch] = true;
     }
     return RET_CONTINUE;
 }
