@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-
+#include <map>
 
 #ifdef _WIN32
 #define ons_fseek64 _fseeki64
@@ -14,9 +14,22 @@
 #define ons_ftell64 ftello
 #endif
 
+#define IS_TWO_BYTE(x)                             \
+    (((unsigned char)(x) > (unsigned char)0x80) && \
+     ((unsigned char)(x) != (unsigned char)0xff))
+
 static const size_t BUFF_LENGHT = 4096;
 static const uint8_t DEFAULT_MARK = 0x84;
 static const uint8_t magic[5] = {0x79, 0x57, 0x0d, 0x80, 0x04};
+unsigned short ons_get_unencryption_short(unsigned short t);
+static const std::unordered_map<uint16_t, uint16_t> specialMapping = {
+    //the key is reversed, value is not
+    {0xBA57, 0xA1AA }, //——
+    {0xCC16, 0xA1AA }, //——
+    {0x4811, 0xDDAA }, //蒔 C9 50 莳
+    {0x1C65, 0xBBE6 }, //絵 BD 7D 绘
+    {0x321C, 0xB8A8}, //輔 DD 6F 辅
+};
 
 uint8_t *createKeyTable(const char *key_exe) {
     if (!key_exe) return NULL;
@@ -108,6 +121,7 @@ int main(int argc, char *argv[]) {
     }
     auto key_table = createKeyTable(keyExe);
     std::string input = *(argv + 1);
+    bool mmrank_encrypt = false;
     if (mode == -1) {
         mode = 0;
         if (endsWith(input, "nscr_sec.dat")) {
@@ -118,6 +132,9 @@ int main(int argc, char *argv[]) {
             mode = 1;
         } else if (endsWith(input, ".nt")) {
             mode = 15;
+        } else if (endsWith(input, ".ent")) {
+            mode = 15;
+            mmrank_encrypt = true;
         } else if (endsWith(input, ".nt2")) {
             mode = 16;
         } else if (endsWith(input, ".nt3")) {
@@ -150,10 +167,11 @@ int main(int argc, char *argv[]) {
                 strerror(errno));
         return 1;
     }
-    printf("nsdecode\n  extract: %s\n  output: %s\n  mode: %d\n",
+    printf("nsdecode\n  extract: %s\n  output: %s\n  mode: %d\n  mmrank_encrypt: %d\n",
            input.data(),
            outFile.data(),
-           mode);
+           mode,
+           mmrank_encrypt);
     size_t data_size = getfilesize(pFile) - 0x920;
     unsigned char key_buf[4];
     int32_t key = 0;
@@ -162,7 +180,7 @@ int main(int argc, char *argv[]) {
         ons_fseek64(pFile, 0x91C, 0);
         std::fread(&key, 4, 1, pFile);
     }
-    char *buffer = new char[BUFF_LENGHT]{0};
+    char *buffer = new char[BUFF_LENGHT*2]{0};
     int result = std::fread(buffer, 1, BUFF_LENGHT, pFile);
     int magic_counter = 0;
     int offset = 0;
@@ -188,6 +206,29 @@ int main(int argc, char *argv[]) {
                 ch ^= tmp;
             }
             buffer[i] = ch;
+        }
+        if (mmrank_encrypt) {
+            bool has_prev = false;
+            for (int i = 0; i < result; ++i) {
+                if (IS_TWO_BYTE(buffer[i])) {
+                    if (i+1 >= result) {
+                        int count = std::fread(buffer+result, 1, 1, pFile);
+                        result += count;
+                    }
+                    unsigned short index = (unsigned char)(buffer[i]);
+                    index = index << 8 | (unsigned char)(buffer[i+1]);
+                    unsigned short value = ons_get_unencryption_short(index);
+                    if (value != (unsigned short)-1) {
+                        buffer[i] = (char)(value >> 8);
+                        buffer[i+1] = (char)(value & 0xff);
+                    } else if (specialMapping.find(index) != specialMapping.end()) {
+                        unsigned short value = specialMapping.at(index);
+                        buffer[i] = (char)(value >> 8);
+                        buffer[i+1] = (char)(value & 0xff);
+                    }
+                    i++;
+                }
+            }
         }
         std::fwrite(buffer, 1, result, pOutFile);
         result = std::fread(buffer, 1, BUFF_LENGHT, pFile);

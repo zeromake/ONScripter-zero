@@ -333,7 +333,8 @@ end
 target("nsdec")
     use_binary()
     add_files(
-        "src/tools/nscriptdecode.cpp"
+        "src/tools/nscriptdecode.cpp",
+        "src/tools/mmrank.cpp"
     )
 
 target("sardec")
