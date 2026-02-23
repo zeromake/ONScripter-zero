@@ -137,6 +137,10 @@ public class MainActivity extends Activity implements
     @Override
     public void onDenied(List<String> permissions, boolean never) {
         Toast.makeText(MainActivity.this, "权限申请失败", Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            startActivity(intent);
+        }
     }
 
     public void setting() {

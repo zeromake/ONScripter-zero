@@ -31,6 +31,8 @@ android {
     defaultConfig {
         applicationId = "com.zeromake.onscripter"
         minSdk = 16
+        //noinspection ExpiredTargetSdkVersion
+        targetSdk = 24
         versionCode = 1
         versionName = "1.0.0"
         localVersionName?.let {
@@ -71,10 +73,18 @@ android {
             jniLibs.srcDirs("libs")
         }
     }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
     implementation(project(":XXPermissions"))
+//    implementation("com.github.getActivity:DeviceCompat:2.3")
+//    implementation("com.github.getActivity:XXPermissions:28.0")
+//    implementation("androidx.appcompat:appcompat:1.7.1")
+//    implementation(platform("org.jetbrains.kotlin:kotlin-bom:2.2.0"))
 //    implementation("com.android.support:support-annotations:28.0.0")
 //    implementation("androidx.core:core:1.9.0")
 //    implementation("com.squareup.picasso:picasso:2.8")

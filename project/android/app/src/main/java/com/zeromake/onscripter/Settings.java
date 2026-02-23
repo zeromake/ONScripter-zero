@@ -2,6 +2,7 @@ package com.zeromake.onscripter;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Environment;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -18,13 +19,13 @@ public class Settings {
     private Settings() {
     }
 
-    public static void LoadGlobals(Activity activity,  boolean reload) {
+    public static void LoadGlobals(Activity activity, boolean reload) {
         if (globalsSettingsLoaded && !reload) {
             return;
         }
         SharedPreferences sharedPreferences = activity.getSharedPreferences("pref", 0);
         Globals.CurrentDirectoryPathForLauncher = sharedPreferences.getString("CurrentDirectoryPathForLauncher", Globals.CurrentDirectoryPathForLauncher);
-        setupCurrentDirectory();
+        setupCurrentDirectory(activity);
         globalsSettingsLoaded = true;
     }
 
@@ -37,7 +38,7 @@ public class Settings {
         edit.apply();
     }
 
-    private static void setupCurrentDirectory() {
+    private static void setupCurrentDirectory(Activity activity) {
         if (Globals.CurrentDirectoryPathForLauncher != null) {
             if (Globals.CurrentDirectoryPathForLauncher.isEmpty()) {
                 Globals.CurrentDirectoryPathForLauncher = null;
@@ -53,7 +54,7 @@ public class Settings {
         TreeSet<String> treeSet = new TreeSet<>();
         TreeSet<String> validDirectory = new TreeSet<>();
         validDirectory.add(Environment.getExternalStorageDirectory().getAbsolutePath());
-        for (String inlineSd: Globals.FallbackDirectoryPathArray) {
+        for (String inlineSd : Globals.FallbackDirectoryPathArray) {
             File inlineSdF = new File(inlineSd);
             if (inlineSdF.exists() && inlineSdF.isDirectory() && inlineSdF.canRead()) {
                 validDirectory.add(inlineSd);
@@ -88,6 +89,27 @@ public class Settings {
         if (str8 != null) {
             validEnvDirectory.addAll(Arrays.asList(str8.split(";")));
         }
+        // 通过 getExternalFilesDirs 获取外置sd卡路径
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            File[] list = activity.getExternalFilesDirs(null);
+            for (File f : list) {
+                String str = f.getAbsolutePath();
+                String[] dirs = str.split("/");
+                if (dirs.length < 3) continue;
+                String dirName = dirs[2];
+                String rootName = dirs[1];
+                // 仅支持 storage 下的适配
+                if (!rootName.equals("storage")) continue;
+                if (dirName.equals("emulated") || dirName.equals("self")) {
+                    continue;
+                }
+                String item = "/" + rootName + "/" + dirName;
+                if (!new File(item).exists()) continue;
+                validEnvDirectory.add(item);
+                // 回退也添加上该路径
+                validDirectory.add(item);
+            }
+        }
 
         for (String str : Globals.CURRENT_DIRECTORY_PATH_TEMPLATE_ARRAY) {
             if (!str.contains("${SDCARD}")) {
@@ -97,7 +119,7 @@ public class Settings {
                 for (String inlineSd : validDirectory) {
                     treeSet.add(str.replace("${SDCARD}", inlineSd));
                 }
-                for (String envSd: validEnvDirectory) {
+                for (String envSd : validEnvDirectory) {
                     treeSet.add(str.replace("${SDCARD}", envSd));
                 }
             }
@@ -122,7 +144,7 @@ public class Settings {
 
     public static DisplayImageOptions getDisplayImageOptions() {
         return new DisplayImageOptions.Builder()
-                .cacheInMemory(true)//是否进行内存缓存
-                .build();
+            .cacheInMemory(true)//是否进行内存缓存
+            .build();
     }
 }

@@ -5,7 +5,10 @@ public class Globals {
     public static String CurrentDirectoryPath = null;
     public static String[] CurrentDirectoryPathArray = null;
     public static String[] CurrentDirectoryValidPathArray = null;
-    public static final String[] CURRENT_DIRECTORY_PATH_TEMPLATE_ARRAY = new String[]{"${SDCARD}/mine", "${SDCARD}/ons"};
+    public static final String[] CURRENT_DIRECTORY_PATH_TEMPLATE_ARRAY = new String[]{
+        "${SDCARD}/mine",
+        "${SDCARD}/ons",
+    };
     public static boolean CurrentGameRunning = false;
 
     public static String[] FallbackDirectoryPathArray = new String[]{
@@ -19,6 +22,7 @@ public class Globals {
         "/mnt/usbdisk",
         "/sdcard",
         "/sdcard/sd",
+        "/storage/self/primary",
         "/storage/sdcard",
         "/storage/sdcard0",
         "/storage/sdcard1",
