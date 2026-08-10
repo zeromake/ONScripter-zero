@@ -1,3 +1,5 @@
+
+
 ONScripter
 =============
 
@@ -30,7 +32,7 @@ Fork to [ONScripter-Jh](https://github.com/jh10001/ONScripter-Jh)
 - [x] 修复多层 for 的 break 无法正确的消费 next 命令
 - [ ] 自动播放会导致音频播放不完整。
 
-## feture
+## feature
 
 - [x] 使用 `xmake` 编译，支持 `windows`，`osx`。
 - [x] 内置所有必须依赖，在 3rd 文件夹中，使用 `xmake` 编译。
